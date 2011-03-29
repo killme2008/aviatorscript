@@ -1,0 +1,7 @@
+Aviator is a lighweith,high performance expression evaluator for java.
+Aviator compiles expresson on the fly to byte code and evaluate it by reflection.
+
+homepage: http://code.google.com/p/aviator/
+downloads: http://code.google.com/p/aviator/downloads/list
+author:  dennis (killme2008@gmail.com, boyan@taobao.com)
+
