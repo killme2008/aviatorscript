@@ -1,0 +1,40 @@
+<assembly>
+	<id>bin-with-dependencies</id>
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+	<fileSets>
+		<!--
+			<fileSet> <directory>User_Guide_zh</directory>
+			<outputDirectory>/User_Guide_zh</outputDirectory> </fileSet>
+		-->
+		<fileSet>
+			<directory>${project.build.directory}
+			</directory>
+			<includes>
+				<include>*.jar</include>
+			</includes>
+			<outputDirectory>/</outputDirectory>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<scope>runtime</scope>
+			<excludes>
+				<exclude>aviator*</exclude>
+			</excludes>
+		</dependencySet>
+	</dependencySets>
+	<files>
+		<file>
+			<source>README</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+
+		<file>
+			<source>licenses.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+	</files>
+</assembly>

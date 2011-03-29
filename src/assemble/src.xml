@@ -1,0 +1,26 @@
+<assembly>
+	<id>src</id>
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+	<fileSets>
+		<fileSet>
+			<directory>${project.basedir}/src</directory>
+			<outputDirectory>/src</outputDirectory>
+		</fileSet>
+	</fileSets>
+	<files>
+		<file>
+			<source>README</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>pom.xml</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
+			<source>licenses.txt</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+	</files>
+</assembly>
