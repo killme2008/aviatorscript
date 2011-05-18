@@ -34,76 +34,118 @@ public class ExpressionLexerUnitTest {
     @Test
     public void testSimpleExpression() {
         this.lexer = new ExpressionLexer("1+2");
-        Token<?> token = lexer.scan();
+        Token<?> token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(1, token.getValue(null));
         assertEquals(0, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('+', token.getValue(null));
         assertEquals(1, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(2, token.getValue(null));
         assertEquals(2, token.getStartIndex());
 
-        assertNull(lexer.scan());
+        assertNull(this.lexer.scan());
+    }
+
+
+    @Test
+    public void testParseHexNumber() {
+        this.lexer = new ExpressionLexer("0X0a2B");
+        Token<?> token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(2603, token.getValue(null));
+        assertEquals(0, token.getStartIndex());
+    }
+    
+    @Test
+    public void testParseLikeHexNumber() {
+        this.lexer = new ExpressionLexer("0344");
+        Token<?> token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(344, token.getValue(null));
+        assertEquals(0, token.getStartIndex());
+    }
+
+
+
+    @Test
+    public void testSimpleExpression_WithHexNumber() {
+        this.lexer = new ExpressionLexer("3+0xAF");
+        Token<?> token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(3, token.getValue(null));
+        assertEquals(0, token.getStartIndex());
+        
+        token = this.lexer.scan();
+        assertEquals(TokenType.Char, token.getType());
+        assertEquals('+', token.getValue(null));
+        assertEquals(1, token.getStartIndex());
+
+        token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(175, token.getValue(null));
+        assertEquals(2, token.getStartIndex());
+
+        assertNull(this.lexer.scan());
     }
 
 
     @Test
     public void testSimpleExpression_WithSpace() {
         this.lexer = new ExpressionLexer(" 1 + 2 ");
-        Token<?> token = lexer.scan();
+        Token<?> token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(1, token.getValue(null));
         assertEquals(1, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('+', token.getValue(null));
         assertEquals(3, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(2, token.getValue(null));
         assertEquals(5, token.getStartIndex());
 
-        assertNull(lexer.scan());
+        assertNull(this.lexer.scan());
     }
 
 
     @Test
     public void testExpression_WithDouble() {
         this.lexer = new ExpressionLexer("3.0+4-5.9");
-        Token<?> token = lexer.scan();
+        Token<?> token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(3.0, token.getValue(null));
         assertEquals(0, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('+', token.getValue(null));
         assertEquals(3, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(4, token.getValue(null));
         assertEquals(4, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('-', token.getValue(null));
         assertEquals(5, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(5.9, token.getValue(null));
         assertEquals(6, token.getStartIndex());
 
-        assertNull(lexer.scan());
+        assertNull(this.lexer.scan());
 
     }
 
@@ -111,7 +153,7 @@ public class ExpressionLexerUnitTest {
     @Test(expected = CompileExpressionErrorException.class)
     public void testExpression_WithIllegalDouble() {
         this.lexer = new ExpressionLexer("3.0+4-5.9.2");
-        while (lexer.scan() != null) {
+        while (this.lexer.scan() != null) {
             ;
         }
 
@@ -127,7 +169,7 @@ public class ExpressionLexerUnitTest {
         assertTrue((Boolean) token.getValue(null));
         assertNull(this.lexer.scan());
 
-        lexer = new ExpressionLexer("false");
+        this.lexer = new ExpressionLexer("false");
         token = this.lexer.scan();
 
         assertEquals(TokenType.Variable, token.getType());
@@ -290,67 +332,67 @@ public class ExpressionLexerUnitTest {
     @Test
     public void testExpression_WithString() {
         this.lexer = new ExpressionLexer("'hello world'");
-        Token<?> token = lexer.scan();
+        Token<?> token = this.lexer.scan();
         assertEquals(TokenType.String, token.getType());
         assertEquals("hello world", token.getValue(null));
         assertEquals(0, token.getStartIndex());
-        assertNull(lexer.scan());
+        assertNull(this.lexer.scan());
     }
 
 
     @Test
     public void testExpression_WithNestedString() {
         this.lexer = new ExpressionLexer("'hello \"good\" world'");
-        Token<?> token = lexer.scan();
+        Token<?> token = this.lexer.scan();
         assertEquals(TokenType.String, token.getType());
         assertEquals("hello \"good\" world", token.getValue(null));
         assertEquals(0, token.getStartIndex());
-        assertNull(lexer.scan());
+        assertNull(this.lexer.scan());
     }
 
 
     @Test(expected = CompileExpressionErrorException.class)
     public void testExpression_WithIllegalString() {
         this.lexer = new ExpressionLexer("'hello \" world");
-        lexer.scan();
+        this.lexer.scan();
     }
 
 
     @Test
     public void testExpressionHasPattern() {
         this.lexer = new ExpressionLexer("/a\\.f\\d+/");
-        Token<?> token = lexer.scan();
+        Token<?> token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals("/", token.getLexeme());
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Variable, token.getType());
         assertEquals("a", token.getLexeme());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals("\\", token.getLexeme());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(".", token.getLexeme());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Variable, token.getType());
         assertEquals("f", token.getLexeme());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals("\\", token.getLexeme());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Variable, token.getType());
         assertEquals("d", token.getLexeme());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals("+", token.getLexeme());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals("/", token.getLexeme());
 
@@ -362,94 +404,94 @@ public class ExpressionLexerUnitTest {
     @Test
     public void testExpressionHasPattern2() {
         this.lexer = new ExpressionLexer("/\\//");
-        Token<?> token = lexer.scan();
+        Token<?> token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals("/", token.getLexeme());
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals("\\", token.getLexeme());
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals("/", token.getLexeme());
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals("/", token.getLexeme());
-        token = lexer.scan();
-        assertNull(lexer.scan());
+        token = this.lexer.scan();
+        assertNull(this.lexer.scan());
     }
 
 
     @Test
     public void testExpressionWithParen() {
         this.lexer = new ExpressionLexer("2.0+(2+2)*99");
-        Token<?> token = lexer.scan();
+        Token<?> token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(2.0, token.getValue(null));
         assertEquals(0, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('+', token.getValue(null));
         assertEquals(3, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('(', token.getValue(null));
         assertEquals(4, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(2, token.getValue(null));
         assertEquals(5, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('+', token.getValue(null));
         assertEquals(6, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(2, token.getValue(null));
         assertEquals(7, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals(')', token.getValue(null));
         assertEquals(8, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('*', token.getValue(null));
         assertEquals(9, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Number, token.getType());
         assertEquals(99, token.getValue(null));
         assertEquals(10, token.getStartIndex());
 
-        assertNull(lexer.scan());
+        assertNull(this.lexer.scan());
     }
 
 
     @Test
     public void testNotAnsylyse() {
         this.lexer = new ExpressionLexer("a + b *d+'hello\n'");
-        Token<?> token = lexer.scan();
+        Token<?> token = this.lexer.scan();
         assertEquals(TokenType.Variable, token.getType());
         assertEquals("a", token.getValue(null));
         assertEquals(0, token.getStartIndex());
 
-        token = lexer.scan();
+        token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('+', token.getValue(null));
         assertEquals(2, token.getStartIndex());
 
-        token = lexer.scan(false);
+        token = this.lexer.scan(false);
         assertEquals(TokenType.Char, token.getType());
         assertEquals(' ', token.getValue(null));
         assertEquals(3, token.getStartIndex());
 
-        token = lexer.scan(false);
+        token = this.lexer.scan(false);
         assertEquals(TokenType.Char, token.getType());
         assertEquals('b', token.getValue(null));
         assertEquals(4, token.getStartIndex());
@@ -461,7 +503,7 @@ public class ExpressionLexerUnitTest {
     public void testScanHasLine() {
         this.lexer = new ExpressionLexer("4+5>\n5");
 
-        while (lexer.scan() != null) {
+        while (this.lexer.scan() != null) {
             ;
         }
 

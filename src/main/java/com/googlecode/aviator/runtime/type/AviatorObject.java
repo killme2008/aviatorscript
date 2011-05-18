@@ -37,17 +37,17 @@ public abstract class AviatorObject {
 
 
     public AviatorObject match(AviatorObject other, Map<String, Object> env) {
-        throw new ExpressionRuntimeException(desc(env) + " doesn't support match operation '=~'");
+        throw new ExpressionRuntimeException(this.desc(env) + " doesn't support match operation '=~'");
     }
 
 
     public AviatorObject neg(Map<String, Object> env) {
-        throw new ExpressionRuntimeException(desc(env) + " doesn't support negative operation '-'");
+        throw new ExpressionRuntimeException(this.desc(env) + " doesn't support negative operation '-'");
     }
 
 
     public AviatorObject not(Map<String, Object> env) {
-        throw new ExpressionRuntimeException(desc(env) + " doesn't support not operation '!'");
+        throw new ExpressionRuntimeException(this.desc(env) + " doesn't support not operation '!'");
     }
 
 
@@ -61,6 +61,42 @@ public abstract class AviatorObject {
 
     public AviatorObject add(AviatorObject other, Map<String, Object> env) {
         throw new ExpressionRuntimeException("Could not add " + this.desc(env) + " with " + other.desc(env));
+    }
+
+
+    public AviatorObject bitAnd(AviatorObject other, Map<String, Object> env) {
+        throw new ExpressionRuntimeException("Could not bitAnd " + this.desc(env) + " with " + other.desc(env));
+    }
+
+
+    public AviatorObject bitOr(AviatorObject other, Map<String, Object> env) {
+        throw new ExpressionRuntimeException("Could not bitOr " + this.desc(env) + " with " + other.desc(env));
+    }
+
+
+    public AviatorObject bitXor(AviatorObject other, Map<String, Object> env) {
+        throw new ExpressionRuntimeException("Could not bitXor " + this.desc(env) + " with " + other.desc(env));
+    }
+
+
+    public AviatorObject shiftRight(AviatorObject other, Map<String, Object> env) {
+        throw new ExpressionRuntimeException("Could not shiftRight " + this.desc(env) + " with " + other.desc(env));
+    }
+
+
+    public AviatorObject shiftLeft(AviatorObject other, Map<String, Object> env) {
+        throw new ExpressionRuntimeException("Could not shiftLeft " + this.desc(env) + " with " + other.desc(env));
+    }
+
+
+    public AviatorObject unsignedShiftRight(AviatorObject other, Map<String, Object> env) {
+        throw new ExpressionRuntimeException("Could not unsignedShiftRight " + this.desc(env) + " with "
+                + other.desc(env));
+    }
+
+
+    public AviatorObject bitNot(Map<String, Object> env) {
+        throw new ExpressionRuntimeException(this.desc(env) + " doesn't support not operation '^'");
     }
 
 

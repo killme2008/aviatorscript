@@ -30,6 +30,27 @@ import com.googlecode.aviator.lexer.token.Token;
  */
 public interface CodeGenerator {
 
+    public void onShiftRight(Token<?> lookhead);
+
+
+    public void onShiftLeft(Token<?> lookhead);
+
+
+    public void onUnsignedShiftRight(Token<?> lookhead);
+
+
+    public void onBitOr(Token<?> lookhead);
+
+
+    public void onBitAnd(Token<?> lookhead);
+
+
+    public void onBitXor(Token<?> lookhead);
+
+
+    public void onBitNot(Token<?> lookhead);
+
+
     public void onAdd(Token<?> lookhead);
 
 

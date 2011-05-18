@@ -31,6 +31,20 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * 
  */
 public enum OperatorType {
+    BIT_OR("|", 2),
+
+    BIT_AND("&", 2),
+
+    BIT_XOR("^", 2),
+
+    BIT_NOT("~", 1),
+
+    SHIFT_LEFT("<<", 2),
+
+    SHIFT_RIGHT(">>", 2),
+
+    U_SHIFT_RIGHT(">>>", 2),
+
     NOT("!", 1),
 
     MULT("*", 2),
@@ -133,6 +147,20 @@ public enum OperatorType {
             return ((AviatorJavaType) args[0]).getElement(null, args[1]);
         case TERNARY:
             return args[0].booleanValue(null) ? args[1] : args[2];
+        case BIT_OR:
+            return args[0].bitOr(args[1], null);
+        case BIT_AND:
+            return args[0].bitAnd(args[1], null);
+        case BIT_XOR:
+            return args[0].bitXor(args[1], null);
+        case SHIFT_LEFT:
+            return args[0].shiftLeft(args[1], null);
+        case SHIFT_RIGHT:
+            return args[0].shiftRight(args[1], null);
+        case U_SHIFT_RIGHT:
+            return args[0].unsignedShiftRight(args[1], null);
+        case BIT_NOT:
+            return args[0].bitNot(null);
 
         }
         return null;
@@ -145,6 +173,6 @@ public enum OperatorType {
 
 
     public int getOperandCount() {
-        return operandCount;
+        return this.operandCount;
     }
 }
