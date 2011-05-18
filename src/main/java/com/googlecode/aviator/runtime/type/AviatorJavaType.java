@@ -47,7 +47,7 @@ public class AviatorJavaType extends AviatorObject {
 
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
 
@@ -59,7 +59,7 @@ public class AviatorJavaType extends AviatorObject {
 
     @Override
     public AviatorObject div(AviatorObject other, Map<String, Object> env) {
-        final Object value = getValue(env);
+        final Object value = this.getValue(env);
         switch (other.getAviatorType()) {
         case Number:
             if (value instanceof Number) {
@@ -84,27 +84,195 @@ public class AviatorJavaType extends AviatorObject {
 
 
     @Override
+    public AviatorObject bitAnd(AviatorObject other, Map<String, Object> env) {
+        final Object value = this.getValue(env);
+        switch (other.getAviatorType()) {
+        case Number:
+            if (value instanceof Number) {
+                AviatorNumber aviatorNumber = AviatorNumber.valueOf(value);
+                return aviatorNumber.bitAnd(other, env);
+            }
+            else {
+                return super.bitAnd(other, env);
+            }
+        case JavaType:
+            if (value instanceof Number) {
+                AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(value);
+                return thisAviatorNumber.bitAnd(other, env);
+            }
+            else {
+                return super.bitAnd(other, env);
+            }
+        default:
+            return super.bitAnd(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject bitNot(Map<String, Object> env) {
+        final Object value = this.getValue(env);
+        if (value instanceof Number) {
+            return AviatorNumber.valueOf(value).bitNot(env);
+        }
+        else {
+            return super.bitNot(env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject bitOr(AviatorObject other, Map<String, Object> env) {
+        final Object value = this.getValue(env);
+        switch (other.getAviatorType()) {
+        case Number:
+            if (value instanceof Number) {
+                AviatorNumber aviatorNumber = AviatorNumber.valueOf(value);
+                return aviatorNumber.bitOr(other, env);
+            }
+            else {
+                return super.bitOr(other, env);
+            }
+        case JavaType:
+            if (value instanceof Number) {
+                AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(value);
+                return thisAviatorNumber.bitOr(other, env);
+            }
+            else {
+                return super.bitOr(other, env);
+            }
+        default:
+            return super.bitOr(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject bitXor(AviatorObject other, Map<String, Object> env) {
+        final Object value = this.getValue(env);
+        switch (other.getAviatorType()) {
+        case Number:
+            if (value instanceof Number) {
+                AviatorNumber aviatorNumber = AviatorNumber.valueOf(value);
+                return aviatorNumber.bitXor(other, env);
+            }
+            else {
+                return super.bitXor(other, env);
+            }
+        case JavaType:
+            if (value instanceof Number) {
+                AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(value);
+                return thisAviatorNumber.bitXor(other, env);
+            }
+            else {
+                return super.bitXor(other, env);
+            }
+        default:
+            return super.bitXor(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject shiftLeft(AviatorObject other, Map<String, Object> env) {
+        final Object value = this.getValue(env);
+        switch (other.getAviatorType()) {
+        case Number:
+            if (value instanceof Number) {
+                AviatorNumber aviatorNumber = AviatorNumber.valueOf(value);
+                return aviatorNumber.shiftLeft(other, env);
+            }
+            else {
+                return super.shiftLeft(other, env);
+            }
+        case JavaType:
+            if (value instanceof Number) {
+                AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(value);
+                return thisAviatorNumber.shiftLeft(other, env);
+            }
+            else {
+                return super.shiftLeft(other, env);
+            }
+        default:
+            return super.shiftLeft(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject shiftRight(AviatorObject other, Map<String, Object> env) {
+        final Object value = this.getValue(env);
+        switch (other.getAviatorType()) {
+        case Number:
+            if (value instanceof Number) {
+                AviatorNumber aviatorNumber = AviatorNumber.valueOf(value);
+                return aviatorNumber.shiftRight(other, env);
+            }
+            else {
+                return super.shiftRight(other, env);
+            }
+        case JavaType:
+            if (value instanceof Number) {
+                AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(value);
+                return thisAviatorNumber.shiftRight(other, env);
+            }
+            else {
+                return super.shiftRight(other, env);
+            }
+        default:
+            return super.shiftRight(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject unsignedShiftRight(AviatorObject other, Map<String, Object> env) {
+        final Object value = this.getValue(env);
+        switch (other.getAviatorType()) {
+        case Number:
+            if (value instanceof Number) {
+                AviatorNumber aviatorNumber = AviatorNumber.valueOf(value);
+                return aviatorNumber.unsignedShiftRight(other, env);
+            }
+            else {
+                return super.unsignedShiftRight(other, env);
+            }
+        case JavaType:
+            if (value instanceof Number) {
+                AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(value);
+                return thisAviatorNumber.unsignedShiftRight(other, env);
+            }
+            else {
+                return super.unsignedShiftRight(other, env);
+            }
+        default:
+            return super.unsignedShiftRight(other, env);
+        }
+    }
+
+
+    @Override
     public Object getValue(Map<String, Object> env) {
         try {
             if (env != null) {
-                if (name.contains(".")) {
-                    return PropertyUtils.getProperty(env, name);
+                if (this.name.contains(".")) {
+                    return PropertyUtils.getProperty(env, this.name);
                 }
                 else {
-                    return env.get(name);
+                    return env.get(this.name);
                 }
             }
             return null;
         }
         catch (Throwable t) {
-            throw new ExpressionRuntimeException("Could not find variable " + name, t);
+            throw new ExpressionRuntimeException("Could not find variable " + this.name, t);
         }
     }
 
 
     @Override
     public AviatorObject mod(AviatorObject other, Map<String, Object> env) {
-        final Object value = getValue(env);
+        final Object value = this.getValue(env);
         switch (other.getAviatorType()) {
         case Number:
             if (value instanceof Number) {
@@ -130,7 +298,7 @@ public class AviatorJavaType extends AviatorObject {
 
     @Override
     public AviatorObject sub(AviatorObject other, Map<String, Object> env) {
-        final Object value = getValue(env);
+        final Object value = this.getValue(env);
         switch (other.getAviatorType()) {
         case Number:
             if (value instanceof Number) {
@@ -170,7 +338,7 @@ public class AviatorJavaType extends AviatorObject {
         case JavaType:
 
             AviatorJavaType otherJavaType = (AviatorJavaType) other;
-            final Object thisValue = getValue(env);
+            final Object thisValue = this.getValue(env);
             final Object otherValue = otherJavaType.getValue(env);
             if (thisValue == null) {
                 return AviatorNil.NIL.compare(other, env);
@@ -197,7 +365,7 @@ public class AviatorJavaType extends AviatorObject {
                 }
                 else if (thisValue instanceof Date && otherValue instanceof String) {
                     // This is date,other is string
-                    return tryCompareDate(thisValue, otherValue);
+                    return this.tryCompareDate(thisValue, otherValue);
                 }
                 else {
                     try {
@@ -236,7 +404,7 @@ public class AviatorJavaType extends AviatorObject {
 
     @Override
     public AviatorObject mult(AviatorObject other, Map<String, Object> env) {
-        final Object value = getValue(env);
+        final Object value = this.getValue(env);
         switch (other.getAviatorType()) {
         case Number:
             if (value instanceof Number) {
@@ -262,7 +430,7 @@ public class AviatorJavaType extends AviatorObject {
 
     @Override
     public AviatorObject neg(Map<String, Object> env) {
-        final Object value = getValue(env);
+        final Object value = this.getValue(env);
         if (value instanceof Number) {
             return AviatorNumber.valueOf(value).neg(env);
         }
@@ -274,7 +442,7 @@ public class AviatorJavaType extends AviatorObject {
 
     @Override
     public AviatorObject not(Map<String, Object> env) {
-        final Object value = getValue(env);
+        final Object value = this.getValue(env);
         if (value instanceof Boolean) {
             return AviatorBoolean.valueOf((Boolean) value).not(env);
         }
@@ -293,13 +461,13 @@ public class AviatorJavaType extends AviatorObject {
      */
     @SuppressWarnings("unchecked")
     public AviatorObject getElement(Map<String, Object> env, AviatorObject indexObject) {
-        Object thisValue = getValue(env);
+        Object thisValue = this.getValue(env);
         if (!thisValue.getClass().isArray() && !(thisValue instanceof List)) {
             throw new ExpressionRuntimeException(this.desc(env)
                     + " is not a array or list,could not use [] to get element");
         }
         Object indexValue = indexObject.getValue(env);
-        if (!isInteger(indexValue)) {
+        if (!this.isInteger(indexValue)) {
             throw new IllegalArgumentException("Illegal index " + indexObject.desc(env));
         }
         int index = ((Number) indexValue).intValue();
@@ -313,14 +481,14 @@ public class AviatorJavaType extends AviatorObject {
 
 
     private boolean isInteger(Object value) {
-        return (value instanceof Long && ((Long) value).longValue() < Integer.MAX_VALUE) || value instanceof Integer
+        return value instanceof Long && ((Long) value).longValue() < Integer.MAX_VALUE || value instanceof Integer
                 || value instanceof Short || value instanceof Byte;
     }
 
 
     @Override
     public AviatorObject add(AviatorObject other, Map<String, Object> env) {
-        final Object value = getValue(env);
+        final Object value = this.getValue(env);
         if (value instanceof String) {
             AviatorString aviatorString = new AviatorString((String) value);
             return aviatorString.add(other, env);

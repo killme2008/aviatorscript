@@ -43,21 +43,21 @@ public class BinaryFunction implements AviatorFunction {
 
 
     public String getName() {
-        return opType.getToken();
+        return this.opType.getToken();
     }
 
 
     public OperatorType getOpType() {
-        return opType;
+        return this.opType;
     }
 
 
     public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
         if (args.length != this.opType.getOperandCount()) {
-            throw new IllegalArgumentException(getName() + " has only " + opType.getOperandCount() + " arguments");
+            throw new IllegalArgumentException(this.getName() + " has only " + this.opType.getOperandCount() + " arguments");
         }
         AviatorObject left = args[0];
-        switch (opType) {
+        switch (this.opType) {
         case ADD:
             AviatorObject right = args[1];
             return left.add(right, env);
@@ -78,7 +78,7 @@ public class BinaryFunction implements AviatorFunction {
         case NEG:
             return left.neg(env);
         default:
-            throw new ExpressionRuntimeException(getName() + " is not a binary operation");
+            throw new ExpressionRuntimeException(this.getName() + " is not a binary operation");
 
         }
     }

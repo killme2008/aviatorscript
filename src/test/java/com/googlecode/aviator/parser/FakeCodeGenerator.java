@@ -52,17 +52,17 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
     public void onAdd(Token<?> lookhead) {
-        appendToken("+");
+        this.appendToken("+");
     }
 
 
     private void appendToken(String s) {
-        if (wasFirst) {
-            wasFirst = false;
-            sb.append(s);
+        if (this.wasFirst) {
+            this.wasFirst = false;
+            this.sb.append(s);
         }
         else {
-            sb.append(" ").append(s);
+            this.sb.append(" ").append(s);
         }
     }
 
@@ -73,13 +73,13 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
     public void onAndRight(Token<?> lookhead) {
-        appendToken("&&");
+        this.appendToken("&&");
 
     }
 
 
     public void onJoinRight(Token<?> lookhead) {
-        appendToken("||");
+        this.appendToken("||");
     }
 
 
@@ -94,35 +94,35 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
     public void onTernaryRight(Token<?> lookhead) {
-        appendToken("?:");
+        this.appendToken("?:");
     }
 
 
     public void onConstant(Token<?> lookhead) {
-        appendToken(lookhead.getLexeme());
+        this.appendToken(lookhead.getLexeme());
     }
 
 
     public void onDiv(Token<?> lookhead) {
-        appendToken("/");
+        this.appendToken("/");
 
     }
 
 
     public void onEq(Token<?> lookhead) {
-        appendToken("==");
+        this.appendToken("==");
 
     }
 
 
     public void onGe(Token<?> lookhead) {
-        appendToken(">=");
+        this.appendToken(">=");
 
     }
 
 
     public void onGt(Token<?> lookhead) {
-        appendToken(">");
+        this.appendToken(">");
 
     }
 
@@ -133,60 +133,60 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
     public void onLe(Token<?> lookhead) {
-        appendToken("<=");
+        this.appendToken("<=");
 
     }
 
 
     public void onLt(Token<?> lookhead) {
-        appendToken("<");
+        this.appendToken("<");
 
     }
 
 
     public void onMatch(Token<?> lookhead) {
-        appendToken("=~");
+        this.appendToken("=~");
 
     }
 
 
     public void onMod(Token<?> lookhead) {
-        appendToken("%");
+        this.appendToken("%");
 
     }
 
 
     public void onMult(Token<?> lookhead) {
-        appendToken("*");
+        this.appendToken("*");
 
     }
 
 
     public void onNeg(Token<?> lookhead) {
-        appendToken("-");
+        this.appendToken("-");
 
     }
 
 
     public void onNeq(Token<?> lookhead) {
-        appendToken("!=");
+        this.appendToken("!=");
 
     }
 
 
     public void onNot(Token<?> lookhead) {
-        appendToken("!");
+        this.appendToken("!");
 
     }
 
 
     public void onSub(Token<?> lookhead) {
-        appendToken("-");
+        this.appendToken("-");
     }
 
 
     public void onMethodInvoke(Token<?> lookhead) {
-        appendToken("method<invoked>");
+        this.appendToken("method<invoked>");
 
     }
 
@@ -202,12 +202,54 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
     public void onElementStart(Token<?> lookhead) {
-         appendToken(lookhead.getLexeme());
+        this.appendToken(lookhead.getLexeme());
     }
 
 
     public void onElementEnd(Token<?> lookhead) {
-        appendToken("[]");
+        this.appendToken("[]");
+
+    }
+
+
+    public void onBitAnd(Token<?> lookhead) {
+        this.appendToken("&");
+
+    }
+
+
+    public void onBitNot(Token<?> lookhead) {
+        this.appendToken("~");
+
+    }
+
+
+    public void onBitOr(Token<?> lookhead) {
+        this.appendToken("|");
+
+    }
+
+
+    public void onBitXor(Token<?> lookhead) {
+        this.appendToken("^");
+
+    }
+
+
+    public void onShiftLeft(Token<?> lookhead) {
+        this.appendToken("<<");
+
+    }
+
+
+    public void onShiftRight(Token<?> lookhead) {
+        this.appendToken(">>");
+
+    }
+
+
+    public void onUnsignedShiftRight(Token<?> lookhead) {
+        this.appendToken(">>>");
 
     }
 

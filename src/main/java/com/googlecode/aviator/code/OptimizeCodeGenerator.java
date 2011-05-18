@@ -62,7 +62,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
     public OptimizeCodeGenerator(ClassLoader classLoader, boolean trace) {
-        asmCodeGenerator = new ASMCodeGenerator(AviatorEvaluator.getAviatorClassLoader(), trace);
+        this.asmCodeGenerator = new ASMCodeGenerator(AviatorEvaluator.getAviatorClassLoader(), trace);
         this.trace = trace;
 
     }
@@ -88,10 +88,10 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
     private int execute() {
         int exeCount = 0;
-        final int size = tokenList.size();
-        printTokenList();
+        final int size = this.tokenList.size();
+        this.printTokenList();
         for (int i = 0; i < size; i++) {
-            Token<?> token = tokenList.get(i);
+            Token<?> token = this.tokenList.get(i);
             if (token.getType() == TokenType.Operator) {
                 final OperatorToken op = (OperatorToken) token;
                 final OperatorType operatorType = op.getOperatorType();
@@ -102,10 +102,10 @@ public class OptimizeCodeGenerator implements CodeGenerator {
                     // Could not optimize function and index call
                     break;
                 default:
-                    Map<Integer, DelegateTokenType> index2DelegateType = getIndex2DelegateTypeMap(operatorType);
-                    final int result = executeOperator(i, operatorType, operandCount, index2DelegateType);
+                    Map<Integer, DelegateTokenType> index2DelegateType = this.getIndex2DelegateTypeMap(operatorType);
+                    final int result = this.executeOperator(i, operatorType, operandCount, index2DelegateType);
                     if (result < 0) {
-                        compactTokenList();
+                        this.compactTokenList();
                         return exeCount;
                     }
                     exeCount += result;
@@ -114,7 +114,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
             }
         }
-        compactTokenList();
+        this.compactTokenList();
         return exeCount;
     }
 
@@ -130,14 +130,14 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         // operand start index
         int operandStartIndex = -1;
         for (int j = operatorIndex - 1; j >= 0; j--) {
-            token = tokenList.get(j);
+            token = this.tokenList.get(j);
             if (token == null) {
                 // we must compact token list and retry executing
                 return -1;
             }
             final TokenType tokenType = token.getType();
             // Check if operand is a literal operand
-            if (!isLiteralOperand(token, tokenType, count + 1, index2DelegateType)) {
+            if (!this.isLiteralOperand(token, tokenType, count + 1, index2DelegateType)) {
                 canExecute = false;
                 break;
             }
@@ -155,20 +155,20 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             AviatorObject[] args = new AviatorObject[operandCount];
             int index = 0;
             for (int j = operandStartIndex; j < operatorIndex; j++) {
-                token = tokenList.get(j);
+                token = this.tokenList.get(j);
                 if (token.getType() == TokenType.Delegate) {
-                    tokenList.set(j, null);
+                    this.tokenList.set(j, null);
                     continue;
                 }
-                args[index++] = getAviatorObjectFromToken(token);
+                args[index++] = this.getAviatorObjectFromToken(token);
                 // set argument token to null
-                tokenList.set(j, null);
+                this.tokenList.set(j, null);
 
             }
             // execute it now
             AviatorObject result = operatorType.eval(args);
             // set result as token to tokenList for next executing
-            tokenList.set(operatorIndex, getTokenFromOperand(result));
+            this.tokenList.set(operatorIndex, this.getTokenFromOperand(result));
             return 1;
         }
         return 0;
@@ -293,32 +293,32 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
     public Expression getResult() {
         // execute literal expression
-        while (execute() > 0) {
+        while (this.execute() > 0) {
             ;
         }
 
         // call asm to generate byte codes
-        callASM();
+        this.callASM();
 
         // Last token is a literal token,then return a LiteralExpression
-        if (tokenList.size() <= 1) {
-            if (tokenList.isEmpty()) {
+        if (this.tokenList.size() <= 1) {
+            if (this.tokenList.isEmpty()) {
                 return new LiteralExpression(null);
             }
-            final Token<?> lastToken = tokenList.get(0);
-            if (isLiteralToken(lastToken)) {
-                return new LiteralExpression(getAviatorObjectFromToken(lastToken).getValue(null));
+            final Token<?> lastToken = this.tokenList.get(0);
+            if (this.isLiteralToken(lastToken)) {
+                return new LiteralExpression(this.getAviatorObjectFromToken(lastToken).getValue(null));
             }
         }
 
         // get result from asm
-        return asmCodeGenerator.getResult();
+        return this.asmCodeGenerator.getResult();
     }
 
 
     private void callASM() {
-        for (int i = 0; i < tokenList.size(); i++) {
-            Token<?> token = tokenList.get(i);
+        for (int i = 0; i < this.tokenList.size(); i++) {
+            Token<?> token = this.tokenList.get(i);
             switch (token.getType()) {
             case Operator:
                 OperatorToken op = (OperatorToken) token;
@@ -381,6 +381,27 @@ public class OptimizeCodeGenerator implements CodeGenerator {
                 case TERNARY:
                     this.asmCodeGenerator.onTernaryRight(token);
                     break;
+                case BIT_AND:
+                    this.asmCodeGenerator.onBitAnd(token);
+                    break;
+                case BIT_OR:
+                    this.asmCodeGenerator.onBitOr(token);
+                    break;
+                case BIT_XOR:
+                    this.asmCodeGenerator.onBitXor(token);
+                    break;
+                case BIT_NOT:
+                    this.asmCodeGenerator.onBitNot(token);
+                    break;
+                case SHIFT_LEFT:
+                    this.asmCodeGenerator.onShiftLeft(token);
+                    break;
+                case SHIFT_RIGHT:
+                    this.asmCodeGenerator.onShiftRight(token);
+                    break;
+                case U_SHIFT_RIGHT:
+                    this.asmCodeGenerator.onUnsignedShiftRight(token);
+                    break;
                 }
                 break;
             case Delegate:
@@ -421,8 +442,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
     private void printTokenList() {
-        if (trace) {
-            for (Token<?> t : tokenList) {
+        if (this.trace) {
+            for (Token<?> t : this.tokenList) {
                 System.out.print(t.getLexeme() + " ");
             }
             System.out.println();
@@ -431,166 +452,210 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
     public void onAdd(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.ADD));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.ADD));
 
     }
 
 
     public void onAndLeft(Token<?> lookhead) {
-        tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
             DelegateTokenType.And_Left));
     }
 
 
     public void onAndRight(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.AND));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.AND));
 
     }
 
 
     public void onConstant(Token<?> lookhead) {
-        tokenList.add(lookhead);
+        this.tokenList.add(lookhead);
     }
 
 
     public void onDiv(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.DIV));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.DIV));
 
     }
 
 
     public void onElementEnd(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.INDEX));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.INDEX));
     }
 
 
     public void onElementStart(Token<?> lookhead) {
-        tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
             DelegateTokenType.Element_Start));
 
     }
 
 
     public void onEq(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.EQ));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.EQ));
 
     }
 
 
     public void onGe(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GE));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GE));
 
     }
 
 
     public void onGt(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GT));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GT));
 
     }
 
 
     public void onJoinLeft(Token<?> lookhead) {
-        tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
             DelegateTokenType.Join_Left));
     }
 
 
     public void onJoinRight(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.OR));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.OR));
 
     }
 
 
     public void onLe(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LE));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LE));
 
     }
 
 
     public void onLt(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LT));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LT));
 
     }
 
 
     public void onMatch(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MATCH));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MATCH));
 
     }
 
 
     public void onMethodInvoke(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.FUNC));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.FUNC));
 
     }
 
 
     public void onMethodName(Token<?> lookhead) {
-        tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
             DelegateTokenType.Method_Name));
 
     }
 
 
     public void onMethodParameter(Token<?> lookhead) {
-        tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
             DelegateTokenType.Method_Param));
 
     }
 
 
     public void onMod(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MOD));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MOD));
 
     }
 
 
     public void onMult(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MULT));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MULT));
 
     }
 
 
     public void onNeg(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEG));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEG));
 
     }
 
 
     public void onNeq(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEQ));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEQ));
 
     }
 
 
     public void onNot(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NOT));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NOT));
 
     }
 
 
     public void onSub(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.SUB));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.SUB));
 
     }
 
 
     public void onTernaryBoolean(Token<?> lookhead) {
-        tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
             DelegateTokenType.Ternary_Boolean));
 
     }
 
 
     public void onTernaryLeft(Token<?> lookhead) {
-        tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
             DelegateTokenType.Ternary_Left));
 
     }
 
 
     public void onTernaryRight(Token<?> lookhead) {
-        tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.TERNARY));
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.TERNARY));
+    }
+
+
+    public void onBitAnd(Token<?> lookhead) {
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.BIT_AND));
+
+    }
+
+
+    public void onBitNot(Token<?> lookhead) {
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.BIT_NOT));
+    }
+
+
+    public void onBitOr(Token<?> lookhead) {
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.BIT_OR));
+
+    }
+
+
+    public void onShiftLeft(Token<?> lookhead) {
+        this.tokenList
+            .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.SHIFT_LEFT));
+
+    }
+
+
+    public void onShiftRight(Token<?> lookhead) {
+        this.tokenList
+            .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.SHIFT_RIGHT));
+
+    }
+
+
+    public void onUnsignedShiftRight(Token<?> lookhead) {
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(),
+            OperatorType.U_SHIFT_RIGHT));
+
+    }
+
+
+    public void onBitXor(Token<?> lookhead) {
+        this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.BIT_XOR));
+
     }
 
 }

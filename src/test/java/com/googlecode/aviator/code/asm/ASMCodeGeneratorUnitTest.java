@@ -133,31 +133,67 @@ public class ASMCodeGeneratorUnitTest {
 
     @Test
     public void testOnAdd() throws Exception {
-        doArithOpTest(OperatorType.ADD);
+        this.doArithOpTest(OperatorType.ADD);
     }
 
 
     @Test
     public void testOnSub() throws Exception {
-        doArithOpTest(OperatorType.SUB);
+        this.doArithOpTest(OperatorType.SUB);
     }
 
 
     @Test
     public void testOnMult() throws Exception {
-        doArithOpTest(OperatorType.MULT);
+        this.doArithOpTest(OperatorType.MULT);
     }
 
 
     @Test
     public void testOnDiv() throws Exception {
-        doArithOpTest(OperatorType.DIV);
+        this.doArithOpTest(OperatorType.DIV);
     }
 
 
     @Test
     public void testOnMod() throws Exception {
-        doArithOpTest(OperatorType.MOD);
+        this.doArithOpTest(OperatorType.MOD);
+    }
+
+
+    @Test
+    public void testOnBitAnd() throws Exception {
+        this.doArithOpTest(OperatorType.BIT_AND);
+    }
+
+
+    @Test
+    public void testOnBitOr() throws Exception {
+        this.doArithOpTest(OperatorType.BIT_OR);
+    }
+
+
+    @Test
+    public void testOnBitXor() throws Exception {
+        this.doArithOpTest(OperatorType.BIT_XOR);
+    }
+
+
+    @Test
+    public void testOnShiftLeft() throws Exception {
+        this.doArithOpTest(OperatorType.SHIFT_LEFT);
+    }
+
+
+    @Test
+    public void testOnShiftRight() throws Exception {
+        this.doArithOpTest(OperatorType.SHIFT_RIGHT);
+    }
+
+
+    @Test
+    public void testOnUnsignedShiftRight() throws Exception {
+        this.doArithOpTest(OperatorType.U_SHIFT_RIGHT);
     }
 
 
@@ -166,39 +202,89 @@ public class ASMCodeGeneratorUnitTest {
         NumberToken b = new NumberToken(3.5d, "3.5");
         Map<String, Object> env = new HashMap<String, Object>();
         env.put("c", 9L);
-        codeGenerator.onConstant(new Variable("c", 0));
-        codeGenerator.onConstant(a);
-        codeGenerator.onConstant(b);
+        this.codeGenerator.onConstant(new Variable("c", 0));
+        this.codeGenerator.onConstant(a);
+        this.codeGenerator.onConstant(b);
         switch (operatorType) {
         case ADD:
-            codeGenerator.onAdd(null);
-            codeGenerator.onAdd(null);
-            Object result = eval(env);
+            this.codeGenerator.onAdd(null);
+            this.codeGenerator.onAdd(null);
+            Object result = this.eval(env);
             assertEquals(15.5, (Double) result, 0.001);
             break;
         case SUB:
-            codeGenerator.onSub(null);
-            codeGenerator.onSub(null);
-            result = eval(env);
+            this.codeGenerator.onSub(null);
+            this.codeGenerator.onSub(null);
+            result = this.eval(env);
             assertEquals(9.5, (Double) result, 0.001);
             break;
         case MULT:
-            codeGenerator.onMult(null);
-            codeGenerator.onMult(null);
-            result = eval(env);
+            this.codeGenerator.onMult(null);
+            this.codeGenerator.onMult(null);
+            result = this.eval(env);
             assertEquals(94.5, (Double) result, 0.001);
             break;
         case DIV:
-            codeGenerator.onDiv(null);
-            codeGenerator.onDiv(null);
-            result = eval(env);
+            this.codeGenerator.onDiv(null);
+            this.codeGenerator.onDiv(null);
+            result = this.eval(env);
             assertEquals(10.50, (Double) result, 0.001);
             break;
         case MOD:
-            codeGenerator.onMod(null);
-            codeGenerator.onMod(null);
-            result = eval(env);
+            this.codeGenerator.onMod(null);
+            this.codeGenerator.onMod(null);
+            result = this.eval(env);
             assertEquals(0.0, (Double) result, 0.001);
+            break;
+        }
+    }
+
+
+    public void doBitOpTests(OperatorType operatorType) throws Exception {
+        NumberToken a = new NumberToken(99L, "3");
+        NumberToken b = new NumberToken(2, "2");
+        Map<String, Object> env = new HashMap<String, Object>();
+        env.put("c", 9L);
+        this.codeGenerator.onConstant(new Variable("c", 7));
+        this.codeGenerator.onConstant(a);
+        this.codeGenerator.onConstant(b);
+        switch (operatorType) {
+        case BIT_OR:
+            this.codeGenerator.onBitOr(null);
+            this.codeGenerator.onBitOr(null);
+            Object result = this.eval(env);
+            assertEquals(7 | 3 | 2, result);
+            break;
+        case BIT_AND:
+            this.codeGenerator.onBitAnd(null);
+            this.codeGenerator.onBitAnd(null);
+            result = this.eval(env);
+            assertEquals(7 & 3 & 2, result);
+            break;
+        case BIT_XOR:
+            this.codeGenerator.onBitXor(null);
+            this.codeGenerator.onBitXor(null);
+            result = this.eval(env);
+            assertEquals(7 ^ 3 ^ 2, result);
+            break;
+        case SHIFT_LEFT:
+            this.codeGenerator.onShiftLeft(null);
+            this.codeGenerator.onShiftLeft(null);
+            result = this.eval(env);
+            assertEquals(7 << 3 << 2, result);
+            break;
+        case SHIFT_RIGHT:
+            this.codeGenerator.onShiftRight(null);
+            this.codeGenerator.onShiftRight(null);
+            result = this.eval(env);
+            assertEquals(7 >> 3 >> 2, result);
+            break;
+
+        case U_SHIFT_RIGHT:
+            this.codeGenerator.onUnsignedShiftRight(null);
+            this.codeGenerator.onUnsignedShiftRight(null);
+            result = this.eval(env);
+            assertEquals(7 >>> 3 >>> 2, result);
             break;
         }
     }
@@ -213,117 +299,134 @@ public class ASMCodeGeneratorUnitTest {
 
     @Test
     public void testOnAnd_False() throws Exception {
-        codeGenerator.onConstant(Variable.TRUE);
-        codeGenerator.onAndLeft(null);
-        codeGenerator.onConstant(Variable.FALSE);
-        codeGenerator.onAndRight(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onConstant(Variable.TRUE);
+        this.codeGenerator.onAndLeft(null);
+        this.codeGenerator.onConstant(Variable.FALSE);
+        this.codeGenerator.onAndRight(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals(Boolean.FALSE, result);
     }
 
 
     @Test
     public void testOnAnd_True() throws Exception {
-        codeGenerator.onConstant(Variable.TRUE);
-        codeGenerator.onAndLeft(null);
-        codeGenerator.onConstant(Variable.TRUE);
-        codeGenerator.onAndRight(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onConstant(Variable.TRUE);
+        this.codeGenerator.onAndLeft(null);
+        this.codeGenerator.onConstant(Variable.TRUE);
+        this.codeGenerator.onAndRight(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals(Boolean.TRUE, result);
     }
 
 
     @Test
     public void testOnJoin_True() throws Exception {
-        codeGenerator.onConstant(Variable.TRUE);
-        codeGenerator.onJoinLeft(null);
-        codeGenerator.onConstant(Variable.FALSE);
-        codeGenerator.onJoinRight(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onConstant(Variable.TRUE);
+        this.codeGenerator.onJoinLeft(null);
+        this.codeGenerator.onConstant(Variable.FALSE);
+        this.codeGenerator.onJoinRight(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals(Boolean.TRUE, result);
     }
 
 
     @Test
     public void testOnJoin_False() throws Exception {
-        codeGenerator.onConstant(Variable.FALSE);
-        codeGenerator.onJoinLeft(null);
-        codeGenerator.onConstant(Variable.FALSE);
-        codeGenerator.onJoinRight(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onConstant(Variable.FALSE);
+        this.codeGenerator.onJoinLeft(null);
+        this.codeGenerator.onConstant(Variable.FALSE);
+        this.codeGenerator.onJoinRight(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals(Boolean.FALSE, result);
     }
 
 
     @Test
     public void testOnNot_True() throws Exception {
-        codeGenerator.onConstant(Variable.FALSE);
-        codeGenerator.onNot(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onConstant(Variable.FALSE);
+        this.codeGenerator.onNot(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals(Boolean.TRUE, result);
     }
 
 
     @Test
     public void testOnNot_False() throws Exception {
-        codeGenerator.onConstant(Variable.TRUE);
-        codeGenerator.onNot(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onConstant(Variable.TRUE);
+        this.codeGenerator.onNot(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals(Boolean.FALSE, result);
     }
 
 
     @Test
     public void testOnNeg_Long() throws Exception {
-        codeGenerator.onConstant(new NumberToken(3L, "3"));
-        codeGenerator.onNeg(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onConstant(new NumberToken(3L, "3"));
+        this.codeGenerator.onNeg(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals(-3L, result);
     }
+    
+    @Test
+    public void testOnBitNot1() throws Exception {
+        this.codeGenerator.onConstant(new NumberToken(-3L, "-3"));
+        this.codeGenerator.onBitNot(null);
+        Object result = this.eval(new HashMap<String, Object>());
+        assertEquals(2, result);
+    }
+    
+    @Test
+    public void testOnBitNot2() throws Exception {
+        this.codeGenerator.onConstant(new NumberToken(3L, "3"));
+        this.codeGenerator.onBitNot(null);
+        Object result = this.eval(new HashMap<String, Object>());
+        assertEquals(-4L, result);
+    }
+
 
 
     @Test
     public void testOnNeg_Double() throws Exception {
-        codeGenerator.onConstant(new NumberToken(-3.3d, "-3.3"));
-        codeGenerator.onNeg(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onConstant(new NumberToken(-3.3d, "-3.3"));
+        this.codeGenerator.onNeg(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals(3.3, result);
     }
 
 
     @Test
     public void testOnEq() throws Exception {
-        doLogicOpTest(OperatorType.EQ);
+        this.doLogicOpTest(OperatorType.EQ);
     }
 
 
     @Test
     public void testOnNeq() throws Exception {
-        doLogicOpTest(OperatorType.NEQ);
+        this.doLogicOpTest(OperatorType.NEQ);
     }
 
 
     @Test
     public void testOnGt() throws Exception {
-        doLogicOpTest(OperatorType.GT);
+        this.doLogicOpTest(OperatorType.GT);
     }
 
 
     @Test
     public void testOnGe() throws Exception {
-        doLogicOpTest(OperatorType.GE);
+        this.doLogicOpTest(OperatorType.GE);
     }
 
 
     @Test
     public void testOnLt() throws Exception {
-        doLogicOpTest(OperatorType.LT);
+        this.doLogicOpTest(OperatorType.LT);
     }
 
 
     @Test
     public void testOnLe() throws Exception {
-        doLogicOpTest(OperatorType.LE);
+        this.doLogicOpTest(OperatorType.LE);
     }
 
 
@@ -334,45 +437,45 @@ public class ASMCodeGeneratorUnitTest {
         env.put("c", 9L);
         switch (operatorType) {
         case EQ:
-            codeGenerator.onConstant(a);
-            codeGenerator.onConstant(b);
-            codeGenerator.onEq(null);
-            Object result = eval(env);
+            this.codeGenerator.onConstant(a);
+            this.codeGenerator.onConstant(b);
+            this.codeGenerator.onEq(null);
+            Object result = this.eval(env);
             assertEquals(Boolean.TRUE, result);
             break;
         case NEQ:
-            codeGenerator.onConstant(a);
-            codeGenerator.onConstant(b);
-            codeGenerator.onNeq(null);
-            result = eval(env);
+            this.codeGenerator.onConstant(a);
+            this.codeGenerator.onConstant(b);
+            this.codeGenerator.onNeq(null);
+            result = this.eval(env);
             assertEquals(Boolean.FALSE, result);
             break;
         case GT:
-            codeGenerator.onConstant(a);
-            codeGenerator.onConstant(b);
-            codeGenerator.onGt(null);
-            result = eval(env);
+            this.codeGenerator.onConstant(a);
+            this.codeGenerator.onConstant(b);
+            this.codeGenerator.onGt(null);
+            result = this.eval(env);
             assertEquals(Boolean.FALSE, result);
             break;
         case GE:
-            codeGenerator.onConstant(a);
-            codeGenerator.onConstant(b);
-            codeGenerator.onGe(null);
-            result = eval(env);
+            this.codeGenerator.onConstant(a);
+            this.codeGenerator.onConstant(b);
+            this.codeGenerator.onGe(null);
+            result = this.eval(env);
             assertEquals(Boolean.TRUE, result);
             break;
         case LT:
-            codeGenerator.onConstant(a);
-            codeGenerator.onConstant(new Variable("c", 0));
-            codeGenerator.onLt(null);
-            result = eval(env);
+            this.codeGenerator.onConstant(a);
+            this.codeGenerator.onConstant(new Variable("c", 0));
+            this.codeGenerator.onLt(null);
+            result = this.eval(env);
             assertEquals(Boolean.TRUE, result);
             break;
         case LE:
-            codeGenerator.onConstant(a);
-            codeGenerator.onConstant(b);
-            codeGenerator.onLe(null);
-            result = eval(env);
+            this.codeGenerator.onConstant(a);
+            this.codeGenerator.onConstant(b);
+            this.codeGenerator.onLe(null);
+            result = this.eval(env);
             assertEquals(Boolean.TRUE, result);
             break;
         }
@@ -382,19 +485,19 @@ public class ASMCodeGeneratorUnitTest {
 
     @Test
     public void testOnMatch() throws Exception {
-        codeGenerator.onConstant(new StringToken("killme2008@gmail.com", 0));
-        codeGenerator.onConstant(new PatternToken("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-z]{2,4}$", 1));
-        codeGenerator.onMatch(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onConstant(new StringToken("killme2008@gmail.com", 0));
+        this.codeGenerator.onConstant(new PatternToken("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-z]{2,4}$", 1));
+        this.codeGenerator.onMatch(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals(Boolean.TRUE, result);
     }
 
 
     @Test
     public void testOnMethod_withoutArguments() throws Exception {
-        codeGenerator.onMethodName(new Variable("sysdate", -1));
-        codeGenerator.onMethodInvoke(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onMethodName(new Variable("sysdate", -1));
+        this.codeGenerator.onMethodInvoke(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertNotNull(result);
         assertTrue(result instanceof Date);
     }
@@ -402,15 +505,15 @@ public class ASMCodeGeneratorUnitTest {
 
     @Test
     public void testOnMethod_withTwoArguments() throws Exception {
-        codeGenerator.onMethodName(new Variable("string.substring", -1));
-        codeGenerator.onConstant(new StringToken("hello", -1));
-        codeGenerator.onMethodParameter(null);
-        codeGenerator.onConstant(new NumberToken(2L, "2"));
-        codeGenerator.onMethodParameter(null);
-        codeGenerator.onConstant(new NumberToken(5L, "5"));
-        codeGenerator.onMethodParameter(null);
-        codeGenerator.onMethodInvoke(null);
-        Object result = eval(new HashMap<String, Object>());
+        this.codeGenerator.onMethodName(new Variable("string.substring", -1));
+        this.codeGenerator.onConstant(new StringToken("hello", -1));
+        this.codeGenerator.onMethodParameter(null);
+        this.codeGenerator.onConstant(new NumberToken(2L, "2"));
+        this.codeGenerator.onMethodParameter(null);
+        this.codeGenerator.onConstant(new NumberToken(5L, "5"));
+        this.codeGenerator.onMethodParameter(null);
+        this.codeGenerator.onMethodInvoke(null);
+        Object result = this.eval(new HashMap<String, Object>());
         assertEquals("llo", result);
     }
 }
