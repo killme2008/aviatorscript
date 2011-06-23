@@ -57,10 +57,13 @@ import com.googlecode.aviator.runtime.function.string.StringLengthFunction;
 import com.googlecode.aviator.runtime.function.string.StringStartsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringSubStringFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;
+import com.googlecode.aviator.runtime.function.system.DoubleFunction;
+import com.googlecode.aviator.runtime.function.system.LongFunction;
 import com.googlecode.aviator.runtime.function.system.NowFunction;
 import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
+import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -93,7 +96,7 @@ public final class AviatorEvaluator {
     /**
      * Aviator version
      */
-    public static final String VERSION = "1.0.2";
+    public static final String VERSION = "1.1.1";
 
     /**
      * Generated java class version,default 1.5
@@ -120,6 +123,9 @@ public final class AviatorEvaluator {
         addFunction(new PrintFunction());
         addFunction(new RandomFunction());
         addFunction(new NowFunction());
+        addFunction(new LongFunction());
+        addFunction(new DoubleFunction());
+        addFunction(new StrFunction());
         addFunction(new BinaryFunction(OperatorType.ADD));
         addFunction(new BinaryFunction(OperatorType.SUB));
         addFunction(new BinaryFunction(OperatorType.MULT));
