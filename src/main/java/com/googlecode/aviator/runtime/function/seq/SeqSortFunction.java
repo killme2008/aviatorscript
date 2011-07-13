@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
@@ -35,14 +35,12 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  * @author dennis
  * 
  */
-public class SeqSortFunction implements AviatorFunction {
+public class SeqSortFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 1) {
-            throw new IllegalArgumentException("sort(seq)");
-        }
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
 
-        Object first = args[0].getValue(env);
+        Object first = arg1.getValue(env);
         if (first == null) {
             throw new NullPointerException("null seq");
         }
@@ -62,7 +60,7 @@ public class SeqSortFunction implements AviatorFunction {
             return new AviatorRuntimeJavaType(dup);
         }
         else {
-            throw new IllegalArgumentException(args[0].desc(env) + " is not a seq");
+            throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
         }
     }
 

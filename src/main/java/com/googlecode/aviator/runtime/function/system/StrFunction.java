@@ -2,7 +2,7 @@ package com.googlecode.aviator.runtime.function.system;
 
 import java.util.Map;
 
-import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorString;
 
@@ -15,14 +15,11 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  * @since 1.1.1
  * 
  */
-public class StrFunction implements AviatorFunction {
+public class StrFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length > 1) {
-            throw new IllegalArgumentException("str(value) only supports one arguments");
-        }
-        AviatorObject arg = args[0];
-        final Object value = arg.getValue(env);
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+        final Object value = arg1.getValue(env);
         return new AviatorString(value == null ? "nil" : value.toString());
     }
 

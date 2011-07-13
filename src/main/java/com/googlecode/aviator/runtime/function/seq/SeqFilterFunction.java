@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -37,17 +38,15 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  * @author dennis
  * 
  */
-public class SeqFilterFunction implements AviatorFunction {
+public class SeqFilterFunction extends AbstractFunction {
 
+    @Override
     @SuppressWarnings("unchecked")
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 2) {
-            throw new IllegalArgumentException("filter(seq,pred)");
-        }
-        Object first = args[0].getValue(env);
-        AviatorFunction fun = FunctionUtils.getFunction(1, args, env, 1);
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+        Object first = arg1.getValue(env);
+        AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 1);
         if (fun == null) {
-            throw new ExpressionRuntimeException("There is no function named " + ((AviatorJavaType) args[1]).getName());
+            throw new ExpressionRuntimeException("There is no function named " + ((AviatorJavaType) arg2).getName());
         }
         if (first == null) {
             throw new NullPointerException("null seq");
@@ -81,7 +80,7 @@ public class SeqFilterFunction implements AviatorFunction {
             return new AviatorRuntimeJavaType(result.toArray());
         }
         else {
-            throw new IllegalArgumentException(args[0].desc(env) + " is not a seq");
+            throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
         }
 
     }

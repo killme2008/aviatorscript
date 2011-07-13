@@ -20,23 +20,23 @@ package com.googlecode.aviator.runtime.function.string;
 
 import java.util.Map;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
+
 /**
  * string.length(s) function
+ * 
  * @author dennis
- *
+ * 
  */
-public class StringLengthFunction implements AviatorFunction {
+public class StringLengthFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 1) {
-            throw new IllegalArgumentException("string.length(string)");
-        }
-        String value = FunctionUtils.getStringValue(0, args, env);
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+        String value = FunctionUtils.getStringValue(arg1, env);
         return new AviatorLong(value.length());
     }
 
@@ -44,4 +44,5 @@ public class StringLengthFunction implements AviatorFunction {
     public String getName() {
         return "string.length";
     }
+
 }

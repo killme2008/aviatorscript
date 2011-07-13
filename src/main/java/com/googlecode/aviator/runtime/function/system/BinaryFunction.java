@@ -22,7 +22,7 @@ import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
@@ -32,7 +32,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  * 
  */
-public class BinaryFunction implements AviatorFunction {
+public class BinaryFunction extends AbstractFunction {
     private final OperatorType opType;
 
 
@@ -52,33 +52,46 @@ public class BinaryFunction implements AviatorFunction {
     }
 
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != this.opType.getOperandCount()) {
-            throw new IllegalArgumentException(this.getName() + " has only " + this.opType.getOperandCount() + " arguments");
-        }
-        AviatorObject left = args[0];
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+        AviatorObject left = arg1;
+        AviatorObject right = arg2;
         switch (this.opType) {
         case ADD:
-            AviatorObject right = args[1];
             return left.add(right, env);
         case SUB:
-            right = args[1];
             return left.sub(right, env);
         case MULT:
-            right = args[1];
             return left.mult(right, env);
         case DIV:
-            right = args[1];
             return left.div(right, env);
         case MOD:
-            right = args[1];
             return left.mod(right, env);
+        case NOT:
+        case NEG:
+            return this.throwArity(2);
+        default:
+            throw new ExpressionRuntimeException("Invalid binary operator");
+        }
+    }
+
+
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+        AviatorObject left = arg1;
+        switch (this.opType) {
+        case ADD:
+        case SUB:
+        case MULT:
+        case DIV:
+        case MOD:
+            return this.throwArity(1);
         case NOT:
             return left.not(env);
         case NEG:
             return left.neg(env);
         default:
-            throw new ExpressionRuntimeException(this.getName() + " is not a binary operation");
+            throw new ExpressionRuntimeException("Invalid binary operator");
 
         }
     }

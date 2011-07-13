@@ -2,7 +2,7 @@ package com.googlecode.aviator.runtime.function.system;
 
 import java.util.Map;
 
-import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -15,18 +15,15 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @since 1.1.1
  * 
  */
-public class LongFunction implements AviatorFunction {
+public class LongFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length > 1) {
-            throw new IllegalArgumentException("long(value) only supports one arguments");
-        }
-        AviatorObject arg = args[0];
-        switch (arg.getAviatorType()) {
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+        switch (arg1.getAviatorType()) {
         case Boolean:
-            return new AviatorLong(arg.booleanValue(env) ? 1 : 0);
+            return new AviatorLong(arg1.booleanValue(env) ? 1 : 0);
         case JavaType:
-            Object obj = arg.getValue(env);
+            Object obj = arg1.getValue(env);
             if (obj instanceof Number) {
                 return new AviatorLong(((Number) obj).longValue());
             }
@@ -40,11 +37,11 @@ public class LongFunction implements AviatorFunction {
                 throw new ClassCastException("Could not cast " + obj.getClass().getName() + " to long");
             }
         case String:
-            return new AviatorLong(Long.valueOf((String) arg.getValue(env)));
+            return new AviatorLong(Long.valueOf((String) arg1.getValue(env)));
         case Number:
-            return new AviatorLong(((Number) arg.getValue(env)).longValue());
+            return new AviatorLong(((Number) arg1.getValue(env)).longValue());
         default:
-            throw new ClassCastException("Could not cast " + arg + " to long");
+            throw new ClassCastException("Could not cast " + arg1 + " to long");
         }
     }
 

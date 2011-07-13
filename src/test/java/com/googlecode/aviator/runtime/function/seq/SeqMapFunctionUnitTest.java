@@ -17,15 +17,14 @@ public class SeqMapFunctionUnitTest {
 
     @Test
     public void testMap_Array() {
-        AviatorObject[] args = new AviatorObject[2];
         final String[] strs = new String[10];
         for (int i = 0; i < strs.length; i++) {
             strs[i] = "hello";
         }
-        args[0] = new AviatorRuntimeJavaType(strs);
-        args[1] = new AviatorJavaType("string.length");
         SeqMapFunction fun = new SeqMapFunction();
-        AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, args);
+        AviatorObject result =
+                fun.call(AviatorEvaluator.FUNC_MAP, new AviatorRuntimeJavaType(strs), new AviatorJavaType(
+                    "string.length"));
         Object[] array = (Object[]) result.getValue(null);
         for (Object i : array) {
             assertEquals(5, i);
@@ -35,15 +34,12 @@ public class SeqMapFunctionUnitTest {
 
     @Test
     public void testCount_Collection() {
-        AviatorObject[] args = new AviatorObject[2];
         final List<String> strs = new LinkedList<String>();
         for (int i = 0; i < 10; i++) {
             strs.add("hello");
         }
-        args[0] = new AviatorRuntimeJavaType(strs);
-        args[1] = new AviatorJavaType("string.length");
         SeqMapFunction fun = new SeqMapFunction();
-        AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, args);
+        AviatorObject result = fun.call(null, new AviatorRuntimeJavaType(strs), new AviatorJavaType("string.length"));
         LinkedList array = (LinkedList) result.getValue(null);
         for (Object i : array) {
             assertEquals(5, i);
@@ -53,13 +49,10 @@ public class SeqMapFunctionUnitTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testMap_String() {
-        AviatorObject[] args = new AviatorObject[2];
-
-        args[0] = new AviatorRuntimeJavaType("hello");
-        args[1] = new AviatorJavaType("string.length");
         SeqMapFunction fun = new SeqMapFunction();
 
-        AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, args);
+        AviatorObject result =
+                fun.call(null, new AviatorRuntimeJavaType("hello"), new AviatorJavaType("string.length"));
     }
 
 }

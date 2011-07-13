@@ -21,8 +21,8 @@ package com.googlecode.aviator.runtime.function.seq;
 import java.util.Collection;
 import java.util.Map;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
@@ -33,14 +33,11 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  * @author dennis
  * 
  */
-public class SeqIncludeFunction implements AviatorFunction {
+public class SeqIncludeFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 2) {
-            throw new IllegalArgumentException("include(seq,item)");
-        }
-        Object first = args[0].getValue(env);
-        AviatorObject second = args[1];
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+        Object first = arg1.getValue(env);
         if (first == null) {
             throw new NullPointerException("null seq");
         }
@@ -50,7 +47,7 @@ public class SeqIncludeFunction implements AviatorFunction {
             Collection<?> seq = (Collection<?>) first;
             try {
                 for (Object obj : seq) {
-                    if (new AviatorRuntimeJavaType(obj).compare(second, env) == 0) {
+                    if (new AviatorRuntimeJavaType(obj).compare(arg2, env) == 0) {
                         contains = true;
                         break;
                     }
@@ -64,7 +61,7 @@ public class SeqIncludeFunction implements AviatorFunction {
             Object[] seq = (Object[]) first;
             try {
                 for (Object obj : seq) {
-                    if (new AviatorRuntimeJavaType(obj).compare(second, env) == 0) {
+                    if (new AviatorRuntimeJavaType(obj).compare(arg2, env) == 0) {
                         contains = true;
                         break;
                     }
@@ -75,7 +72,7 @@ public class SeqIncludeFunction implements AviatorFunction {
             }
         }
         else {
-            throw new IllegalArgumentException(args[0].desc(env) + " is not a seq");
+            throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
         }
 
         return AviatorBoolean.valueOf(contains);

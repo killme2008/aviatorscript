@@ -21,8 +21,8 @@ package com.googlecode.aviator.runtime.function.system;
 import java.util.Map;
 import java.util.Random;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
@@ -32,15 +32,14 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  * 
  */
-public class RandomFunction implements AviatorFunction {
+public class RandomFunction extends AbstractFunction {
 
     private static Random random = new Random();
 
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length > 0) {
-            throw new IllegalArgumentException("rand()");
-        }
+    @Override
+    public AviatorObject call(Map<String, Object> env) {
+
         return AviatorDouble.valueOf(random.nextDouble());
     }
 
@@ -48,5 +47,4 @@ public class RandomFunction implements AviatorFunction {
     public String getName() {
         return "rand";
     }
-
 }

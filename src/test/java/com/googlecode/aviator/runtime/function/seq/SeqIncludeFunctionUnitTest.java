@@ -20,22 +20,17 @@ public class SeqIncludeFunctionUnitTest {
         a[0] = 1;
         a[1] = -100;
 
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = new AviatorRuntimeJavaType(a);
-        args[1] = new AviatorRuntimeJavaType(-100);
-
         SeqIncludeFunction fun = new SeqIncludeFunction();
-        AviatorObject result = fun.call(null, args);
+        final AviatorRuntimeJavaType arg1 = new AviatorRuntimeJavaType(a);
+        AviatorObject result = fun.call(null, arg1, new AviatorRuntimeJavaType(-100));
         assertTrue(result.booleanValue(null));
 
         // contains null Object
-        args[1] = AviatorNil.NIL;
-        result = fun.call(null, args);
+        result = fun.call(null, arg1, AviatorNil.NIL);
         assertTrue(result.booleanValue(null));
 
         // not match
-        args[1] = new AviatorRuntimeJavaType(1000);
-        result = fun.call(null, args);
+        result = fun.call(null, arg1, new AviatorRuntimeJavaType(1000));
         assertFalse(result.booleanValue(null));
     }
 
@@ -47,22 +42,20 @@ public class SeqIncludeFunctionUnitTest {
         a.add(-100);
         a.add(null);
 
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = new AviatorRuntimeJavaType(a);
-        args[1] = new AviatorRuntimeJavaType(-100);
+        AviatorObject arg1 = new AviatorRuntimeJavaType(a);
 
         SeqIncludeFunction fun = new SeqIncludeFunction();
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, arg1, new AviatorRuntimeJavaType(-100));
         assertTrue(result.booleanValue(null));
 
         // contains null Object
-        args[1] = new AviatorRuntimeJavaType(null);
-        result = fun.call(null, args);
+        result = fun.call(null, arg1, new AviatorRuntimeJavaType(null));
+        assertTrue(result.booleanValue(null));
+        result = fun.call(null, arg1, AviatorNil.NIL);
         assertTrue(result.booleanValue(null));
 
         // not match
-        args[1] = new AviatorRuntimeJavaType(1000);
-        result = fun.call(null, args);
+        result = fun.call(null, arg1, new AviatorRuntimeJavaType(1000));
         assertFalse(result.booleanValue(null));
 
     }
@@ -70,12 +63,8 @@ public class SeqIncludeFunctionUnitTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInclude_String() {
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = new AviatorRuntimeJavaType("hello");
-        args[1] = new AviatorRuntimeJavaType("h");
-
         SeqIncludeFunction fun = new SeqIncludeFunction();
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"), new AviatorRuntimeJavaType("h"));
     }
 
 }

@@ -20,8 +20,8 @@ package com.googlecode.aviator.runtime.function.string;
 
 import java.util.Map;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorString;
 
@@ -32,27 +32,30 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  * @author dennis
  * 
  */
-public class StringSubStringFunction implements AviatorFunction {
+public class StringSubStringFunction extends AbstractFunction {
     public String getName() {
         return "string.substring";
     }
 
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 2 && args.length != 3) {
-            throw new IllegalArgumentException("string.endsWith(string,beginIndex[,endIndex])");
-        }
-        String target = FunctionUtils.getStringValue(0, args, env);
-        Number beginIndex = FunctionUtils.getNumberValue(1, args, env);
-        switch (args.length) {
-        case 2:
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
 
-            return new AviatorString(target.substring(beginIndex.intValue()));
-        case 3:
-            Number endIndex = FunctionUtils.getNumberValue(2, args, env);
-            return new AviatorString(target.substring(beginIndex.intValue(), endIndex.intValue()));
+        String target = FunctionUtils.getStringValue(arg1, env);
+        Number beginIndex = FunctionUtils.getNumberValue(arg2, env);
+        Number endIndex = FunctionUtils.getNumberValue(arg3, env);
+        return new AviatorString(target.substring(beginIndex.intValue(), endIndex.intValue()));
 
-        }
-        return null;
     }
+
+
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+        String target = FunctionUtils.getStringValue(arg1, env);
+        Number beginIndex = FunctionUtils.getNumberValue(arg2, env);
+
+        return new AviatorString(target.substring(beginIndex.intValue()));
+
+    }
+
 }

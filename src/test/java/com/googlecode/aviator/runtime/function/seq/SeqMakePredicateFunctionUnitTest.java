@@ -20,17 +20,14 @@ public class SeqMakePredicateFunctionUnitTest {
     public void testMakePredicate() {
         SeqMakePredicateFunFunction fun = new SeqMakePredicateFunFunction("eq", OperatorType.EQ);
 
-        AviatorObject[] args = new AviatorObject[1];
-        args[0] = new AviatorRuntimeJavaType("hello");
-
         Map<String, Object> env = new HashMap<String, Object>();
-        AviatorJavaType predicateName = (AviatorJavaType) fun.call(env, args);
+        AviatorJavaType predicateName = (AviatorJavaType) fun.call(env, new AviatorRuntimeJavaType("hello"));
 
         assertNotNull(predicateName);
         assertEquals(1, env.size());
         AviatorFunction predicate = (AviatorFunction) env.get(predicateName.getName());
         assertNotNull(predicate);
-        AviatorObject result = predicate.call(null, args);
+        AviatorObject result = predicate.call(null, new AviatorRuntimeJavaType("hello"));
         // equals self
         assertTrue(result.booleanValue(null));
 
@@ -48,14 +45,12 @@ public class SeqMakePredicateFunctionUnitTest {
         assertEquals(1, env.size());
         AviatorFunction predicate = (AviatorFunction) env.get(predicateName.getName());
         assertNotNull(predicate);
-        AviatorObject[] args = new AviatorObject[1];
-        args[0] = new AviatorRuntimeJavaType("hello");
-        AviatorObject result = predicate.call(null, args);
+
+        AviatorObject result = predicate.call(null, new AviatorRuntimeJavaType("hello"));
         // equals self
         assertTrue(result.booleanValue(null));
 
-        args[0] = new AviatorRuntimeJavaType("he11o");
-        result = predicate.call(null, args);
+        result = predicate.call(null, new AviatorRuntimeJavaType("he11o"));
         // equals self
         assertFalse(result.booleanValue(null));
 

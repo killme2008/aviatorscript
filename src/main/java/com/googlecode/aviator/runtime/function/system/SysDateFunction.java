@@ -21,7 +21,7 @@ package com.googlecode.aviator.runtime.function.system;
 import java.util.Date;
 import java.util.Map;
 
-import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
@@ -32,17 +32,15 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  * @author dennis
  * 
  */
-public class SysDateFunction implements AviatorFunction {
+public class SysDateFunction extends AbstractFunction {
 
     public String getName() {
         return "sysdate";
     }
 
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length > 0) {
-            throw new IllegalArgumentException("sysdate()");
-        }
+    @Override
+    public AviatorObject call(Map<String, Object> env) {
         return new AviatorRuntimeJavaType(new Date());
     }
 

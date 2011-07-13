@@ -53,6 +53,7 @@ import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
 import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
 import com.googlecode.aviator.runtime.function.string.StringEndsWithFunction;
+import com.googlecode.aviator.runtime.function.string.StringIndexOfFunction;
 import com.googlecode.aviator.runtime.function.string.StringLengthFunction;
 import com.googlecode.aviator.runtime.function.string.StringStartsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringSubStringFunction;
@@ -137,6 +138,7 @@ public final class AviatorEvaluator {
         // load string lib
 
         addFunction(new StringContainsFunction());
+        addFunction(new StringIndexOfFunction());
         addFunction(new StringStartsWithFunction());
         addFunction(new StringEndsWithFunction());
         addFunction(new StringSubStringFunction());
@@ -222,7 +224,8 @@ public final class AviatorEvaluator {
      * @param function
      */
     public static void addFunction(AviatorFunction function) {
-        FUNC_MAP.put(function.getName(), function);
+        final String name = function.getName();
+        FUNC_MAP.put(name, function);
     }
 
 
@@ -234,6 +237,32 @@ public final class AviatorEvaluator {
      */
     public static AviatorFunction removeFunction(String name) {
         return (AviatorFunction) FUNC_MAP.remove(name);
+    }
+
+
+    /**
+     * get a aviator function by name,throw exception if null
+     * 
+     * @param name
+     * @return
+     */
+    public static AviatorFunction getFunction(String name) {
+        final AviatorFunction function = (AviatorFunction) FUNC_MAP.get(name);
+        if (function == null) {
+            throw new ExpressionRuntimeException("Could not find function named '" + name + "'");
+        }
+        return function;
+    }
+
+
+    /**
+     * Check if the function is existed in aviator
+     * 
+     * @param name
+     * @return
+     */
+    public static boolean containsFunction(String name) {
+        return FUNC_MAP.containsKey(name);
     }
 
 

@@ -93,6 +93,11 @@ public class ExpressionLexer {
     }
 
 
+    public int getCurrentIndex() {
+        return this.iterator.getIndex();
+    }
+
+
     public Token<?> scan(boolean analyse) {
         // If buffer is not empty,return
         if (!this.tokenBuffer.isEmpty()) {
@@ -105,11 +110,11 @@ public class ExpressionLexer {
             }
 
             if (analyse) {
-                if (this.peek == ' ' || this.peek == '\t') {
+                if (this.peek == ' ' || this.peek == '\t' || this.peek == '\r') {
                     continue;
                 }
                 if (this.peek == '\n') {
-                    throw new CompileExpressionErrorException("Aviator doesn't support newline expression,index="
+                    throw new CompileExpressionErrorException("Aviator doesn't support newline expression at "
                             + this.iterator.getIndex());
                 }
                 else {
@@ -156,7 +161,7 @@ public class ExpressionLexer {
                 sb.append(this.peek);
                 if (this.peek == '.') {
                     if (hasDot) {
-                        throw new CompileExpressionErrorException("Illegal Number, index=" + this.iterator.getIndex());
+                        throw new CompileExpressionErrorException("Illegal Number at " + this.iterator.getIndex());
                     }
                     else {
                         hasDot = true;
@@ -213,7 +218,7 @@ public class ExpressionLexer {
             StringBuilder sb = new StringBuilder();
             while ((this.peek = this.iterator.next()) != left) {
                 if (this.peek == CharacterIterator.DONE) {
-                    throw new CompileExpressionErrorException("Illegal String,start index=" + startIndex);
+                    throw new CompileExpressionErrorException("Illegal String at " + startIndex);
                 }
                 else {
                     sb.append(this.peek);

@@ -22,8 +22,8 @@ import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
@@ -33,7 +33,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  * 
  */
-public class SeqPredicateFunction implements AviatorFunction {
+public class SeqPredicateFunction extends AbstractFunction {
     private final String name;
     private final OperatorType opType;
     private final AviatorObject value;
@@ -47,31 +47,29 @@ public class SeqPredicateFunction implements AviatorFunction {
     }
 
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != opType.getOperandCount() - 1) {
-            throw new IllegalArgumentException(getName() + " only have " + opType.getOperandCount() + " operands");
-        }
-        switch (opType) {
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+        switch (this.opType) {
         case EQ:
-            return args[0].compare(value, env) == 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+            return arg1.compare(this.value, env) == 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
         case NEQ:
-            return args[0].compare(value, env) != 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+            return arg1.compare(this.value, env) != 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
         case LT:
-            return args[0].compare(value, env) < 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+            return arg1.compare(this.value, env) < 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
         case LE:
-            return args[0].compare(value, env) <= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+            return arg1.compare(this.value, env) <= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
         case GE:
-            return args[0].compare(value, env) >= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+            return arg1.compare(this.value, env) >= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
         case GT:
-            return args[0].compare(value, env) > 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+            return arg1.compare(this.value, env) > 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
         default:
-            throw new ExpressionRuntimeException(getName() + " is not a relation operator");
+            throw new ExpressionRuntimeException(this.getName() + " is not a relation operator");
         }
     }
 
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
 }

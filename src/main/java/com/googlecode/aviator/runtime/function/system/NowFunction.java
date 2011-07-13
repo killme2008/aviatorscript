@@ -20,7 +20,7 @@ package com.googlecode.aviator.runtime.function.system;
 
 import java.util.Map;
 
-import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -31,12 +31,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  * 
  */
-public class NowFunction implements AviatorFunction {
+public class NowFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length > 0) {
-            throw new IllegalArgumentException("now()");
-        }
+    @Override
+    public AviatorObject call(Map<String, Object> env) {
         return AviatorLong.valueOf(System.currentTimeMillis());
     }
 
