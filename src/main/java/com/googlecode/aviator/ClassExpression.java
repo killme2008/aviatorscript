@@ -52,7 +52,7 @@ public class ClassExpression implements Expression {
      */
     public Object execute(Map<String, Object> env) {
         if (env == null) {
-            env = new HashMap<String, Object>(AviatorEvaluator.FUNC_MAP);
+            env = new HashMap<String, Object>();
         }
         else {
             env = new HashMap<String, Object>(env);
@@ -62,7 +62,6 @@ public class ClassExpression implements Expression {
                             + " is a function name,please don't use it as variable");
                 }
             }
-            env.putAll(AviatorEvaluator.FUNC_MAP);
         }
         try {
             return this.runMethod.invoke(null, env);
@@ -87,7 +86,7 @@ public class ClassExpression implements Expression {
      * @see com.googlecode.aviator.IExpression#execute()
      */
     public Object execute() {
-        return execute(null);
+        return this.execute(null);
     }
 
 
