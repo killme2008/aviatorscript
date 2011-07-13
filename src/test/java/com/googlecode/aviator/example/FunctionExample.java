@@ -43,7 +43,7 @@ public class FunctionExample {
         System.out.println(AviatorEvaluator.execute("count(list)", env));
         System.out.println(AviatorEvaluator.execute("include(list,100)", env));
         System.out.println(AviatorEvaluator.execute("sort(list)", env));
-        System.out.println(AviatorEvaluator.execute("map(list,print)", env));
+        System.out.println(AviatorEvaluator.execute("map(list,println)", env));
         System.out.println(list);
     }
 
