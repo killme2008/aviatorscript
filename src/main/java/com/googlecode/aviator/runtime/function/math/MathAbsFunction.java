@@ -20,9 +20,9 @@ package com.googlecode.aviator.runtime.function.math;
 
 import java.util.Map;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -33,13 +33,11 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  * 
  */
-public class MathAbsFunction implements AviatorFunction {
+public class MathAbsFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 1) {
-            throw new IllegalArgumentException("math.abs(number)");
-        }
-        Number number = FunctionUtils.getNumberValue(0, args, env);
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+        Number number = FunctionUtils.getNumberValue(arg1, env);
         if (number instanceof Double || number instanceof Float) {
             return new AviatorDouble(Math.abs(number.doubleValue()));
         }

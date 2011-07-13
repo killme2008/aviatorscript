@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
-import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorString;
 
 
@@ -23,14 +22,14 @@ public class PrintlnFunctionUnitTest {
 
     @Before
     public void setUp() {
-        fun = new PrintlnFunction();
-        systemOut = System.out;
+        this.fun = new PrintlnFunction();
+        this.systemOut = System.out;
     }
 
 
     @After
     public void tearDown() {
-        System.setOut(systemOut);
+        System.setOut(this.systemOut);
     }
 
 
@@ -38,7 +37,7 @@ public class PrintlnFunctionUnitTest {
     public void testCall_WithEmpyArguments() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         System.setOut(new PrintStream(out));
-        fun.call(null, new AviatorObject[0]);
+        this.fun.call(null);
         out.flush();
         out.close();
         String lineSeparator = System.getProperty("line.separator");
@@ -51,9 +50,7 @@ public class PrintlnFunctionUnitTest {
     public void testCall_WithOneArgument() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         System.setOut(new PrintStream(out));
-        AviatorObject[] args = new AviatorObject[1];
-        args[0] = new AviatorString("hello");
-        fun.call(null, args);
+        this.fun.call(null, new AviatorString("hello"));
         out.flush();
         out.close();
         String lineSeparator = System.getProperty("line.separator");
@@ -66,13 +63,9 @@ public class PrintlnFunctionUnitTest {
     @Test
     public void testCall_WithTwoArgument() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(out));
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = new AviatorJavaType("out");
-        args[1] = new AviatorString("hello");
         Map<String, Object> env = new HashMap<String, Object>();
         env.put("out", out);
-        fun.call(env, args);
+        this.fun.call(env, new AviatorJavaType("out"), new AviatorString("hello"));
         out.flush();
         out.close();
         String lineSeparator = System.getProperty("line.separator");
@@ -84,7 +77,8 @@ public class PrintlnFunctionUnitTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCall_WithFourArgument() throws Exception {
-        fun.call(null, new AviatorObject[4]);
+        this.fun.call(null, new AviatorJavaType("out"), new AviatorString("1"), new AviatorString("1"),
+            new AviatorString("1"));
 
     }
 

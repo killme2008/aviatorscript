@@ -20,9 +20,9 @@ package com.googlecode.aviator.runtime.function.string;
 
 import java.util.Map;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
@@ -32,20 +32,18 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  * 
  */
-public class StringContainsFunction implements AviatorFunction {
+public class StringContainsFunction extends AbstractFunction {
 
     public String getName() {
         return "string.contains";
     }
 
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 2) {
-            throw new IllegalArgumentException("string.contains(string,string|char)");
-        }
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
 
-        String target = FunctionUtils.getStringValue(0, args, env);
-        String param = FunctionUtils.getStringValue(1, args, env);
+        String target = FunctionUtils.getStringValue(arg1, env);
+        String param = FunctionUtils.getStringValue(arg2, env);
 
         return target.indexOf(param) >= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
     }

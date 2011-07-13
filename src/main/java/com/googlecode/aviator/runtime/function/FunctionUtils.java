@@ -20,6 +20,7 @@ package com.googlecode.aviator.runtime.function;
 
 import java.util.Map;
 
+import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -35,12 +36,12 @@ import com.googlecode.aviator.runtime.type.AviatorType;
  */
 public class FunctionUtils {
 
-    public static final String getStringValue(int index, AviatorObject[] args, Map<String, Object> env) {
+    public static final String getStringValue(AviatorObject arg, Map<String, Object> env) {
         String result = null;
 
-        final Object value = args[index].getValue(env);
-        if (value == null && args[index].getAviatorType() == AviatorType.JavaType) {
-            throw new NullPointerException("There is no string named" + ((AviatorJavaType) args[index]).getName());
+        final Object value = arg.getValue(env);
+        if (value == null && arg.getAviatorType() == AviatorType.JavaType) {
+            throw new NullPointerException("There is no string named" + ((AviatorJavaType) arg).getName());
         }
         if (value instanceof Character) {
             result = value.toString();
@@ -52,8 +53,7 @@ public class FunctionUtils {
     }
 
 
-    public static Object getJavaObject(int index, AviatorObject[] args, Map<String, Object> env) {
-        final AviatorObject arg = args[index];
+    public static Object getJavaObject(AviatorObject arg, Map<String, Object> env) {
         if (!(arg instanceof AviatorJavaType)) {
             throw new ExpressionRuntimeException(arg.desc(env) + " is not a javaType");
         }
@@ -61,8 +61,7 @@ public class FunctionUtils {
     }
 
 
-    public static AviatorFunction getFunction(int index, AviatorObject[] args, Map<String, Object> env, int arity) {
-        final AviatorObject arg = args[index];
+    public static AviatorFunction getFunction(AviatorObject arg, Map<String, Object> env, int arity) {
         if (!(arg instanceof AviatorJavaType)) {
             throw new ExpressionRuntimeException(arg.desc(env) + " is not a function");
         }
@@ -76,12 +75,19 @@ public class FunctionUtils {
                 name = "-neg";
             }
         }
-        return (AviatorFunction) env.get(name);
+        AviatorFunction rt = null;
+        if (env != null) {
+            rt = (AviatorFunction) env.get(name);
+        }
+        if (rt == null) {
+            rt = AviatorEvaluator.getFunction(name);
+        }
+        return rt;
     }
 
 
-    public static final Number getNumberValue(int index, AviatorObject[] args, Map<String, Object> env) {
-        return (Number) args[index].getValue(env);
+    public static final Number getNumberValue(AviatorObject arg1, Map<String, Object> env) {
+        return (Number) arg1.getValue(env);
     }
 
 }

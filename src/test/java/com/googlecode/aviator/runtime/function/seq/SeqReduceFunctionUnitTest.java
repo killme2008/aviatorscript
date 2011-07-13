@@ -22,13 +22,9 @@ public class SeqReduceFunctionUnitTest {
             a[i] = i;
         }
 
-        AviatorObject[] args = new AviatorObject[3];
-        args[0] = new AviatorRuntimeJavaType(a);
-        args[1] = new AviatorJavaType("+");
-        args[2] = new AviatorRuntimeJavaType(0);
-
         SeqReduceFunction fun = new SeqReduceFunction();
-        AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, args);
+        AviatorObject result =
+                fun.call(null, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
         assertNotNull(result);
         assertEquals(45, result.getValue(null));
 
@@ -44,13 +40,9 @@ public class SeqReduceFunctionUnitTest {
             }
         }
 
-        AviatorObject[] args = new AviatorObject[3];
-        args[0] = new AviatorRuntimeJavaType(a);
-        args[1] = new AviatorJavaType("+");
-        args[2] = new AviatorRuntimeJavaType(0);
-
         SeqReduceFunction fun = new SeqReduceFunction();
-        AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, args);
+        AviatorObject result =
+                fun.call(null, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
 
     }
 
@@ -62,13 +54,9 @@ public class SeqReduceFunctionUnitTest {
             a.add(i);
         }
 
-        AviatorObject[] args = new AviatorObject[3];
-        args[0] = new AviatorRuntimeJavaType(a);
-        args[1] = new AviatorJavaType("+");
-        args[2] = new AviatorRuntimeJavaType(0);
-
         SeqReduceFunction fun = new SeqReduceFunction();
-        AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, args);
+        AviatorObject result =
+                fun.call(null, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
         assertNotNull(result);
         assertEquals(45, result.getValue(null));
 
@@ -82,25 +70,18 @@ public class SeqReduceFunctionUnitTest {
             a.add(i);
         }
 
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = new AviatorRuntimeJavaType(a);
-        args[1] = new AviatorJavaType("+");
-
         SeqReduceFunction fun = new SeqReduceFunction();
-        AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, args);
+        AviatorObject result = fun.call(null, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"));
     }
 
 
     @Test(expected = IllegalArgumentException.class)
     public void testReduce_String() {
 
-        AviatorObject[] args = new AviatorObject[3];
-        args[0] = new AviatorRuntimeJavaType("hello");
-        args[1] = new AviatorJavaType("+");
-        args[2] = new AviatorRuntimeJavaType(0);
-
         SeqReduceFunction fun = new SeqReduceFunction();
-        AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, args);
+        AviatorObject result =
+                fun.call(AviatorEvaluator.FUNC_MAP, new AviatorRuntimeJavaType("hello"), new AviatorJavaType("+"),
+                    new AviatorRuntimeJavaType(0));
     }
 
 }

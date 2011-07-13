@@ -3,21 +3,19 @@ package com.googlecode.aviator.example;
 import java.util.Map;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
 public class AddFunctionExample {
-    private static class AddFunction implements AviatorFunction {
+    private static class AddFunction extends AbstractFunction {
 
-        public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-            if (args.length != 2) {
-                throw new IllegalArgumentException("Add only supports two arguments");
-            }
-            Number left = FunctionUtils.getNumberValue(0, args, env);
-            Number right = FunctionUtils.getNumberValue(1, args, env);
+        @Override
+        public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+            Number left = FunctionUtils.getNumberValue(arg1, env);
+            Number right = FunctionUtils.getNumberValue(arg2, env);
             return new AviatorDouble(left.doubleValue() + right.doubleValue());
         }
 

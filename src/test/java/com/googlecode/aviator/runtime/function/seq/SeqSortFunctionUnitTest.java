@@ -24,11 +24,8 @@ public class SeqSortFunctionUnitTest {
             a[index++] = i;
         }
 
-        AviatorObject[] args = new AviatorObject[1];
-        args[0] = new AviatorRuntimeJavaType(a);
-
         SeqSortFunction fun = new SeqSortFunction();
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, new AviatorRuntimeJavaType(a));
         index = 0;
         Integer[] dup = (Integer[]) result.getValue(null);
         assertFalse(Arrays.equals(a, dup));
@@ -46,11 +43,8 @@ public class SeqSortFunctionUnitTest {
             a.add(i);
         }
 
-        AviatorObject[] args = new AviatorObject[1];
-        args[0] = new AviatorRuntimeJavaType(a);
-
         SeqSortFunction fun = new SeqSortFunction();
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, new AviatorRuntimeJavaType(a));
         index = 0;
         List<Integer> dup = (List<Integer>) result.getValue(null);
         assertFalse(a.equals(dup));
@@ -70,10 +64,7 @@ public class SeqSortFunctionUnitTest {
             a.add(i);
         }
 
-        AviatorObject[] args = new AviatorObject[1];
-        args[0] = new AviatorRuntimeJavaType(a);
-
         SeqSortFunction fun = new SeqSortFunction();
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, new AviatorRuntimeJavaType(a));
     }
 }

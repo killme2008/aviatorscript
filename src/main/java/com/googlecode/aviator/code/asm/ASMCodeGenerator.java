@@ -620,42 +620,54 @@ public class ASMCodeGenerator implements CodeGenerator {
     }
 
 
+    private String getInvokeMethodDesc(int paramCount) {
+        StringBuilder sb = new StringBuilder("(Ljava/util/Map;");
+        for (int i = 0; i < paramCount; i++) {
+            sb.append("Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+        }
+        sb.append(")Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+        return sb.toString();
+    }
+
+
     public void onMethodInvoke(Token<?> lookhead) {
         final MethodMetaData methodMetaData = this.methodMetaDataStack.pop();
-        this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/method/AviatorMethod", "invoke",
-            "(Ljava/util/Map;Ljava/util/List;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+        final int parameterCount = methodMetaData.parameterCount;
+        this.mv.visitMethodInsn(INVOKEINTERFACE, "com/googlecode/aviator/runtime/type/AviatorFunction", "call", this
+            .getInvokeMethodDesc(parameterCount));
+
         this.popOperand(); // method object
         this.popOperand(); // env map
-        this.popOperand(); // argument list
         // pop operands
-        for (int i = 0; i < methodMetaData.parameterCount; i++) {
+        for (int i = 0; i < parameterCount; i++) {
             this.popOperand();
         }
+        // push result
         this.pushOperand(0);
     }
 
 
     public void onMethodParameter(Token<?> lookhead) {
         this.methodMetaDataStack.peek().parameterCount++;
-        // add parameter to list
-        this.mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "add", "(Ljava/lang/Object;)Z");
-        // pop boolean
-        this.mv.visitInsn(POP);
-        this.mv.visitVarInsn(ALOAD, this.methodMetaDataStack.peek().parameterListIndex);
+        // // add parameter to list
+        // this.mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "add",
+        // "(Ljava/lang/Object;)Z");
+        // // pop boolean
+        // this.mv.visitInsn(POP);
+        // this.mv.visitVarInsn(ALOAD,
+        // this.methodMetaDataStack.peek().parameterListIndex);
     }
 
     private static class MethodMetaData {
-        String methodName;
+        final String methodName;
 
         int parameterCount;
-        int parameterListIndex;
 
 
-        public MethodMetaData(String methodName, int parameterListIndex) {
+        public MethodMetaData(String methodName) {
             super();
             this.methodName = methodName;
             this.parameterCount = 0;
-            this.parameterListIndex = parameterListIndex;
         }
 
     }
@@ -691,31 +703,31 @@ public class ASMCodeGenerator implements CodeGenerator {
 
     public void onMethodName(Token<?> lookhead) {
         String methodName = lookhead.getLexeme();
-        this.createAviatorMethodObject(methodName);
+        this.createAviatorFunctionObject(methodName);
         this.loadEnv();
-        final int parameterLocalIndex = this.createArugmentList();
-        this.methodMetaDataStack.push(new MethodMetaData(methodName, parameterLocalIndex));
+        // final int parameterLocalIndex = this.createArugmentList();
+        this.methodMetaDataStack.push(new MethodMetaData(methodName));
 
         // pushOperand(0);
 
     }
 
 
-    private int createArugmentList() {
-        // create argument list
-        this.pushOperand(0);
-        this.pushOperand(0);
-        this.mv.visitTypeInsn(NEW, "java/util/ArrayList");
-        this.mv.visitInsn(DUP);
-        this.popOperand();
-        this.mv.visitMethodInsn(INVOKESPECIAL, "java/util/ArrayList", "<init>", "()V");
-        // store to local variable
-        final int parameterLocalIndex = this.getLocalIndex();
-        this.mv.visitVarInsn(ASTORE, parameterLocalIndex);
-        this.mv.visitVarInsn(ALOAD, parameterLocalIndex);
-        return parameterLocalIndex;
-    }
-
+    // private int createArugmentList() {
+    // // create argument list
+    // this.pushOperand(0);
+    // this.pushOperand(0);
+    // this.mv.visitTypeInsn(NEW, "java/util/ArrayList");
+    // this.mv.visitInsn(DUP);
+    // this.popOperand();
+    // this.mv.visitMethodInsn(INVOKESPECIAL, "java/util/ArrayList", "<init>",
+    // "()V");
+    // // store to local variable
+    // final int parameterLocalIndex = this.getLocalIndex();
+    // this.mv.visitVarInsn(ASTORE, parameterLocalIndex);
+    // this.mv.visitVarInsn(ALOAD, parameterLocalIndex);
+    // return parameterLocalIndex;
+    // }
 
     private void loadEnv() {
         // load env
@@ -724,17 +736,13 @@ public class ASMCodeGenerator implements CodeGenerator {
     }
 
 
-    private void createAviatorMethodObject(String methodName) {
+    private void createAviatorFunctionObject(String methodName) {
         this.pushOperand(0);
-        this.pushOperand(0);
-        this.pushOperand(0);
-        this.mv.visitTypeInsn(NEW, "com/googlecode/aviator/runtime/method/AviatorMethod");
-        this.mv.visitInsn(DUP);
         this.mv.visitLdcInsn(methodName);
+        this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/AviatorEvaluator", "getFunction",
+            "(Ljava/lang/String;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
         this.popOperand();
-        this.popOperand();
-        this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/runtime/method/AviatorMethod", "<init>",
-            "(Ljava/lang/String;)V");
+        this.pushOperand(0);
     }
 
 

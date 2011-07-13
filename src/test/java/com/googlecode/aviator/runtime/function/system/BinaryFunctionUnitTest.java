@@ -16,10 +16,7 @@ public class BinaryFunctionUnitTest {
     @Test
     public void testAddFunction() {
         BinaryFunction fun = new BinaryFunction(OperatorType.ADD);
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = AviatorLong.valueOf(10L);
-        args[1] = AviatorLong.valueOf(11L);
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, AviatorLong.valueOf(10L), AviatorLong.valueOf(11L));
         assertEquals(21L, (Long) result.getValue(null), 0L);
 
     }
@@ -28,10 +25,7 @@ public class BinaryFunctionUnitTest {
     @Test
     public void testSubFunction() {
         BinaryFunction fun = new BinaryFunction(OperatorType.SUB);
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = AviatorLong.valueOf(10L);
-        args[1] = AviatorLong.valueOf(11L);
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, AviatorLong.valueOf(10L), AviatorLong.valueOf(11L));
         assertEquals(-1L, (Long) result.getValue(null), 0L);
 
     }
@@ -40,10 +34,7 @@ public class BinaryFunctionUnitTest {
     @Test
     public void testMultFunction() {
         BinaryFunction fun = new BinaryFunction(OperatorType.MULT);
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = AviatorLong.valueOf(10L);
-        args[1] = AviatorLong.valueOf(11L);
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, AviatorLong.valueOf(10L), AviatorLong.valueOf(11L));
         assertEquals(110L, (Long) result.getValue(null), 0L);
 
     }
@@ -52,10 +43,7 @@ public class BinaryFunctionUnitTest {
     @Test
     public void testDivFunction() {
         BinaryFunction fun = new BinaryFunction(OperatorType.DIV);
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = AviatorLong.valueOf(10L);
-        args[1] = AviatorLong.valueOf(11L);
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, AviatorLong.valueOf(10L), AviatorLong.valueOf(11L));
         assertEquals(0, (Long) result.getValue(null), 0.00);
 
     }
@@ -64,10 +52,7 @@ public class BinaryFunctionUnitTest {
     @Test
     public void testModFunction() {
         BinaryFunction fun = new BinaryFunction(OperatorType.MOD);
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = AviatorLong.valueOf(10L);
-        args[1] = AviatorLong.valueOf(11L);
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, AviatorLong.valueOf(10L), AviatorLong.valueOf(11L));
         assertEquals(10L, (Long) result.getValue(null), 0L);
 
     }
@@ -76,9 +61,7 @@ public class BinaryFunctionUnitTest {
     @Test
     public void testNegFunction() {
         BinaryFunction fun = new BinaryFunction(OperatorType.NEG);
-        AviatorObject[] args = new AviatorObject[1];
-        args[0] = AviatorLong.valueOf(10L);
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, AviatorLong.valueOf(10L));
         assertEquals(-10L, (Long) result.getValue(null), 0L);
 
     }
@@ -87,9 +70,7 @@ public class BinaryFunctionUnitTest {
     @Test
     public void testNotFunction() {
         BinaryFunction fun = new BinaryFunction(OperatorType.NOT);
-        AviatorObject[] args = new AviatorObject[1];
-        args[0] = AviatorBoolean.FALSE;
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, AviatorBoolean.FALSE);
         assertTrue((Boolean) result.getValue(null));
 
     }
@@ -98,9 +79,6 @@ public class BinaryFunctionUnitTest {
     @Test(expected = ExpressionRuntimeException.class)
     public void testIllegalFunction() {
         BinaryFunction fun = new BinaryFunction(OperatorType.EQ);
-        AviatorObject[] args = new AviatorObject[2];
-        args[0] = AviatorLong.valueOf(10L);
-        args[1] = AviatorLong.valueOf(11L);
-        AviatorObject result = fun.call(null, args);
+        AviatorObject result = fun.call(null, AviatorLong.valueOf(10L), AviatorLong.valueOf(11L));
     }
 }

@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -36,21 +37,19 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  * @author dennis
  * 
  */
-public class SeqReduceFunction implements AviatorFunction {
+public class SeqReduceFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 3) {
-            throw new IllegalArgumentException("reduce(seq,fun,init)");
-        }
-        Object first = args[0].getValue(env);
-        AviatorFunction fun = FunctionUtils.getFunction(1, args, env, 2);
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
+        Object first = arg1.getValue(env);
+        AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 2);
         if (fun == null) {
-            throw new ExpressionRuntimeException("There is no function named " + ((AviatorJavaType) args[1]).getName());
+            throw new ExpressionRuntimeException("There is no function named " + ((AviatorJavaType) arg2).getName());
         }
         if (first == null) {
             throw new NullPointerException("null seq");
         }
-        AviatorObject result = args[2];
+        AviatorObject result = arg3;
         Class<?> clazz = first.getClass();
 
         if (Collection.class.isAssignableFrom(clazz)) {
@@ -65,7 +64,7 @@ public class SeqReduceFunction implements AviatorFunction {
             }
         }
         else {
-            throw new IllegalArgumentException(args[0].desc(env) + " is not a seq");
+            throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
         }
 
         return result;

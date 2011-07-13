@@ -58,7 +58,9 @@ public class ExpressionParser {
     private final CodeGenerator codeGenerator;
 
     // Paren depth
-    private int depth = 0;
+    private int parenDepth = 0;
+
+    private int bracketDepth = 0;
 
     private boolean inPattern = false;
 
@@ -90,12 +92,12 @@ public class ExpressionParser {
                 this.codeGenerator.onTernaryRight(this.lookhead);
             }
             else {
-                this.reportSyntaxError();
+                this.reportSyntaxError("expect ':'");
             }
         }
         else {
             if (this.expectLexeme(")")) {
-                if (this.depth > 0) {
+                if (this.parenDepth > 0) {
                     return;
                 }
                 else {
@@ -103,7 +105,7 @@ public class ExpressionParser {
                 }
             }
             if (this.expectLexeme("]")) {
-                if (this.depth > 0) {
+                if (this.bracketDepth > 0) {
                     return;
                 }
                 else {
@@ -111,7 +113,7 @@ public class ExpressionParser {
                 }
             }
             if (!this.expectLexeme("(") && !this.expectLexeme("[")) {
-                this.reportSyntaxError();
+                this.reportSyntaxError("illegal expression");
             }
 
         }
@@ -130,7 +132,7 @@ public class ExpressionParser {
                     this.codeGenerator.onJoinRight(this.lookhead);
                 }
                 else {
-                    this.reportSyntaxError();
+                    this.reportSyntaxError("expect '|'");
                 }
             }
             else {
@@ -230,7 +232,7 @@ public class ExpressionParser {
                     this.codeGenerator.onAndRight(this.lookhead);
                 }
                 else {
-                    this.reportSyntaxError();
+                    this.reportSyntaxError("expect '&'");
                 }
             }
             else {
@@ -258,7 +260,7 @@ public class ExpressionParser {
                     this.codeGenerator.onMatch(this.lookhead);
                 }
                 else {
-                    this.reportSyntaxError();
+                    this.reportSyntaxError("Aviator doesn't support assignment");
                 }
             }
             else if (this.expectLexeme("!")) {
@@ -269,7 +271,7 @@ public class ExpressionParser {
                     this.codeGenerator.onNeq(this.lookhead);
                 }
                 else {
-                    this.reportSyntaxError();
+                    this.reportSyntaxError("expect '='");
                 }
             }
             else {
@@ -459,7 +461,7 @@ public class ExpressionParser {
             if (lexeme.equals("-")) {
                 lexeme = "-sub";
             }
-            return AviatorEvaluator.FUNC_MAP.containsKey(lexeme);
+            return AviatorEvaluator.containsFunction(lexeme);
         }
         else {
             this.back();
@@ -470,10 +472,10 @@ public class ExpressionParser {
 
     public void factor() {
         if (this.lookhead == null) {
-            this.reportSyntaxError();
+            this.reportSyntaxError("invalid value");
         }
         if (this.expectLexeme("(")) {
-            this.depth++;
+            this.parenDepth++;
             this.move(true);
             this.ternary();
             if (!this.expectLexeme(")")) {
@@ -482,7 +484,7 @@ public class ExpressionParser {
             else {
                 this.move(true);
             }
-            this.depth--;
+            this.parenDepth--;
         }
         else if (this.lookhead.getType() == TokenType.Number || this.lookhead.getType() == TokenType.String
                 || this.lookhead.getType() == TokenType.Variable || this.lookhead == Variable.TRUE
@@ -502,7 +504,7 @@ public class ExpressionParser {
                 this.method();
             }
             else if (this.prevToken.getType() == TokenType.Variable && this.expectLexeme("[")) {
-                this.depth++;
+                this.bracketDepth++;
                 if (RESERVED_WORDS.contains(this.prevToken.getLexeme())) {
                     throw new ExpressionSyntaxErrorException(this.prevToken.getLexeme() + " could not use [] operator");
                 }
@@ -514,7 +516,7 @@ public class ExpressionParser {
                     this.reportSyntaxError("insert ']' to complete Expression");
                 }
                 else {
-                    this.depth--;
+                    this.bracketDepth--;
                     this.move(true);
                     this.codeGenerator.onElementEnd(this.lookhead);
                 }
@@ -527,7 +529,7 @@ public class ExpressionParser {
             this.pattern();
         }
         else {
-            this.reportSyntaxError();
+            this.reportSyntaxError("invalid value");
         }
 
     }
@@ -544,7 +546,7 @@ public class ExpressionParser {
 
 
     private void method() {
-        this.depth++;
+        this.parenDepth++;
         this.codeGenerator.onMethodName(this.prevToken);
         this.move(true);
         if (!this.expectLexeme(")")) {
@@ -557,10 +559,10 @@ public class ExpressionParser {
             }
         }
         if (!this.expectLexeme(")")) {
-            this.reportSyntaxError("insert ')' to complete Expression");
+            this.reportSyntaxError("insert ')' to complete expression");
         }
         else {
-            this.depth--;
+            this.parenDepth--;
             this.move(true);
             this.codeGenerator.onMethodInvoke(this.lookhead);
         }
@@ -619,21 +621,15 @@ public class ExpressionParser {
             break;
         }
         if (this.inPattern) {
-            this.reportSyntaxError();
+            this.reportSyntaxError("invalid regular pattern");
         }
         this.codeGenerator.onConstant(new PatternToken(sb.toString(), startIndex));
         this.move(true);
     }
 
 
-    private void reportSyntaxError() {
-        throw new ExpressionSyntaxErrorException("Syntax error:prev=" + (this.prevToken != null ? this.prevToken : "")
-                + ",current=" + this.lookhead);
-    }
-
-
     private void reportSyntaxError(String message) {
-        throw new ExpressionSyntaxErrorException("Syntax error:" + message);
+        throw new ExpressionSyntaxErrorException("Syntax error:" + message + " at " + this.lexer.getCurrentIndex());
     }
 
 
@@ -643,7 +639,7 @@ public class ExpressionParser {
             this.lookhead = this.lexer.scan(analyse);
         }
         else {
-            this.reportSyntaxError();
+            this.reportSyntaxError("Illegal expression");
         }
 
     }
@@ -657,8 +653,11 @@ public class ExpressionParser {
 
     public Expression parse() {
         this.ternary();
-        if (this.depth > 0) {
+        if (this.parenDepth > 0) {
             this.reportSyntaxError("insert ')' to complete Expression");
+        }
+        if (this.bracketDepth > 0) {
+            this.reportSyntaxError("insert ']' to complete Expression");
         }
         return this.codeGenerator.getResult();
     }

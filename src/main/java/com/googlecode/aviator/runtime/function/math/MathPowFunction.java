@@ -20,9 +20,9 @@ package com.googlecode.aviator.runtime.function.math;
 
 import java.util.Map;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
@@ -32,14 +32,12 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  * 
  */
-public class MathPowFunction implements AviatorFunction {
+public class MathPowFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 2) {
-            throw new IllegalArgumentException("math.pow(base,exp)");
-        }
-        Number left = FunctionUtils.getNumberValue(0, args, env);
-        Number right = FunctionUtils.getNumberValue(1, args, env);
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+        Number left = FunctionUtils.getNumberValue(arg1, env);
+        Number right = FunctionUtils.getNumberValue(arg2, env);
         return new AviatorDouble(Math.pow(left.doubleValue(), right.doubleValue()));
 
     }
@@ -48,5 +46,4 @@ public class MathPowFunction implements AviatorFunction {
     public String getName() {
         return "math.pow";
     }
-
 }

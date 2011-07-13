@@ -22,7 +22,7 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 
-import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -33,14 +33,11 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  * 
  */
-public class SeqCountFunction implements AviatorFunction {
+public class SeqCountFunction extends AbstractFunction {
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 1) {
-            throw new IllegalArgumentException("count(seq)");
-        }
-
-        Object value = args[0].getValue(env);
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+        Object value = arg1.getValue(env);
         if (value == null) {
             throw new NullPointerException("null seq");
         }
@@ -55,7 +52,7 @@ public class SeqCountFunction implements AviatorFunction {
             size = Array.getLength(value);
         }
         else {
-            throw new IllegalArgumentException(args[0].desc(env) + " is not a seq");
+            throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
         }
         return AviatorLong.valueOf(size);
     }

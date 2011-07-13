@@ -22,8 +22,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Map;
 
+import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -34,33 +34,34 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  * 
  */
-public class PrintlnFunction implements AviatorFunction {
+public class PrintlnFunction extends AbstractFunction {
 
     public String getName() {
         return "println";
     }
 
 
-    public AviatorObject call(Map<String, Object> env, AviatorObject... args) {
-        if (args.length != 0 && args.length != 1 && args.length != 2) {
-            throw new IllegalArgumentException("println([out],[obj])");
-        }
-
-        switch (args.length) {
-        case 0:
-            System.out.println();
-            break;
-        case 1:
-            System.out.println(args[0].getValue(env));
-            break;
-        case 2:
-            OutputStream out = (OutputStream) FunctionUtils.getJavaObject(0, args, env);
-            PrintStream printStream = new PrintStream(out);
-            printStream.println(args[1].getValue(env));
-            break;
-        }
+    @Override
+    public AviatorObject call(Map<String, Object> env) {
+        System.out.println();
         return AviatorNil.NIL;
+    }
 
+
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+        System.out.println(arg1.getValue(env));
+        return AviatorNil.NIL;
+    }
+
+
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+        OutputStream out = (OutputStream) FunctionUtils.getJavaObject(arg1, env);
+        PrintStream printStream = new PrintStream(out);
+        printStream.println(arg2.getValue(env));
+
+        return AviatorNil.NIL;
     }
 
 }
