@@ -52,7 +52,7 @@ public class ASMCodeGeneratorUnitTest {
                     }
                 });
 
-        this.codeGenerator = new ASMCodeGenerator(classloader, true);
+        this.codeGenerator = new ASMCodeGenerator(classloader,System.out, true);
     }
 
 
