@@ -18,6 +18,7 @@
  **/
 package com.googlecode.aviator.code;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,8 +62,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     private boolean trace = false;
 
 
-    public OptimizeCodeGenerator(ClassLoader classLoader, boolean trace) {
-        this.asmCodeGenerator = new ASMCodeGenerator(AviatorEvaluator.getAviatorClassLoader(), trace);
+    public OptimizeCodeGenerator(ClassLoader classLoader,OutputStream traceOutStream, boolean trace) {
+        this.asmCodeGenerator = new ASMCodeGenerator(AviatorEvaluator.getAviatorClassLoader(),traceOutStream, trace);
         this.trace = trace;
 
     }
