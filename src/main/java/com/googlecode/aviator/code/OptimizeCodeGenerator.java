@@ -284,7 +284,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             }
             break;
         case Char:
-            result = new AviatorPattern(String.valueOf(lookhead.getValue(null)));
+            result = new AviatorString(String.valueOf(lookhead.getValue(null)));
             break;
         }
         return result;
