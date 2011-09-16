@@ -69,7 +69,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 	private int operandsCount = 0;
 
 	private int maxStacks = 0;
-	private int maxLocals = 1;
+	private int maxLocals = 2;
 
 	private void setMaxStacks(int newMaxStacks) {
 		if (newMaxStacks > this.maxStacks) {
@@ -77,8 +77,8 @@ public class ASMCodeGenerator implements CodeGenerator {
 		}
 	}
 
-	public ASMCodeGenerator(AviatorClassLoader classLoader, OutputStream traceOut,
-			boolean trace) {
+	public ASMCodeGenerator(AviatorClassLoader classLoader,
+			OutputStream traceOut, boolean trace) {
 		this.classLoader = classLoader;
 		// Generate inner class name
 		this.className = "Script_" + System.currentTimeMillis() + "_"
@@ -98,10 +98,17 @@ public class ASMCodeGenerator implements CodeGenerator {
 	}
 
 	private void startVisitMethodCode() {
-		this.mv = this.checkClassAdapter
+		// this.mv = this.checkClassAdapter
+		// .visitMethod(
+		// ACC_PUBLIC + ACC_STATIC + ACC_FINAL,
+		// "run",
+		// "(Ljava/util/Map;)Ljava/lang/Object;",
+		// "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Ljava/lang/Object;",
+		// null);
+		this.mv = checkClassAdapter
 				.visitMethod(
-						ACC_PUBLIC + ACC_STATIC + ACC_FINAL,
-						"run",
+						ACC_PUBLIC + ACC_VARARGS + ACC_FINAL,
+						"execute0",
 						"(Ljava/util/Map;)Ljava/lang/Object;",
 						"(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Ljava/lang/Object;",
 						null);
@@ -139,15 +146,16 @@ public class ASMCodeGenerator implements CodeGenerator {
 	 */
 	private void makeConstructor() {
 		this.checkClassAdapter.visit(AviatorEvaluator.BYTECODE_VER, ACC_PUBLIC
-				+ ACC_SUPER, this.className, null, "java/lang/Object", null);
+				+ ACC_SUPER, this.className, null,
+				"com/googlecode/aviator/ClassExpression", null);
 
 		{
 			this.mv = this.checkClassAdapter.visitMethod(ACC_PUBLIC, "<init>",
 					"()V", null, null);
 			this.mv.visitCode();
 			this.mv.visitVarInsn(ALOAD, 0);
-			this.mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object",
-					"<init>", "()V");
+			mv.visitMethodInsn(INVOKESPECIAL,
+					"com/googlecode/aviator/ClassExpression", "<init>", "()V");
 			this.mv.visitInsn(RETURN);
 			this.mv.visitMaxs(1, 1);
 			this.mv.visitEnd();
@@ -445,7 +453,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 		this.mv.visitTypeInsn(CHECKCAST,
 				"com/googlecode/aviator/runtime/type/AviatorObject");
-		this.mv.visitVarInsn(ALOAD, 0);
+		this.mv.visitVarInsn(ALOAD, 1);
 		this.mv.visitMethodInsn(INVOKEVIRTUAL,
 				"com/googlecode/aviator/runtime/type/AviatorObject", "not",
 				"(Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
@@ -462,7 +470,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 		this.pushOperand(0);
 		this.mv.visitTypeInsn(CHECKCAST,
 				"com/googlecode/aviator/runtime/type/AviatorObject");
-		this.mv.visitVarInsn(ALOAD, 0);
+		this.mv.visitVarInsn(ALOAD, 1);
 		this.mv.visitMethodInsn(INVOKEVIRTUAL,
 				"com/googlecode/aviator/runtime/type/AviatorObject", "bitNot",
 				"(Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
@@ -483,7 +491,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 		this.mv.visitTypeInsn(CHECKCAST,
 				"com/googlecode/aviator/runtime/type/AviatorObject");
-		this.mv.visitVarInsn(ALOAD, 0);
+		this.mv.visitVarInsn(ALOAD, 1);
 		this.mv.visitMethodInsn(INVOKEVIRTUAL,
 				"com/googlecode/aviator/runtime/type/AviatorObject", "neg",
 				"(Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
@@ -501,8 +509,9 @@ public class ASMCodeGenerator implements CodeGenerator {
 		this.endVisitCode();
 		byte[] bytes = this.classWriter.toByteArray();
 		try {
-			return new ClassExpression(this.classLoader.defineClass(
-					this.className, bytes));
+			Class<?> defineClass = this.classLoader.defineClass(this.className,
+					bytes);
+			return (Expression)defineClass.newInstance();
 		} catch (Exception e) {
 			throw new CompileExpressionErrorException("define class error", e);
 		}
@@ -728,7 +737,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 	private void loadEnv() {
 		// load env
 		this.pushOperand(0);
-		this.mv.visitVarInsn(ALOAD, 0);
+		this.mv.visitVarInsn(ALOAD, 1);
 	}
 
 	private void createAviatorFunctionObject(String methodName) {
