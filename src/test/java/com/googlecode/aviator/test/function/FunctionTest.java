@@ -75,6 +75,7 @@ public class FunctionTest {
         env.put("d", d);
         env.put("b", b);
 
+        System.setProperty("aviator.asm.trace","true");
         assertEquals(-100, AviatorEvaluator.execute("-i", env));
         assertEquals(-103.4, AviatorEvaluator.execute("-i-pi", env));
         assertEquals(2 * 3.14 * 10, (Double) AviatorEvaluator.execute("2*pi*10", env), 0.001);
