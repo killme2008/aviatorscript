@@ -54,7 +54,7 @@ public class FunctionUtils {
 
 
     public static Object getJavaObject(AviatorObject arg, Map<String, Object> env) {
-        if (!(arg instanceof AviatorJavaType)) {
+        if (arg.getAviatorType()!=AviatorType.JavaType) {
             throw new ExpressionRuntimeException(arg.desc(env) + " is not a javaType");
         }
         return env.get(((AviatorJavaType) arg).getName());
@@ -62,7 +62,7 @@ public class FunctionUtils {
 
 
     public static AviatorFunction getFunction(AviatorObject arg, Map<String, Object> env, int arity) {
-        if (!(arg instanceof AviatorJavaType)) {
+        if (arg.getAviatorType()!=AviatorType.JavaType) {
             throw new ExpressionRuntimeException(arg.desc(env) + " is not a function");
         }
         // special processing for "-" operator

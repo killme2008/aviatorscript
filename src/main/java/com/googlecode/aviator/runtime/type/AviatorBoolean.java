@@ -21,6 +21,7 @@ package com.googlecode.aviator.runtime.type;
 import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -58,7 +59,7 @@ public class AviatorBoolean extends AviatorObject {
         case JavaType:
             AviatorJavaType javaType = (AviatorJavaType) other;
             final Object otherJavaValue = javaType.getValue(env);
-            if (otherJavaValue instanceof String || otherJavaValue instanceof Character) {
+            if (TypeUtils.isString(otherJavaValue)) {
                 return new AviatorString(this.value.toString() + otherJavaValue.toString());
             }
             else {

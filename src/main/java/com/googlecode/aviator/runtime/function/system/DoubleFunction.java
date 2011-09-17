@@ -38,7 +38,8 @@ public class DoubleFunction extends AbstractFunction {
             }
         case String:
             return new AviatorDouble(Double.parseDouble((String) arg1.getValue(env)));
-        case Number:
+        case Long:
+        case Double:
             return new AviatorDouble(((Number) arg1.getValue(env)).doubleValue());
         default:
             throw new ClassCastException("Could not cast " + arg1 + " to double");

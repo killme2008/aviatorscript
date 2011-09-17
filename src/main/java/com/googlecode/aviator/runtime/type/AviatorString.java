@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -62,7 +63,8 @@ public class AviatorString extends AviatorObject {
         case Boolean:
             AviatorBoolean otherBoolean = (AviatorBoolean) other;
             return new AviatorString(this.lexeme + otherBoolean.value);
-        case Number:
+        case Long:
+        case Double:
             AviatorNumber otherNumber = (AviatorNumber) other;
             return new AviatorString(this.lexeme + otherNumber.number);
         case Nil:
@@ -102,10 +104,7 @@ public class AviatorString extends AviatorObject {
             if (otherJavaValue == null) {
                 return 1;
             }
-            if (otherJavaValue instanceof String) {
-                return this.lexeme.compareTo((String) otherJavaValue);
-            }
-            else if (otherJavaValue instanceof Character) {
+            if(TypeUtils.isString(otherJavaValue)) {
                 return this.lexeme.compareTo(String.valueOf(otherJavaValue));
             }
             else if (otherJavaValue instanceof Date) {

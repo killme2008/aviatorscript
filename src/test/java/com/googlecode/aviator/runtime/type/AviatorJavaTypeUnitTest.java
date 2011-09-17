@@ -736,13 +736,13 @@ public class AviatorJavaTypeUnitTest {
 
         AviatorJavaType javaTypeForArray = new AviatorJavaType("a");
 
-        assertEquals(9, javaTypeForArray.getElement(env, new AviatorLong(0)).getValue(null));
-        assertEquals(10, javaTypeForArray.getElement(env, new AviatorLong(1)).getValue(null));
+        assertEquals(9, javaTypeForArray.getElement(env, AviatorLong.valueOf(0)).getValue(null));
+        assertEquals(10, javaTypeForArray.getElement(env, AviatorLong.valueOf(1)).getValue(null));
 
         AviatorJavaType javaTypeForList = new AviatorJavaType("list");
 
-        assertEquals("hello", javaTypeForList.getElement(env, new AviatorLong(0)).getValue(null));
-        assertEquals("world", javaTypeForList.getElement(env, new AviatorLong(1)).getValue(null));
+        assertEquals("hello", javaTypeForList.getElement(env, AviatorLong.valueOf(0)).getValue(null));
+        assertEquals("world", javaTypeForList.getElement(env, AviatorLong.valueOf(1)).getValue(null));
 
     }
 
@@ -789,7 +789,7 @@ public class AviatorJavaTypeUnitTest {
         env.put("a", true);
         AviatorJavaType javaTypeForArray = new AviatorJavaType("a");
 
-        javaTypeForArray.getElement(env, new AviatorLong(0)).getValue(null);
+        javaTypeForArray.getElement(env, AviatorLong.valueOf(0)).getValue(null);
     }
 
 
@@ -800,6 +800,6 @@ public class AviatorJavaTypeUnitTest {
         env.put("a", new HashMap<String, String>());
         AviatorJavaType javaTypeForArray = new AviatorJavaType("a");
 
-        javaTypeForArray.getElement(env, new AviatorLong(0)).getValue(null);
+        javaTypeForArray.getElement(env, AviatorLong.valueOf(0)).getValue(null);
     }
 }

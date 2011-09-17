@@ -22,6 +22,7 @@ import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 
+
 /**
  * Aviator long type
  * 
@@ -30,275 +31,327 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
  */
 public class AviatorLong extends AviatorNumber {
 
-	public AviatorLong(Number number) {
-		super(number);
+    private static class LongCache {
+        private LongCache() {
+        }
 
-	}
+        static final AviatorLong cache[] = new AviatorLong[-(-128) + 127 + 1];
 
-	@Override
-	public AviatorObject neg(Map<String, Object> env) {
-		return new AviatorLong(-this.number.longValue());
-	}
+        static {
+            for (long i = 0; i < cache.length; i++)
+                cache[(int)i] = new AviatorLong(i - 128);
+        }
+    }
 
-	@Override
-	public int innerCompare(AviatorObject other) {
-		this.ensureNumber(other);
-		AviatorNumber otherNum = (AviatorNumber) other;
-		if (other instanceof AviatorLong) {
-			if (this.number.longValue() > otherNum.longValue()) {
-				return 1;
-			} else if (this.number.longValue() < otherNum.longValue()) {
-				return -1;
-			} else {
-				return 0;
-			}
-		} else if (other instanceof AviatorDouble) {
-			if (this.number.doubleValue() > otherNum.doubleValue()) {
-				return 1;
-			} else if (this.number.doubleValue() < otherNum.doubleValue()) {
-				return -1;
-			} else {
-				return 0;
-			}
-		} else {
-			throw new ExpressionRuntimeException("Could not compare " + this
-					+ " with " + other);
-		}
-	}
 
-	@Override
-	public AviatorObject innerDiv(AviatorObject other) {
-		this.ensureNumber(other);
-		AviatorNumber otherNum = (AviatorNumber) other;
-		if (other instanceof AviatorLong) {
-			this.number = this.number.longValue() / otherNum.longValue();
-			return this;
-		} else {
-			otherNum.number = this.number.doubleValue()
-					/ otherNum.doubleValue();
-			return otherNum;
-		}
-	}
+    public AviatorLong(Number number) {
+        super(number);
 
-	@Override
-	public AviatorNumber innerAdd(AviatorNumber other) {
-		this.ensureNumber(other);
-		AviatorNumber otherNum = other;
-		if (other instanceof AviatorLong) {
-			this.number = this.number.longValue() + otherNum.longValue();
-			return this;
-		} else {
-			otherNum.number = this.number.doubleValue()
-					+ otherNum.doubleValue();
-			return otherNum;
-		}
-	}
+    }
 
-	@Override
-	public AviatorObject innerMod(AviatorObject other) {
-		this.ensureNumber(other);
-		AviatorNumber otherNum = (AviatorNumber) other;
-		if (other instanceof AviatorLong) {
-			this.number = this.number.longValue() % otherNum.longValue();
-			return this;
-		} else {
-			otherNum.number = this.number.doubleValue()
-					% otherNum.doubleValue();
-			return otherNum;
-		}
-	}
 
-	@Override
-	public AviatorObject innerMult(AviatorObject other) {
-		this.ensureNumber(other);
-		AviatorNumber otherNum = (AviatorNumber) other;
-		if (other instanceof AviatorLong) {
-			this.number = this.number.longValue() * otherNum.longValue();
-			return this;
-		} else {
-			otherNum.number = this.number.doubleValue()
-					* otherNum.doubleValue();
-			return otherNum;
-		}
-	}
+    public static AviatorLong valueOf(long l) {
+        final int offset = 128;
+        if (l >= -128 && l <= 127) { // will cache
+            return LongCache.cache[(int) l + offset];
+        }
+        return new AviatorLong(l);
+    }
 
-	protected void ensureLong(AviatorObject other) {
-		if (!(other instanceof AviatorLong)) {
-			throw new ExpressionRuntimeException("Operator only supports Long");
-		}
-	}
 
-	@Override
-	public AviatorObject bitAnd(AviatorObject other, Map<String, Object> env) {
-		switch (other.getAviatorType()) {
-		case Number:
-			return this.innerBitAnd(other);
-		case JavaType:
-			AviatorJavaType otherJavaType = (AviatorJavaType) other;
-			final Object otherValue = otherJavaType.getValue(env);
-			if (otherValue instanceof Number) {
-				return this.innerBitAnd(AviatorNumber.valueOf(otherValue));
-			} else {
-				return super.bitAnd(other, env);
-			}
-		default:
-			return super.bitAnd(other, env);
-		}
-	}
+    public static AviatorLong valueOf(Long l) {
+        return valueOf(l.longValue());
+    }
 
-	private AviatorObject innerBitAnd(AviatorObject other) {
-		this.ensureLong(other);
-		AviatorLong otherLong = (AviatorLong) other;
-		this.number = this.number.longValue() & otherLong.longValue();
-		return this;
-	}
 
-	private AviatorObject innerBitOr(AviatorObject other) {
-		this.ensureLong(other);
-		AviatorLong otherLong = (AviatorLong) other;
-		this.number = this.number.longValue() | otherLong.longValue();
-		return this;
-	}
+    @Override
+    public AviatorObject neg(Map<String, Object> env) {
+        return AviatorLong.valueOf(-this.number.longValue());
+    }
 
-	private AviatorObject innerBitXor(AviatorObject other) {
-		this.ensureLong(other);
-		AviatorLong otherLong = (AviatorLong) other;
-		this.number = this.number.longValue() ^ otherLong.longValue();
-		return this;
-	}
 
-	private AviatorObject innerShiftLeft(AviatorObject other) {
-		this.ensureLong(other);
-		AviatorLong otherLong = (AviatorLong) other;
-		this.number = this.number.longValue() << otherLong.longValue();
-		return this;
-	}
+    @Override
+    public int innerCompare(AviatorObject other) {
+        this.ensureNumber(other);
+        AviatorNumber otherNum = (AviatorNumber) other;
+        switch (other.getAviatorType()) {
+        case Long:
+            if (this.number.longValue() > otherNum.longValue()) {
+                return 1;
+            }
+            else if (this.number.longValue() < otherNum.longValue()) {
+                return -1;
+            }
+            else {
+                return 0;
+            }
+        case Double:
+            if (this.number.doubleValue() > otherNum.doubleValue()) {
+                return 1;
+            }
+            else if (this.number.doubleValue() < otherNum.doubleValue()) {
+                return -1;
+            }
+            else {
+                return 0;
+            }
+        default:
+            throw new ExpressionRuntimeException("Could not compare " + this + " with " + other);
+        }
 
-	private AviatorObject innerShiftRight(AviatorObject other) {
-		this.ensureLong(other);
-		AviatorLong otherLong = (AviatorLong) other;
-		this.number = this.number.longValue() >> otherLong.longValue();
-		return this;
-	}
+    }
 
-	private AviatorObject innerUnsignedShiftRight(AviatorObject other) {
-		this.ensureLong(other);
-		AviatorLong otherLong = (AviatorLong) other;
-		this.number = this.number.longValue() >>> otherLong.longValue();
-		return this;
-	}
 
-	@Override
-	public AviatorObject bitNot(Map<String, Object> env) {
-		this.number = ~this.number.longValue();
-		return this;
+    @Override
+    public AviatorObject innerDiv(AviatorObject other) {
+        this.ensureNumber(other);
+        AviatorNumber otherNum = (AviatorNumber) other;
+        switch (other.getAviatorType()) {
+        case Long:
+            return AviatorLong.valueOf(this.number.longValue() / otherNum.longValue());
+        default:
+            return new AviatorDouble(this.number.longValue() / otherNum.doubleValue());
+        }
+    }
 
-	}
 
-	@Override
-	public AviatorObject bitOr(AviatorObject other, Map<String, Object> env) {
-		switch (other.getAviatorType()) {
-		case Number:
-			return this.innerBitOr(other);
-		case JavaType:
-			AviatorJavaType otherJavaType = (AviatorJavaType) other;
-			final Object otherValue = otherJavaType.getValue(env);
-			if (otherValue instanceof Number) {
-				return this.innerBitOr(AviatorNumber.valueOf(otherValue));
-			} else {
-				return super.bitOr(other, env);
-			}
-		default:
-			return super.bitOr(other, env);
-		}
-	}
+    @Override
+    public AviatorNumber innerAdd(AviatorNumber other) {
+        this.ensureNumber(other);
+        AviatorNumber otherNum = other;
+        switch (other.getAviatorType()) {
+        case Long:
+            return AviatorLong.valueOf(this.number.longValue() + otherNum.longValue());
+        default:
+            return new AviatorDouble(this.number.longValue() + otherNum.doubleValue());
+        }
+    }
 
-	@Override
-	public AviatorObject bitXor(AviatorObject other, Map<String, Object> env) {
-		switch (other.getAviatorType()) {
-		case Number:
-			return this.innerBitXor(other);
-		case JavaType:
-			AviatorJavaType otherJavaType = (AviatorJavaType) other;
-			final Object otherValue = otherJavaType.getValue(env);
-			if (otherValue instanceof Number) {
-				return this.innerBitXor(AviatorNumber.valueOf(otherValue));
-			} else {
-				return super.bitXor(other, env);
-			}
-		default:
-			return super.bitXor(other, env);
-		}
-	}
 
-	@Override
-	public AviatorObject shiftLeft(AviatorObject other, Map<String, Object> env) {
-		switch (other.getAviatorType()) {
-		case Number:
-			return this.innerShiftLeft(other);
-		case JavaType:
-			AviatorJavaType otherJavaType = (AviatorJavaType) other;
-			final Object otherValue = otherJavaType.getValue(env);
-			if (otherValue instanceof Number) {
-				return this.innerShiftLeft(AviatorNumber.valueOf(otherValue));
-			} else {
-				return super.shiftLeft(other, env);
-			}
-		default:
-			return super.shiftLeft(other, env);
-		}
-	}
+    @Override
+    public AviatorObject innerMod(AviatorObject other) {
+        this.ensureNumber(other);
+        AviatorNumber otherNum = (AviatorNumber) other;
+        switch (other.getAviatorType()) {
+        case Long:
+            return AviatorLong.valueOf(this.number.longValue() % otherNum.longValue());
+        default:
+            return new AviatorDouble(this.number.longValue() % otherNum.doubleValue());
+        }
+    }
 
-	@Override
-	public AviatorObject shiftRight(AviatorObject other, Map<String, Object> env) {
-		switch (other.getAviatorType()) {
-		case Number:
-			return this.innerShiftRight(other);
-		case JavaType:
-			AviatorJavaType otherJavaType = (AviatorJavaType) other;
-			final Object otherValue = otherJavaType.getValue(env);
-			if (otherValue instanceof Number) {
-				return this.innerShiftRight(AviatorNumber.valueOf(otherValue));
-			} else {
-				return super.shiftRight(other, env);
-			}
-		default:
-			return super.shiftRight(other, env);
-		}
-	}
 
-	@Override
-	public AviatorObject unsignedShiftRight(AviatorObject other,
-			Map<String, Object> env) {
-		switch (other.getAviatorType()) {
-		case Number:
-			return this.innerUnsignedShiftRight(other);
-		case JavaType:
-			AviatorJavaType otherJavaType = (AviatorJavaType) other;
-			final Object otherValue = otherJavaType.getValue(env);
-			if (otherValue instanceof Number) {
-				return this.innerUnsignedShiftRight(AviatorNumber
-						.valueOf(otherValue));
-			} else {
-				return super.unsignedShiftRight(other, env);
-			}
-		default:
-			return super.unsignedShiftRight(other, env);
-		}
-	}
+    @Override
+    public AviatorObject innerMult(AviatorObject other) {
+        this.ensureNumber(other);
+        AviatorNumber otherNum = (AviatorNumber) other;
+        switch (other.getAviatorType()) {
+        case Long:
+            return AviatorLong.valueOf(this.number.longValue() * otherNum.longValue());
+        default:
+            return new AviatorDouble(this.number.longValue() * otherNum.doubleValue());
+        }
+    }
 
-	@Override
-	public AviatorObject innerSub(AviatorObject other) {
-		this.ensureNumber(other);
-		AviatorNumber otherNum = (AviatorNumber) other;
-		if (other instanceof AviatorLong) {
-			this.number = this.number.longValue() - otherNum.longValue();
-			return this;
-		} else {
-			otherNum.number = this.number.doubleValue()
-					- otherNum.doubleValue();
-			return otherNum;
-		}
-	}
+
+    protected void ensureLong(AviatorObject other) {
+        if (other.getAviatorType() != AviatorType.Long) {
+            throw new ExpressionRuntimeException("Operator only supports Long");
+        }
+    }
+
+
+    @Override
+    public AviatorObject bitAnd(AviatorObject other, Map<String, Object> env) {
+        switch (other.getAviatorType()) {
+        case Long:
+        case Double:
+            return this.innerBitAnd(other);
+        case JavaType:
+            AviatorJavaType otherJavaType = (AviatorJavaType) other;
+            final Object otherValue = otherJavaType.getValue(env);
+            if (otherValue instanceof Number) {
+                return this.innerBitAnd(AviatorNumber.valueOf(otherValue));
+            }
+            else {
+                return super.bitAnd(other, env);
+            }
+        default:
+            return super.bitAnd(other, env);
+        }
+    }
+
+
+    private AviatorObject innerBitAnd(AviatorObject other) {
+        this.ensureLong(other);
+        AviatorLong otherLong = (AviatorLong) other;
+        return AviatorLong.valueOf(this.number.longValue() & otherLong.longValue());
+    }
+
+
+    private AviatorObject innerBitOr(AviatorObject other) {
+        this.ensureLong(other);
+        AviatorLong otherLong = (AviatorLong) other;
+        return AviatorLong.valueOf(this.number.longValue() | otherLong.longValue());
+    }
+
+
+    private AviatorObject innerBitXor(AviatorObject other) {
+        this.ensureLong(other);
+        AviatorLong otherLong = (AviatorLong) other;
+        return AviatorLong.valueOf(this.number.longValue() ^ otherLong.longValue());
+    }
+
+
+    private AviatorObject innerShiftLeft(AviatorObject other) {
+        this.ensureLong(other);
+        AviatorLong otherLong = (AviatorLong) other;
+        return AviatorLong.valueOf(this.number.longValue() << otherLong.longValue());
+    }
+
+
+    private AviatorObject innerShiftRight(AviatorObject other) {
+        this.ensureLong(other);
+        AviatorLong otherLong = (AviatorLong) other;
+        return AviatorLong.valueOf(this.number.longValue() >> otherLong.longValue());
+    }
+
+
+    private AviatorObject innerUnsignedShiftRight(AviatorObject other) {
+        this.ensureLong(other);
+        AviatorLong otherLong = (AviatorLong) other;
+        return AviatorLong.valueOf(this.number.longValue() >>> otherLong.longValue());
+    }
+
+
+    @Override
+    public AviatorObject bitNot(Map<String, Object> env) {
+        return AviatorLong.valueOf(~this.number.longValue());
+
+    }
+
+
+    @Override
+    public AviatorObject bitOr(AviatorObject other, Map<String, Object> env) {
+        switch (other.getAviatorType()) {
+        case Long:
+        case Double:
+            return this.innerBitOr(other);
+        case JavaType:
+            AviatorJavaType otherJavaType = (AviatorJavaType) other;
+            final Object otherValue = otherJavaType.getValue(env);
+            if (otherValue instanceof Number) {
+                return this.innerBitOr(AviatorNumber.valueOf(otherValue));
+            }
+            else {
+                return super.bitOr(other, env);
+            }
+        default:
+            return super.bitOr(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject bitXor(AviatorObject other, Map<String, Object> env) {
+        switch (other.getAviatorType()) {
+        case Long:
+        case Double:
+            return this.innerBitXor(other);
+        case JavaType:
+            AviatorJavaType otherJavaType = (AviatorJavaType) other;
+            final Object otherValue = otherJavaType.getValue(env);
+            if (otherValue instanceof Number) {
+                return this.innerBitXor(AviatorNumber.valueOf(otherValue));
+            }
+            else {
+                return super.bitXor(other, env);
+            }
+        default:
+            return super.bitXor(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject shiftLeft(AviatorObject other, Map<String, Object> env) {
+        switch (other.getAviatorType()) {
+        case Long:
+        case Double:
+            return this.innerShiftLeft(other);
+        case JavaType:
+            AviatorJavaType otherJavaType = (AviatorJavaType) other;
+            final Object otherValue = otherJavaType.getValue(env);
+            if (otherValue instanceof Number) {
+                return this.innerShiftLeft(AviatorNumber.valueOf(otherValue));
+            }
+            else {
+                return super.shiftLeft(other, env);
+            }
+        default:
+            return super.shiftLeft(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject shiftRight(AviatorObject other, Map<String, Object> env) {
+        switch (other.getAviatorType()) {
+        case Long:
+        case Double:
+            return this.innerShiftRight(other);
+        case JavaType:
+            AviatorJavaType otherJavaType = (AviatorJavaType) other;
+            final Object otherValue = otherJavaType.getValue(env);
+            if (otherValue instanceof Number) {
+                return this.innerShiftRight(AviatorNumber.valueOf(otherValue));
+            }
+            else {
+                return super.shiftRight(other, env);
+            }
+        default:
+            return super.shiftRight(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject unsignedShiftRight(AviatorObject other, Map<String, Object> env) {
+        switch (other.getAviatorType()) {
+        case Long:
+        case Double:
+            return this.innerUnsignedShiftRight(other);
+        case JavaType:
+            AviatorJavaType otherJavaType = (AviatorJavaType) other;
+            final Object otherValue = otherJavaType.getValue(env);
+            if (otherValue instanceof Number) {
+                return this.innerUnsignedShiftRight(AviatorNumber.valueOf(otherValue));
+            }
+            else {
+                return super.unsignedShiftRight(other, env);
+            }
+        default:
+            return super.unsignedShiftRight(other, env);
+        }
+    }
+
+
+    @Override
+    public AviatorObject innerSub(AviatorObject other) {
+        this.ensureNumber(other);
+        AviatorNumber otherNum = (AviatorNumber) other;
+        switch (other.getAviatorType()) {
+        case Long:
+            return AviatorLong.valueOf(this.number.longValue() - otherNum.longValue());
+        default:
+            return new AviatorDouble(this.number.longValue() - otherNum.doubleValue());
+        }
+    }
+
+
+    @Override
+    public AviatorType getAviatorType() {
+        return AviatorType.Long;
+    }
 
 }

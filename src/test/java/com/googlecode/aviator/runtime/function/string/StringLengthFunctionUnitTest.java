@@ -67,7 +67,7 @@ public class StringLengthFunctionUnitTest {
 
     @Test(expected = ClassCastException.class)
     public void testClassCastError2() {
-        this.function.call(null, new AviatorLong(3));
+        this.function.call(null, AviatorLong.valueOf(3));
     }
 
 

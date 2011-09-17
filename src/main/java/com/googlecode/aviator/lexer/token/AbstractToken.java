@@ -76,7 +76,7 @@ public abstract class AbstractToken<T> implements Token<T> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        AbstractToken other = (AbstractToken) obj;
+        AbstractToken<?> other = (AbstractToken<?>) obj;
         if (lexeme == null) {
             if (other.lexeme != null) {
                 return false;

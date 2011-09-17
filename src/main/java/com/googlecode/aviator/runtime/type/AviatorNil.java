@@ -20,6 +20,8 @@ package com.googlecode.aviator.runtime.type;
 
 import java.util.Map;
 
+import com.googlecode.aviator.utils.TypeUtils;
+
 
 /**
  * Aviator nil object
@@ -43,7 +45,7 @@ public class AviatorNil extends AviatorObject {
             return new AviatorString("null" + other.getValue(env));
         case JavaType:
             final Object otherValue = other.getValue(env);
-            if (otherValue instanceof String || otherValue instanceof Character) {
+            if (TypeUtils.isString(otherValue)) {
                 return new AviatorString("null" + otherValue);
             }
             else {
