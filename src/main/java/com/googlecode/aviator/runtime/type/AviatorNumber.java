@@ -21,6 +21,7 @@ package com.googlecode.aviator.runtime.type;
 import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -46,11 +47,10 @@ public abstract class AviatorNumber extends AviatorObject {
 
 
     public static AviatorNumber valueOf(Object value) {
-        if (value instanceof Long || value instanceof Byte || value instanceof Short || value instanceof Integer) {
-            return new AviatorLong(((Number) value).longValue());
-
+        if (TypeUtils.isLong(value)) {
+            return AviatorLong.valueOf(((Number) value).longValue());
         }
-        else if (value instanceof Double || value instanceof Float) {
+        else if (TypeUtils.isDouble(value)) {
             return new AviatorDouble(((Number) value).doubleValue());
         }
         else {
@@ -70,7 +70,8 @@ public abstract class AviatorNumber extends AviatorObject {
         switch (other.getAviatorType()) {
         case String:
             return new AviatorString(this.number.toString() + ((AviatorString) other).getLexeme());
-        case Number:
+        case Long:
+        case Double:
             return innerAdd((AviatorNumber) other);
         case JavaType:
             AviatorJavaType otherJavaType = (AviatorJavaType) other;
@@ -94,7 +95,8 @@ public abstract class AviatorNumber extends AviatorObject {
     @Override
     public AviatorObject sub(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
-        case Number:
+        case Long:
+        case Double:
             return innerSub(other);
         case JavaType:
             AviatorJavaType otherJavaType = (AviatorJavaType) other;
@@ -115,7 +117,8 @@ public abstract class AviatorNumber extends AviatorObject {
     @Override
     public AviatorObject mod(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
-        case Number:
+        case Long:
+        case Double:
             return innerMod(other);
         case JavaType:
             AviatorJavaType otherJavaType = (AviatorJavaType) other;
@@ -135,7 +138,8 @@ public abstract class AviatorNumber extends AviatorObject {
     @Override
     public AviatorObject div(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
-        case Number:
+        case Long:
+        case Double:
             return innerDiv(other);
         case JavaType:
             AviatorJavaType otherJavaType = (AviatorJavaType) other;
@@ -156,7 +160,8 @@ public abstract class AviatorNumber extends AviatorObject {
     @Override
     public AviatorObject mult(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
-        case Number:
+        case Long:
+        case Double:
             return innerMult(other);
         case JavaType:
             AviatorJavaType otherJavaType = (AviatorJavaType) other;
@@ -177,7 +182,8 @@ public abstract class AviatorNumber extends AviatorObject {
     @Override
     public int compare(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
-        case Number:
+        case Long:
+        case Double:
             return innerCompare(other);
         case JavaType:
             AviatorJavaType otherJavaType = (AviatorJavaType) other;
@@ -218,20 +224,19 @@ public abstract class AviatorNumber extends AviatorObject {
     public abstract int innerCompare(AviatorObject other);
 
 
-    @Override
-    public AviatorType getAviatorType() {
-        return AviatorType.Number;
-    }
-
-
     public long longValue() {
         return number.longValue();
     }
 
 
     protected void ensureNumber(AviatorObject other) {
-        if (other.getAviatorType() != AviatorType.Number) {
-            throw new ExpressionRuntimeException("Operator only supports Number");
+        switch (other.getAviatorType()) {
+        case Long:
+        case Double:
+            break;
+        default:
+            throw new ExpressionRuntimeException(other + " is not a valid number");
         }
+
     }
 }

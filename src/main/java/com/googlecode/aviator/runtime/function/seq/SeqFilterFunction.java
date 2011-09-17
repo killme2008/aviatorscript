@@ -54,13 +54,13 @@ public class SeqFilterFunction extends AbstractFunction {
         Class<?> clazz = first.getClass();
 
         if (Collection.class.isAssignableFrom(clazz)) {
-            Collection result = null;
+            Collection<Object> result = null;
             try {
-                result = (Collection) clazz.newInstance();
+                result = (Collection<Object>) clazz.newInstance();
             }
             catch (Throwable t) {
                 // ignore
-                result = new ArrayList();
+                result = new ArrayList<Object>();
             }
             for (Object obj : (Collection<?>) first) {
                 if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
@@ -71,7 +71,7 @@ public class SeqFilterFunction extends AbstractFunction {
         }
         else if (clazz.isArray()) {
             Object[] seq = (Object[]) first;
-            List result = new ArrayList();
+            List<Object> result = new ArrayList<Object>();
             for (Object obj : seq) {
                 if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
                     result.add(obj);

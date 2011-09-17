@@ -21,6 +21,7 @@ package com.googlecode.aviator.runtime.type;
 import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -129,10 +130,11 @@ public abstract class AviatorObject {
 
 
     public String stringValue(Map<String, Object> env) {
-        if (!(this.getValue(env) instanceof String) && !(this.getValue(env) instanceof Character)) {
+        Object value = this.getValue(env);
+        if (!(TypeUtils.isString(value))) {
             throw new ExpressionRuntimeException(this.desc(env) + " is not a string value");
         }
-        return String.valueOf(this.getValue(env));
+        return String.valueOf(value);
     }
 
 

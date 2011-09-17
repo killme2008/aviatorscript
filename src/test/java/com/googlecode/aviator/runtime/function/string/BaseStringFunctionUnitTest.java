@@ -39,7 +39,7 @@ public abstract class BaseStringFunctionUnitTest {
 
     @Test(expected = ClassCastException.class)
     public void testClassCastError2() {
-        this.function.call(null, new AviatorString("hello"), new AviatorLong(3));
+        this.function.call(null, new AviatorString("hello"), AviatorLong.valueOf(3));
     }
 
 

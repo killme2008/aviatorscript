@@ -37,7 +37,7 @@ public class StringLengthFunction extends AbstractFunction {
     @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
         String value = FunctionUtils.getStringValue(arg1, env);
-        return new AviatorLong(value.length());
+        return AviatorLong.valueOf(value.length());
     }
 
 

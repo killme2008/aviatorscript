@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -56,7 +57,7 @@ public class AviatorPattern extends AviatorObject {
         case JavaType:
             AviatorJavaType javaType = (AviatorJavaType) other;
             final Object otherValue = javaType.getValue(env);
-            if (otherValue instanceof String || otherValue instanceof Character) {
+            if (TypeUtils.isString(otherValue)) {
                 return new AviatorString(this.pattern.pattern() + otherValue.toString());
             }
             else {
@@ -90,10 +91,7 @@ public class AviatorPattern extends AviatorObject {
         case JavaType:
             AviatorJavaType javaType = (AviatorJavaType) other;
             final Object javaValue = javaType.getValue(env);
-            if (javaValue instanceof String) {
-                return match(new AviatorString((String) javaValue), env);
-            }
-            else if (javaValue instanceof Character) {
+            if (TypeUtils.isString(javaValue)) {
                 return match(new AviatorString(String.valueOf(javaValue)), env);
             }
             else {

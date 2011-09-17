@@ -21,9 +21,11 @@ package com.googlecode.aviator.code;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
@@ -62,8 +64,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     private boolean trace = false;
 
 
-    public OptimizeCodeGenerator(ClassLoader classLoader,OutputStream traceOutStream, boolean trace) {
-        this.asmCodeGenerator = new ASMCodeGenerator(AviatorEvaluator.getAviatorClassLoader(),traceOutStream, trace);
+    public OptimizeCodeGenerator(ClassLoader classLoader, OutputStream traceOutStream, boolean trace) {
+        this.asmCodeGenerator = new ASMCodeGenerator(AviatorEvaluator.getAviatorClassLoader(), traceOutStream, trace);
         this.trace = trace;
 
     }
@@ -226,7 +228,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         case Nil:
             token = Variable.NIL;
             break;
-        case Number:
+        case Double:
+        case Long:
             final Number value = (Number) operand.getValue(null);
             token = new NumberToken(value, value.toString());
             break;
@@ -318,6 +321,15 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
     private void callASM() {
+        Set<Variable> variables = new HashSet<Variable>();
+        for (Token<?> token : this.tokenList) {
+            if (token.getType() == TokenType.Variable) {
+                variables.add((Variable) token);
+            }
+        }
+
+        this.asmCodeGenerator.initVariables(variables);
+
         for (int i = 0; i < this.tokenList.size(); i++) {
             Token<?> token = this.tokenList.get(i);
             switch (token.getType()) {

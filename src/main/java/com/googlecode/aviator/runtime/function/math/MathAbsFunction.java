@@ -25,6 +25,7 @@ import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -38,11 +39,11 @@ public class MathAbsFunction extends AbstractFunction {
     @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
         Number number = FunctionUtils.getNumberValue(arg1, env);
-        if (number instanceof Double || number instanceof Float) {
+        if (TypeUtils.isDouble(number)) {
             return new AviatorDouble(Math.abs(number.doubleValue()));
         }
         else {
-            return new AviatorLong(Math.abs(number.longValue()));
+            return AviatorLong.valueOf(Math.abs(number.longValue()));
         }
     }
 

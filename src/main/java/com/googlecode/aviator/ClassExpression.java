@@ -18,10 +18,11 @@
  **/
 package com.googlecode.aviator;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+
 
 /**
  * Compiled expression,all generated class inherit this class
@@ -31,48 +32,44 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
  */
 public abstract class ClassExpression implements Expression {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.googlecode.aviator.IExpression#execute(java.util.Map)
-	 */
-	public Object execute(Map<String, Object> env) {
-		if (env == null) {
-			env = new HashMap<String, Object>();
-		} else {
-			env = new HashMap<String, Object>(env);
-			for (String variableName : env.keySet()) {
-				if (AviatorEvaluator.FUNC_MAP.containsKey(variableName)) {
-					throw new ExpressionRuntimeException(
-							variableName
-									+ " is a function name,please don't use it as variable");
-				}
-			}
-		}
-		try {
-			return execute0(env);
-		} catch (Throwable e) {
-			throw new ExpressionRuntimeException("Execute expression error", e);
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.googlecode.aviator.IExpression#execute(java.util.Map)
+     */
+    public Object execute(Map<String, Object> env) {
+        if (env == null) {
+            env = Collections.emptyMap();
+        }
 
-	public abstract Object execute0(Map<String, Object> env);
+        try {
+            return execute0(env);
+        }
+        catch (Throwable e) {
+            throw new ExpressionRuntimeException("Execute expression error", e);
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.googlecode.aviator.IExpression#execute()
-	 */
-	public Object execute() {
-		return this.execute(null);
-	}
 
-	/**
-	 * Get generated java class
-	 * 
-	 * @return
-	 */
-	public Class<?> getJavaClass() {
-		return this.getClass();
-	}
+    public abstract Object execute0(Map<String, Object> env);
+
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.googlecode.aviator.IExpression#execute()
+     */
+    public Object execute() {
+        return this.execute(null);
+    }
+
+
+    /**
+     * Get generated java class
+     * 
+     * @return
+     */
+    public Class<?> getJavaClass() {
+        return this.getClass();
+    }
 }

@@ -55,13 +55,13 @@ public class SeqMapFunction extends AbstractFunction {
         Class<?> clazz = first.getClass();
 
         if (Collection.class.isAssignableFrom(clazz)) {
-            Collection result = null;
+            Collection<Object> result = null;
             try {
-                result = (Collection) clazz.newInstance();
+                result = (Collection<Object>) clazz.newInstance();
             }
             catch (Throwable t) {
                 // ignore
-                result = new ArrayList();
+                result = new ArrayList<Object>();
             }
             for (Object obj : (Collection<?>) first) {
                 result.add(fun.call(env, new AviatorRuntimeJavaType(obj)).getValue(env));
