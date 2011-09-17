@@ -71,6 +71,7 @@ import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 
+
 /**
  * Avaitor Expression evaluator
  * 
@@ -78,356 +79,378 @@ import com.googlecode.aviator.runtime.type.AviatorNil;
  * 
  */
 public final class AviatorEvaluator {
-	// The classloader to define generated class
-	private static AviatorClassLoader aviatorClassLoader;
+    private static Boolean trace = Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
 
-	/**
-	 * Optimized for compile speed,this is the default option
-	 */
-	public static final int COMPILE = 0;
+    // The classloader to define generated class
+    private static AviatorClassLoader aviatorClassLoader;
 
-	/**
-	 * Optimized for execute speed
-	 */
-	public static final int EVAL = 1;
+    /**
+     * Optimized for compile speed,this is the default option
+     */
+    public static final int COMPILE = 0;
 
-	// optimize level
-	private static int optimize = EVAL;
+    /**
+     * Optimized for execute speed
+     */
+    public static final int EVAL = 1;
 
-	/**
-	 * Aviator version
-	 */
-	public static final String VERSION = "1.1.1";
+    // optimize level
+    private static int optimize = EVAL;
 
-	/**
-	 * Generated java class version,default 1.5
-	 */
-	public static int BYTECODE_VER = Opcodes.V1_5;
+    /**
+     * Aviator version
+     */
+    public static final String VERSION = "1.1.1";
 
-	private static OutputStream traceOutputStream = System.out;
+    /**
+     * Generated java class version,default 1.5
+     */
+    public static int BYTECODE_VER = Opcodes.V1_5;
 
-	/**
-	 * Get current trace output stream,default is System.out
-	 * 
-	 * @return
-	 */
-	public static OutputStream getTraceOutputStream() {
-		return traceOutputStream;
-	}
+    private static OutputStream traceOutputStream = System.out;
 
-	/**
-	 * Set trace output stream
-	 * 
-	 * @param traceOutputStream
-	 */
-	public static void setTraceOutputStream(OutputStream traceOutputStream) {
-		AviatorEvaluator.traceOutputStream = traceOutputStream;
-	}
 
-	static {
-		aviatorClassLoader = AccessController
-				.doPrivileged(new PrivilegedAction<AviatorClassLoader>() {
+    /**
+     * Configure whether to trace code generation
+     * 
+     * @param t
+     *            true is to trace,default is false.
+     */
+    public static void setTrace(boolean t) {
+        trace = t;
+    }
 
-					public AviatorClassLoader run() {
-						return new AviatorClassLoader(AviatorEvaluator.class
-								.getClassLoader());
-					}
 
-				});
-	}
+    /**
+     * Get current trace output stream,default is System.out
+     * 
+     * @return
+     */
+    public static OutputStream getTraceOutputStream() {
+        return traceOutputStream;
+    }
 
-	public final static Map<String, Object> FUNC_MAP = new HashMap<String, Object>();
 
-	static {
-		// Load internal functions
-		// load sys lib
-		addFunction(new SysDateFunction());
-		addFunction(new PrintlnFunction());
-		addFunction(new PrintFunction());
-		addFunction(new RandomFunction());
-		addFunction(new NowFunction());
-		addFunction(new LongFunction());
-		addFunction(new DoubleFunction());
-		addFunction(new StrFunction());
-		addFunction(new BinaryFunction(OperatorType.ADD));
-		addFunction(new BinaryFunction(OperatorType.SUB));
-		addFunction(new BinaryFunction(OperatorType.MULT));
-		addFunction(new BinaryFunction(OperatorType.DIV));
-		addFunction(new BinaryFunction(OperatorType.MOD));
-		addFunction(new BinaryFunction(OperatorType.NEG));
-		addFunction(new BinaryFunction(OperatorType.NOT));
+    /**
+     * Set trace output stream
+     * 
+     * @param traceOutputStream
+     */
+    public static void setTraceOutputStream(OutputStream traceOutputStream) {
+        AviatorEvaluator.traceOutputStream = traceOutputStream;
+    }
 
-		// load string lib
+    static {
+        aviatorClassLoader = AccessController.doPrivileged(new PrivilegedAction<AviatorClassLoader>() {
 
-		addFunction(new StringContainsFunction());
-		addFunction(new StringIndexOfFunction());
-		addFunction(new StringStartsWithFunction());
-		addFunction(new StringEndsWithFunction());
-		addFunction(new StringSubStringFunction());
-		addFunction(new StringLengthFunction());
-		// load math lib
-		addFunction(new MathAbsFunction());
-		addFunction(new MathPowFunction());
-		addFunction(new MathSqrtFunction());
-		addFunction(new MathLog10Function());
-		addFunction(new MathLogFunction());
-		addFunction(new MathSinFunction());
-		addFunction(new MathCosFunction());
-		addFunction(new MathTanFunction());
+            public AviatorClassLoader run() {
+                return new AviatorClassLoader(AviatorEvaluator.class.getClassLoader());
+            }
 
-		// seq lib
-		addFunction(new SeqMapFunction());
-		addFunction(new SeqReduceFunction());
-		addFunction(new SeqFilterFunction());
-		addFunction(new SeqSortFunction());
-		addFunction(new SeqIncludeFunction());
-		addFunction(new SeqCountFunction());
-		addFunction(new SeqMakePredicateFunFunction("seq.eq", OperatorType.EQ));
-		addFunction(new SeqMakePredicateFunFunction("seq.neq", OperatorType.NEQ));
-		addFunction(new SeqMakePredicateFunFunction("seq.lt", OperatorType.LT));
-		addFunction(new SeqMakePredicateFunFunction("seq.le", OperatorType.LE));
-		addFunction(new SeqMakePredicateFunFunction("seq.gt", OperatorType.GT));
-		addFunction(new SeqMakePredicateFunFunction("seq.ge", OperatorType.GE));
-		addFunction(new SeqMakePredicateFunFunction("seq.true",
-				OperatorType.EQ, AviatorBoolean.TRUE));
-		addFunction(new SeqMakePredicateFunFunction("seq.false",
-				OperatorType.EQ, AviatorBoolean.FALSE));
-		addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ,
-				AviatorNil.NIL));
-		addFunction(new SeqMakePredicateFunFunction("seq.exists",
-				OperatorType.NEQ, AviatorNil.NIL));
-	}
+        });
+    }
 
-	/**
-	 * Compiled Expression cache
-	 */
-	private final static ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-																							 * Compiled
-																							 * expression
-																							 * task
-																							 */> cacheExpressions = new ConcurrentHashMap<String, FutureTask<Expression>>();
+    public final static Map<String, Object> FUNC_MAP = new HashMap<String, Object>();
 
-	/**
-	 * set optimize level,default AviatorEvaluator.COMPILE
-	 * 
-	 * @see COMPILE,EVAL
-	 * 
-	 * @param value
-	 */
-	public static void setOptimize(int value) {
-		if (value != COMPILE && value != EVAL) {
-			throw new IllegalArgumentException("Invlaid optimize option value");
-		}
-		optimize = value;
-	}
+    static {
+        // Load internal functions
+        // load sys lib
+        addFunction(new SysDateFunction());
+        addFunction(new PrintlnFunction());
+        addFunction(new PrintFunction());
+        addFunction(new RandomFunction());
+        addFunction(new NowFunction());
+        addFunction(new LongFunction());
+        addFunction(new DoubleFunction());
+        addFunction(new StrFunction());
+        addFunction(new BinaryFunction(OperatorType.ADD));
+        addFunction(new BinaryFunction(OperatorType.SUB));
+        addFunction(new BinaryFunction(OperatorType.MULT));
+        addFunction(new BinaryFunction(OperatorType.DIV));
+        addFunction(new BinaryFunction(OperatorType.MOD));
+        addFunction(new BinaryFunction(OperatorType.NEG));
+        addFunction(new BinaryFunction(OperatorType.NOT));
 
-	public static void setBYTECODE_VER(int nversion) {
-		BYTECODE_VER = nversion;
-	}
+        // load string lib
 
-	private AviatorEvaluator() {
+        addFunction(new StringContainsFunction());
+        addFunction(new StringIndexOfFunction());
+        addFunction(new StringStartsWithFunction());
+        addFunction(new StringEndsWithFunction());
+        addFunction(new StringSubStringFunction());
+        addFunction(new StringLengthFunction());
+        // load math lib
+        addFunction(new MathAbsFunction());
+        addFunction(new MathPowFunction());
+        addFunction(new MathSqrtFunction());
+        addFunction(new MathLog10Function());
+        addFunction(new MathLogFunction());
+        addFunction(new MathSinFunction());
+        addFunction(new MathCosFunction());
+        addFunction(new MathTanFunction());
 
-	}
+        // seq lib
+        addFunction(new SeqMapFunction());
+        addFunction(new SeqReduceFunction());
+        addFunction(new SeqFilterFunction());
+        addFunction(new SeqSortFunction());
+        addFunction(new SeqIncludeFunction());
+        addFunction(new SeqCountFunction());
+        addFunction(new SeqMakePredicateFunFunction("seq.eq", OperatorType.EQ));
+        addFunction(new SeqMakePredicateFunFunction("seq.neq", OperatorType.NEQ));
+        addFunction(new SeqMakePredicateFunFunction("seq.lt", OperatorType.LT));
+        addFunction(new SeqMakePredicateFunFunction("seq.le", OperatorType.LE));
+        addFunction(new SeqMakePredicateFunFunction("seq.gt", OperatorType.GT));
+        addFunction(new SeqMakePredicateFunFunction("seq.ge", OperatorType.GE));
+        addFunction(new SeqMakePredicateFunFunction("seq.true", OperatorType.EQ, AviatorBoolean.TRUE));
+        addFunction(new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
+        addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
+        addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
+    }
 
-	public static void clearExpressionCache() {
-		cacheExpressions.clear();
-	}
+    /**
+     * Compiled Expression cache
+     */
+    private final static ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
+                                                                                               * Compiled
+                                                                                               * expression
+                                                                                               * task
+                                                                                               */> cacheExpressions =
+            new ConcurrentHashMap<String, FutureTask<Expression>>();
 
-	public static AviatorClassLoader getAviatorClassLoader() {
-		return aviatorClassLoader;
-	}
 
-	/**
-	 * Add a aviator function
-	 * 
-	 * @param function
-	 */
-	public static void addFunction(AviatorFunction function) {
-		final String name = function.getName();
-		FUNC_MAP.put(name, function);
-	}
+    /**
+     * set optimize level,default AviatorEvaluator.COMPILE
+     * 
+     * @see COMPILE,EVAL
+     * 
+     * @param value
+     */
+    public static void setOptimize(int value) {
+        if (value != COMPILE && value != EVAL) {
+            throw new IllegalArgumentException("Invlaid optimize option value");
+        }
+        optimize = value;
+    }
 
-	/**
-	 * Remove a aviator function by name
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static AviatorFunction removeFunction(String name) {
-		return (AviatorFunction) FUNC_MAP.remove(name);
-	}
 
-	/**
-	 * get a aviator function by name,throw exception if null
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static AviatorFunction getFunction(String name) {
-		final AviatorFunction function = (AviatorFunction) FUNC_MAP.get(name);
-		if (function == null) {
-			throw new ExpressionRuntimeException(
-					"Could not find function named '" + name + "'");
-		}
-		return function;
-	}
+    public static void setBYTECODE_VER(int nversion) {
+        BYTECODE_VER = nversion;
+    }
 
-	/**
-	 * Check if the function is existed in aviator
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static boolean containsFunction(String name) {
-		return FUNC_MAP.containsKey(name);
-	}
 
-	/**
-	 * Remove a aviator function
-	 * 
-	 * @param function
-	 * @return
-	 */
-	public static AviatorFunction removeFunction(AviatorFunction function) {
-		return removeFunction(function.getName());
-	}
+    private AviatorEvaluator() {
 
-	public static void setAviatorClassLoader(
-			AviatorClassLoader aviatorClassLoader) {
-		AviatorEvaluator.aviatorClassLoader = aviatorClassLoader;
-	}
+    }
 
-	/**
-	 * Compile a text expression to Expression object
-	 * 
-	 * @param expression
-	 *            text expression
-	 * @param cached
-	 *            Whether to cache the compiled result,make true to cache it.
-	 * @return
-	 */
-	public static Expression compile(final String expression, boolean cached) {
-		if (expression == null || expression.trim().length() == 0) {
-			throw new CompileExpressionErrorException("Blank expression");
-		}
 
-		if (cached) {
-			FutureTask<Expression> task = cacheExpressions.get(expression);
-			if (task != null) {
-				return getCompiledExpression(expression, task);
-			}
-			task = new FutureTask<Expression>(new Callable<Expression>() {
-				public Expression call() throws Exception {
-					return innerCompile(expression);
-				}
+    public static void clearExpressionCache() {
+        cacheExpressions.clear();
+    }
 
-			});
-			FutureTask<Expression> existedTask = cacheExpressions.putIfAbsent(
-					expression, task);
-			if (existedTask == null) {
-				existedTask = task;
-				existedTask.run();
-			}
-			return getCompiledExpression(expression, existedTask);
 
-		} else {
-			return innerCompile(expression);
-		}
+    public static AviatorClassLoader getAviatorClassLoader() {
+        return aviatorClassLoader;
+    }
 
-	}
 
-	private static Expression getCompiledExpression(final String expression,
-			FutureTask<Expression> task) {
-		try {
-			return task.get();
-		} catch (Exception e) {
-			cacheExpressions.remove(expression);
-			throw new CompileExpressionErrorException(
-					"Compile expression failure:" + expression, e);
-		}
-	}
+    /**
+     * Add a aviator function
+     * 
+     * @param function
+     */
+    public static void addFunction(AviatorFunction function) {
+        final String name = function.getName();
+        FUNC_MAP.put(name, function);
+    }
 
-	private static Expression innerCompile(final String expression) {
-		ExpressionLexer lexer = new ExpressionLexer(expression);
-		CodeGenerator codeGenerator = newCodeGenerator();
-		ExpressionParser parser = new ExpressionParser(lexer, codeGenerator);
-		return parser.parse();
-	}
 
-	private static CodeGenerator newCodeGenerator() {
-		switch (optimize) {
-		case COMPILE:
-			return new ASMCodeGenerator(aviatorClassLoader, traceOutputStream,
-					Boolean.valueOf(System.getProperty("aviator.asm.trace",
-							"false")));
-		case EVAL:
-			return new OptimizeCodeGenerator(aviatorClassLoader,
-					traceOutputStream, Boolean.valueOf(System.getProperty(
-							"aviator.asm.trace", "false")));
-		default:
-			throw new IllegalArgumentException("Unknow option " + optimize);
-		}
+    /**
+     * Remove a aviator function by name
+     * 
+     * @param name
+     * @return
+     */
+    public static AviatorFunction removeFunction(String name) {
+        return (AviatorFunction) FUNC_MAP.remove(name);
+    }
 
-	}
 
-	/**
-	 * Compile a text expression to Expression Object without caching
-	 * 
-	 * @param expression
-	 * @return
-	 */
-	public static Expression compile(String expression) {
-		return compile(expression, false);
-	}
+    /**
+     * get a aviator function by name,throw exception if null
+     * 
+     * @param name
+     * @return
+     */
+    public static AviatorFunction getFunction(String name) {
+        final AviatorFunction function = (AviatorFunction) FUNC_MAP.get(name);
+        if (function == null) {
+            throw new ExpressionRuntimeException("Could not find function named '" + name + "'");
+        }
+        return function;
+    }
 
-	/**
-	 * Execute a text expression with environment
-	 * 
-	 * @param expression
-	 *            text expression
-	 * @param env
-	 *            Binding variable environment
-	 * @param cached
-	 *            Whether to cache the compiled result,make true to cache it.
-	 */
-	public static Object execute(String expression, Map<String, Object> env,
-			boolean cached) {
-		Expression compiledExpression = compile(expression, cached);
-		if (compiledExpression != null) {
-			return compiledExpression.execute(env);
-		} else {
-			throw new ExpressionRuntimeException(
-					"Null compiled expression for " + expression);
-		}
-	}
 
-	/**
-	 * Execute a text expression without caching
-	 * 
-	 * @param expression
-	 * @param env
-	 * @return
-	 */
-	public static Object execute(String expression, Map<String, Object> env) {
-		return execute(expression, env, false);
-	}
+    /**
+     * Check if the function is existed in aviator
+     * 
+     * @param name
+     * @return
+     */
+    public static boolean containsFunction(String name) {
+        return FUNC_MAP.containsKey(name);
+    }
 
-	/**
-	 * Invalidate expression cache
-	 * 
-	 * @param expression
-	 */
-	public static void invalidateCache(String expression) {
-		cacheExpressions.remove(expression);
-	}
 
-	/**
-	 * Execute a text expression without caching
-	 * 
-	 * @param expression
-	 * @return
-	 */
-	public static Object execute(String expression) {
-		return execute(expression, null);
-	}
+    /**
+     * Remove a aviator function
+     * 
+     * @param function
+     * @return
+     */
+    public static AviatorFunction removeFunction(AviatorFunction function) {
+        return removeFunction(function.getName());
+    }
+
+
+    public static void setAviatorClassLoader(AviatorClassLoader aviatorClassLoader) {
+        AviatorEvaluator.aviatorClassLoader = aviatorClassLoader;
+    }
+
+
+    /**
+     * Compile a text expression to Expression object
+     * 
+     * @param expression
+     *            text expression
+     * @param cached
+     *            Whether to cache the compiled result,make true to cache it.
+     * @return
+     */
+    public static Expression compile(final String expression, boolean cached) {
+        if (expression == null || expression.trim().length() == 0) {
+            throw new CompileExpressionErrorException("Blank expression");
+        }
+
+        if (cached) {
+            FutureTask<Expression> task = cacheExpressions.get(expression);
+            if (task != null) {
+                return getCompiledExpression(expression, task);
+            }
+            task = new FutureTask<Expression>(new Callable<Expression>() {
+                public Expression call() throws Exception {
+                    return innerCompile(expression);
+                }
+
+            });
+            FutureTask<Expression> existedTask = cacheExpressions.putIfAbsent(expression, task);
+            if (existedTask == null) {
+                existedTask = task;
+                existedTask.run();
+            }
+            return getCompiledExpression(expression, existedTask);
+
+        }
+        else {
+            return innerCompile(expression);
+        }
+
+    }
+
+
+    private static Expression getCompiledExpression(final String expression, FutureTask<Expression> task) {
+        try {
+            return task.get();
+        }
+        catch (Exception e) {
+            cacheExpressions.remove(expression);
+            throw new CompileExpressionErrorException("Compile expression failure:" + expression, e);
+        }
+    }
+
+
+    private static Expression innerCompile(final String expression) {
+        ExpressionLexer lexer = new ExpressionLexer(expression);
+        CodeGenerator codeGenerator = newCodeGenerator();
+        ExpressionParser parser = new ExpressionParser(lexer, codeGenerator);
+        return parser.parse();
+    }
+
+
+    private static CodeGenerator newCodeGenerator() {
+        switch (optimize) {
+        case COMPILE:
+            return new ASMCodeGenerator(aviatorClassLoader, traceOutputStream, trace);
+        case EVAL:
+            return new OptimizeCodeGenerator(aviatorClassLoader, traceOutputStream, trace);
+        default:
+            throw new IllegalArgumentException("Unknow option " + optimize);
+        }
+
+    }
+
+
+    /**
+     * Compile a text expression to Expression Object without caching
+     * 
+     * @param expression
+     * @return
+     */
+    public static Expression compile(String expression) {
+        return compile(expression, false);
+    }
+
+
+    /**
+     * Execute a text expression with environment
+     * 
+     * @param expression
+     *            text expression
+     * @param env
+     *            Binding variable environment
+     * @param cached
+     *            Whether to cache the compiled result,make true to cache it.
+     */
+    public static Object execute(String expression, Map<String, Object> env, boolean cached) {
+        Expression compiledExpression = compile(expression, cached);
+        if (compiledExpression != null) {
+            return compiledExpression.execute(env);
+        }
+        else {
+            throw new ExpressionRuntimeException("Null compiled expression for " + expression);
+        }
+    }
+
+
+    /**
+     * Execute a text expression without caching
+     * 
+     * @param expression
+     * @param env
+     * @return
+     */
+    public static Object execute(String expression, Map<String, Object> env) {
+        return execute(expression, env, false);
+    }
+
+
+    /**
+     * Invalidate expression cache
+     * 
+     * @param expression
+     */
+    public static void invalidateCache(String expression) {
+        cacheExpressions.remove(expression);
+    }
+
+
+    /**
+     * Execute a text expression without caching
+     * 
+     * @param expression
+     * @return
+     */
+    public static Object execute(String expression) {
+        return execute(expression, null);
+    }
 }
