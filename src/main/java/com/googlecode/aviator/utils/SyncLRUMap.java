@@ -24,6 +24,11 @@ public class SyncLRUMap<K, V> extends LinkedHashMap<K, V> {
     }
 
 
+    public synchronized int size() {
+        return super.size();
+    }
+
+
     public synchronized V put(K k, V v) {
         return super.put(k, v);
     }
