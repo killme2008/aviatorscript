@@ -1,6 +1,7 @@
 package com.googlecode.aviator.example;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +13,10 @@ public class FunctionExample {
         System.out.println(AviatorEvaluator.execute("sysdate()"));
         System.out.println(AviatorEvaluator.execute("rand()"));
         System.out.println(AviatorEvaluator.execute("now()"));
+        System.out.println(AviatorEvaluator.execute("date_to_string(sysdate(),'yyyy-MM-dd')"));
+        System.out.println(AviatorEvaluator
+            .execute("string_to_date(date_to_string(sysdate(),'yyyy-MM-dd'),'yyyy-MM-dd')"));
+
         // string function
         System.out.println("test string function...");
         System.out.println(AviatorEvaluator.execute("string.length('hello')"));
@@ -19,6 +24,8 @@ public class FunctionExample {
         System.out.println(AviatorEvaluator.execute("string.startsWith('hello','h')"));
         System.out.println(AviatorEvaluator.execute("string.endsWith('hello','llo')"));
         System.out.println(AviatorEvaluator.execute("string.contains(\"test\",string.substring('hello',1,2))"));
+        System.out.println(Arrays.toString((String[]) AviatorEvaluator
+            .execute("string.split('hello world,aviator',' ')")));
 
         // math function
         System.out.println("test math function...");
