@@ -106,6 +106,8 @@ public class AviatorPattern extends AviatorObject {
 
     @Override
     public int compare(AviatorObject other, Map<String, Object> env) {
+        if (this == other)
+            return 0;
         switch (other.getAviatorType()) {
         case Pattern:
             return this.pattern.pattern().compareTo(((AviatorPattern) other).pattern.pattern());
