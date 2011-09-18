@@ -48,6 +48,7 @@ public abstract class ClassExpression implements Expression {
         catch (Throwable e) {
             throw new ExpressionRuntimeException("Execute expression error", e);
         }
+
     }
 
 

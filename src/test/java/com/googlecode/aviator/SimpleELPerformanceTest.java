@@ -14,7 +14,7 @@ public class SimpleELPerformanceTest extends TestCase {
 		ctx.put("b", 4);
 		ctx.put("c", 5);
 
-		//AviatorEvaluator.setTrace(true);
+        // AviatorEvaluator.setTrace(true);
 		for (int i = 0; i < 10; ++i) {
 			perf(ctx);
 		}

@@ -329,6 +329,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         }
 
         this.asmCodeGenerator.initVariables(variables);
+        this.asmCodeGenerator.start();
 
         for (int i = 0; i < this.tokenList.size(); i++) {
             Token<?> token = this.tokenList.get(i);
