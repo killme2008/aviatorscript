@@ -55,10 +55,15 @@ import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
 import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
 import com.googlecode.aviator.runtime.function.string.StringEndsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringIndexOfFunction;
+import com.googlecode.aviator.runtime.function.string.StringJoinFunction;
 import com.googlecode.aviator.runtime.function.string.StringLengthFunction;
+import com.googlecode.aviator.runtime.function.string.StringReplaceAllFunction;
+import com.googlecode.aviator.runtime.function.string.StringReplaceFirstFunction;
+import com.googlecode.aviator.runtime.function.string.StringSplitFunction;
 import com.googlecode.aviator.runtime.function.string.StringStartsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringSubStringFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;
+import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
 import com.googlecode.aviator.runtime.function.system.NowFunction;
@@ -66,6 +71,7 @@ import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
+import com.googlecode.aviator.runtime.function.system.String2DateFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -163,6 +169,8 @@ public final class AviatorEvaluator {
         addFunction(new LongFunction());
         addFunction(new DoubleFunction());
         addFunction(new StrFunction());
+        addFunction(new Date2StringFunction());
+        addFunction(new String2DateFunction());
         addFunction(new BinaryFunction(OperatorType.ADD));
         addFunction(new BinaryFunction(OperatorType.SUB));
         addFunction(new BinaryFunction(OperatorType.MULT));
@@ -172,13 +180,17 @@ public final class AviatorEvaluator {
         addFunction(new BinaryFunction(OperatorType.NOT));
 
         // load string lib
-
         addFunction(new StringContainsFunction());
         addFunction(new StringIndexOfFunction());
         addFunction(new StringStartsWithFunction());
         addFunction(new StringEndsWithFunction());
         addFunction(new StringSubStringFunction());
         addFunction(new StringLengthFunction());
+        addFunction(new StringSplitFunction());
+        addFunction(new StringJoinFunction());
+        addFunction(new StringReplaceFirstFunction());
+        addFunction(new StringReplaceAllFunction());
+
         // load math lib
         addFunction(new MathAbsFunction());
         addFunction(new MathPowFunction());
