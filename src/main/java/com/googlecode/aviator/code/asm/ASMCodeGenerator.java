@@ -664,7 +664,7 @@ public class ASMCodeGenerator implements CodeGenerator {
             String outterVarName = var.getLexeme();
             String innerVarName = getInnerVarName(outterVarName);
             this.innerVarMap.put(outterVarName, innerVarName);
-            this.checkClassAdapter.visitField(ACC_PRIVATE, innerVarName,
+            this.checkClassAdapter.visitField(ACC_PRIVATE + ACC_FINAL, innerVarName,
                 "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;", null, null).visitEnd();
 
         }

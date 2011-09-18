@@ -39,7 +39,7 @@ public class AviatorLong extends AviatorNumber {
 
         static {
             for (long i = 0; i < cache.length; i++)
-                cache[(int)i] = new AviatorLong(i - 128);
+                cache[(int) i] = new AviatorLong(i - 128);
         }
     }
 
@@ -86,15 +86,7 @@ public class AviatorLong extends AviatorNumber {
                 return 0;
             }
         case Double:
-            if (this.number.doubleValue() > otherNum.doubleValue()) {
-                return 1;
-            }
-            else if (this.number.doubleValue() < otherNum.doubleValue()) {
-                return -1;
-            }
-            else {
-                return 0;
-            }
+            return Double.compare(this.number.doubleValue(), otherNum.doubleValue());
         default:
             throw new ExpressionRuntimeException("Could not compare " + this + " with " + other);
         }
@@ -156,7 +148,7 @@ public class AviatorLong extends AviatorNumber {
 
     protected void ensureLong(AviatorObject other) {
         if (other.getAviatorType() != AviatorType.Long) {
-            throw new ExpressionRuntimeException("Operator only supports Long");
+            throw new ExpressionRuntimeException(other + " is not long type");
         }
     }
 

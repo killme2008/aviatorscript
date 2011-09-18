@@ -20,7 +20,7 @@ public class StrFunction extends AbstractFunction {
     @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
         final Object value = arg1.getValue(env);
-        return new AviatorString(value == null ? "nil" : value.toString());
+        return new AviatorString(value == null ? "null" : value.toString());
     }
 
 
