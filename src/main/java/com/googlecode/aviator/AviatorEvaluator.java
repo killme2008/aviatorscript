@@ -380,7 +380,9 @@ public final class AviatorEvaluator {
     private static CodeGenerator newCodeGenerator() {
         switch (optimize) {
         case COMPILE:
-            return new ASMCodeGenerator(aviatorClassLoader, traceOutputStream, trace);
+            ASMCodeGenerator asmCodeGenerator = new ASMCodeGenerator(aviatorClassLoader, traceOutputStream, trace);
+            asmCodeGenerator.start();
+            return asmCodeGenerator;
         case EVAL:
             return new OptimizeCodeGenerator(aviatorClassLoader, traceOutputStream, trace);
         default:

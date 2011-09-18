@@ -40,8 +40,6 @@ public class AviatorJavaType extends AviatorObject {
 
     final private String name;
 
-    private Object value;
-
 
     @Override
     public AviatorType getAviatorType() {
@@ -263,14 +261,6 @@ public class AviatorJavaType extends AviatorObject {
 
     @Override
     public Object getValue(Map<String, Object> env) {
-        if (this.value != null)
-            return this.value;
-        this.value = get0(env);
-        return this.value;
-    }
-
-
-    private Object get0(Map<String, Object> env) {
         try {
             if (env != null) {
                 if (this.name.contains(".")) {

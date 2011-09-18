@@ -29,7 +29,6 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.googlecode.aviator.AviatorEvaluator;
-import com.googlecode.aviator.ClassExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.asm.ClassVisitor;
 import com.googlecode.aviator.asm.ClassWriter;
@@ -52,6 +51,7 @@ import com.googlecode.aviator.parser.AviatorClassLoader;
  * 
  */
 public class ASMCodeGenerator implements CodeGenerator {
+    private static final String FIELD_PREFIX = "var_";
     // Class Writer to generate class
     private final ClassWriter classWriter;
     // Trace visitor
@@ -75,6 +75,10 @@ public class ASMCodeGenerator implements CodeGenerator {
     private int maxStacks = 0;
     private int maxLocals = 2;
 
+    private int fieldCounter = 0;
+
+    private Map<String/* variable name */, String/* inner var name */> innerVarMap = new HashMap<String, String>();
+
 
     private void setMaxStacks(int newMaxStacks) {
         if (newMaxStacks > this.maxStacks) {
@@ -96,19 +100,17 @@ public class ASMCodeGenerator implements CodeGenerator {
         else {
             this.checkClassAdapter = new CheckClassAdapter(this.classWriter);
         }
+        visitClass();
+    }
+
+
+    public void start() {
         this.makeConstructor();
         this.startVisitMethodCode();
     }
 
 
     private void startVisitMethodCode() {
-        // this.mv = this.checkClassAdapter
-        // .visitMethod(
-        // ACC_PUBLIC + ACC_STATIC + ACC_FINAL,
-        // "run",
-        // "(Ljava/util/Map;)Ljava/lang/Object;",
-        // "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Ljava/lang/Object;",
-        // null);
         this.mv =
                 checkClassAdapter.visitMethod(ACC_PUBLIC + +ACC_FINAL, "execute0",
                     "(Ljava/util/Map;)Ljava/lang/Object;",
@@ -117,8 +119,7 @@ public class ASMCodeGenerator implements CodeGenerator {
     }
 
 
-    private void endVisitCode() {
-
+    private void endVisitMethodCode() {
         if (this.operandsCount > 0) {
             this.loadEnv();
             this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject", "getValue",
@@ -139,6 +140,10 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitMaxs(this.maxStacks, this.maxLocals);
         this.mv.visitEnd();
 
+    }
+
+
+    private void endVisitClass() {
         this.checkClassAdapter.visitEnd();
     }
 
@@ -147,18 +152,36 @@ public class ASMCodeGenerator implements CodeGenerator {
      * Make a default constructor
      */
     private void makeConstructor() {
-        this.checkClassAdapter.visit(AviatorEvaluator.BYTECODE_VER, ACC_PUBLIC + ACC_SUPER, this.className, null,
-            "com/googlecode/aviator/ClassExpression", null);
-
         {
             this.mv = this.checkClassAdapter.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
             this.mv.visitCode();
             this.mv.visitVarInsn(ALOAD, 0);
             mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/ClassExpression", "<init>", "()V");
+            if (!this.innerVarMap.isEmpty()) {
+                for (Map.Entry<String, String> entry : this.innerVarMap.entrySet()) {
+                    String outterName = entry.getKey();
+                    String innerName = entry.getValue();
+                    this.mv.visitVarInsn(ALOAD, 0);
+                    this.mv.visitTypeInsn(NEW, "com/googlecode/aviator/runtime/type/AviatorJavaType");
+                    this.mv.visitInsn(DUP);
+                    this.mv.visitLdcInsn(outterName);
+                    this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/runtime/type/AviatorJavaType",
+                        "<init>", "(Ljava/lang/String;)V");
+                    this.mv.visitFieldInsn(PUTFIELD, this.className, innerName,
+                        "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;");
+                }
+            }
+
             this.mv.visitInsn(RETURN);
-            this.mv.visitMaxs(1, 1);
+            this.mv.visitMaxs(4, 1);
             this.mv.visitEnd();
         }
+    }
+
+
+    private void visitClass() {
+        this.checkClassAdapter.visit(AviatorEvaluator.BYTECODE_VER, ACC_PUBLIC + ACC_SUPER, this.className, null,
+            "com/googlecode/aviator/ClassExpression", null);
     }
 
 
@@ -517,7 +540,8 @@ public class ASMCodeGenerator implements CodeGenerator {
      * @see com.googlecode.aviator.code.CodeGenerator#getResult()
      */
     public Expression getResult() {
-        this.endVisitCode();
+        end();
+
         byte[] bytes = this.classWriter.toByteArray();
         try {
             Class<?> defineClass = this.classLoader.defineClass(this.className, bytes);
@@ -526,6 +550,12 @@ public class ASMCodeGenerator implements CodeGenerator {
         catch (Exception e) {
             throw new CompileExpressionErrorException("define class error", e);
         }
+    }
+
+
+    private void end() {
+        this.endVisitMethodCode();
+        this.endVisitClass();
     }
 
 
@@ -601,17 +631,19 @@ public class ASMCodeGenerator implements CodeGenerator {
                 this.pushOperand(0);
             }
             else {
-                String varName = variable.getLexeme();
-
-                if (var2LocalIndexMap.get(varName) != null) {
-                    int index = var2LocalIndexMap.get(varName);
-                    this.mv.visitVarInsn(ALOAD, index);
-                    this.pushOperand(0);
+                String outterVarName = variable.getLexeme();
+                String innerVarName = this.innerVarMap.get(outterVarName);
+                if (innerVarName != null) {
+                    this.mv.visitVarInsn(ALOAD, 0);
+                    this.mv.visitFieldInsn(GETFIELD, this.className, innerVarName,
+                        "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;");
+                    this.pushOperand(1);
+                    this.popOperand();
                 }
                 else {
                     this.mv.visitTypeInsn(NEW, "com/googlecode/aviator/runtime/type/AviatorJavaType");
                     this.mv.visitInsn(DUP);
-                    this.mv.visitLdcInsn(variable.getLexeme());
+                    this.mv.visitLdcInsn(outterVarName);
                     this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/runtime/type/AviatorJavaType",
                         "<init>", "(Ljava/lang/String;)V");
                     this.pushOperand(2);
@@ -625,25 +657,22 @@ public class ASMCodeGenerator implements CodeGenerator {
 
     }
 
-    private Map<String/* variable name */, Integer/* local index */> var2LocalIndexMap = new HashMap<String, Integer>();
-
 
     public void initVariables(Set<Variable> varTokens) {
         for (Variable var : varTokens) {
-            String varName = var.getLexeme();
-            this.mv.visitTypeInsn(NEW, "com/googlecode/aviator/runtime/type/AviatorJavaType");
-            this.mv.visitInsn(DUP);
-            this.mv.visitLdcInsn(varName);
-            this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/runtime/type/AviatorJavaType", "<init>",
-                "(Ljava/lang/String;)V");
-            int index = getLocalIndex();
-            this.mv.visitVarInsn(ASTORE, index);
-            this.var2LocalIndexMap.put(varName, index);
-            this.pushOperand(2);
-            this.popOperand();
-            this.popOperand();
-            this.popOperand();
+            // Use inner variable name instead of outter variable name
+            String outterVarName = var.getLexeme();
+            String innerVarName = getInnerVarName(outterVarName);
+            this.innerVarMap.put(outterVarName, innerVarName);
+            this.checkClassAdapter.visitField(ACC_PRIVATE, innerVarName,
+                "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;", null, null).visitEnd();
+
         }
+    }
+
+
+    private String getInnerVarName(String varName) {
+        return FIELD_PREFIX + (this.fieldCounter++);
     }
 
 
