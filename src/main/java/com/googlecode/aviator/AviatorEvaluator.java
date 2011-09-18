@@ -256,11 +256,19 @@ public final class AviatorEvaluator {
     }
 
 
+    /**
+     * Clear all cached compiled expression
+     */
     public static void clearExpressionCache() {
         cacheExpressions.clear();
     }
 
 
+    /**
+     * Returns classloader
+     * 
+     * @return
+     */
     public static AviatorClassLoader getAviatorClassLoader() {
         return aviatorClassLoader;
     }
@@ -325,6 +333,11 @@ public final class AviatorEvaluator {
     }
 
 
+    /**
+     * Configure user defined classloader
+     * 
+     * @param aviatorClassLoader
+     */
     public static void setAviatorClassLoader(AviatorClassLoader aviatorClassLoader) {
         AviatorEvaluator.aviatorClassLoader = aviatorClassLoader;
     }

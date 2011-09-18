@@ -48,15 +48,7 @@ public class AviatorDouble extends AviatorNumber {
     public int innerCompare(AviatorObject other) {
         ensureNumber(other);
         AviatorNumber otherNum = (AviatorNumber) other;
-        if (this.number.doubleValue() > otherNum.doubleValue()) {
-            return 1;
-        }
-        else if (this.number.doubleValue() < otherNum.doubleValue()) {
-            return -1;
-        }
-        else {
-            return 0;
-        }
+        return Double.compare(this.number.doubleValue(), otherNum.doubleValue());
     }
 
 
