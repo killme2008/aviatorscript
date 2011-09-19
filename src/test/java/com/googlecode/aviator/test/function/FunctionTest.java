@@ -147,6 +147,7 @@ public class FunctionTest {
 
     @Test
     public void testSystemFunction() {
+        AviatorEvaluator.setTrace(true);
         // sysdate()
         Object date = AviatorEvaluator.execute("sysdate()");
         assertNotNull(date);

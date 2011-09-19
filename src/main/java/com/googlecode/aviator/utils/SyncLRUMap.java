@@ -24,6 +24,11 @@ public class SyncLRUMap<K, V> extends LinkedHashMap<K, V> {
     }
 
 
+    public synchronized V remove(Object key) {
+        return super.remove(key);
+    }
+
+
     public synchronized int size() {
         return super.size();
     }
