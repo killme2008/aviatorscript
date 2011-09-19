@@ -321,14 +321,40 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
     private void callASM() {
-        Set<Variable> variables = new HashSet<Variable>();
+        Map<String, Integer/* counter */> variables = new HashMap<String, Integer>();
+        Map<String, Integer/* counter */> methods = new HashMap<String, Integer>();
         for (Token<?> token : this.tokenList) {
-            if (token.getType() == TokenType.Variable) {
-                variables.add((Variable) token);
+            switch (token.getType()) {
+            case Variable:
+                String varName = token.getLexeme();
+                if (!variables.containsKey(varName)) {
+                    variables.put(varName, 1);
+                }
+                else {
+                    variables.put(varName, variables.get(varName) + 1);
+                }
+
+                break;
+            case Delegate:
+                DelegateToken delegateToken = (DelegateToken) token;
+                if (delegateToken.getDelegateTokenType() == DelegateTokenType.Method_Name) {
+                    Token<?> realToken = delegateToken.getToken();
+                    if (realToken.getType() == TokenType.Variable) {
+                        String methodName = token.getLexeme();
+                        if (!methods.containsKey(methodName)) {
+                            methods.put(methodName, 1);
+                        }
+                        else {
+                            methods.put(methodName, methods.get(methodName) + 1);
+                        }
+                    }
+                }
+                break;
             }
         }
 
         this.asmCodeGenerator.initVariables(variables);
+        this.asmCodeGenerator.initMethods(methods);
         this.asmCodeGenerator.start();
 
         for (int i = 0; i < this.tokenList.size(); i++) {
