@@ -106,7 +106,7 @@ public final class AviatorEvaluator {
     /**
      * Aviator version
      */
-    public static final String VERSION = "1.1.1";
+    public static final String VERSION = "2.1.1";
 
     /**
      * Generated java class version,default 1.5
