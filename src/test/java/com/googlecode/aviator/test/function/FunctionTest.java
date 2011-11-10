@@ -433,6 +433,36 @@ public class FunctionTest {
 
 
     @Test
+    public void testArrayAccess() {
+
+        // AviatorEvaluator.setTrace(true);
+        Map<String, Object> env = new HashMap<String, Object>();
+        int[] a = new int[] { 1, 2, 3, 4 };
+        int[][] b = new int[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
+        int[][][] c = new int[][][] { { { 1, 2 }, { 3, 4 } }, { { 5, 6 }, { 7, 8 } } };
+        env.put("a", a);
+        env.put("b", b);
+        env.put("c", c);
+
+        assertEquals(a[0] + b[0][0] + c[0][0][0], AviatorEvaluator.execute("a[0]+b[0][0]+c[0][0][0]", env));
+        assertEquals(a[1] + b[0][2] * c[1][1][1], AviatorEvaluator.execute("a[1]+b[0][2]*c[1][1][1]", env));
+        assertEquals(a[1] + b[0][2] * c[1][1][1] / (a[2] * a[1] + 100 - c[0][1][1] * b[0][1]),
+            AviatorEvaluator.execute("a[1]+b[0][2]*c[1][1][1]/(a[2]*a[1]+100-c[0][1][1]*b[0][1])", env));
+        assertEquals(c[0][1][1] > b[1][0], AviatorEvaluator.execute("c[0][1][1]>b[1][0]", env));
+        assertEquals(c[0][1][1] <= b[1][0], AviatorEvaluator.execute("c[0][1] [1] <= b[1][0]", env));
+        assertEquals(c[0][1][1] > b[1][0] ? a[0] : a[2], AviatorEvaluator.execute("c[0][1][1]>b[1][0]? a[0]:a[2]", env));
+        assertEquals(b[0].length, AviatorEvaluator.execute("count(b[0])", env));
+        assertEquals(6, AviatorEvaluator.execute("reduce(b[0],+,0)", env));
+        Object[] rt = (Object[]) AviatorEvaluator.execute("filter(c[0][0],seq.gt(1))", env);
+        assertEquals(1, rt.length);
+        assertEquals(2, rt[0]);
+        AviatorEvaluator.execute("map(c[1][0],println)", env);
+        assertTrue((Boolean) AviatorEvaluator.execute("include(b[0],3)", env));
+
+    }
+
+
+    @Test
     public void testOtherFunction() {
         // AviatorEvaluator.setOptimize(AviatorEvaluator.EVAL);
         // System.setProperty("aviator.asm.trace","true");

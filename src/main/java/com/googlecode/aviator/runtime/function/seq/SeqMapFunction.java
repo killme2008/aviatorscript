@@ -69,10 +69,12 @@ public class SeqMapFunction extends AbstractFunction {
             return new AviatorRuntimeJavaType(result);
         }
         else if (clazz.isArray()) {
-            Object[] seq = (Object[]) first;
-            Object result = Array.newInstance(Object.class, seq.length);
+            // Object[] seq = (Object[]) first;
+            int length = Array.getLength(first);
+            Object result = Array.newInstance(Object.class, length);
             int index = 0;
-            for (Object obj : seq) {
+            for (int i = 0; i < length; i++) {
+                Object obj = Array.get(first, i);
                 Array.set(result, index++, fun.call(env, new AviatorRuntimeJavaType(obj)).getValue(env));
             }
             return new AviatorRuntimeJavaType(result);

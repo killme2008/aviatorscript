@@ -500,29 +500,30 @@ public class ExpressionParser {
             }
             this.move(true);
             // function
-            if (this.prevToken.getType() == TokenType.Variable && this.expectLexeme("(")) {
+            Token<?> prev = this.prevToken;
+            if (prev.getType() == TokenType.Variable && this.expectLexeme("(")) {
                 this.method();
             }
-            else if (this.prevToken.getType() == TokenType.Variable && this.expectLexeme("[")) {
-                this.bracketDepth++;
-                if (RESERVED_WORDS.contains(this.prevToken.getLexeme())) {
-                    throw new ExpressionSyntaxErrorException(this.prevToken.getLexeme() + " could not use [] operator");
+            else if (prev.getType() == TokenType.Variable || prev.getLexeme().equals(")")) {
+                // check if it is a array index access
+                boolean hasArray = false;
+                while (this.expectLexeme("[")) {
+                    if (!hasArray) {
+                        this.codeGenerator.onArray(this.prevToken);
+                        this.move(true);
+                        hasArray = true;
+                    }
+                    else {
+                        this.move(true);
+                    }
+                    this.codeGenerator.onArrayIndexStart(this.prevToken);
+                    array();
                 }
-                this.codeGenerator.onElementStart(this.prevToken);
-
-                this.move(true);
-                this.ternary();
-                if (!this.expectLexeme("]")) {
-                    this.reportSyntaxError("insert ']' to complete Expression");
-                }
-                else {
-                    this.bracketDepth--;
-                    this.move(true);
-                    this.codeGenerator.onElementEnd(this.lookhead);
-                }
+                if (!hasArray)
+                    this.codeGenerator.onConstant(this.prevToken);
             }
             else {
-                this.codeGenerator.onConstant(this.prevToken);
+                this.codeGenerator.onConstant(prev);
             }
         }
         else if (this.expectLexeme("/")) {
@@ -532,6 +533,24 @@ public class ExpressionParser {
             this.reportSyntaxError("invalid value");
         }
 
+    }
+
+
+    private void array() {
+        this.bracketDepth++;
+        if (RESERVED_WORDS.contains(this.prevToken.getLexeme())) {
+            throw new ExpressionSyntaxErrorException(this.prevToken.getLexeme() + " could not use [] operator");
+        }
+
+        this.ternary();
+        if (!this.expectLexeme("]")) {
+            this.reportSyntaxError("insert ']' to complete Expression");
+        }
+        else {
+            this.bracketDepth--;
+            this.move(true);
+            this.codeGenerator.onArrayIndexEnd(this.lookhead);
+        }
     }
 
 

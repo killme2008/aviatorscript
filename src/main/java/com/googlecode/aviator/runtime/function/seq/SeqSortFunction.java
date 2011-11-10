@@ -53,9 +53,12 @@ public class SeqSortFunction extends AbstractFunction {
             return new AviatorRuntimeJavaType(Arrays.asList(a));
         }
         else if (clazz.isArray()) {
-            Object[] array = (Object[]) first;
-            Object[] dup = (Object[]) Array.newInstance(array.getClass().getComponentType(), array.length);
-            System.arraycopy(array, 0, dup, 0, dup.length);
+            int length = Array.getLength(first);
+            Object[] dup = (Object[]) Array.newInstance(first.getClass().getComponentType(), length);
+            for (int i = 0; i < length; i++) {
+                dup[i] = Array.get(first, i);
+            }
+            // System.arraycopy(array, 0, dup, 0, dup.length);
             Arrays.sort(dup);
             return new AviatorRuntimeJavaType(dup);
         }

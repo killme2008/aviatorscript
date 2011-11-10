@@ -201,12 +201,17 @@ public class FakeCodeGenerator implements CodeGenerator {
     }
 
 
-    public void onElementStart(Token<?> lookhead) {
+    public void onArray(Token<?> lookhead) {
         this.appendToken(lookhead.getLexeme());
     }
 
 
-    public void onElementEnd(Token<?> lookhead) {
+    public void onArrayIndexStart(Token<?> token) {
+
+    }
+
+
+    public void onArrayIndexEnd(Token<?> lookhead) {
         this.appendToken("[]");
 
     }

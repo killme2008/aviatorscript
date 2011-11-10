@@ -144,4 +144,16 @@ public abstract class AviatorObject {
         }
         return (Boolean) this.getValue(env);
     }
+
+
+    /**
+     * Access array or list element
+     * 
+     * @param env
+     * @param indexObject
+     * @return
+     */
+    public AviatorObject getElement(Map<String, Object> env, AviatorObject indexObject) {
+        throw new ExpressionRuntimeException(this.desc(env) + " is not a array");
+    }
 }

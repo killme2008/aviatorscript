@@ -413,7 +413,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
                     this.asmCodeGenerator.onMethodInvoke(token);
                     break;
                 case INDEX:
-                    this.asmCodeGenerator.onElementEnd(token);
+                    this.asmCodeGenerator.onArrayIndexEnd(token);
                     break;
                 case MATCH:
                     this.asmCodeGenerator.onMatch(token);
@@ -454,8 +454,11 @@ public class OptimizeCodeGenerator implements CodeGenerator {
                 case Join_Left:
                     this.asmCodeGenerator.onJoinLeft(realToken);
                     break;
-                case Element_Start:
-                    this.asmCodeGenerator.onElementStart(realToken);
+                case Array:
+                    this.asmCodeGenerator.onArray(realToken);
+                    break;
+                case Index_Start:
+                    this.asmCodeGenerator.onArrayIndexStart(realToken);
                     break;
                 case Ternary_Boolean:
                     this.asmCodeGenerator.onTernaryBoolean(realToken);
@@ -520,14 +523,21 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     }
 
 
-    public void onElementEnd(Token<?> lookhead) {
+    public void onArrayIndexStart(Token<?> lookhead) {
+        this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+            DelegateTokenType.Index_Start));
+
+    }
+
+
+    public void onArrayIndexEnd(Token<?> lookhead) {
         this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.INDEX));
     }
 
 
-    public void onElementStart(Token<?> lookhead) {
+    public void onArray(Token<?> lookhead) {
         this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-            DelegateTokenType.Element_Start));
+            DelegateTokenType.Array));
 
     }
 

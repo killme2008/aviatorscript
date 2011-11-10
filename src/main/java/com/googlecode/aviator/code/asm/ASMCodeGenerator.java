@@ -834,17 +834,21 @@ public class ASMCodeGenerator implements CodeGenerator {
     private final Stack<MethodMetaData> methodMetaDataStack = new Stack<MethodMetaData>();
 
 
-    public void onElementStart(Token<?> lookhead) {
+    public void onArray(Token<?> lookhead) {
         this.onConstant(lookhead);
+    }
+
+
+    public void onArrayIndexStart(Token<?> token) {
         this.loadEnv();
     }
 
 
-    public void onElementEnd(Token<?> lookhead) {
+    public void onArrayIndexEnd(Token<?> lookhead) {
         this.mv
             .visitMethodInsn(
                 INVOKEVIRTUAL,
-                "com/googlecode/aviator/runtime/type/AviatorJavaType",
+                "com/googlecode/aviator/runtime/type/AviatorObject",
                 "getElement",
                 "(Ljava/util/Map;Lcom/googlecode/aviator/runtime/type/AviatorObject;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
 

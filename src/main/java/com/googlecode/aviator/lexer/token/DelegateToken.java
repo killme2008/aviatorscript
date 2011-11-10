@@ -19,7 +19,8 @@ public class DelegateToken extends AbstractToken<Token<?>> {
         Join_Left,
         Ternary_Boolean,
         Ternary_Left,
-        Element_Start,
+        Array,
+        Index_Start,
         Method_Name,
         Method_Param
     }
