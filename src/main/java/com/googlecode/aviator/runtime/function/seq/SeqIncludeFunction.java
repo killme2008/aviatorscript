@@ -18,6 +18,7 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 
@@ -58,9 +59,11 @@ public class SeqIncludeFunction extends AbstractFunction {
             }
         }
         else if (clazz.isArray()) {
-            Object[] seq = (Object[]) first;
+            //Object[] seq = (Object[]) first;
             try {
-                for (Object obj : seq) {
+                int length = Array.getLength(first);
+                for (int i = 0; i < length; i++) {
+                    Object obj = Array.get(first, i);
                     if (new AviatorRuntimeJavaType(obj).compare(arg2, env) == 0) {
                         contains = true;
                         break;

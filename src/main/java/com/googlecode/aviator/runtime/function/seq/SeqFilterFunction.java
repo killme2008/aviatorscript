@@ -18,6 +18,7 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -70,9 +71,11 @@ public class SeqFilterFunction extends AbstractFunction {
             return new AviatorRuntimeJavaType(result);
         }
         else if (clazz.isArray()) {
-            Object[] seq = (Object[]) first;
+            // Object[] seq = (Object[]) first;
             List<Object> result = new ArrayList<Object>();
-            for (Object obj : seq) {
+            int length = Array.getLength(first);
+            for (int i = 0; i < length; i++) {
+                Object obj = Array.get(first, i);
                 if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
                     result.add(obj);
                 }

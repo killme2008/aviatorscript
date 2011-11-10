@@ -1,5 +1,6 @@
 package com.googlecode.aviator.runtime.function.string;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 
@@ -52,9 +53,10 @@ public class StringJoinFunction extends AbstractFunction {
             }
         }
         else if (clazz.isArray()) {
-            Object[] seq = (Object[]) target;
-            boolean wasFirst = true;
-            for (Object obj : seq) {
+            int length = Array.getLength(target);
+            boolean wasFirst=true;
+            for (int i = 0; i < length; i++) {
+                Object obj = Array.get(target, i);
                 wasFirst = append(sb, split, wasFirst, obj);
             }
         }

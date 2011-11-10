@@ -129,9 +129,12 @@ public interface CodeGenerator {
     public void onMethodInvoke(Token<?> lookhead);
 
 
-    public void onElementStart(Token<?> lookhead);
+    public void onArray(Token<?> lookhead);
 
 
-    public void onElementEnd(Token<?> lookhead);
+    public void onArrayIndexStart(Token<?> token);
+
+
+    public void onArrayIndexEnd(Token<?> lookhead);
 
 }

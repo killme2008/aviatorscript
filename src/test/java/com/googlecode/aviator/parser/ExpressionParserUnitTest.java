@@ -188,22 +188,22 @@ public class ExpressionParserUnitTest {
         this.parser = new ExpressionParser(new ExpressionLexer("true || 2&1==0 ? 1 :0"), this.codeGenerator);
         this.parser.parse();
         assertEquals("true 2 1 0 == & || 1 0 ?:", this.codeGenerator.getPostFixExpression());
-        
+
         this.resetCodeGenerator();
         this.parser = new ExpressionParser(new ExpressionLexer("3+4>>1"), this.codeGenerator);
         this.parser.parse();
         assertEquals("3 4 + 1 >>", this.codeGenerator.getPostFixExpression());
-        
+
         this.resetCodeGenerator();
         this.parser = new ExpressionParser(new ExpressionLexer("3-4>>1"), this.codeGenerator);
         this.parser.parse();
         assertEquals("3 4 - 1 >>", this.codeGenerator.getPostFixExpression());
-        
+
         this.resetCodeGenerator();
         this.parser = new ExpressionParser(new ExpressionLexer("3-4<<1==0"), this.codeGenerator);
         this.parser.parse();
         assertEquals("3 4 - 1 << 0 ==", this.codeGenerator.getPostFixExpression());
-        
+
         this.resetCodeGenerator();
         this.parser = new ExpressionParser(new ExpressionLexer("3-4<<1&3"), this.codeGenerator);
         this.parser.parse();
@@ -296,8 +296,8 @@ public class ExpressionParserUnitTest {
                 new ExpressionParser(new ExpressionLexer(
                     "'killme2008@gmail.com'=~/[a-zA-Z0-9_]+[@][a-zA-Z0-9]+([\\.com]|[\\.cn])/"), this.codeGenerator);
         this.parser.parse();
-        assertEquals("killme2008@gmail.com [a-zA-Z0-9_]+[@][a-zA-Z0-9]+([\\.com]|[\\.cn]) =~", this.codeGenerator
-            .getPostFixExpression());
+        assertEquals("killme2008@gmail.com [a-zA-Z0-9_]+[@][a-zA-Z0-9]+([\\.com]|[\\.cn]) =~",
+            this.codeGenerator.getPostFixExpression());
 
     }
 
@@ -317,8 +317,8 @@ public class ExpressionParserUnitTest {
                 new ExpressionParser(new ExpressionLexer("/[a-zA-Z0-9_]+[@][a-zA-Z0-9]+([\\.com]|[\\.cn])/==/hello/"),
                     this.codeGenerator);
         this.parser.parse();
-        assertEquals("[a-zA-Z0-9_]+[@][a-zA-Z0-9]+([\\.com]|[\\.cn]) hello ==", this.codeGenerator
-            .getPostFixExpression());
+        assertEquals("[a-zA-Z0-9_]+[@][a-zA-Z0-9]+([\\.com]|[\\.cn]) hello ==",
+            this.codeGenerator.getPostFixExpression());
     }
 
 
@@ -336,8 +336,8 @@ public class ExpressionParserUnitTest {
                 new ExpressionParser(new ExpressionLexer("5+(5+(5+a*1.02)*1.02)*1.02-600/(4*b-(c+d))"),
                     this.codeGenerator);
         this.parser.parse();
-        assertEquals("5 5 5 a 1.02 * + 1.02 * + 1.02 * + 600 4 b * c d + - / -", this.codeGenerator
-            .getPostFixExpression());
+        assertEquals("5 5 5 a 1.02 * + 1.02 * + 1.02 * + 600 4 b * c d + - / -",
+            this.codeGenerator.getPostFixExpression());
     }
 
 
@@ -539,8 +539,8 @@ public class ExpressionParserUnitTest {
                     this.codeGenerator);
         this.parser.parse();
 
-        assertEquals("hello 3 4 method<invoked> hello 1 method<invoked> method<invoked> 3 2 > &&", this.codeGenerator
-            .getPostFixExpression());
+        assertEquals("hello 3 4 method<invoked> hello 1 method<invoked> method<invoked> 3 2 > &&",
+            this.codeGenerator.getPostFixExpression());
 
     }
 
@@ -551,6 +551,24 @@ public class ExpressionParserUnitTest {
         this.parser.parse();
 
         assertEquals("a 2 []", this.codeGenerator.getPostFixExpression());
+    }
+
+
+    @Test
+    public void testMultiDimensionalArrayAccess1() {
+        this.parser = new ExpressionParser(new ExpressionLexer("a[2][3]"), this.codeGenerator);
+        this.parser.parse();
+        assertEquals("a 2 [] 3 []", this.codeGenerator.getPostFixExpression());
+
+    }
+
+
+    @Test
+    public void testMultiDimensionalArrayAccess2() {
+
+        this.parser = new ExpressionParser(new ExpressionLexer("a[1][2] [3]   [4]"), this.codeGenerator);
+        this.parser.parse();
+        assertEquals("a 1 [] 2 [] 3 [] 4 []", this.codeGenerator.getPostFixExpression());
     }
 
 
@@ -597,11 +615,12 @@ public class ExpressionParserUnitTest {
     }
 
 
-    @Test(expected = ExpressionSyntaxErrorException.class)
-    public void testArrayAccess_Illegal3() {
-        this.parser = new ExpressionParser(new ExpressionLexer("a[c[3+true[y*2]]]"), this.codeGenerator);
-        this.parser.parse();
-    }
+    // @Test(expected = ExpressionSyntaxErrorException.class)
+    // public void testArrayAccess_Illegal3() {
+    // this.parser = new ExpressionParser(new
+    // ExpressionLexer("a[c[3+true[y*2]]]"), this.codeGenerator);
+    // this.parser.parse();
+    // }
 
 
     @Test(expected = ExpressionSyntaxErrorException.class)
