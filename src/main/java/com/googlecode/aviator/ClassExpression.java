@@ -20,6 +20,7 @@ package com.googlecode.aviator;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 
@@ -30,7 +31,12 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
  * @author dennis
  * 
  */
-public abstract class ClassExpression implements Expression {
+public abstract class ClassExpression extends BaseExpression {
+
+    public ClassExpression(Set<String> varNames) {
+        super(varNames);
+    }
+
 
     /*
      * (non-Javadoc)
@@ -56,16 +62,6 @@ public abstract class ClassExpression implements Expression {
 
 
     public abstract Object execute0(Map<String, Object> env);
-
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.googlecode.aviator.IExpression#execute()
-     */
-    public Object execute() {
-        return this.execute(null);
-    }
 
 
     /**

@@ -27,10 +27,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 
 
@@ -58,8 +60,8 @@ public class FunctionTest {
 
         assertEquals(1, AviatorEvaluator.execute("100%3"));
         assertEquals(0, AviatorEvaluator.execute("1-100%3"));
-        assertEquals(100 % 3 * 4.2 + (37 + 95) / (6 * 3 - 18.0), (Double) AviatorEvaluator
-            .execute("100%3*4.2+(37+95)/(6*3-18.0)"), 0.0001);
+        assertEquals(100 % 3 * 4.2 + (37 + 95) / (6 * 3 - 18.0),
+            (Double) AviatorEvaluator.execute("100%3*4.2+(37+95)/(6*3-18.0)"), 0.0001);
     }
 
 
@@ -75,7 +77,7 @@ public class FunctionTest {
         env.put("d", d);
         env.put("b", b);
 
-        System.setProperty("aviator.asm.trace","true");
+        System.setProperty("aviator.asm.trace", "true");
         assertEquals(-100, AviatorEvaluator.execute("-i", env));
         assertEquals(-103.4, AviatorEvaluator.execute("-i-pi", env));
         assertEquals(2 * 3.14 * 10, (Double) AviatorEvaluator.execute("2*pi*10", env), 0.001);
@@ -84,15 +86,15 @@ public class FunctionTest {
         assertEquals((i + pi + d + b) / 4, AviatorEvaluator.execute("(i+pi+d+b)/4", env));
         assertEquals(200, AviatorEvaluator.execute("i+100", env));
         assertEquals(0, AviatorEvaluator.execute("i%4", env));
-        assertEquals(i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99, AviatorEvaluator.execute(
-            "i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99", env));
+        assertEquals(i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99,
+            AviatorEvaluator.execute("i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99", env));
     }
 
 
     @Test
     public void testOperatorPrecedence() {
-        assertEquals(false, AviatorEvaluator
-            .execute("6.7-100>39.6 ? 5==5? 4+5:6-1 : !false ? 5-6>0&& false: 100%3<=5 || 67*40>=100"));
+        assertEquals(false,
+            AviatorEvaluator.execute("6.7-100>39.6 ? 5==5? 4+5:6-1 : !false ? 5-6>0&& false: 100%3<=5 || 67*40>=100"));
     }
 
 
@@ -334,8 +336,8 @@ public class FunctionTest {
         assertEquals(99 | ~k, AviatorEvaluator.execute("99|~k", env));
         assertEquals(j >>> i, AviatorEvaluator.execute("j>>>i", env));
 
-        assertEquals(i ^ j ^ k & i & j & k | i | j | k & 3 & 4 | 5 & ~i, AviatorEvaluator.execute(
-            "i^j^k&i&j&k|i|j|k&3&4|5&~i", env));
+        assertEquals(i ^ j ^ k & i & j & k | i | j | k & 3 & 4 | 5 & ~i,
+            AviatorEvaluator.execute("i^j^k&i&j&k|i|j|k&3&4|5&~i", env));
         assertEquals(
             4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) : i >> j * k / i
                     ^ ~j + k << i >> j >> 1000L,
@@ -364,8 +366,8 @@ public class FunctionTest {
         assertEquals(0xFF == 0Xff, AviatorEvaluator.execute("0xFF==0Xff", env));
         assertEquals(~0xFF == 0Xff, AviatorEvaluator.execute("~0xFF==0Xff", env));
         assertEquals(~0xFF | k & 3 - 0X11, AviatorEvaluator.execute("~0xFF|k&3-0X11", env));
-        assertEquals(0x45 > i ? 0x11 - 0344 * 5 / 7 : k / 0xFF - j * 0x45, AviatorEvaluator.execute(
-            "0x45>i?0x11-0344*5/7:k/0xFF-j*0x45 ", env));
+        assertEquals(0x45 > i ? 0x11 - 0344 * 5 / 7 : k / 0xFF - j * 0x45,
+            AviatorEvaluator.execute("0x45>i?0x11-0344*5/7:k/0xFF-j*0x45 ", env));
     }
 
 
@@ -404,6 +406,29 @@ public class FunctionTest {
     @Test
     public void testMathFunction() {
 
+    }
+
+
+    @Test
+    public void testGetVariableNames() {
+        Expression expression = AviatorEvaluator.compile("a+b", true);
+        assertNotNull(expression);
+        Set<String> varSet = expression.getVariableNames();
+        assertNotNull(varSet);
+        assertEquals(2, varSet.size());
+        assertTrue(varSet.contains("a"));
+        assertTrue(varSet.contains("b"));
+
+        expression = AviatorEvaluator.compile("a==b || c>3 || a+d*e/2 <= 1000", true);
+        assertNotNull(expression);
+        varSet = expression.getVariableNames();
+        assertNotNull(varSet);
+        assertEquals(5, varSet.size());
+        assertTrue(varSet.contains("a"));
+        assertTrue(varSet.contains("b"));
+        assertTrue(varSet.contains("c"));
+        assertTrue(varSet.contains("d"));
+        assertTrue(varSet.contains("e"));
     }
 
 

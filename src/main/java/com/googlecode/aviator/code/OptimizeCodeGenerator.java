@@ -301,26 +301,6 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             ;
         }
 
-        // call asm to generate byte codes
-        this.callASM();
-
-        // Last token is a literal token,then return a LiteralExpression
-        if (this.tokenList.size() <= 1) {
-            if (this.tokenList.isEmpty()) {
-                return new LiteralExpression(null);
-            }
-            final Token<?> lastToken = this.tokenList.get(0);
-            if (this.isLiteralToken(lastToken)) {
-                return new LiteralExpression(this.getAviatorObjectFromToken(lastToken).getValue(null));
-            }
-        }
-
-        // get result from asm
-        return this.asmCodeGenerator.getResult();
-    }
-
-
-    private void callASM() {
         Map<String, Integer/* counter */> variables = new HashMap<String, Integer>();
         Map<String, Integer/* counter */> methods = new HashMap<String, Integer>();
         for (Token<?> token : this.tokenList) {
@@ -352,7 +332,27 @@ public class OptimizeCodeGenerator implements CodeGenerator {
                 break;
             }
         }
+        // call asm to generate byte codes
+        this.callASM(variables, methods);
 
+        // Last token is a literal token,then return a LiteralExpression
+        if (this.tokenList.size() <= 1) {
+            if (this.tokenList.isEmpty()) {
+                return new LiteralExpression(null, variables.keySet());
+            }
+            final Token<?> lastToken = this.tokenList.get(0);
+            if (this.isLiteralToken(lastToken)) {
+                return new LiteralExpression(this.getAviatorObjectFromToken(lastToken).getValue(null),
+                    variables.keySet());
+            }
+        }
+
+        // get result from asm
+        return this.asmCodeGenerator.getResult();
+    }
+
+
+    private void callASM(Map<String, Integer/* counter */> variables, Map<String, Integer/* counter */> methods) {
         this.asmCodeGenerator.initVariables(variables);
         this.asmCodeGenerator.initMethods(methods);
         this.asmCodeGenerator.start();
