@@ -22,6 +22,7 @@ import static com.googlecode.aviator.asm.Opcodes.*;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -165,10 +166,11 @@ public class ASMCodeGenerator implements CodeGenerator {
      */
     private void makeConstructor() {
         {
-            this.mv = this.checkClassAdapter.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
+            this.mv = this.checkClassAdapter.visitMethod(ACC_PUBLIC, "<init>", "(Ljava/util/Set;)V", null, null);
             this.mv.visitCode();
             this.mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/ClassExpression", "<init>", "()V");
+            this.mv.visitVarInsn(ALOAD, 1);
+            mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/ClassExpression", "<init>", "(Ljava/util/Set;)V");
             if (!this.innerVarMap.isEmpty()) {
                 for (Map.Entry<String, String> entry : this.innerVarMap.entrySet()) {
                     String outterName = entry.getKey();
@@ -605,7 +607,8 @@ public class ASMCodeGenerator implements CodeGenerator {
         byte[] bytes = this.classWriter.toByteArray();
         try {
             Class<?> defineClass = this.classLoader.defineClass(this.className, bytes);
-            return (Expression) defineClass.newInstance();
+            Constructor<?> constructor = defineClass.getConstructor(Set.class);
+            return (Expression) constructor.newInstance(this.varTokens.keySet());
         }
         catch (Exception e) {
             throw new CompileExpressionErrorException("define class error", e);

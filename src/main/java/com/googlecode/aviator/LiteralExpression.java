@@ -1,4 +1,5 @@
 package com.googlecode.aviator;
+
 /**
  *  Copyright (C) 2010 dennis zhuang (killme2008@gmail.com)
  *
@@ -18,6 +19,7 @@ package com.googlecode.aviator;
  *
  **/
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -26,18 +28,14 @@ import java.util.Map;
  * @author dennis
  * 
  */
-public class LiteralExpression implements Expression {
+public class LiteralExpression extends BaseExpression {
+
     private final Object result;
 
 
-    public LiteralExpression(Object result) {
-        super();
+    public LiteralExpression(Object result, Set<String> varNames) {
+        super(varNames);
         this.result = result;
-    }
-
-
-    public Object execute() {
-        return result;
     }
 
 

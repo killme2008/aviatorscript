@@ -344,6 +344,22 @@ public final class AviatorEvaluator {
 
 
     /**
+     * Returns a compiled expression in cache
+     * 
+     * @param expression
+     * @return
+     */
+    public static Expression getCachedExpression(String expression) {
+        FutureTask<Expression> task = cacheExpressions.get(expression);
+        if (task != null) {
+            return getCompiledExpression(expression, task);
+        }
+        else
+            return null;
+    }
+
+
+    /**
      * Compile a text expression to Expression object
      * 
      * @param expression

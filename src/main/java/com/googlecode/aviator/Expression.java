@@ -19,6 +19,7 @@
 package com.googlecode.aviator;
 
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -45,5 +46,15 @@ public interface Expression {
      * @return
      */
     public abstract Object execute();
+
+
+    /**
+     * Returns this expression's all variable names when using
+     * AviatorEvaluator.EVAL mode,else returns empty set
+     * 
+     * @see com.googlecode.aviator.AviatorEvaluator#EVAL
+     * @return
+     */
+    public Set<String> getVariableNames();
 
 }
