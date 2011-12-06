@@ -21,7 +21,9 @@ package com.googlecode.aviator;
 import java.io.OutputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -445,6 +447,38 @@ public final class AviatorEvaluator {
 
 
     /**
+     * Execute a text expression with values that are variables order in the
+     * expression.
+     * 
+     * @param expression
+     * @param values
+     * @return
+     */
+    public static Object exec(String expression, Object... values) {
+        Expression compiledExpression = compile(expression, true);
+        if (compiledExpression != null) {
+            List<String> vars = compiledExpression.getVariableNames();
+            if (!vars.isEmpty()) {
+                int valLen = values == null ? 0 : values.length;
+                if (valLen != vars.size())
+                    throw new IllegalArgumentException("Expect " + vars.size() + " values,but has " + valLen);
+                Map<String, Object> env = new HashMap<String, Object>();
+                int i = 0;
+                for (String var : vars) {
+                    env.put(var, values[i++]);
+                }
+                return compiledExpression.execute(env);
+            }
+            else
+                return compiledExpression.execute();
+        }
+        else {
+            throw new ExpressionRuntimeException("Null compiled expression for " + expression);
+        }
+    }
+
+
+    /**
      * Execute a text expression with environment
      * 
      * @param expression
@@ -494,6 +528,6 @@ public final class AviatorEvaluator {
      * @return
      */
     public static Object execute(String expression) {
-        return execute(expression, null);
+        return execute(expression, (Map<String, Object>) null);
     }
 }
