@@ -76,6 +76,7 @@ public class FunctionTest {
         env.put("pi", pi);
         env.put("d", d);
         env.put("b", b);
+        System.out.println(AviatorEvaluator.execute("i+pi",env).getClass());
 
         System.setProperty("aviator.asm.trace", "true");
         assertEquals(-100, AviatorEvaluator.execute("-i", env));
@@ -411,24 +412,32 @@ public class FunctionTest {
 
     @Test
     public void testGetVariableNames() {
-        Expression expression = AviatorEvaluator.compile("a+b", true);
+        Expression expression = AviatorEvaluator.compile("b+a", true);
         assertNotNull(expression);
-        Set<String> varSet = expression.getVariableNames();
-        assertNotNull(varSet);
-        assertEquals(2, varSet.size());
-        assertTrue(varSet.contains("a"));
-        assertTrue(varSet.contains("b"));
+        List<String> vars = expression.getVariableNames();
+        assertNotNull(vars);
+        assertEquals(2, vars.size());
+        assertTrue(vars.contains("a"));
+        assertTrue(vars.contains("b"));
+        assertEquals("b", vars.get(0));
+        assertEquals("a", vars.get(1));
 
-        expression = AviatorEvaluator.compile("a==b || c>3 || a+d*e/2 <= 1000", true);
+        expression = AviatorEvaluator.compile("b==a || d>3 || e+c*d/2 <= 1000", true);
         assertNotNull(expression);
-        varSet = expression.getVariableNames();
-        assertNotNull(varSet);
-        assertEquals(5, varSet.size());
-        assertTrue(varSet.contains("a"));
-        assertTrue(varSet.contains("b"));
-        assertTrue(varSet.contains("c"));
-        assertTrue(varSet.contains("d"));
-        assertTrue(varSet.contains("e"));
+        vars = expression.getVariableNames();
+        assertNotNull(vars);
+        assertEquals(5, vars.size());
+        assertTrue(vars.contains("a"));
+        assertTrue(vars.contains("b"));
+        assertTrue(vars.contains("c"));
+        assertTrue(vars.contains("d"));
+        assertTrue(vars.contains("e"));
+        assertEquals("b", vars.get(0));
+        assertEquals("a", vars.get(1));
+        assertEquals("d", vars.get(2));
+        assertEquals("e", vars.get(3));
+        assertEquals("c", vars.get(4));
+        
     }
 
 

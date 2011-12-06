@@ -23,7 +23,10 @@ import static com.googlecode.aviator.asm.Opcodes.*;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -82,7 +85,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
     private Map<String/* method name */, String/* inner method name */> innerMethodMap = new HashMap<String, String>();
 
-    private Map<String, Integer/* counter */> varTokens = new HashMap<String, Integer>();
+    private Map<String, Integer/* counter */> varTokens = new LinkedHashMap<String, Integer>();
     private Map<String, Integer/* counter */> methodTokens = new HashMap<String, Integer>();
 
     private Map<Label, Map<String/* inner name */, Integer/* local index */>> labelNameIndexMap =
@@ -166,11 +169,11 @@ public class ASMCodeGenerator implements CodeGenerator {
      */
     private void makeConstructor() {
         {
-            this.mv = this.checkClassAdapter.visitMethod(ACC_PUBLIC, "<init>", "(Ljava/util/Set;)V", null, null);
+            this.mv = this.checkClassAdapter.visitMethod(ACC_PUBLIC, "<init>", "(Ljava/util/List;)V", null, null);
             this.mv.visitCode();
             this.mv.visitVarInsn(ALOAD, 0);
             this.mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/ClassExpression", "<init>", "(Ljava/util/Set;)V");
+            mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/ClassExpression", "<init>", "(Ljava/util/List;)V");
             if (!this.innerVarMap.isEmpty()) {
                 for (Map.Entry<String, String> entry : this.innerVarMap.entrySet()) {
                     String outterName = entry.getKey();
@@ -607,8 +610,8 @@ public class ASMCodeGenerator implements CodeGenerator {
         byte[] bytes = this.classWriter.toByteArray();
         try {
             Class<?> defineClass = this.classLoader.defineClass(this.className, bytes);
-            Constructor<?> constructor = defineClass.getConstructor(Set.class);
-            return (Expression) constructor.newInstance(this.varTokens.keySet());
+            Constructor<?> constructor = defineClass.getConstructor(List.class);
+            return (Expression) constructor.newInstance(new ArrayList<String>(this.varTokens.keySet()));
         }
         catch (Exception e) {
             throw new CompileExpressionErrorException("define class error", e);

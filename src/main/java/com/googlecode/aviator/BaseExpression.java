@@ -1,5 +1,6 @@
 package com.googlecode.aviator;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -11,10 +12,10 @@ import java.util.Set;
  */
 public abstract class BaseExpression implements Expression {
 
-    private Set<String> varNames;
+    private List<String> varNames;
 
 
-    public BaseExpression(Set<String> varNames) {
+    public BaseExpression(List<String> varNames) {
         super();
         this.varNames = varNames;
     }
@@ -35,7 +36,7 @@ public abstract class BaseExpression implements Expression {
      * 
      * @see com.googlecode.aviator.IExpression#getVariableNames()
      */
-    public Set<String> getVariableNames() {
+    public List<String> getVariableNames() {
         return this.varNames;
     }
 
