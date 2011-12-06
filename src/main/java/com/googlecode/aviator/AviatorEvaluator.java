@@ -448,6 +448,7 @@ public final class AviatorEvaluator {
 
     /**
      * Execute a text expression with values that are variables order in the
+     * expression.It only runs in EVAL mode,and it will cache the compiled
      * expression.
      * 
      * @param expression
@@ -455,6 +456,8 @@ public final class AviatorEvaluator {
      * @return
      */
     public static Object exec(String expression, Object... values) {
+        if (optimize != EVAL)
+            throw new IllegalStateException("Aviator evaluator is not in EVAL mode.");
         Expression compiledExpression = compile(expression, true);
         if (compiledExpression != null) {
             List<String> vars = compiledExpression.getVariableNames();
