@@ -43,6 +43,25 @@ public class AviatorEvaluatorUnitTest {
 
 
     @Test
+    public void testExec() {
+        String exp1 = "b-c+a";
+        String exp2 = "2*3.14*(R-r)+b/c";
+        String exp3 = "f>d?k:a";
+        assertEquals(8, AviatorEvaluator.exec(exp1, 6, 2, 4));
+        assertEquals(104, AviatorEvaluator.exec(exp1, 99, 3, 8));
+        assertEquals(1.14d, AviatorEvaluator.exec(exp1, 3.14, 3, 1));
+        assertEquals(6.28, AviatorEvaluator.exec(exp2, 4, 3, 0, 100));
+        assertEquals(13.304d, AviatorEvaluator.exec(exp2, 5, 3.2, 4, 2.0));
+        assertEquals(3.14d, AviatorEvaluator.exec(exp3, 2, 1, 3.14, 9));
+        assertEquals(9, AviatorEvaluator.exec(exp3,1,2,3.14,9));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testExecIllegalArguments() {
+        AviatorEvaluator.exec("a-b+c",1,2);
+    }
+
+    @Test
     public void testCompileCache() {
         Expression exp1 = AviatorEvaluator.compile("1+3", true);
         Expression exp2 = AviatorEvaluator.compile("1+3", true);
