@@ -19,6 +19,7 @@
 package com.googlecode.aviator;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
  */
 public abstract class ClassExpression extends BaseExpression {
 
-    public ClassExpression(Set<String> varNames) {
+    public ClassExpression(List<String> varNames) {
         super(varNames);
     }
 

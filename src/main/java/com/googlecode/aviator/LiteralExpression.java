@@ -18,6 +18,7 @@ package com.googlecode.aviator;
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  **/
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class LiteralExpression extends BaseExpression {
     private final Object result;
 
 
-    public LiteralExpression(Object result, Set<String> varNames) {
+    public LiteralExpression(Object result, List<String> varNames) {
         super(varNames);
         this.result = result;
     }

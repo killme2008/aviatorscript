@@ -18,6 +18,7 @@
  **/
 package com.googlecode.aviator;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,12 +50,12 @@ public interface Expression {
 
 
     /**
-     * Returns this expression's all variable names when using
+     * Returns this expression's all variable names in order when using
      * AviatorEvaluator.EVAL mode,else returns empty set
      * 
      * @see com.googlecode.aviator.AviatorEvaluator#EVAL
      * @return
      */
-    public Set<String> getVariableNames();
+    public List<String> getVariableNames();
 
 }

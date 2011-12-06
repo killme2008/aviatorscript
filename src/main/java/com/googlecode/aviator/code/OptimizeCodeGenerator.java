@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
@@ -301,7 +303,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             ;
         }
 
-        Map<String, Integer/* counter */> variables = new HashMap<String, Integer>();
+        Map<String, Integer/* counter */> variables = new LinkedHashMap<String, Integer>();
         Map<String, Integer/* counter */> methods = new HashMap<String, Integer>();
         for (Token<?> token : this.tokenList) {
             switch (token.getType()) {
@@ -338,12 +340,12 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         // Last token is a literal token,then return a LiteralExpression
         if (this.tokenList.size() <= 1) {
             if (this.tokenList.isEmpty()) {
-                return new LiteralExpression(null, variables.keySet());
+                return new LiteralExpression(null, new ArrayList<String>(variables.keySet()));
             }
             final Token<?> lastToken = this.tokenList.get(0);
             if (this.isLiteralToken(lastToken)) {
                 return new LiteralExpression(this.getAviatorObjectFromToken(lastToken).getValue(null),
-                    variables.keySet());
+                    new ArrayList<String>(variables.keySet()));
             }
         }
 
