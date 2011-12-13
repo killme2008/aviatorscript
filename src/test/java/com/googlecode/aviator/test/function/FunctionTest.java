@@ -76,7 +76,7 @@ public class FunctionTest {
         env.put("pi", pi);
         env.put("d", d);
         env.put("b", b);
-        System.out.println(AviatorEvaluator.execute("i+pi",env).getClass());
+        System.out.println(AviatorEvaluator.execute("i+pi", env).getClass());
 
         System.setProperty("aviator.asm.trace", "true");
         assertEquals(-100, AviatorEvaluator.execute("-i", env));
@@ -252,6 +252,15 @@ public class FunctionTest {
 
         assertEquals(2, AviatorEvaluator.execute("count(map(list,string.length))", env));
         assertTrue((Boolean) AviatorEvaluator.execute("include(map(list,string.length),5)", env));
+    }
+
+
+    @Test
+    public void testIssue2() {
+        assertEquals(100000000000000000000.0 / 3.0, AviatorEvaluator.execute("100000000000000000000.0/3.0"));
+        System.out.println(AviatorEvaluator.execute("100000000000000000000.0/3.0"));
+        // assertEquals(100000000000000000000/3,
+        // AviatorEvaluator.execute("100000000000000000000/3"));
     }
 
 
@@ -437,7 +446,7 @@ public class FunctionTest {
         assertEquals("d", vars.get(2));
         assertEquals("e", vars.get(3));
         assertEquals("c", vars.get(4));
-        
+
     }
 
 

@@ -78,9 +78,8 @@ public class ExpressionLexer {
         this.peek = this.iterator.previous();
     }
 
-    static final char[] VALID_HEX_CHAR =
-            { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F',
-             'f' };
+    static final char[] VALID_HEX_CHAR = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'a', 'B', 'b', 'C',
+                                          'c', 'D', 'd', 'E', 'e', 'F', 'f' };
 
 
     public boolean isValidHexChar(char ch) {
@@ -154,7 +153,8 @@ public class ExpressionLexer {
         if (Character.isDigit(this.peek) || this.peek == '.') {
             StringBuffer sb = new StringBuffer();
             int startIndex = this.iterator.getIndex();
-            Number value = 0L;
+            long lval = 0L;
+            double dval = 0d;
             boolean hasDot = false;
             double d = 10.0;
             do {
@@ -165,23 +165,28 @@ public class ExpressionLexer {
                     }
                     else {
                         hasDot = true;
-                        value = new Double(value.longValue());
                         this.nextChar();
                     }
 
                 }
                 else {
+                    int digit = Character.digit(this.peek, 10);
                     if (!hasDot) {
-                        value = 10 * value.longValue() + Character.digit(this.peek, 10);
+                        lval = 10 * lval + digit;
+                        dval = 10 * dval + digit;
                         this.nextChar();
                     }
                     else {
-                        value = value.doubleValue() + Character.digit(this.peek, 10) / d;
+                        dval = dval + digit / d;
                         d = d * 10;
                         this.nextChar();
                     }
                 }
             } while (Character.isDigit(this.peek) || this.peek == '.');
+            Number value = lval;
+            if (hasDot) {
+                value = dval;
+            }
             return new NumberToken(value, sb.toString(), startIndex);
         }
 
