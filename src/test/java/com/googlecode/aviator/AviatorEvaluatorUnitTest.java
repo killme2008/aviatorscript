@@ -47,19 +47,33 @@ public class AviatorEvaluatorUnitTest {
         String exp1 = "b-c+a";
         String exp2 = "2*3.14*(R-r)+b/c";
         String exp3 = "f>d?k:a";
+        String exp4 = "map.a > map.b ? list[0][1]: y";
         assertEquals(8, AviatorEvaluator.exec(exp1, 6, 2, 4));
         assertEquals(104, AviatorEvaluator.exec(exp1, 99, 3, 8));
         assertEquals(1.14d, AviatorEvaluator.exec(exp1, 3.14, 3, 1));
         assertEquals(6.28, AviatorEvaluator.exec(exp2, 4, 3, 0, 100));
         assertEquals(13.304d, AviatorEvaluator.exec(exp2, 5, 3.2, 4, 2.0));
         assertEquals(3.14d, AviatorEvaluator.exec(exp3, 2, 1, 3.14, 9));
-        assertEquals(9, AviatorEvaluator.exec(exp3,1,2,3.14,9));
+        assertEquals(9, AviatorEvaluator.exec(exp3, 1, 2, 3.14, 9));
+
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        map.put("a", 100);
+        map.put("b", 99);
+        int[][] list = new int[1][2];
+        list[0]=new int[2];
+        list[0][1] = 2000;
+        int y = 999;
+        assertEquals(2000L, AviatorEvaluator.exec(exp4, map, list, y));
+        map.put("a", 99);
+        assertEquals(999L, AviatorEvaluator.exec(exp4, map, list, y));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+
+    @Test(expected = IllegalArgumentException.class)
     public void testExecIllegalArguments() {
-        AviatorEvaluator.exec("a-b+c",1,2);
+        AviatorEvaluator.exec("a-b+c", 1, 2);
     }
+
 
     @Test
     public void testCompileCache() {

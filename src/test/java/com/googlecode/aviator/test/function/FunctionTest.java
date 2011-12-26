@@ -447,6 +447,20 @@ public class FunctionTest {
         assertEquals("e", vars.get(3));
         assertEquals("c", vars.get(4));
 
+        // Test map or list as variable
+        expression = AviatorEvaluator.compile("map.a>10 && list[0][1]<3 && bean.c == bean.x || bean.d == y", true);
+        assertNotNull(expression);
+        vars = expression.getVariableNames();
+        assertEquals(4, vars.size());
+        assertTrue(vars.contains("map"));
+        assertTrue(vars.contains("list"));
+        assertTrue(vars.contains("bean"));
+        assertTrue(vars.contains("y"));
+        assertEquals("map", vars.get(0));
+        assertEquals("list", vars.get(1));
+        assertEquals("bean", vars.get(2));
+        assertEquals("y", vars.get(3));
+
     }
 
 

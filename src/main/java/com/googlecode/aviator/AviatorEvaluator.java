@@ -93,12 +93,12 @@ public final class AviatorEvaluator {
     private static AviatorClassLoader aviatorClassLoader;
 
     /**
-     * Optimized for compile speed,this is the default option
+     * Optimized for compile speed
      */
     public static final int COMPILE = 0;
 
     /**
-     * Optimized for execute speed
+     * Optimized for execute speed,this is the default option
      */
     public static final int EVAL = 1;
 
@@ -234,9 +234,10 @@ public final class AviatorEvaluator {
 
 
     /**
-     * set optimize level,default AviatorEvaluator.COMPILE
+     * set optimize level,default AviatorEvaluator.EVAL
      * 
-     * @see COMPILE,EVAL
+     * @see #COMPILE
+     * @see #EVAL
      * 
      * @param value
      */
