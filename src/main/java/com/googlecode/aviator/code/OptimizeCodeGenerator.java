@@ -331,6 +331,18 @@ public class OptimizeCodeGenerator implements CodeGenerator {
                         }
                     }
                 }
+                else if (delegateToken.getDelegateTokenType() == DelegateTokenType.Array) {
+                    Token<?> realToken = delegateToken.getToken();
+                    if (realToken.getType() == TokenType.Variable) {
+                        varName = token.getLexeme();
+                        if (!variables.containsKey(varName)) {
+                            variables.put(varName, 1);
+                        }
+                        else {
+                            variables.put(varName, variables.get(varName) + 1);
+                        }
+                    }
+                }
                 break;
             }
         }
