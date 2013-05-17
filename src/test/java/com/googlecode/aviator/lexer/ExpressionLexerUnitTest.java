@@ -18,7 +18,13 @@
  **/
 package com.googlecode.aviator.lexer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.junit.Test;
 
@@ -61,7 +67,58 @@ public class ExpressionLexerUnitTest {
         assertEquals(2603, token.getValue(null));
         assertEquals(0, token.getStartIndex());
     }
-    
+
+
+    @Test
+    public void testParseBigInteger() {
+        this.lexer = new ExpressionLexer("3N");
+        Token<?> token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(new BigInteger("3"), token.getValue(null));
+        assertEquals(0, token.getStartIndex());
+    }
+
+
+    @Test
+    public void testParseBigDecimal() {
+        this.lexer = new ExpressionLexer("3.2M");
+        Token<?> token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(new BigDecimal("3.2"), token.getValue(null));
+        assertEquals(0, token.getStartIndex());
+    }
+
+
+    @Test
+    public void testParseNumbers() {
+        this.lexer = new ExpressionLexer("3N .2M 1 2.3  4.33M");
+        Token<?> token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(new BigInteger("3"), token.getValue(null));
+        assertEquals(0, token.getStartIndex());
+
+        token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(new BigDecimal("0.2"), token.getValue(null));
+        assertEquals(3, token.getStartIndex());
+
+        token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(1, token.getValue(null));
+        assertEquals(7, token.getStartIndex());
+
+        token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(2.3, token.getValue(null));
+        assertEquals(9, token.getStartIndex());
+
+        token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(new BigDecimal("4.33"), token.getValue(null));
+        assertEquals(14, token.getStartIndex());
+    }
+
+
     @Test
     public void testParseLikeHexNumber() {
         this.lexer = new ExpressionLexer("0344");
@@ -80,7 +137,7 @@ public class ExpressionLexerUnitTest {
         assertEquals(TokenType.Number, token.getType());
         assertEquals(3, token.getValue(null));
         assertEquals(0, token.getStartIndex());
-        
+
         token = this.lexer.scan();
         assertEquals(TokenType.Char, token.getType());
         assertEquals('+', token.getValue(null));

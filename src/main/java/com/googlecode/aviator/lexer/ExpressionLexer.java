@@ -18,6 +18,8 @@
  **/
 package com.googlecode.aviator.lexer;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Stack;
@@ -79,7 +81,7 @@ public class ExpressionLexer {
     }
 
     static final char[] VALID_HEX_CHAR = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'a', 'B', 'b', 'C',
-                                          'c', 'D', 'd', 'E', 'e', 'F', 'f' };
+                                           'c', 'D', 'd', 'E', 'e', 'F', 'f' };
 
 
     public boolean isValidHexChar(char ch) {
@@ -113,7 +115,7 @@ public class ExpressionLexer {
                     continue;
                 }
                 if (this.peek == '\n') {
-                    throw new CompileExpressionErrorException("Aviator doesn't support newline expression at "
+                    throw new CompileExpressionErrorException("Aviator doesn't support multi-lines expression at "
                             + this.iterator.getIndex());
                 }
                 else {
@@ -157,11 +159,14 @@ public class ExpressionLexer {
             double dval = 0d;
             boolean hasDot = false;
             double d = 10.0;
+            boolean isBigInt = false;
+            boolean isBigDecimal = false;
             do {
                 sb.append(this.peek);
                 if (this.peek == '.') {
                     if (hasDot) {
-                        throw new CompileExpressionErrorException("Illegal Number at " + this.iterator.getIndex());
+                        throw new CompileExpressionErrorException("Illegal Number " + sb + " at "
+                                + this.iterator.getIndex());
                     }
                     else {
                         hasDot = true;
@@ -169,23 +174,46 @@ public class ExpressionLexer {
                     }
 
                 }
+                else if (this.peek == 'N') {
+                    // big integer
+                    if (hasDot) {
+                        throw new CompileExpressionErrorException("Illegal number " + sb + " at "
+                                + this.iterator.getIndex());
+                    }
+                    isBigInt = true;
+                    this.nextChar();
+                    break;
+                }
+                else if (this.peek == 'M') {
+                    isBigDecimal = true;
+                    this.nextChar();
+                    break;
+                }
                 else {
                     int digit = Character.digit(this.peek, 10);
                     if (!hasDot) {
                         lval = 10 * lval + digit;
                         dval = 10 * dval + digit;
-                        this.nextChar();
                     }
                     else {
                         dval = dval + digit / d;
                         d = d * 10;
-                        this.nextChar();
                     }
+                    this.nextChar();
                 }
-            } while (Character.isDigit(this.peek) || this.peek == '.');
-            Number value = lval;
+            } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'M' || this.peek == 'N');
+            Number value;
             if (hasDot) {
                 value = dval;
+            }
+            else if (isBigDecimal) {
+                value = new BigDecimal(sb.toString().substring(0, sb.length() - 1));
+            }
+            else if (isBigInt) {
+                value = new BigInteger(sb.toString().substring(0, sb.length() - 1));
+            }
+            else {
+                value = lval;
             }
             return new NumberToken(value, sb.toString(), startIndex);
         }
@@ -223,7 +251,7 @@ public class ExpressionLexer {
             StringBuilder sb = new StringBuilder();
             while ((this.peek = this.iterator.next()) != left) {
                 if (this.peek == CharacterIterator.DONE) {
-                    throw new CompileExpressionErrorException("Illegal String at " + startIndex);
+                    throw new CompileExpressionErrorException("Illegal String " + sb + " at " + startIndex);
                 }
                 else {
                     sb.append(this.peek);

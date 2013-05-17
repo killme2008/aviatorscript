@@ -32,5 +32,7 @@ public enum AviatorType {
     Boolean,
     Pattern,
     Nil,
-    Method;
+    Method,
+    BigInt,
+    Decimal;
 }

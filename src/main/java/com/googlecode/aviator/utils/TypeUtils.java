@@ -18,6 +18,10 @@
  **/
 package com.googlecode.aviator.utils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+
 /**
  * Java type to aviator type utilities
  * 
@@ -25,6 +29,15 @@ package com.googlecode.aviator.utils;
  * 
  */
 public class TypeUtils {
+
+    public static final boolean isBigInt(Object value) {
+        return value instanceof BigInteger;
+    }
+
+
+    public static final boolean isDecimal(Object value) {
+        return value instanceof BigDecimal;
+    }
 
     public static final boolean isLong(Object value) {
         return value instanceof Integer || value instanceof Long || value instanceof Byte || value instanceof Short;

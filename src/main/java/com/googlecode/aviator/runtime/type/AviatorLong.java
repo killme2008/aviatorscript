@@ -35,11 +35,12 @@ public class AviatorLong extends AviatorNumber {
         private LongCache() {
         }
 
-        static final AviatorLong cache[] = new AviatorLong[-(-128) + 127 + 1];
+        static final AviatorLong cache[] = new AviatorLong[256];
 
         static {
-            for (long i = 0; i < cache.length; i++)
+            for (long i = 0; i < cache.length; i++) {
                 cache[(int) i] = new AviatorLong(i - 128);
+            }
         }
     }
 
@@ -71,84 +72,85 @@ public class AviatorLong extends AviatorNumber {
 
 
     @Override
-    public int innerCompare(AviatorObject other) {
-        this.ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
+    public int innerCompare(AviatorNumber other) {
         switch (other.getAviatorType()) {
+        case BigInt:
+            return this.toBigInt().compareTo(other.toBigInt());
+        case Decimal:
+            return this.toDecimal().compareTo(other.toDecimal());
         case Long:
-            if (this.number.longValue() > otherNum.longValue()) {
-                return 1;
-            }
-            else if (this.number.longValue() < otherNum.longValue()) {
-                return -1;
-            }
-            else {
-                return 0;
-            }
+            return Long.compare(this.longValue(), other.longValue());
         case Double:
-            return Double.compare(this.number.doubleValue(), otherNum.doubleValue());
+            return Double.compare(this.number.doubleValue(), other.doubleValue());
         default:
             throw new ExpressionRuntimeException("Could not compare " + this + " with " + other);
         }
-
     }
 
 
     @Override
-    public AviatorObject innerDiv(AviatorObject other) {
-        this.ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
+    public AviatorObject innerDiv(AviatorNumber other) {
         switch (other.getAviatorType()) {
+        case BigInt:
+            return AviatorBigInt.valueOf(this.toBigInt().divide(other.toBigInt()));
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().divide(other.toDecimal()));
         case Long:
-            return AviatorLong.valueOf(this.number.longValue() / otherNum.longValue());
+            return AviatorLong.valueOf(this.number.longValue() / other.longValue());
         default:
-            return new AviatorDouble(this.number.longValue() / otherNum.doubleValue());
+            return new AviatorDouble(this.number.longValue() / other.doubleValue());
         }
     }
 
 
     @Override
-    public AviatorNumber innerAdd(AviatorNumber other) {
-        this.ensureNumber(other);
-        AviatorNumber otherNum = other;
+    public AviatorObject innerAdd(AviatorNumber other) {
         switch (other.getAviatorType()) {
+        case BigInt:
+            return AviatorBigInt.valueOf(this.toBigInt().add(other.toBigInt()));
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().add(other.toDecimal()));
         case Long:
-            return AviatorLong.valueOf(this.number.longValue() + otherNum.longValue());
+            return AviatorLong.valueOf(this.number.longValue() + other.longValue());
         default:
-            return new AviatorDouble(this.number.longValue() + otherNum.doubleValue());
+            return new AviatorDouble(this.number.longValue() + other.doubleValue());
         }
     }
 
 
     @Override
-    public AviatorObject innerMod(AviatorObject other) {
-        this.ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
+    public AviatorObject innerMod(AviatorNumber other) {
         switch (other.getAviatorType()) {
+        case BigInt:
+            return AviatorBigInt.valueOf(this.toBigInt().mod(other.toBigInt()));
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().remainder(other.toDecimal()));
         case Long:
-            return AviatorLong.valueOf(this.number.longValue() % otherNum.longValue());
+            return AviatorLong.valueOf(this.number.longValue() % other.longValue());
         default:
-            return new AviatorDouble(this.number.longValue() % otherNum.doubleValue());
+            return new AviatorDouble(this.number.longValue() % other.doubleValue());
         }
     }
 
 
     @Override
-    public AviatorObject innerMult(AviatorObject other) {
-        this.ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
+    public AviatorObject innerMult(AviatorNumber other) {
         switch (other.getAviatorType()) {
+        case BigInt:
+            return AviatorBigInt.valueOf(this.toBigInt().multiply(other.toBigInt()));
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().multiply(other.toDecimal()));
         case Long:
-            return AviatorLong.valueOf(this.number.longValue() * otherNum.longValue());
+            return AviatorLong.valueOf(this.number.longValue() * other.longValue());
         default:
-            return new AviatorDouble(this.number.longValue() * otherNum.doubleValue());
+            return new AviatorDouble(this.number.longValue() * other.doubleValue());
         }
     }
 
 
     protected void ensureLong(AviatorObject other) {
         if (other.getAviatorType() != AviatorType.Long) {
-            throw new ExpressionRuntimeException(other + " is not long type");
+            throw new ExpressionRuntimeException(other + " is not long type,could not be used as a bit operand.");
         }
     }
 
@@ -156,6 +158,8 @@ public class AviatorLong extends AviatorNumber {
     @Override
     public AviatorObject bitAnd(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
+        case BigInt:
+        case Decimal:
         case Long:
         case Double:
             return this.innerBitAnd(other);
@@ -174,42 +178,42 @@ public class AviatorLong extends AviatorNumber {
     }
 
 
-    private AviatorObject innerBitAnd(AviatorObject other) {
+    protected AviatorObject innerBitAnd(AviatorObject other) {
         this.ensureLong(other);
         AviatorLong otherLong = (AviatorLong) other;
         return AviatorLong.valueOf(this.number.longValue() & otherLong.longValue());
     }
 
 
-    private AviatorObject innerBitOr(AviatorObject other) {
+    protected AviatorObject innerBitOr(AviatorObject other) {
         this.ensureLong(other);
         AviatorLong otherLong = (AviatorLong) other;
         return AviatorLong.valueOf(this.number.longValue() | otherLong.longValue());
     }
 
 
-    private AviatorObject innerBitXor(AviatorObject other) {
+    protected AviatorObject innerBitXor(AviatorObject other) {
         this.ensureLong(other);
         AviatorLong otherLong = (AviatorLong) other;
         return AviatorLong.valueOf(this.number.longValue() ^ otherLong.longValue());
     }
 
 
-    private AviatorObject innerShiftLeft(AviatorObject other) {
+    protected AviatorObject innerShiftLeft(AviatorObject other) {
         this.ensureLong(other);
         AviatorLong otherLong = (AviatorLong) other;
         return AviatorLong.valueOf(this.number.longValue() << otherLong.longValue());
     }
 
 
-    private AviatorObject innerShiftRight(AviatorObject other) {
+    protected AviatorObject innerShiftRight(AviatorObject other) {
         this.ensureLong(other);
         AviatorLong otherLong = (AviatorLong) other;
         return AviatorLong.valueOf(this.number.longValue() >> otherLong.longValue());
     }
 
 
-    private AviatorObject innerUnsignedShiftRight(AviatorObject other) {
+    protected AviatorObject innerUnsignedShiftRight(AviatorObject other) {
         this.ensureLong(other);
         AviatorLong otherLong = (AviatorLong) other;
         return AviatorLong.valueOf(this.number.longValue() >>> otherLong.longValue());
@@ -219,13 +223,14 @@ public class AviatorLong extends AviatorNumber {
     @Override
     public AviatorObject bitNot(Map<String, Object> env) {
         return AviatorLong.valueOf(~this.number.longValue());
-
     }
 
 
     @Override
     public AviatorObject bitOr(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
+        case BigInt:
+        case Decimal:
         case Long:
         case Double:
             return this.innerBitOr(other);
@@ -247,6 +252,8 @@ public class AviatorLong extends AviatorNumber {
     @Override
     public AviatorObject bitXor(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
+        case BigInt:
+        case Decimal:
         case Long:
         case Double:
             return this.innerBitXor(other);
@@ -268,6 +275,8 @@ public class AviatorLong extends AviatorNumber {
     @Override
     public AviatorObject shiftLeft(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
+        case BigInt:
+        case Decimal:
         case Long:
         case Double:
             return this.innerShiftLeft(other);
@@ -289,6 +298,8 @@ public class AviatorLong extends AviatorNumber {
     @Override
     public AviatorObject shiftRight(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
+        case BigInt:
+        case Decimal:
         case Long:
         case Double:
             return this.innerShiftRight(other);
@@ -310,6 +321,8 @@ public class AviatorLong extends AviatorNumber {
     @Override
     public AviatorObject unsignedShiftRight(AviatorObject other, Map<String, Object> env) {
         switch (other.getAviatorType()) {
+        case BigInt:
+        case Decimal:
         case Long:
         case Double:
             return this.innerUnsignedShiftRight(other);
@@ -329,14 +342,16 @@ public class AviatorLong extends AviatorNumber {
 
 
     @Override
-    public AviatorObject innerSub(AviatorObject other) {
-        this.ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
+    public AviatorObject innerSub(AviatorNumber other) {
         switch (other.getAviatorType()) {
+        case BigInt:
+            return AviatorBigInt.valueOf(this.toBigInt().subtract(other.toBigInt()));
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().subtract(other.toDecimal()));
         case Long:
-            return AviatorLong.valueOf(this.number.longValue() - otherNum.longValue());
+            return AviatorLong.valueOf(this.number.longValue() - other.longValue());
         default:
-            return new AviatorDouble(this.number.longValue() - otherNum.doubleValue());
+            return new AviatorDouble(this.number.longValue() - other.doubleValue());
         }
     }
 

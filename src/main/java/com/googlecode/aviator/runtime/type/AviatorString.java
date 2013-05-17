@@ -63,6 +63,8 @@ public class AviatorString extends AviatorObject {
         case Boolean:
             AviatorBoolean otherBoolean = (AviatorBoolean) other;
             return new AviatorString(this.lexeme + otherBoolean.value);
+        case BigInt:
+        case Decimal:
         case Long:
         case Double:
             AviatorNumber otherNumber = (AviatorNumber) other;
@@ -94,8 +96,9 @@ public class AviatorString extends AviatorObject {
 
     @Override
     public int compare(AviatorObject other, Map<String, Object> env) {
-        if (this == other)
+        if (this == other) {
             return 0;
+        }
         switch (other.getAviatorType()) {
         case String:
             AviatorString otherString = (AviatorString) other;
@@ -110,7 +113,7 @@ public class AviatorString extends AviatorObject {
                 return this.lexeme.compareTo(String.valueOf(otherJavaValue));
             }
             else if (otherJavaValue instanceof Date) {
-                return tryCompareDate((Date) otherJavaValue);
+                return this.tryCompareDate((Date) otherJavaValue);
             }
             else {
                 throw new ExpressionRuntimeException("Could not compare " + this + " with " + other);
@@ -124,7 +127,7 @@ public class AviatorString extends AviatorObject {
 
 
     public String getLexeme() {
-        return lexeme;
+        return this.lexeme;
     }
 
 }
