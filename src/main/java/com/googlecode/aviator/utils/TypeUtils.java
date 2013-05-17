@@ -21,6 +21,8 @@ package com.googlecode.aviator.utils;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import com.googlecode.aviator.AviatorEvaluator;
+
 
 /**
  * Java type to aviator type utilities
@@ -39,6 +41,7 @@ public class TypeUtils {
         return value instanceof BigDecimal;
     }
 
+
     public static final boolean isLong(Object value) {
         return value instanceof Integer || value instanceof Long || value instanceof Byte || value instanceof Short;
     }
@@ -52,6 +55,36 @@ public class TypeUtils {
 
     public static final boolean isString(Object value) {
         return value instanceof String || value instanceof Character;
+    }
+
+    public static long NEWTON_METHOD_REPEATS = 10000;
+
+
+    /**
+     * newton method to get natural logarithm
+     * 
+     * @param x
+     * @return
+     */
+    public static BigDecimal ln(BigDecimal x) {
+        if (x.equals(BigDecimal.ONE)) {
+            return BigDecimal.ZERO;
+        }
+
+        x = x.subtract(BigDecimal.ONE);
+        BigDecimal ret = new BigDecimal(NEWTON_METHOD_REPEATS + 1);
+        for (long i = NEWTON_METHOD_REPEATS; i >= 0; i--) {
+            BigDecimal N = new BigDecimal(i / 2 + 1).pow(2);
+            N = N.multiply(x, AviatorEvaluator.getMathContext());
+            ret = N.divide(ret, AviatorEvaluator.getMathContext());
+
+            N = new BigDecimal(i + 1);
+            ret = ret.add(N, AviatorEvaluator.getMathContext());
+
+        }
+
+        ret = x.divide(ret, AviatorEvaluator.getMathContext());
+        return ret;
     }
 
 }

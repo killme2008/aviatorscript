@@ -18,7 +18,12 @@
  **/
 package com.googlecode.aviator.test.function;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +32,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -142,9 +146,9 @@ public class FunctionTest {
         assertEquals(
             true,
             AviatorEvaluator
-                .execute(
-                    "i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99 ==i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99",
-                    env));
+            .execute(
+                "i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99 ==i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99",
+                env));
     }
 
 
@@ -318,10 +322,10 @@ public class FunctionTest {
         assertEquals(1 ^ 2 ^ 3 & 4 | 5 ^ ~2 | 5 & 4, AviatorEvaluator.execute("1^2^3&4|5^~2|5&4"));
         assertEquals((1 ^ 2 ^ 3 & 4 | 5 ^ ~2 | 5 & 4) == 100, AviatorEvaluator.execute("(1^2^3&4|5^~2|5&4) == 100"));
         assertEquals(
-            4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) : 6L >> 2L * 2L / 4L
+            4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? !false && true ? 1 & 4 : 0 : 6L >> 2L * 2L / 4L
                     ^ ~699L + 100L << 4L >> 5L >> 1000L,
-            AviatorEvaluator
-                .execute("4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) : 6 >> 2 * 2 / 4^ ~699 + 100 << 4 >> 5 >> 1000"));
+                    AviatorEvaluator
+                    .execute("4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) : 6 >> 2 * 2 / 4^ ~699 + 100 << 4 >> 5 >> 1000"));
 
         assertEquals((99 & 7) == (99 & 7) && false, AviatorEvaluator.execute("(99&7)==(99&7)&&false "));
         assertEquals((99 | 7) != (99 | 7) || false, AviatorEvaluator.execute("(99|7)!=(99|7)||false "));
@@ -351,12 +355,12 @@ public class FunctionTest {
         assertEquals(i ^ j ^ k & i & j & k | i | j | k & 3 & 4 | 5 & ~i,
             AviatorEvaluator.execute("i^j^k&i&j&k|i|j|k&3&4|5&~i", env));
         assertEquals(
-            4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) : i >> j * k / i
+            4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? !false && true ? 1 & 4 : 0 : i >> j * k / i
                     ^ ~j + k << i >> j >> 1000L,
-            AviatorEvaluator
-                .execute(
-                    "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) :i >> j * k / i ^ ~j + k << i >> j >> 1000,",
-                    env));
+                    AviatorEvaluator
+                    .execute(
+                        "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) :i >> j * k / i ^ ~j + k << i >> j >> 1000,",
+                        env));
 
         assertEquals((i & 7) == (i & 7) && false, AviatorEvaluator.execute("(i & 7) == (i & 7) && false ", env));
         assertEquals((j | k) != (j | k) || false, AviatorEvaluator.execute("(j | k) != (j | k) || false ", env));
@@ -379,7 +383,7 @@ public class FunctionTest {
         assertEquals(~0xFF == 0Xff, AviatorEvaluator.execute("~0xFF==0Xff", env));
         assertEquals(~0xFF | k & 3 - 0X11, AviatorEvaluator.execute("~0xFF|k&3-0X11", env));
         assertEquals(0x45 > i ? 0x11 - 0344 * 5 / 7 : k / 0xFF - j * 0x45,
-            AviatorEvaluator.execute("0x45>i?0x11-0344*5/7:k/0xFF-j*0x45 ", env));
+                AviatorEvaluator.execute("0x45>i?0x11-0344*5/7:k/0xFF-j*0x45 ", env));
     }
 
 
@@ -495,6 +499,11 @@ public class FunctionTest {
 
     }
 
+
+    @Test
+    public void testBigNumber() {
+
+    }
 
     @Test
     public void testOtherFunction() {
