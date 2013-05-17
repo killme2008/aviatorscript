@@ -18,10 +18,15 @@
  **/
 package com.googlecode.aviator.runtime.function.math;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 
+import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.type.AviatorBigInt;
+import com.googlecode.aviator.runtime.type.AviatorDecimal;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -39,7 +44,13 @@ public class MathAbsFunction extends AbstractFunction {
     @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
         Number number = FunctionUtils.getNumberValue(arg1, env);
-        if (TypeUtils.isDouble(number)) {
+        if (TypeUtils.isDecimal(number)) {
+            return new AviatorDecimal(((BigDecimal) number).abs(AviatorEvaluator.getMathContext()));
+        }
+        else if (TypeUtils.isBigInt(number)) {
+            return new AviatorBigInt(((BigInteger) number).abs());
+        }
+        else if (TypeUtils.isDouble(number)) {
             return new AviatorDouble(Math.abs(number.doubleValue()));
         }
         else {
@@ -48,6 +59,7 @@ public class MathAbsFunction extends AbstractFunction {
     }
 
 
+    @Override
     public String getName() {
         return "math.abs";
     }
