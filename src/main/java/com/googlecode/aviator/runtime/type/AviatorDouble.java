@@ -45,10 +45,13 @@ public class AviatorDouble extends AviatorNumber {
 
 
     @Override
-    public int innerCompare(AviatorObject other) {
-        ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
-        return Double.compare(this.number.doubleValue(), otherNum.doubleValue());
+    public int innerCompare(AviatorNumber other) {
+        switch (other.getAviatorType()) {
+        case Decimal:
+            return this.toDecimal().compareTo(other.toDecimal());
+        default:
+            return Double.compare(this.number.doubleValue(), other.doubleValue());
+        }
     }
 
 
@@ -59,36 +62,47 @@ public class AviatorDouble extends AviatorNumber {
 
 
     @Override
-    public AviatorObject innerDiv(AviatorObject other) {
-        ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
-        return new AviatorDouble(this.number.doubleValue() / otherNum.doubleValue());
+    public AviatorObject innerDiv(AviatorNumber other) {
+        switch (other.getAviatorType()) {
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().divide(other.toDecimal()));
+        default:
+            return new AviatorDouble(this.number.doubleValue() / other.doubleValue());
+        }
     }
 
 
     @Override
     public AviatorNumber innerAdd(AviatorNumber other) {
-        ensureNumber(other);
-        AviatorNumber otherNum = other;
-        return new AviatorDouble(this.number.doubleValue() + otherNum.doubleValue());
+        switch (other.getAviatorType()) {
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().add(other.toDecimal()));
+        default:
+            return new AviatorDouble(this.number.doubleValue() + other.doubleValue());
+        }
     }
 
 
     @Override
-    public AviatorObject innerMod(AviatorObject other) {
-        ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
-        return new AviatorDouble(this.number.doubleValue() % otherNum.doubleValue());
+    public AviatorObject innerMod(AviatorNumber other) {
+        switch (other.getAviatorType()) {
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().remainder(other.toDecimal()));
+        default:
+            return new AviatorDouble(this.number.doubleValue() % other.doubleValue());
+        }
     }
 
 
     @Override
-    public AviatorObject innerMult(AviatorObject other) {
-        ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
-        return new AviatorDouble(this.number.doubleValue() * otherNum.doubleValue());
+    public AviatorObject innerMult(AviatorNumber other) {
+        switch (other.getAviatorType()) {
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().multiply(other.toDecimal()));
+        default:
+            return new AviatorDouble(this.number.doubleValue() * other.doubleValue());
+        }
     }
-
 
     @Override
     public AviatorType getAviatorType() {
@@ -97,9 +111,12 @@ public class AviatorDouble extends AviatorNumber {
 
 
     @Override
-    public AviatorObject innerSub(AviatorObject other) {
-        ensureNumber(other);
-        AviatorNumber otherNum = (AviatorNumber) other;
-        return new AviatorDouble(this.number.doubleValue() - otherNum.doubleValue());
+    public AviatorObject innerSub(AviatorNumber other) {
+        switch (other.getAviatorType()) {
+        case Decimal:
+            return AviatorDecimal.valueOf(this.toDecimal().subtract(other.toDecimal()));
+        default:
+            return new AviatorDouble(this.number.doubleValue() - other.doubleValue());
+        }
     }
 }

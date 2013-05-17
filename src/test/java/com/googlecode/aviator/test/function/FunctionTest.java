@@ -301,6 +301,8 @@ public class FunctionTest {
         assertTrue((Boolean) AviatorEvaluator.execute("string.contains(s1+s2+s3,s2)", env));
         assertEquals("ello world", AviatorEvaluator.execute("string.substring(s1,1)", env));
         assertEquals("el", AviatorEvaluator.execute("string.substring(s1,1,3)", env));
+        assertEquals("hello",((String[])AviatorEvaluator.exec("string.split('hello world',' ')"))[0]);
+        assertEquals("world",((String[])AviatorEvaluator.exec("string.split('hello world',' ')"))[1]);
     }
 
 
