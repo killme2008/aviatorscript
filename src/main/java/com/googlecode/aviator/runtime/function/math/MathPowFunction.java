@@ -18,12 +18,17 @@
  **/
 package com.googlecode.aviator.runtime.function.math;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.type.AviatorBigInt;
+import com.googlecode.aviator.runtime.type.AviatorDecimal;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -38,11 +43,19 @@ public class MathPowFunction extends AbstractFunction {
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
         Number left = FunctionUtils.getNumberValue(arg1, env);
         Number right = FunctionUtils.getNumberValue(arg2, env);
-        return new AviatorDouble(Math.pow(left.doubleValue(), right.doubleValue()));
+        if (TypeUtils.isBigInt(left)) {
+            return new AviatorBigInt(((BigInteger) left).pow(right.intValue()));
+        }
+        else if (TypeUtils.isDecimal(left)) {
+            return new AviatorDecimal(((BigDecimal) left).pow(right.intValue()));
+        }
+        else {
+            return new AviatorDouble(Math.pow(left.doubleValue(), right.doubleValue()));
+        }
 
     }
 
-
+    @Override
     public String getName() {
         return "math.pow";
     }
