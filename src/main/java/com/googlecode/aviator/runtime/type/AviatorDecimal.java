@@ -1,6 +1,7 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import com.googlecode.aviator.AviatorEvaluator;
 
@@ -38,6 +39,12 @@ public class AviatorDecimal extends AviatorNumber {
             return AviatorDecimal.valueOf(this.toDecimal().subtract(other.toDecimal(),
                 AviatorEvaluator.getMathContext()));
         }
+    }
+
+
+    @Override
+    public AviatorObject neg(Map<String, Object> env) {
+        return AviatorDecimal.valueOf(this.toDecimal().negate());
     }
 
 

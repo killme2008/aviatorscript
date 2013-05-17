@@ -53,7 +53,7 @@ public class AviatorBigInt extends AviatorLong {
 
     @Override
     public AviatorObject neg(Map<String, Object> env) {
-        return AviatorBigInt.valueOf(((BigInteger) this.number).negate());
+        return AviatorBigInt.valueOf(this.toBigInt().negate());
     }
 
 
