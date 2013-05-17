@@ -19,9 +19,9 @@
 package com.googlecode.aviator;
 
 import java.io.OutputStream;
+import java.math.MathContext;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +117,11 @@ public final class AviatorEvaluator {
 
     private static OutputStream traceOutputStream = System.out;
 
+    /**
+     * Default match context for decimal.
+     */
+    private static MathContext mathContext = MathContext.DECIMAL128;
+
 
     /**
      * Configure whether to trace code generation
@@ -140,6 +145,31 @@ public final class AviatorEvaluator {
 
 
     /**
+     * Returns current math context for decimal.
+     * 
+     * @since 2.3.0
+     * @return
+     */
+    public static MathContext getMathContext() {
+        return mathContext;
+    }
+
+
+    /**
+     * Set math context for decimal.
+     * 
+     * @param mathContext
+     * @since 2.3.0
+     */
+    public static void setMathContext(MathContext mathContext) {
+        if (mathContext == null) {
+            throw new IllegalArgumentException("null mathContext");
+        }
+        AviatorEvaluator.mathContext = mathContext;
+    }
+
+
+    /**
      * Set trace output stream
      * 
      * @param traceOutputStream
@@ -151,6 +181,7 @@ public final class AviatorEvaluator {
     static {
         aviatorClassLoader = AccessController.doPrivileged(new PrivilegedAction<AviatorClassLoader>() {
 
+            @Override
             public AviatorClassLoader run() {
                 return new AviatorClassLoader(AviatorEvaluator.class.getClassLoader());
             }
@@ -226,11 +257,11 @@ public final class AviatorEvaluator {
      * Compiled Expression cache
      */
     private final static ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                               * Compiled
-                                                                                               * expression
-                                                                                               * task
-                                                                                               */> cacheExpressions =
-            new ConcurrentHashMap<String, FutureTask<Expression>>();
+     * Compiled
+     * expression
+     * task
+     */> cacheExpressions =
+     new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
     /**
@@ -357,8 +388,9 @@ public final class AviatorEvaluator {
         if (task != null) {
             return getCompiledExpression(expression, task);
         }
-        else
+        else {
             return null;
+        }
     }
 
 
@@ -382,6 +414,7 @@ public final class AviatorEvaluator {
                 return getCompiledExpression(expression, task);
             }
             task = new FutureTask<Expression>(new Callable<Expression>() {
+                @Override
                 public Expression call() throws Exception {
                     return innerCompile(expression);
                 }
@@ -457,15 +490,17 @@ public final class AviatorEvaluator {
      * @return
      */
     public static Object exec(String expression, Object... values) {
-        if (optimize != EVAL)
+        if (optimize != EVAL) {
             throw new IllegalStateException("Aviator evaluator is not in EVAL mode.");
+        }
         Expression compiledExpression = compile(expression, true);
         if (compiledExpression != null) {
             List<String> vars = compiledExpression.getVariableNames();
             if (!vars.isEmpty()) {
                 int valLen = values == null ? 0 : values.length;
-                if (valLen != vars.size())
+                if (valLen != vars.size()) {
                     throw new IllegalArgumentException("Expect " + vars.size() + " values,but has " + valLen);
+                }
                 Map<String, Object> env = new HashMap<String, Object>();
                 int i = 0;
                 for (String var : vars) {
@@ -473,8 +508,9 @@ public final class AviatorEvaluator {
                 }
                 return compiledExpression.execute(env);
             }
-            else
+            else {
                 return compiledExpression.execute();
+            }
         }
         else {
             throw new ExpressionRuntimeException("Null compiled expression for " + expression);

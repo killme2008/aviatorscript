@@ -24,6 +24,7 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Stack;
 
+import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.NumberToken;
@@ -128,7 +129,6 @@ public class ExpressionLexer {
                 this.nextChar();
                 return new CharToken(ch, index);
             }
-
         }
 
         // if it is a hex digit
@@ -161,9 +161,15 @@ public class ExpressionLexer {
             double d = 10.0;
             boolean isBigInt = false;
             boolean isBigDecimal = false;
+            boolean scientificNotation = false;
+            boolean negExp = false;
             do {
                 sb.append(this.peek);
                 if (this.peek == '.') {
+                    if (scientificNotation) {
+                        throw new CompileExpressionErrorException("Illegal number " + sb + " at "
+                                + this.iterator.getIndex());
+                    }
                     if (hasDot) {
                         throw new CompileExpressionErrorException("Illegal Number " + sb + " at "
                                 + this.iterator.getIndex());
@@ -189,31 +195,64 @@ public class ExpressionLexer {
                     this.nextChar();
                     break;
                 }
+                else if (this.peek == 'e' || this.peek == 'E') {
+                    if (scientificNotation) {
+                        throw new CompileExpressionErrorException("Illegal number " + sb + " at "
+                                + this.iterator.getIndex());
+                    }
+                    scientificNotation = true;
+                    this.nextChar();
+                    if (this.peek == '-') {
+                        negExp = true;
+                        sb.append(this.peek);
+                        this.nextChar();
+                    }
+                }
                 else {
                     int digit = Character.digit(this.peek, 10);
-                    if (!hasDot) {
-                        lval = 10 * lval + digit;
-                        dval = 10 * dval + digit;
+                    if (scientificNotation) {
+                        while (digit-- > 0) {
+                            if (negExp) {
+                                dval = dval / 10;
+                            }
+                            else {
+                                dval = 10 * dval;
+                            }
+                        }
+                        hasDot = true;
                     }
-                    else {
+                    else if (hasDot) {
                         dval = dval + digit / d;
                         d = d * 10;
                     }
+                    else {
+                        lval = 10 * lval + digit;
+                        dval = 10 * dval + digit;
+
+                    }
                     this.nextChar();
                 }
-            } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'M' || this.peek == 'N');
+            } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'E' || this.peek == 'e'
+                    || this.peek == 'M' || this.peek == 'N');
             Number value;
-            if (hasDot) {
-                value = dval;
-            }
-            else if (isBigDecimal) {
-                value = new BigDecimal(sb.toString().substring(0, sb.length() - 1));
+            if (isBigDecimal) {
+                value = new BigDecimal(sb.toString().substring(0, sb.length() - 1), AviatorEvaluator.getMathContext());
             }
             else if (isBigInt) {
                 value = new BigInteger(sb.toString().substring(0, sb.length() - 1));
             }
+            else if (hasDot) {
+                value = dval;
+            }
             else {
-                value = lval;
+                // if the long value is out of range,then it must be negative,so
+                // we make it as a big integer.
+                if (lval < 0) {
+                    value = new BigInteger(sb.toString());
+                }
+                else {
+                    value = lval;
+                }
             }
             return new NumberToken(value, sb.toString(), startIndex);
         }

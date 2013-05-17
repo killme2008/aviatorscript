@@ -2,6 +2,8 @@ package com.googlecode.aviator.runtime.type;
 
 import java.math.BigDecimal;
 
+import com.googlecode.aviator.AviatorEvaluator;
+
 
 /**
  * Aviator Big Decimal
@@ -22,39 +24,79 @@ public class AviatorDecimal extends AviatorNumber {
     }
 
 
+    public static final AviatorDecimal valueOf(String d) {
+        return new AviatorDecimal(new BigDecimal(d, AviatorEvaluator.getMathContext()));
+    }
+
+
     @Override
     public AviatorObject innerSub(AviatorNumber other) {
-        return AviatorDecimal.valueOf(this.toDecimal().subtract(other.toDecimal()));
+        switch (other.getAviatorType()) {
+        case Double:
+            return AviatorDouble.valueOf(this.doubleValue() - other.doubleValue());
+        default:
+            return AviatorDecimal.valueOf(this.toDecimal().subtract(other.toDecimal(),
+                AviatorEvaluator.getMathContext()));
+        }
     }
 
 
     @Override
     public AviatorObject innerMult(AviatorNumber other) {
-        return AviatorDecimal.valueOf(this.toDecimal().multiply(other.toDecimal()));
+        switch (other.getAviatorType()) {
+        case Double:
+            return AviatorDouble.valueOf(this.doubleValue() * other.doubleValue());
+        default:
+            return AviatorDecimal.valueOf(this.toDecimal().multiply(other.toDecimal(),
+                AviatorEvaluator.getMathContext()));
+        }
     }
 
 
     @Override
     public AviatorObject innerMod(AviatorNumber other) {
-        return AviatorDecimal.valueOf(this.toDecimal().remainder(other.toDecimal()));
+        switch (other.getAviatorType()) {
+        case Double:
+            return AviatorDouble.valueOf(this.doubleValue() % other.doubleValue());
+        default:
+            return AviatorDecimal.valueOf(this.toDecimal().remainder(other.toDecimal(),
+                AviatorEvaluator.getMathContext()));
+        }
     }
 
 
     @Override
     public AviatorObject innerDiv(AviatorNumber other) {
-        return AviatorDecimal.valueOf(this.toDecimal().divide(other.toDecimal()));
+        switch (other.getAviatorType()) {
+        case Double:
+            return AviatorDouble.valueOf(this.doubleValue() / other.doubleValue());
+        default:
+            return AviatorDecimal
+                    .valueOf(this.toDecimal().divide(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        }
     }
 
 
     @Override
     public AviatorNumber innerAdd(AviatorNumber other) {
-        return AviatorDecimal.valueOf(this.toDecimal().add(other.toDecimal()));
+        switch (other.getAviatorType()) {
+        case Double:
+            return AviatorDouble.valueOf(this.doubleValue() + other.doubleValue());
+        default:
+            return AviatorDecimal.valueOf(this.toDecimal().add(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        }
     }
 
 
     @Override
     public int innerCompare(AviatorNumber other) {
-        return this.toDecimal().compareTo(other.toDecimal());
+        switch (other.getAviatorType()) {
+        case Double:
+            return Double.compare(this.doubleValue(), other.doubleValue());
+        default:
+            return this.toDecimal().compareTo(other.toDecimal());
+        }
+
     }
 
 

@@ -402,7 +402,13 @@ public class AviatorNumberUnitTest {
             this.reset();
             assertEquals(7.3, this.d.add(this.b, null).getValue(null));
 
-            System.out.println(this.a.add(this.e, null).getValue(null));
+            assertEquals(new BigInteger("92233720368547758074"), this.b.add(this.e, null).getValue(null));
+            assertEquals(new BigInteger("92233720368547759071"), this.c.add(this.e, null).getValue(null));
+            assertEquals(9.223372036854776E18, this.a.add(this.e, null).getValue(null));
+
+            assertEquals(new BigDecimal("92233720368547758074.1001"), this.b.add(this.f, null).getValue(null));
+            assertEquals(new BigDecimal("92233720368547759071.1001"), this.c.add(this.f, null).getValue(null));
+            assertEquals(9.223372036854776E19, this.a.add(this.f, null).getValue(null));
             break;
         case Sub:
             this.reset();
@@ -421,6 +427,14 @@ public class AviatorNumberUnitTest {
             assertEquals(-1.3, this.b.sub(this.d, null).getValue(null));
             this.reset();
             assertEquals(1.3, this.d.sub(this.b, null).getValue(null));
+
+            assertEquals(new BigInteger("-92233720368547758068"), this.b.sub(this.e, null).getValue(null));
+            assertEquals(new BigInteger("-92233720368547757071"), this.c.sub(this.e, null).getValue(null));
+            assertEquals(-9.223372036854776E19, this.a.sub(this.e, null).getValue(null));
+
+            assertEquals(new BigDecimal("-92233720368547758068.1001"), this.b.sub(this.f, null).getValue(null));
+            assertEquals(new BigDecimal("-92233720368547757071.1001"), this.c.sub(this.f, null).getValue(null));
+            assertEquals(-9.223372036854776E19, this.a.sub(this.f, null).getValue(null));
             break;
         case Mult:
             this.reset();
@@ -439,6 +453,14 @@ public class AviatorNumberUnitTest {
             assertEquals(12.9, this.b.mult(this.d, null).getValue(null));
             this.reset();
             assertEquals(12.9, this.d.mult(this.b, null).getValue(null));
+
+            assertEquals(new BigInteger("276701161105643274213"), this.b.mult(this.e, null).getValue(null));
+            assertEquals(new BigInteger("92233720368547758071000"), this.c.mult(this.e, null).getValue(null));
+            assertEquals(3.043712772162076E20, this.a.mult(this.e, null).getValue(null));
+
+            assertEquals(new BigDecimal("276701161105643274213.3003"), this.b.mult(this.f, null).getValue(null));
+            assertEquals(new BigDecimal("92233720368547758071100.1000"), this.c.mult(this.f, null).getValue(null));
+            assertEquals(3.043712772162076E20, this.a.mult(this.f, null).getValue(null));
             break;
 
         case Div:
@@ -459,6 +481,16 @@ public class AviatorNumberUnitTest {
             assertEquals(0.6976744, (Double) this.b.div(this.d, null).getValue(null), 0.001);
             this.reset();
             assertEquals(1.433333333, (Double) this.d.div(this.b, null).getValue(null), 0.001);
+
+            assertEquals(new BigInteger("30744573456182586023"), this.e.div(this.b, null).getValue(null));
+            assertEquals(new BigInteger("92233720368547758"), this.e.div(this.c, null).getValue(null));
+            assertEquals(2.794961223289326E19, this.e.div(this.a, null).getValue(null));
+
+            assertEquals(new BigDecimal("3.252606517456513302336211867796323E-20"),
+                this.b.div(this.f, null).getValue(null));
+            assertEquals(new BigDecimal("1.084202172485504434112070622598774E-17"),
+                this.c.div(this.f, null).getValue(null));
+            assertEquals(3.577867169202164E-20, this.a.div(this.f, null).getValue(null));
             break;
         case Mod:
             this.reset();
@@ -477,10 +509,22 @@ public class AviatorNumberUnitTest {
             assertEquals(3.0, (Double) this.b.mod(this.d, null).getValue(null), 0.001);
             this.reset();
             assertEquals(1.3, (Double) this.d.mod(this.b, null).getValue(null), 0.001);
+
+            assertEquals(new BigInteger("2"), this.e.mod(this.b, null).getValue(null));
+            assertEquals(new BigInteger("71"), this.e.mod(this.c, null).getValue(null));
+            assertEquals(0.0, this.e.mod(this.a, null).getValue(null));
+
+            assertEquals(new BigDecimal("3"),
+                this.b.mod(this.f, null).getValue(null));
+            assertEquals(new BigDecimal("1000"),
+                this.c.mod(this.f, null).getValue(null));
+            assertEquals(3.3, this.a.mod(this.f, null).getValue(null));
+
+            assertEquals(new BigDecimal("2.1001"), this.f.mod(this.b, null).getValue(null));
+            assertEquals(new BigDecimal("71.1001"), this.f.mod(this.c, null).getValue(null));
+            assertEquals(0.0, this.f.mod(this.a, null).getValue(null));
             break;
-
         }
-
     }
 
 
