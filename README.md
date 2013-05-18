@@ -1,7 +1,9 @@
 # Introduction
 
 Aviator is a lighweith,high performance expression evaluator for java.
-Aviator compiles expresson on the fly to byte code and evaluate it by reflection.
+Aviator compiles expresson to byte code and evaluate it on the fly.
+
+Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地将表达式编译成字节码并运行。更详细的信息请看[官方主页](http://code.google.com/p/aviator/)。
 
 # News
 
