@@ -2,6 +2,7 @@ package com.googlecode.aviator.example;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 
 import com.googlecode.aviator.AviatorEvaluator;
 
@@ -25,6 +26,11 @@ public class BigNumberExample {
         rt = AviatorEvaluator.exec("b+c*2", b, c);
         System.out.println(rt + "  " + rt.getClass());
 
+        rt = AviatorEvaluator.exec("a*b/c", a, b, c);
+        System.out.println(rt + "  " + rt.getClass());
+
+        // set math context
+        AviatorEvaluator.setMathContext(MathContext.DECIMAL64);
         rt = AviatorEvaluator.exec("a*b/c", a, b, c);
         System.out.println(rt + "  " + rt.getClass());
     }
