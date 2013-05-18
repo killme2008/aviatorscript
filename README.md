@@ -19,10 +19,10 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
 
 # Links
 
-homepage: http://code.google.com/p/aviator/
-downloads: http://code.google.com/p/aviator/downloads/list
-documents: https://code.google.com/p/aviator/w/list
-author:  dennis (killme2008@gmail.com, boyan@taobao.com)
+ * homepage: http://code.google.com/p/aviator/
+ * downloads: http://code.google.com/p/aviator/downloads/list
+ * documents: https://code.google.com/p/aviator/w/list
+ * author:  dennis (killme2008@gmail.com, boyan@taobao.com)
 
 
 
