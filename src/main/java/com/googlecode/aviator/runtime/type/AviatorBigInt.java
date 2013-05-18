@@ -38,9 +38,11 @@ public class AviatorBigInt extends AviatorLong {
         return new AviatorBigInt(v);
     }
 
+
     public static final AviatorBigInt valueOf(String v) {
         return new AviatorBigInt(new BigInteger(v));
     }
+
 
     public static final AviatorBigInt valueOf(long l) {
         final int offset = 128;
@@ -61,11 +63,12 @@ public class AviatorBigInt extends AviatorLong {
     public AviatorObject innerSub(AviatorNumber other) {
         switch (other.getAviatorType()) {
         case Decimal:
-            return AviatorDecimal.valueOf(this.toDecimal().add(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            return AviatorDecimal.valueOf(this.toDecimal().subtract(other.toDecimal(),
+                AviatorEvaluator.getMathContext()));
         case Double:
-            return AviatorDouble.valueOf(this.doubleValue() + other.doubleValue());
+            return AviatorDouble.valueOf(this.doubleValue() - other.doubleValue());
         default:
-            return AviatorBigInt.valueOf(this.toBigInt().add(other.toBigInt()));
+            return AviatorBigInt.valueOf(this.toBigInt().subtract(other.toBigInt()));
         }
     }
 
@@ -172,7 +175,7 @@ public class AviatorBigInt extends AviatorLong {
 
     @Override
     protected AviatorObject innerUnsignedShiftRight(AviatorObject other) {
-        throw new UnsupportedOperationException("The unsigned right shift operator for big int (>>>) is omitted.");
+        return this.innerShiftRight(other);
     }
 
 

@@ -562,7 +562,7 @@ public final class AviatorEvaluator {
 
 
     /**
-     * Execute a text expression without caching
+     * Execute a text expression without caching and env map.
      * 
      * @param expression
      * @return

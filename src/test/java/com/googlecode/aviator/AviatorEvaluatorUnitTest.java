@@ -18,7 +18,10 @@
  **/
 package com.googlecode.aviator;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +63,7 @@ public class AviatorEvaluatorUnitTest {
         map.put("a", 100);
         map.put("b", 99);
         int[][] list = new int[1][2];
-        list[0]=new int[2];
+        list[0] = new int[2];
         list[0][1] = 2000;
         int y = 999;
         assertEquals(2000L, AviatorEvaluator.exec(exp4, map, list, y));
@@ -129,6 +132,12 @@ public class AviatorEvaluatorUnitTest {
     @Test(expected = CompileExpressionErrorException.class)
     public void compileBlankExpression1() {
         AviatorEvaluator.compile("");
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetNullMathContext() {
+        AviatorEvaluator.setMathContext(null);
     }
 
 
