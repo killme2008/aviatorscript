@@ -452,6 +452,8 @@ public class FunctionTest {
             AviatorEvaluator.exec("99999999999999999999999999999999"));
         assertEquals(new BigInteger("99999999999999999999999999999999"),
             AviatorEvaluator.exec("99999999999999999999999999999999N"));
+        assertEquals(new BigInteger("199999999999999999999999999999998"),
+            AviatorEvaluator.exec("99999999999999999999999999999999+99999999999999999999999999999999"));
 
         assertEquals(new BigDecimal("99999999999999999999999999999999.99999999", AviatorEvaluator.getMathContext()),
             AviatorEvaluator.exec("99999999999999999999999999999999.99999999M"));
