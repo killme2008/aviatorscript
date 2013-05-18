@@ -434,6 +434,19 @@ public class FunctionTest {
 
 
     @Test
+    public void testParseScientificNotations() {
+        assertEquals(1e5, AviatorEvaluator.exec("1e5"));
+        assertEquals(1E5, AviatorEvaluator.exec("1E5"));
+        assertEquals(1E-5, AviatorEvaluator.exec("1E-5"));
+
+        assertEquals(2e3 + 4e6, AviatorEvaluator.exec("2e3+4e6"));
+        assertEquals(2e3 - 4e6, AviatorEvaluator.exec("2e3-4e6"));
+        assertEquals(2e3 / 4e6, AviatorEvaluator.exec("2e3/4e6"));
+        assertEquals(2e3 % 4e6, AviatorEvaluator.exec("2e3%4e6"));
+    }
+
+
+    @Test
     public void testParseBigNumbers() {
         assertEquals(new BigInteger("99999999999999999999999999999999"),
             AviatorEvaluator.exec("99999999999999999999999999999999"));
