@@ -25,6 +25,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -305,8 +307,8 @@ public class FunctionTest {
         assertTrue((Boolean) AviatorEvaluator.execute("string.contains(s1+s2+s3,s2)", env));
         assertEquals("ello world", AviatorEvaluator.execute("string.substring(s1,1)", env));
         assertEquals("el", AviatorEvaluator.execute("string.substring(s1,1,3)", env));
-        assertEquals("hello",((String[])AviatorEvaluator.exec("string.split('hello world',' ')"))[0]);
-        assertEquals("world",((String[])AviatorEvaluator.exec("string.split('hello world',' ')"))[1]);
+        assertEquals("hello", ((String[]) AviatorEvaluator.exec("string.split('hello world',' ')"))[0]);
+        assertEquals("world", ((String[]) AviatorEvaluator.exec("string.split('hello world',' ')"))[1]);
     }
 
 
@@ -421,7 +423,25 @@ public class FunctionTest {
 
     @Test
     public void testMathFunction() {
+        assertEquals(Math.pow(10, 100.0), AviatorEvaluator.exec("math.pow(10,100)"));
+        assertEquals(Math.log(99), AviatorEvaluator.exec("math.log(99)"));
+        assertEquals(Math.log10(99), AviatorEvaluator.exec("math.log10(99)"));
+        assertEquals(Math.sin(99), AviatorEvaluator.exec("math.sin(99)"));
+        assertEquals(Math.cos(99), AviatorEvaluator.exec("math.cos(99)"));
+        assertEquals(Math.tan(99), AviatorEvaluator.exec("math.tan(99)"));
+        assertEquals(Math.sqrt(99), AviatorEvaluator.exec("math.sqrt(99)"));
+    }
 
+
+    @Test
+    public void testParseBigNumbers() {
+        assertEquals(new BigInteger("99999999999999999999999999999999"),
+            AviatorEvaluator.exec("99999999999999999999999999999999"));
+        assertEquals(new BigInteger("99999999999999999999999999999999"),
+            AviatorEvaluator.exec("99999999999999999999999999999999N"));
+
+        assertEquals(new BigDecimal("99999999999999999999999999999999.99999999", AviatorEvaluator.getMathContext()),
+            AviatorEvaluator.exec("99999999999999999999999999999999.99999999M"));
     }
 
 
@@ -502,8 +522,100 @@ public class FunctionTest {
 
     @Test
     public void testBigNumber() {
+        // big int + long
+        assertEquals(new BigInteger("4"), AviatorEvaluator.exec("a+b", 1, new BigInteger("3")));
+        assertEquals(new BigInteger("4"), AviatorEvaluator.exec("a+3N", 1));
+        assertEquals(new BigInteger("4"), AviatorEvaluator.exec("1+b", new BigInteger("3")));
+        assertEquals(new BigInteger("4"), AviatorEvaluator.exec("3N+1"));
+        assertEquals(new BigInteger("300"), AviatorEvaluator.exec("3N*100"));
+        assertEquals(new BigInteger("100"), AviatorEvaluator.exec("400/4N"));
+        assertEquals(new BigInteger("-3"), AviatorEvaluator.exec("a-4N", 1));
 
+        // big int + double
+        assertEquals(4.1, AviatorEvaluator.exec("a+b", 1.1, new BigInteger("3")));
+        assertEquals(4.1, AviatorEvaluator.exec("a+3N", 1.1));
+        assertEquals(4.1, AviatorEvaluator.exec("1.1+b", new BigInteger("3")));
+        assertEquals(4.1, AviatorEvaluator.exec("3N+1.1"));
+        assertEquals(300.0, AviatorEvaluator.exec("3N*100.0"));
+        assertEquals(100.0, AviatorEvaluator.exec("400.0/4N"));
+        assertEquals(-2.9, AviatorEvaluator.exec("a-4N", 1.1));
+
+        // big int + big int
+        assertEquals(new BigInteger("4"), AviatorEvaluator.exec("a+b", new BigInteger("1"), new BigInteger("3")));
+        assertEquals(new BigInteger("4"), AviatorEvaluator.exec("a+3N", new BigInteger("1")));
+        assertEquals(new BigInteger("4"), AviatorEvaluator.exec("1+b", new BigInteger("3")));
+        assertEquals(new BigInteger("4"), AviatorEvaluator.exec("3N+1N"));
+        assertEquals(new BigInteger("300"), AviatorEvaluator.exec("3N*100N"));
+        assertEquals(new BigInteger("100"), AviatorEvaluator.exec("400N/4N"));
+        assertEquals(new BigInteger("-3"), AviatorEvaluator.exec("a-4N", new BigInteger("1")));
+
+        // big int + decimal
+        assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("a+b", new BigDecimal("1.1"), new BigInteger("3")));
+        assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("a+3N", new BigDecimal("1")));
+        assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("1.1M+b", new BigInteger("3")));
+        assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("3N+1.1M"));
+        assertEquals(new BigDecimal("301"), AviatorEvaluator.exec("3.01M*100N"));
+        assertEquals(new BigDecimal("100"), AviatorEvaluator.exec("400M/4N"));
+        assertEquals(new BigDecimal("-2.9"), AviatorEvaluator.exec("a-4N", new BigDecimal("1.1")));
+
+        // decimal + long
+        assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("a+b", new BigDecimal("1.1"), 3));
+        assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("a+3", new BigDecimal("1")));
+        assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("1.1M+b", 3));
+        assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("3+1.1M"));
+        assertEquals(new BigDecimal("301"), AviatorEvaluator.exec("3.01M*100"));
+        assertEquals(new BigDecimal("100"), AviatorEvaluator.exec("400M/4"));
+        assertEquals(new BigDecimal("-2.9"), AviatorEvaluator.exec("a-4", new BigDecimal("1.1")));
+        // decimal + double
+        assertEquals(4.1, AviatorEvaluator.exec("a+b", 1.1, new BigDecimal("3")));
+        assertEquals(4.1, AviatorEvaluator.exec("a+3.0M", 1.1));
+        assertEquals(4.1, AviatorEvaluator.exec("1.1+b", new BigDecimal("3")));
+        assertEquals(4.1, AviatorEvaluator.exec("3.00M+1.1"));
+        assertEquals(300.0, AviatorEvaluator.exec("3M*100.0"));
+        assertEquals(100.0, AviatorEvaluator.exec("400.0/4M"));
+        assertEquals(-2.9, AviatorEvaluator.exec("a-4.00M", 1.1));
     }
+
+
+    @Test
+    public void testBigNumberNegative() {
+        assertEquals(new BigInteger("-1000000000000000000000000000000000"),
+            AviatorEvaluator.exec("-a", new BigInteger("1000000000000000000000000000000000")));
+        assertEquals(new BigDecimal("9999999999999999999999999999999999999.99999999999"),
+            AviatorEvaluator.exec("-a", new BigDecimal("-9999999999999999999999999999999999999.99999999999")));
+        assertEquals(new BigDecimal("9999999999999999999.999999999999"),
+            AviatorEvaluator.exec("-(-9999999999999999999.999999999999M)"));
+        assertEquals(new BigInteger("9999999999999999999"), AviatorEvaluator.exec("-(-9999999999999999999N)"));
+    }
+
+
+    @Test
+    public void testBigNumberBitOperations() {
+        assertEquals(
+            new BigInteger("1000000000000000000000000000000000").xor(new BigInteger("9999999999999999999999")),
+            AviatorEvaluator.exec("a^b", new BigInteger("1000000000000000000000000000000000"), new BigInteger(
+                    "9999999999999999999999")));
+        assertEquals(
+            new BigInteger("1000000000000000000000000000000000").and(new BigInteger("9999999999999999999999")),
+            AviatorEvaluator.exec("a&b", new BigInteger("1000000000000000000000000000000000"), new BigInteger(
+                    "9999999999999999999999")));
+        assertEquals(new BigInteger("1000000000000000000000000000000000").or(new BigInteger("9999999999999999999999")),
+            AviatorEvaluator.exec("a|b", new BigInteger("1000000000000000000000000000000000"), new BigInteger(
+                    "9999999999999999999999")));
+        assertEquals(new BigInteger("1000000000000000000000000000000000").shiftLeft(2),
+            AviatorEvaluator.exec("a<<2", new BigInteger("1000000000000000000000000000000000")));
+        assertEquals(new BigInteger("1000000000000000000000000000000000").shiftRight(2),
+            AviatorEvaluator.exec("a>>2", new BigInteger("1000000000000000000000000000000000")));
+        assertEquals(new BigInteger("1000000000000000000000000000000000").shiftRight(2),
+            AviatorEvaluator.exec("a>>>2", new BigInteger("1000000000000000000000000000000000")));
+    }
+
+
+    @Test(expected = ExpressionRuntimeException.class)
+    public void testDecimalBitAnd() {
+        AviatorEvaluator.exec("3M< & 2M");
+    }
+
 
     @Test
     public void testOtherFunction() {

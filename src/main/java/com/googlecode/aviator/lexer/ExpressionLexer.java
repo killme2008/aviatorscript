@@ -236,10 +236,12 @@ public class ExpressionLexer {
                     || this.peek == 'M' || this.peek == 'N');
             Number value;
             if (isBigDecimal) {
-                value = new BigDecimal(sb.toString().substring(0, sb.length() - 1), AviatorEvaluator.getMathContext());
+                String lexeme = this.getBigNumberLexeme(sb);
+                value = new BigDecimal(lexeme, AviatorEvaluator.getMathContext());
             }
             else if (isBigInt) {
-                value = new BigInteger(sb.toString().substring(0, sb.length() - 1));
+                String lexeme = this.getBigNumberLexeme(sb);
+                value = new BigInteger(lexeme);
             }
             else if (hasDot) {
                 value = dval;
@@ -254,7 +256,11 @@ public class ExpressionLexer {
                     value = lval;
                 }
             }
-            return new NumberToken(value, sb.toString(), startIndex);
+            String lexeme = sb.toString();
+            if (isBigDecimal || isBigInt) {
+                lexeme = lexeme.substring(0, lexeme.length() - 1);
+            }
+            return new NumberToken(value, lexeme, startIndex);
         }
 
         // It is a variable
@@ -303,6 +309,13 @@ public class ExpressionLexer {
         Token<Character> token = new CharToken(this.peek, this.iterator.getIndex());
         this.nextChar();
         return token;
+    }
+
+
+    private String getBigNumberLexeme(StringBuffer sb) {
+        String lexeme = sb.toString();
+        lexeme = lexeme.substring(0, lexeme.length() - 1);
+        return lexeme;
     }
 
     static final char[] OPS = { '=', '>', '<', '+', '-', '*', '/', '%', '!', '&', '|' };
