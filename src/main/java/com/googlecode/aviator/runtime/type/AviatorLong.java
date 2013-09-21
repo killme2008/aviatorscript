@@ -22,6 +22,7 @@ import java.util.Map;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -80,7 +81,7 @@ public class AviatorLong extends AviatorNumber {
         case Decimal:
             return this.toDecimal().compareTo(other.toDecimal());
         case Long:
-            return Long.compare(this.longValue(), other.longValue());
+            return TypeUtils.comapreLong(this.longValue(), other.longValue());
         case Double:
             return Double.compare(this.number.doubleValue(), other.doubleValue());
         default:

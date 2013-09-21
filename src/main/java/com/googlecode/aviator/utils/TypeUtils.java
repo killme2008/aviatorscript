@@ -60,6 +60,16 @@ public class TypeUtils {
     public static long NEWTON_METHOD_REPEATS = 10000;
 
 
+    public static int comapreLong(long x, long y) {
+        if (x > y)
+            return 1;
+        else if (x < y)
+            return -1;
+        else
+            return 0;
+    }
+
+
     /**
      * newton method to get natural logarithm
      * 
