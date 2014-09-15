@@ -7,7 +7,6 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
 
 # News
 * 2.3.3 released.修复非缓存模式下内存泄露的 Bug 。
- * 2.3.0 released. [Release note](https://code.google.com/p/aviator/wiki/ReleaseNotes)
 
 # Dependency
 
