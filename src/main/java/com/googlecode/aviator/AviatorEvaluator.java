@@ -82,14 +82,15 @@ import com.googlecode.aviator.runtime.type.AviatorNil;
 
 /**
  * Avaitor Expression evaluator
- *
+ * 
  * @author dennis
- *
+ * 
  */
 public final class AviatorEvaluator {
     private static Boolean trace = Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
 
     // The classloader to define generated class
+    @Deprecated
     private static AviatorClassLoader aviatorClassLoader;
 
     /**
@@ -125,7 +126,7 @@ public final class AviatorEvaluator {
 
     /**
      * Configure whether to trace code generation
-     *
+     * 
      * @param t
      *            true is to trace,default is false.
      */
@@ -136,7 +137,7 @@ public final class AviatorEvaluator {
 
     /**
      * Get current trace output stream,default is System.out
-     *
+     * 
      * @return
      */
     public static OutputStream getTraceOutputStream() {
@@ -146,7 +147,7 @@ public final class AviatorEvaluator {
 
     /**
      * Returns current math context for decimal.
-     *
+     * 
      * @since 2.3.0
      * @return
      */
@@ -157,7 +158,7 @@ public final class AviatorEvaluator {
 
     /**
      * Set math context for decimal.
-     *
+     * 
      * @param mathContext
      * @since 2.3.0
      */
@@ -171,7 +172,7 @@ public final class AviatorEvaluator {
 
     /**
      * Set trace output stream
-     *
+     * 
      * @param traceOutputStream
      */
     public static void setTraceOutputStream(OutputStream traceOutputStream) {
@@ -257,19 +258,19 @@ public final class AviatorEvaluator {
      * Compiled Expression cache
      */
     private final static ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-     * Compiled
-     * expression
-     * task
-     */> cacheExpressions =
-     new ConcurrentHashMap<String, FutureTask<Expression>>();
+                                                                                               * Compiled
+                                                                                               * expression
+                                                                                               * task
+                                                                                               */> cacheExpressions =
+            new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
     /**
      * set optimize level,default AviatorEvaluator.EVAL
-     *
+     * 
      * @see #COMPILE
      * @see #EVAL
-     *
+     * 
      * @param value
      */
     public static void setOptimize(int value) {
@@ -300,17 +301,30 @@ public final class AviatorEvaluator {
 
     /**
      * Returns classloader
-     *
+     * 
      * @return
      */
     public static AviatorClassLoader getAviatorClassLoader() {
-        return aviatorClassLoader;
+        return getAviatorClassLoader(false);
+    }
+
+
+    /**
+     * Returns classloader
+     * 
+     * @return
+     */
+    public static AviatorClassLoader getAviatorClassLoader(boolean cached) {
+        if (cached)
+            return aviatorClassLoader;
+        else
+            return new AviatorClassLoader(Thread.currentThread().getContextClassLoader());
     }
 
 
     /**
      * Add a aviator function
-     *
+     * 
      * @param function
      */
     public static void addFunction(AviatorFunction function) {
@@ -321,7 +335,7 @@ public final class AviatorEvaluator {
 
     /**
      * Remove a aviator function by name
-     *
+     * 
      * @param name
      * @return
      */
@@ -332,7 +346,7 @@ public final class AviatorEvaluator {
 
     /**
      * get a aviator function by name,throw exception if null
-     *
+     * 
      * @param name
      * @return
      */
@@ -347,7 +361,7 @@ public final class AviatorEvaluator {
 
     /**
      * Check if the function is existed in aviator
-     *
+     * 
      * @param name
      * @return
      */
@@ -358,7 +372,7 @@ public final class AviatorEvaluator {
 
     /**
      * Remove a aviator function
-     *
+     * 
      * @param function
      * @return
      */
@@ -369,17 +383,18 @@ public final class AviatorEvaluator {
 
     /**
      * Configure user defined classloader
-     *
+     * 
+     * @deprecated
      * @param aviatorClassLoader
      */
     public static void setAviatorClassLoader(AviatorClassLoader aviatorClassLoader) {
-        AviatorEvaluator.aviatorClassLoader = aviatorClassLoader;
+        // AviatorEvaluator.aviatorClassLoader = aviatorClassLoader;
     }
 
 
     /**
      * Returns a compiled expression in cache
-     *
+     * 
      * @param expression
      * @return
      */
@@ -396,14 +411,14 @@ public final class AviatorEvaluator {
 
     /**
      * Compile a text expression to Expression object
-     *
+     * 
      * @param expression
      *            text expression
      * @param cached
      *            Whether to cache the compiled result,make true to cache it.
      * @return
      */
-    public static Expression compile(final String expression, boolean cached) {
+    public static Expression compile(final String expression, final boolean cached) {
         if (expression == null || expression.trim().length() == 0) {
             throw new CompileExpressionErrorException("Blank expression");
         }
@@ -416,7 +431,7 @@ public final class AviatorEvaluator {
             task = new FutureTask<Expression>(new Callable<Expression>() {
                 @Override
                 public Expression call() throws Exception {
-                    return innerCompile(expression);
+                    return innerCompile(expression, cached);
                 }
 
             });
@@ -429,7 +444,7 @@ public final class AviatorEvaluator {
 
         }
         else {
-            return innerCompile(expression);
+            return innerCompile(expression, cached);
         }
 
     }
@@ -446,22 +461,23 @@ public final class AviatorEvaluator {
     }
 
 
-    private static Expression innerCompile(final String expression) {
+    private static Expression innerCompile(final String expression, boolean cached) {
         ExpressionLexer lexer = new ExpressionLexer(expression);
-        CodeGenerator codeGenerator = newCodeGenerator();
+        CodeGenerator codeGenerator = newCodeGenerator(cached);
         ExpressionParser parser = new ExpressionParser(lexer, codeGenerator);
         return parser.parse();
     }
 
 
-    private static CodeGenerator newCodeGenerator() {
+    private static CodeGenerator newCodeGenerator(boolean cached) {
         switch (optimize) {
         case COMPILE:
-            ASMCodeGenerator asmCodeGenerator = new ASMCodeGenerator(aviatorClassLoader, traceOutputStream, trace);
+            ASMCodeGenerator asmCodeGenerator =
+                    new ASMCodeGenerator(getAviatorClassLoader(cached), traceOutputStream, trace);
             asmCodeGenerator.start();
             return asmCodeGenerator;
         case EVAL:
-            return new OptimizeCodeGenerator(aviatorClassLoader, traceOutputStream, trace);
+            return new OptimizeCodeGenerator(getAviatorClassLoader(cached), traceOutputStream, trace);
         default:
             throw new IllegalArgumentException("Unknow option " + optimize);
         }
@@ -471,7 +487,7 @@ public final class AviatorEvaluator {
 
     /**
      * Compile a text expression to Expression Object without caching
-     *
+     * 
      * @param expression
      * @return
      */
@@ -484,7 +500,7 @@ public final class AviatorEvaluator {
      * Execute a text expression with values that are variables order in the
      * expression.It only runs in EVAL mode,and it will cache the compiled
      * expression.
-     *
+     * 
      * @param expression
      * @param values
      * @return
@@ -520,7 +536,7 @@ public final class AviatorEvaluator {
 
     /**
      * Execute a text expression with environment
-     *
+     * 
      * @param expression
      *            text expression
      * @param env
@@ -541,19 +557,19 @@ public final class AviatorEvaluator {
 
     /**
      * Execute a text expression without caching
-     *
+     * 
      * @param expression
      * @param env
      * @return
      */
     public static Object execute(String expression, Map<String, Object> env) {
-        return execute(expression, env, true);
+        return execute(expression, env, false);
     }
 
 
     /**
      * Invalidate expression cache
-     *
+     * 
      * @param expression
      */
     public static void invalidateCache(String expression) {
@@ -563,7 +579,7 @@ public final class AviatorEvaluator {
 
     /**
      * Execute a text expression without caching and env map.
-     *
+     * 
      * @param expression
      * @return
      */
