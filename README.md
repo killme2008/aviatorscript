@@ -14,7 +14,7 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
       <dependency>
           <groupId>com.googlecode.aviator</groupId>
           <artifactId>aviator</artifactId>
-          <version>2.3.0</version>
+          <version>2.3.3</version>
       </dependency>
 
 # Links
