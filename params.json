@@ -1,0 +1,6 @@
+{
+  "name": "Aviator",
+  "tagline": "A high performance expression evaluator for java ",
+  "body": "# Intro\r\n\r\nAviator is a lighweith,high performance expression evaluator for java.\r\nAviator compiles expresson to byte code and evaluate it on the fly.\r\n\r\nAviator是一个轻量级、高性能的Java表达式执行引擎，它动态地将表达式编译成字节码并运行。更详细的请阅读[开发指南](https://github.com/killme2008/aviator/wiki)。\r\n\r\n# News\r\n* [2.3.3 released](https://github.com/killme2008/aviator/releases/tag/aviator-2.3.3).修复非缓存模式下内存泄露的 Bug 。\r\n\r\n# Dependency\r\n\r\n      <dependency>\r\n          <groupId>com.googlecode.aviator</groupId>\r\n          <artifactId>aviator</artifactId>\r\n          <version>2.3.3</version>\r\n      </dependency>\r\n\r\n# Links\r\n\r\n * downloads: https://github.com/killme2008/aviator/releases\r\n * documents: https://github.com/killme2008/aviator/wiki\r\n * author:  dennis (killme2008@gmail.com)\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
