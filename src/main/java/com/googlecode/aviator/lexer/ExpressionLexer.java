@@ -25,6 +25,7 @@ import java.text.StringCharacterIterator;
 import java.util.Stack;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.NumberToken;
@@ -236,15 +237,21 @@ public class ExpressionLexer {
                     || this.peek == 'M' || this.peek == 'N');
             Number value;
             if (isBigDecimal) {
-                String lexeme = this.getBigNumberLexeme(sb);
-                value = new BigDecimal(lexeme, AviatorEvaluator.getMathContext());
+                value = getDecimalValue(sb);
             }
             else if (isBigInt) {
                 String lexeme = this.getBigNumberLexeme(sb);
                 value = new BigInteger(lexeme);
             }
             else if (hasDot) {
-                value = dval;
+				boolean alwaysUseDecimalAsDouble = AviatorEvaluator
+						.getOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL);
+				if (alwaysUseDecimalAsDouble) {
+					value = new BigDecimal(sb.toString(),
+							AviatorEvaluator.getMathContext());
+				} else {
+					value = dval;
+				}
             }
             else {
                 // if the long value is out of range,then it must be negative,so
@@ -310,6 +317,14 @@ public class ExpressionLexer {
         this.nextChar();
         return token;
     }
+
+
+	private Number getDecimalValue(StringBuffer sb) {
+		Number value;
+		String lexeme = this.getBigNumberLexeme(sb);
+		value = new BigDecimal(lexeme, AviatorEvaluator.getMathContext());
+		return value;
+	}
 
 
     private String getBigNumberLexeme(StringBuffer sb) {

@@ -122,7 +122,8 @@ public final class AviatorEvaluator {
      * Default match context for decimal.
      */
     private static MathContext mathContext = MathContext.DECIMAL128;
-
+    
+	private static final ConcurrentHashMap<Options, Object> options = new ConcurrentHashMap<Options, Object>();
 
     /**
      * Configure whether to trace code generation
@@ -134,6 +135,32 @@ public final class AviatorEvaluator {
         trace = t;
     }
 
+	/**
+	 * Adds a evaluator option
+	 * 
+	 * @since 2.3.4
+	 * @see Options
+	 * @param opt
+	 * @param val
+	 */
+	public static void setOption(Options opt, Object val) {
+		options.put(opt, val);
+	}
+
+	/**
+	 * Returns the current evaluator option value, returns null if missing.
+	 * 
+	 * @param opt
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getOption(Options opt) {
+		Object val = options.get(opt);
+		if (val == null) {
+			val = opt.getDefaultValue();
+		}
+		return (T) val;
+	}
 
     /**
      * Get current trace output stream,default is System.out
