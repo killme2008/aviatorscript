@@ -108,9 +108,9 @@ public final class AviatorEvaluator {
     public static final String VERSION = "2.1.1";
 
     /**
-     * Generated java class version,default 1.5
+     * Generated java class version,default 1.6
      */
-    public static int BYTECODE_VER = Opcodes.V1_5;
+    public static int BYTECODE_VER = Opcodes.V1_6;
 
     private static OutputStream traceOutputStream = System.out;
 
