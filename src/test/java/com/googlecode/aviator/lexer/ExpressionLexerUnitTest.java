@@ -28,6 +28,8 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
+import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
@@ -212,6 +214,23 @@ public class ExpressionLexerUnitTest {
         assertEquals(TokenType.Number, token.getType());
         assertEquals(new BigDecimal("4.33"), token.getValue(null));
         assertEquals(14, token.getStartIndex());
+    }
+
+
+    @Test
+    public void testParseDoubleAsDecimal() {
+        try {
+            AviatorEvaluator.setOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL, true);
+            this.lexer = new ExpressionLexer("3.2");
+            Token<?> token = this.lexer.scan();
+            assertEquals(TokenType.Number, token.getType());
+            assertTrue(token.getValue(null) instanceof BigDecimal);
+            assertEquals(new BigDecimal("3.2"), token.getValue(null));
+            assertEquals(0, token.getStartIndex());
+        }
+        finally {
+            AviatorEvaluator.setOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL, false);
+        }
     }
 
 

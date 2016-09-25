@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
+import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,30 @@ public class AviatorEvaluatorUnitTest {
 
         assertEquals(4, exp1.execute(null));
         assertEquals(4, exp2.execute(null));
+    }
+
+
+    @Test
+    public void testDefaultOptionValues() {
+        assertEquals(AviatorEvaluator.getOption(Options.TRACE), false);
+        assertEquals(AviatorEvaluator.getOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL), false);
+        assertEquals(AviatorEvaluator.getOption(Options.OPTIMIZE_LEVEL), AviatorEvaluator.EVAL);
+        assertEquals(AviatorEvaluator.getOption(Options.MATH_CONTEXT), MathContext.DECIMAL128);
+    }
+
+
+    @Test
+    public void testSetOptions() {
+        try {
+            AviatorEvaluator.setOption(Options.TRACE, true);
+            assertEquals(AviatorEvaluator.getOption(Options.TRACE), true);
+            AviatorEvaluator.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
+            assertEquals(AviatorEvaluator.getOption(Options.OPTIMIZE_LEVEL), AviatorEvaluator.COMPILE);
+        }
+        finally {
+            AviatorEvaluator.setOption(Options.TRACE, false);
+            AviatorEvaluator.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.EVAL);
+        }
     }
 
 
