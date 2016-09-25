@@ -113,8 +113,9 @@ public final class AviatorEvaluator {
     public static int BYTECODE_VER = Opcodes.V1_5;
 
     private static OutputStream traceOutputStream = System.out;
-    
-	private static final ConcurrentHashMap<Options, Object> options = new ConcurrentHashMap<Options, Object>();
+
+    private static final ConcurrentHashMap<Options, Object> options = new ConcurrentHashMap<Options, Object>();
+
 
     /**
      * Configure whether to trace code generation
@@ -123,47 +124,45 @@ public final class AviatorEvaluator {
      * @param t
      *            true is to trace,default is false.
      */
-	public static void setTrace(boolean t) {
-		setOption(Options.TRACE, t);
-	}
+    public static void setTrace(boolean t) {
+        setOption(Options.TRACE, t);
+    }
 
-	/**
-	 * Adds a evaluator option
-	 * 
-	 * @since 2.3.4
-	 * @see Options
-	 * @param opt
-	 * @param val
-	 */
-	public static void setOption(Options opt, Object val) {
-		if (opt == null || val == null) {
-			throw new IllegalArgumentException(
-					"Option and value should not be null.");
-		}
-		if (!opt.isValidValue(val)) {
-			throw new IllegalArgumentException("Invalid value for option:"
-					+ opt.name());
-		}
-		options.put(opt, val);
-		if (opt == Options.OPTIMIZE_LEVEL) {
-			optimizeLevel = -1;
-		}
-	}
 
-	/**
-	 * Returns the current evaluator option value, returns null if missing.
-	 * 
-	 * @param opt
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getOption(Options opt) {
-		Object val = options.get(opt);
-		if (val == null) {
-			val = opt.getDefaultValue();
-		}
-		return (T) val;
-	}
+    /**
+     * Adds a evaluator option
+     * 
+     * @since 2.3.4
+     * @see Options
+     * @param opt
+     * @param val
+     */
+    public static void setOption(Options opt, Object val) {
+        if (opt == null || val == null) {
+            throw new IllegalArgumentException("Option and value should not be null.");
+        }
+        if (!opt.isValidValue(val)) {
+            throw new IllegalArgumentException("Invalid value for option:" + opt.name());
+        }
+        options.put(opt, val);
+    }
+
+
+    /**
+     * Returns the current evaluator option value, returns null if missing.
+     * 
+     * @param opt
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getOption(Options opt) {
+        Object val = options.get(opt);
+        if (val == null) {
+            val = opt.getDefaultValue();
+        }
+        return (T) val;
+    }
+
 
     /**
      * Get current trace output stream,default is System.out
@@ -182,9 +181,9 @@ public final class AviatorEvaluator {
      * @deprecated Please use {@link #getOption(Options)}
      * @return
      */
-	public static MathContext getMathContext() {
-		return getOption(Options.MATH_CONTEXT);
-	}
+    public static MathContext getMathContext() {
+        return getOption(Options.MATH_CONTEXT);
+    }
 
 
     /**
@@ -500,27 +499,24 @@ public final class AviatorEvaluator {
         ExpressionParser parser = new ExpressionParser(lexer, codeGenerator);
         return parser.parse();
     }
-    
-	private static int optimizeLevel = -1;
 
-	private static int getOptimizeLevel() {
-		// cache it, avoid unboxing.
-		if (optimizeLevel == -1) {
-			optimizeLevel = getOption(Options.OPTIMIZE_LEVEL);
-		}
-		return optimizeLevel;
-	}
+
+    private static int getOptimizeLevel() {
+        return getOption(Options.OPTIMIZE_LEVEL);
+    }
 
 
     private static CodeGenerator newCodeGenerator(boolean cached) {
         switch (getOptimizeLevel()) {
         case COMPILE:
             ASMCodeGenerator asmCodeGenerator =
-                    new ASMCodeGenerator(getAviatorClassLoader(cached), traceOutputStream, (Boolean)getOption(Options.TRACE));
+                    new ASMCodeGenerator(getAviatorClassLoader(cached), traceOutputStream,
+                        (Boolean) getOption(Options.TRACE));
             asmCodeGenerator.start();
             return asmCodeGenerator;
         case EVAL:
-            return new OptimizeCodeGenerator(getAviatorClassLoader(cached), traceOutputStream, (Boolean)getOption(Options.TRACE));
+            return new OptimizeCodeGenerator(getAviatorClassLoader(cached), traceOutputStream,
+                (Boolean) getOption(Options.TRACE));
         default:
             throw new IllegalArgumentException("Unknow option " + getOptimizeLevel());
         }
