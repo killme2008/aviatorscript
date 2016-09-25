@@ -39,6 +39,7 @@ import org.junit.Test;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 
 
@@ -148,9 +149,9 @@ public class FunctionTest {
         assertEquals(
             true,
             AviatorEvaluator
-            .execute(
-                "i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99 ==i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99",
-                env));
+                .execute(
+                    "i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99 ==i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99",
+                    env));
     }
 
 
@@ -326,8 +327,8 @@ public class FunctionTest {
         assertEquals(
             4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? !false && true ? 1 & 4 : 0 : 6L >> 2L * 2L / 4L
                     ^ ~699L + 100L << 4L >> 5L >> 1000L,
-                    AviatorEvaluator
-                    .execute("4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) : 6 >> 2 * 2 / 4^ ~699 + 100 << 4 >> 5 >> 1000"));
+            AviatorEvaluator
+                .execute("4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) : 6 >> 2 * 2 / 4^ ~699 + 100 << 4 >> 5 >> 1000"));
 
         assertEquals((99 & 7) == (99 & 7) && false, AviatorEvaluator.execute("(99&7)==(99&7)&&false "));
         assertEquals((99 | 7) != (99 | 7) || false, AviatorEvaluator.execute("(99|7)!=(99|7)||false "));
@@ -359,10 +360,10 @@ public class FunctionTest {
         assertEquals(
             4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? !false && true ? 1 & 4 : 0 : i >> j * k / i
                     ^ ~j + k << i >> j >> 1000L,
-                    AviatorEvaluator
-                    .execute(
-                        "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) :i >> j * k / i ^ ~j + k << i >> j >> 1000,",
-                        env));
+            AviatorEvaluator
+                .execute(
+                    "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) :i >> j * k / i ^ ~j + k << i >> j >> 1000,",
+                    env));
 
         assertEquals((i & 7) == (i & 7) && false, AviatorEvaluator.execute("(i & 7) == (i & 7) && false ", env));
         assertEquals((j | k) != (j | k) || false, AviatorEvaluator.execute("(j | k) != (j | k) || false ", env));
@@ -385,7 +386,7 @@ public class FunctionTest {
         assertEquals(~0xFF == 0Xff, AviatorEvaluator.execute("~0xFF==0Xff", env));
         assertEquals(~0xFF | k & 3 - 0X11, AviatorEvaluator.execute("~0xFF|k&3-0X11", env));
         assertEquals(0x45 > i ? 0x11 - 0344 * 5 / 7 : k / 0xFF - j * 0x45,
-                AviatorEvaluator.execute("0x45>i?0x11-0344*5/7:k/0xFF-j*0x45 ", env));
+            AviatorEvaluator.execute("0x45>i?0x11-0344*5/7:k/0xFF-j*0x45 ", env));
     }
 
 
@@ -609,14 +610,14 @@ public class FunctionTest {
         assertEquals(
             new BigInteger("1000000000000000000000000000000000").xor(new BigInteger("9999999999999999999999")),
             AviatorEvaluator.exec("a^b", new BigInteger("1000000000000000000000000000000000"), new BigInteger(
-                    "9999999999999999999999")));
+                "9999999999999999999999")));
         assertEquals(
             new BigInteger("1000000000000000000000000000000000").and(new BigInteger("9999999999999999999999")),
             AviatorEvaluator.exec("a&b", new BigInteger("1000000000000000000000000000000000"), new BigInteger(
-                    "9999999999999999999999")));
+                "9999999999999999999999")));
         assertEquals(new BigInteger("1000000000000000000000000000000000").or(new BigInteger("9999999999999999999999")),
             AviatorEvaluator.exec("a|b", new BigInteger("1000000000000000000000000000000000"), new BigInteger(
-                    "9999999999999999999999")));
+                "9999999999999999999999")));
         assertEquals(new BigInteger("1000000000000000000000000000000000").shiftLeft(2),
             AviatorEvaluator.exec("a<<2", new BigInteger("1000000000000000000000000000000000")));
         assertEquals(new BigInteger("1000000000000000000000000000000000").shiftRight(2),
@@ -629,6 +630,31 @@ public class FunctionTest {
     @Test(expected = ExpressionRuntimeException.class)
     public void testDecimalBitAnd() {
         AviatorEvaluator.exec("3M< & 2M");
+    }
+
+
+    @Test
+    public void testAlwaysUseDoubleAsDecimal() {
+        AviatorEvaluator.setOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL, true);
+        try {
+            Object val = AviatorEvaluator.execute("3.2");
+            assertTrue(val instanceof BigDecimal);
+            assertEquals(new BigDecimal("3.2"), val);
+
+            val = AviatorEvaluator.execute("3.2 + 4.3");
+            assertTrue(val instanceof BigDecimal);
+            assertEquals(new BigDecimal("7.5"), val);
+
+            Map<String, Object> env = new HashMap<String, Object>();
+            env.put("a", new BigDecimal("2.1"));
+            env.put("b", 4);
+            val = AviatorEvaluator.execute("3.2 + a * b ", env);
+            assertTrue(val instanceof BigDecimal);
+            assertEquals(new BigDecimal("11.6"), val);
+        }
+        finally {
+            AviatorEvaluator.setOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL, false);
+        }
     }
 
 
