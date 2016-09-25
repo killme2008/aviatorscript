@@ -20,11 +20,13 @@ package com.googlecode.aviator.lexer;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Stack;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.NumberToken;
@@ -82,7 +84,7 @@ public class ExpressionLexer {
     }
 
     static final char[] VALID_HEX_CHAR = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'a', 'B', 'b', 'C',
-                                           'c', 'D', 'd', 'E', 'e', 'F', 'f' };
+                                          'c', 'D', 'd', 'E', 'e', 'F', 'f' };
 
 
     public boolean isValidHexChar(char ch) {
@@ -236,15 +238,23 @@ public class ExpressionLexer {
                     || this.peek == 'M' || this.peek == 'N');
             Number value;
             if (isBigDecimal) {
-                String lexeme = this.getBigNumberLexeme(sb);
-                value = new BigDecimal(lexeme, AviatorEvaluator.getMathContext());
+                value =
+                        new BigDecimal(this.getBigNumberLexeme(sb),
+                            (MathContext) AviatorEvaluator.getOption(Options.MATH_CONTEXT));
             }
             else if (isBigInt) {
-                String lexeme = this.getBigNumberLexeme(sb);
-                value = new BigInteger(lexeme);
+                value = new BigInteger(this.getBigNumberLexeme(sb));
             }
             else if (hasDot) {
-                value = dval;
+                boolean alwaysUseDecimalAsDouble = AviatorEvaluator.getOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL);
+                if (alwaysUseDecimalAsDouble) {
+                    value =
+                            new BigDecimal(sb.toString(),
+                                (MathContext) AviatorEvaluator.getOption(Options.MATH_CONTEXT));
+                }
+                else {
+                    value = dval;
+                }
             }
             else {
                 // if the long value is out of range,then it must be negative,so
@@ -310,7 +320,6 @@ public class ExpressionLexer {
         this.nextChar();
         return token;
     }
-
 
     private String getBigNumberLexeme(StringBuffer sb) {
         String lexeme = sb.toString();

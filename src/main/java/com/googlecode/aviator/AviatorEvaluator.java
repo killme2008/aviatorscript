@@ -87,7 +87,6 @@ import com.googlecode.aviator.runtime.type.AviatorNil;
  * 
  */
 public final class AviatorEvaluator {
-    private static Boolean trace = Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
 
     // The classloader to define generated class
     @Deprecated
@@ -103,35 +102,65 @@ public final class AviatorEvaluator {
      */
     public static final int EVAL = 1;
 
-    // optimize level
-    private static int optimize = EVAL;
-
     /**
      * Aviator version
      */
     public static final String VERSION = "2.1.1";
 
     /**
-     * Generated java class version,default 1.5
+     * Generated java class version,default 1.6
      */
-    public static int BYTECODE_VER = Opcodes.V1_5;
+    public static int BYTECODE_VER = Opcodes.V1_6;
 
     private static OutputStream traceOutputStream = System.out;
 
-    /**
-     * Default match context for decimal.
-     */
-    private static MathContext mathContext = MathContext.DECIMAL128;
+    private static final ConcurrentHashMap<Options, Object> options = new ConcurrentHashMap<Options, Object>();
 
 
     /**
      * Configure whether to trace code generation
      * 
+     * @deprecated please use {@link #setOption(Options, Object)}
      * @param t
      *            true is to trace,default is false.
      */
     public static void setTrace(boolean t) {
-        trace = t;
+        setOption(Options.TRACE, t);
+    }
+
+
+    /**
+     * Adds a evaluator option
+     * 
+     * @since 2.3.4
+     * @see Options
+     * @param opt
+     * @param val
+     */
+    public static void setOption(Options opt, Object val) {
+        if (opt == null || val == null) {
+            throw new IllegalArgumentException("Option and value should not be null.");
+        }
+        if (!opt.isValidValue(val)) {
+            throw new IllegalArgumentException("Invalid value for option:" + opt.name());
+        }
+        options.put(opt, val);
+    }
+
+
+    /**
+     * Returns the current evaluator option value, returns null if missing.
+     * 
+     * @param opt
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getOption(Options opt) {
+        Object val = options.get(opt);
+        if (val == null) {
+            val = opt.getDefaultValue();
+        }
+        return (T) val;
     }
 
 
@@ -149,10 +178,11 @@ public final class AviatorEvaluator {
      * Returns current math context for decimal.
      * 
      * @since 2.3.0
+     * @deprecated Please use {@link #getOption(Options)}
      * @return
      */
     public static MathContext getMathContext() {
-        return mathContext;
+        return getOption(Options.MATH_CONTEXT);
     }
 
 
@@ -160,13 +190,14 @@ public final class AviatorEvaluator {
      * Set math context for decimal.
      * 
      * @param mathContext
+     * @deprecated please use {@link #setOption(Options, Object)}
      * @since 2.3.0
      */
     public static void setMathContext(MathContext mathContext) {
         if (mathContext == null) {
             throw new IllegalArgumentException("null mathContext");
         }
-        AviatorEvaluator.mathContext = mathContext;
+        setOption(Options.MATH_CONTEXT, mathContext);
     }
 
 
@@ -270,6 +301,7 @@ public final class AviatorEvaluator {
      * 
      * @see #COMPILE
      * @see #EVAL
+     * @deprecated please use {@link #setOption(Options, Object)}
      * 
      * @param value
      */
@@ -277,7 +309,7 @@ public final class AviatorEvaluator {
         if (value != COMPILE && value != EVAL) {
             throw new IllegalArgumentException("Invlaid optimize option value");
         }
-        optimize = value;
+        setOption(Options.OPTIMIZE_LEVEL, value);
     }
 
 
@@ -469,17 +501,24 @@ public final class AviatorEvaluator {
     }
 
 
+    private static int getOptimizeLevel() {
+        return getOption(Options.OPTIMIZE_LEVEL);
+    }
+
+
     private static CodeGenerator newCodeGenerator(boolean cached) {
-        switch (optimize) {
+        switch (getOptimizeLevel()) {
         case COMPILE:
             ASMCodeGenerator asmCodeGenerator =
-                    new ASMCodeGenerator(getAviatorClassLoader(cached), traceOutputStream, trace);
+                    new ASMCodeGenerator(getAviatorClassLoader(cached), traceOutputStream,
+                        (Boolean) getOption(Options.TRACE));
             asmCodeGenerator.start();
             return asmCodeGenerator;
         case EVAL:
-            return new OptimizeCodeGenerator(getAviatorClassLoader(cached), traceOutputStream, trace);
+            return new OptimizeCodeGenerator(getAviatorClassLoader(cached), traceOutputStream,
+                (Boolean) getOption(Options.TRACE));
         default:
-            throw new IllegalArgumentException("Unknow option " + optimize);
+            throw new IllegalArgumentException("Unknow option " + getOptimizeLevel());
         }
 
     }
@@ -506,7 +545,7 @@ public final class AviatorEvaluator {
      * @return
      */
     public static Object exec(String expression, Object... values) {
-        if (optimize != EVAL) {
+        if (getOptimizeLevel() != EVAL) {
             throw new IllegalStateException("Aviator evaluator is not in EVAL mode.");
         }
         Expression compiledExpression = compile(expression, true);
