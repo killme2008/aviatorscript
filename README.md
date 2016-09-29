@@ -11,7 +11,7 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
 
 # News
 
-* [2.3.4 released](https://github.com/killme2008/aviator/releases/tag/aviator-2.3.5)。修复部分科学计数法数字解析错误。
+* [2.3.5 released](https://github.com/killme2008/aviator/releases/tag/aviator-2.3.5)。修复部分科学计数法数字解析错误。
 * [2.3.4 released](https://github.com/killme2008/aviator/releases/tag/aviator-2.3.4)。重构选项，不再兼容 JDK 1.5，引入 ALWAYS_USE_DOUBLE_AS_DECIMAL 选项。
 
 # Dependency
