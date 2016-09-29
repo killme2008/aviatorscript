@@ -213,12 +213,12 @@ public class ExpressionLexer {
                 else {
                     int digit = Character.digit(this.peek, 10);
                     if (scientificNotation) {
-                        StringBuilder ns = new StringBuilder();
+                        int n = digit;
+                        nextChar();
                         while (Character.isDigit(this.peek)) {
-                            ns.append(this.peek);
+                            n = 10 * n + Character.digit(this.peek, 10);
                             this.nextChar();
                         }
-                        int n = Integer.valueOf(ns.toString());
                         while (n-- > 0) {
                             if (negExp) {
                                 dval = dval / 10;
