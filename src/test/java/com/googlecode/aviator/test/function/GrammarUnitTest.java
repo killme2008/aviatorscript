@@ -980,4 +980,14 @@ public class GrammarUnitTest {
         env.put("p2", "\\d+\\.\\d+");
         return env;
     }
+
+
+    @Test
+    public void testScientificNotationBiggerSmaller() {
+        assertEquals(4E81 / 3E9, AviatorEvaluator.execute("4E81/3E9"));
+        assertEquals(1E9 / 2E101, AviatorEvaluator.execute("1E9/2E101"));
+
+        assertEquals(4E81 / 3E9, AviatorEvaluator.exec("a/3E9", 4E81));
+        assertEquals(1E9 / 2E101, AviatorEvaluator.exec("1E9/b", 2E101));
+    }
 }

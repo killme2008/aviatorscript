@@ -102,6 +102,28 @@ public class ExpressionLexerUnitTest {
 
 
     @Test
+    public void testParseScientificNotationBiggerSmaller() {
+        this.lexer = new ExpressionLexer("3e10");
+        Token<?> token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(3e10, token.getValue(null));
+        assertEquals(0, token.getStartIndex());
+
+        this.lexer = new ExpressionLexer("3e100");
+        token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(3e100, token.getValue(null));
+        assertEquals(0, token.getStartIndex());
+
+        this.lexer = new ExpressionLexer("3e-100");
+        token = this.lexer.scan();
+        assertEquals(TokenType.Number, token.getType());
+        assertEquals(3e-100, token.getValue(null));
+        assertEquals(0, token.getStartIndex());
+    }
+
+
+    @Test
     public void testParseScientificNotation2() {
         this.lexer = new ExpressionLexer("3E2");
         Token<?> token = this.lexer.scan();

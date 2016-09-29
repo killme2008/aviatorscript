@@ -213,7 +213,13 @@ public class ExpressionLexer {
                 else {
                     int digit = Character.digit(this.peek, 10);
                     if (scientificNotation) {
-                        while (digit-- > 0) {
+                        StringBuilder ns = new StringBuilder();
+                        while (Character.isDigit(this.peek)) {
+                            ns.append(this.peek);
+                            this.nextChar();
+                        }
+                        int n = Integer.valueOf(ns.toString());
+                        while (n-- > 0) {
                             if (negExp) {
                                 dval = dval / 10;
                             }
@@ -226,13 +232,14 @@ public class ExpressionLexer {
                     else if (hasDot) {
                         dval = dval + digit / d;
                         d = d * 10;
+                        this.nextChar();
                     }
                     else {
                         lval = 10 * lval + digit;
                         dval = 10 * dval + digit;
-
+                        this.nextChar();
                     }
-                    this.nextChar();
+
                 }
             } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'E' || this.peek == 'e'
                     || this.peek == 'M' || this.peek == 'N');
@@ -320,6 +327,7 @@ public class ExpressionLexer {
         this.nextChar();
         return token;
     }
+
 
     private String getBigNumberLexeme(StringBuffer sb) {
         String lexeme = sb.toString();
