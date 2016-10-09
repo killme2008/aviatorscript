@@ -622,10 +622,37 @@ public class ExpressionParserUnitTest {
     // this.parser.parse();
     // }
 
-
     @Test(expected = ExpressionSyntaxErrorException.class)
     public void testArrayAccess_Illegal4() {
         this.parser = new ExpressionParser(new ExpressionLexer("a[c3+c[y*2]]]"), this.codeGenerator);
+        this.parser.parse();
+    }
+
+
+    @Test(expected = ExpressionSyntaxErrorException.class)
+    public void testInvalidExpression1() {
+        this.parser = new ExpressionParser(new ExpressionLexer("4(ss*^^%%$$$$"), this.codeGenerator);
+        this.parser.parse();
+    }
+
+
+    @Test(expected = ExpressionSyntaxErrorException.class)
+    public void testInvalidExpression2() {
+        this.parser = new ExpressionParser(new ExpressionLexer("4(*)**&^^^^^^^^"), this.codeGenerator);
+        this.parser.parse();
+    }
+
+
+    @Test(expected = ExpressionSyntaxErrorException.class)
+    public void testInvalidExpression3() {
+        this.parser = new ExpressionParser(new ExpressionLexer("4("), this.codeGenerator);
+        this.parser.parse();
+    }
+
+
+    @Test(expected = ExpressionSyntaxErrorException.class)
+    public void testInvalidExpression4() {
+        this.parser = new ExpressionParser(new ExpressionLexer("4(*8^####"), this.codeGenerator);
         this.parser.parse();
     }
 

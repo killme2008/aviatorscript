@@ -362,7 +362,7 @@ public class FunctionTest {
                     ^ ~j + k << i >> j >> 1000L,
             AviatorEvaluator
                 .execute(
-                    "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) :i >> j * k / i ^ ~j + k << i >> j >> 1000,",
+                    "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) :i >> j * k / i ^ ~j + k << i >> j >> 1000",
                     env));
 
         assertEquals((i & 7) == (i & 7) && false, AviatorEvaluator.execute("(i & 7) == (i & 7) && false ", env));
