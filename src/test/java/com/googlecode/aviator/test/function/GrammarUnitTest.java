@@ -990,4 +990,10 @@ public class GrammarUnitTest {
         assertEquals(4E81 / 3E9, AviatorEvaluator.exec("a/3E9", 4E81));
         assertEquals(1E9 / 2E101, AviatorEvaluator.exec("1E9/b", 2E101));
     }
+
+
+    @Test(expected = ExpressionSyntaxErrorException.class)
+    public void test4J() {
+        System.out.println(AviatorEvaluator.execute("4(ss*^^%%$$$$"));
+    }
 }

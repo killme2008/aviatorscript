@@ -678,6 +678,10 @@ public class ExpressionParser {
         if (this.bracketDepth > 0) {
             this.reportSyntaxError("insert ']' to complete Expression");
         }
+        if (this.lookhead != null) {
+            // The lookhead should be null, it's the end.
+            this.reportSyntaxError("Unexpect token '" + this.lookhead.getLexeme() + "'");
+        }
         return this.codeGenerator.getResult();
     }
 
