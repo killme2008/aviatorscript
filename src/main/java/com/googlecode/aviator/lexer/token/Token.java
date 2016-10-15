@@ -33,6 +33,7 @@ public interface Token<T> {
         String,
         Variable,
         Number,
+        Array,
         Char,
         Operator,
         Pattern,

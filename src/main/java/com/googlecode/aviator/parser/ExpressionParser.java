@@ -18,14 +18,20 @@
  **/
 package com.googlecode.aviator.parser;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.code.ConstantsCollector;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
+import com.googlecode.aviator.lexer.token.ArrayToken;
 import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.PatternToken;
 import com.googlecode.aviator.lexer.token.Token;
@@ -55,7 +61,9 @@ public class ExpressionParser {
 
     private Token<?> prevToken;
 
-    private final CodeGenerator codeGenerator;
+    private CodeGenerator codeGenerator;
+
+    private Deque<CodeGenerator> cgStack = new ArrayDeque<CodeGenerator>();
 
     // Paren depth
     private int parenDepth = 0;
@@ -470,6 +478,20 @@ public class ExpressionParser {
     }
 
 
+    public void array() {
+        while (true) {
+            this.factor();
+            if (this.expectLexeme(",")) {
+                this.move(true);
+                continue;
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+
     public void factor() {
         if (this.lookhead == null) {
             this.reportSyntaxError("invalid value");
@@ -485,6 +507,25 @@ public class ExpressionParser {
                 this.move(true);
             }
             this.parenDepth--;
+        }
+        else if (this.expectLexeme("[")) {
+            this.bracketDepth++;
+            int index = this.lookhead.getStartIndex();
+            this.move(true);
+            this.cgStack.push(this.codeGenerator);
+            ConstantsCollector collector = new ConstantsCollector();
+            this.codeGenerator = collector;
+            this.array();
+            if (!expectLexeme("]")) {
+                this.reportSyntaxError("insert ']' to complete array.");
+            }
+            else {
+                this.move(true);
+            }
+            this.codeGenerator = this.cgStack.pop();
+            this.prevToken = new ArrayToken(collector.getConstants(), index);
+            this.bracketDepth--;
+            this.codeGenerator.onConstant(this.prevToken);
         }
         else if (this.lookhead.getType() == TokenType.Number || this.lookhead.getType() == TokenType.String
                 || this.lookhead.getType() == TokenType.Variable || this.lookhead == Variable.TRUE
@@ -517,7 +558,7 @@ public class ExpressionParser {
                         this.move(true);
                     }
                     this.codeGenerator.onArrayIndexStart(this.prevToken);
-                    array();
+                    arrayIndex();
                 }
                 if (!hasArray)
                     this.codeGenerator.onConstant(this.prevToken);
@@ -536,7 +577,7 @@ public class ExpressionParser {
     }
 
 
-    private void array() {
+    private void arrayIndex() {
         this.bracketDepth++;
         if (RESERVED_WORDS.contains(this.prevToken.getLexeme())) {
             throw new ExpressionSyntaxErrorException(this.prevToken.getLexeme() + " could not use [] operator");
