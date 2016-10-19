@@ -1,4 +1,4 @@
-
+[![Build Status](https://travis-ci.org/killme2008/aviator.svg?branch=master)](https://travis-ci.org/killme2008/aviator)
 
 # Intro
 
