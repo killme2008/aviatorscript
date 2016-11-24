@@ -158,25 +158,30 @@ public class FunctionTest {
     @Test
     public void testSystemFunction() {
         AviatorEvaluator.setTrace(true);
-        // sysdate()
-        Object date = AviatorEvaluator.execute("sysdate()");
-        assertNotNull(date);
-        assertTrue(date instanceof Date);
-        assertEquals(((Date) date).getMinutes(), new Date().getMinutes());
+        try {
+            // sysdate()
+            Object date = AviatorEvaluator.execute("sysdate()");
+            assertNotNull(date);
+            assertTrue(date instanceof Date);
+            assertEquals(((Date) date).getMinutes(), new Date().getMinutes());
 
-        // now()
-        Object now = AviatorEvaluator.execute("now()");
-        assertNotNull(now);
-        assertTrue(now instanceof Long);
-        assertEquals((Long) now, System.currentTimeMillis(), 5L);
+            // now()
+            Object now = AviatorEvaluator.execute("now()");
+            assertNotNull(now);
+            assertTrue(now instanceof Long);
+            assertEquals((Long) now, System.currentTimeMillis(), 5L);
 
-        // rand()
-        Object rand1 = AviatorEvaluator.execute("rand()");
-        assertNotNull(rand1);
-        assertTrue(rand1 instanceof Double);
+            // rand()
+            Object rand1 = AviatorEvaluator.execute("rand()");
+            assertNotNull(rand1);
+            assertTrue(rand1 instanceof Double);
 
-        Object rand2 = AviatorEvaluator.execute("rand()");
-        assertFalse(rand1.equals(rand2));
+            Object rand2 = AviatorEvaluator.execute("rand()");
+            assertFalse(rand1.equals(rand2));
+        }
+        finally {
+            AviatorEvaluator.setTrace(false);
+        }
 
     }
 
