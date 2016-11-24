@@ -11,8 +11,7 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
 
 # News
 
-* [2.3.6 发布](https://github.com/killme2008/aviator/releases/tag/aviator-2.3.6)。修复表达式解析错误。
-* [2.3.5 发布](https://github.com/killme2008/aviator/releases/tag/aviator-2.3.5)。修复部分科学计数法数字解析错误。
+* [2.3.7 发布](https://github.com/killme2008/aviator/releases/tag/aviator-2.3.7)。修复超过 20 个参数的 `AviatorFunction` 调用失败的异常。
 
 # Dependency
 
