@@ -10,14 +10,20 @@ import com.googlecode.aviator.AviatorEvaluator;
 
 
 public class Over20ParamsFunctionUnitTest {
+
     @Test
-    public void testGetFirstNonNullFunctionWith21Params() {
+    public void testGetFirstNonNullFunctionWith20Params() {
+        testGetFirstNonNull(19);
+    }
+
+
+    private void testGetFirstNonNull(int n) {
         AviatorEvaluator.addFunction(new GetFirstNonNullFunction());
         HashMap<String, Object> env = new HashMap<String, Object>();
 
         StringBuilder sb = new StringBuilder("getFirstNonNull(");
         boolean wasFirst = true;
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < n; i++) {
             env.put("i" + i, null);
             if (wasFirst) {
                 sb.append("i" + i);
@@ -35,26 +41,14 @@ public class Over20ParamsFunctionUnitTest {
 
 
     @Test
-    public void testGetFirstNonNullFunctionWith101Params() {
-        AviatorEvaluator.addFunction(new GetFirstNonNullFunction());
-        HashMap<String, Object> env = new HashMap<String, Object>();
+    public void testGetFirstNonNullFunctionWith21Params() {
+        testGetFirstNonNull(20);
+    }
 
-        StringBuilder sb = new StringBuilder("getFirstNonNull(");
-        boolean wasFirst = true;
-        for (int i = 0; i < 100; i++) {
-            env.put("i" + i, null);
-            if (wasFirst) {
-                sb.append("i" + i);
-                wasFirst = false;
-            }
-            else {
-                sb.append(",i" + i);
-            }
-        }
-        Object last = new Object();
-        env.put("last", last);
-        sb.append(",last)");
-        assertSame(last, AviatorEvaluator.execute(sb.toString(), env));
+
+    @Test
+    public void testGetFirstNonNullFunctionWith101Params() {
+        testGetFirstNonNull(100);
     }
 
 
