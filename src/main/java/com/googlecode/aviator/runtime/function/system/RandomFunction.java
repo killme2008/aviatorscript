@@ -18,10 +18,12 @@
  **/
 package com.googlecode.aviator.runtime.function.system;
 
+import java.security.SecureRandom;
 import java.util.Map;
 import java.util.Random;
 
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -34,13 +36,33 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class RandomFunction extends AbstractFunction {
 
-    private static Random random = new Random();
+    private static Random random = new SecureRandom();
+
+    static {
+        // prefer JDK7 ThreadLocalRandom
+        try {
+            Class clazz = Class.forName("java.util.concurrent.ThreadLocalRandom");
+            if (clazz != null) {
+                Random newInstance = (Random) clazz.newInstance();
+                if (newInstance != null)
+                    random = newInstance;
+            }
+        }
+        catch (Throwable e) {
+
+        }
+    }
 
 
     @Override
     public AviatorObject call(Map<String, Object> env) {
-
         return AviatorDouble.valueOf(random.nextDouble());
+    }
+
+
+    @Override
+    public AviatorObject call(Map<String, Object> env, AviatorObject arg) {
+        return AviatorDouble.valueOf(random.nextInt(FunctionUtils.getNumberValue(arg, env).intValue()));
     }
 
 

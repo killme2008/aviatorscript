@@ -44,6 +44,7 @@ import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
 import com.googlecode.aviator.runtime.function.math.MathLogFunction;
 import com.googlecode.aviator.runtime.function.math.MathPowFunction;
+import com.googlecode.aviator.runtime.function.math.MathRoundFunction;
 import com.googlecode.aviator.runtime.function.math.MathSinFunction;
 import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
@@ -258,6 +259,7 @@ public final class AviatorEvaluator {
 
         // load math lib
         addFunction(new MathAbsFunction());
+        addFunction(new MathRoundFunction());
         addFunction(new MathPowFunction());
         addFunction(new MathSqrtFunction());
         addFunction(new MathLog10Function());
