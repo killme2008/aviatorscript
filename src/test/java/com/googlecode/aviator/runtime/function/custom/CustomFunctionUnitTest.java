@@ -4,12 +4,19 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.googlecode.aviator.AviatorEvaluator;
 
 
-public class Over20ParamsFunctionUnitTest {
+public class CustomFunctionUnitTest {
+
+    @BeforeClass
+    public static void setup() {
+        AviatorEvaluator.addFunction(new GetFirstNonNullFunction());
+    }
+
 
     @Test
     public void testGetFirstNonNullFunctionWith20Params() {
@@ -18,9 +25,8 @@ public class Over20ParamsFunctionUnitTest {
 
 
     private void testGetFirstNonNull(int n) {
-        AviatorEvaluator.addFunction(new GetFirstNonNullFunction());
-        HashMap<String, Object> env = new HashMap<String, Object>();
 
+        HashMap<String, Object> env = new HashMap<String, Object>();
         StringBuilder sb = new StringBuilder("getFirstNonNull(");
         boolean wasFirst = true;
         for (int i = 0; i < n; i++) {
@@ -54,7 +60,6 @@ public class Over20ParamsFunctionUnitTest {
 
     @Test
     public void testGetFirstNonNullFunctionNestWithManyParams() {
-        AviatorEvaluator.addFunction(new GetFirstNonNullFunction());
         HashMap<String, Object> env = new HashMap<String, Object>();
 
         StringBuilder sb = new StringBuilder("getFirstNonNull(");
@@ -88,6 +93,13 @@ public class Over20ParamsFunctionUnitTest {
         System.out.println(sb.toString());
 
         assertSame(last, AviatorEvaluator.execute(sb.toString(), env));
+    }
+
+
+    @Test
+    public void testMyAddFunction() {
+        assertEquals(10, AviatorEvaluator.execute("myadd(3,7)"));
+        assertEquals(10, AviatorEvaluator.exec("myadd(a,b)", 6, 4));
     }
 
 }

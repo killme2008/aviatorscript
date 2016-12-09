@@ -18,7 +18,7 @@
 	<developers>
 		<developer>
 			<name>dennis zhuang</name>
-			<url>http://www.blogjava.net/killme2008/</url>
+			<url>http://fnil.net/</url>
 			<timezone>8</timezone>
 		</developer>
 	</developers>
@@ -92,7 +92,7 @@
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.8.2</version>
+			<version>1.8.3</version>
 		</dependency>
 	</dependencies>
   <profiles>
