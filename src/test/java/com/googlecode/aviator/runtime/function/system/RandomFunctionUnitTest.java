@@ -20,9 +20,17 @@ public class RandomFunctionUnitTest {
     }
 
 
+    public void testCallWithOneArg() {
+        RandomFunction rand = new RandomFunction();
+        AviatorObject result = rand.call(null, new AviatorRuntimeJavaType(1));
+        assertTrue(((Integer) result.getValue(null)) < 1);
+        assertTrue(((Integer) result.getValue(null)) >= 0);
+    }
+
+
     @Test(expected = IllegalArgumentException.class)
     public void testCallIllegalArgument() {
         RandomFunction rand = new RandomFunction();
-        AviatorObject result = rand.call(null, new AviatorRuntimeJavaType(1));
+        AviatorObject result = rand.call(null, new AviatorRuntimeJavaType(1), new AviatorRuntimeJavaType(2));
     }
 }
