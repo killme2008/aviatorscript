@@ -283,6 +283,8 @@ public final class AviatorEvaluator {
         addFunction(new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
         addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
         addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
+        // load custom functions.
+        CustomFunctionLoader.load();
     }
 
     /**
@@ -355,18 +357,21 @@ public final class AviatorEvaluator {
 
 
     /**
-     * Add a aviator function
+     * Add a aviator function,it's not thread-safe.
      * 
      * @param function
      */
     public static void addFunction(AviatorFunction function) {
         final String name = function.getName();
+        if (FUNC_MAP.containsKey(name)) {
+            System.out.println("[Aviator WARN] The function '" + name + "' is already exists, but you replace it.");
+        }
         FUNC_MAP.put(name, function);
     }
 
 
     /**
-     * Remove a aviator function by name
+     * Remove a aviator function by name,it's not thread-safe.
      * 
      * @param name
      * @return
