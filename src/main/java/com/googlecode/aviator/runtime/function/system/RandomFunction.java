@@ -25,6 +25,7 @@ import java.util.Random;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
+import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
@@ -36,33 +37,25 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class RandomFunction extends AbstractFunction {
 
-    private static Random random = new SecureRandom();
+    private static ThreadLocal<Random> randomLocal = new ThreadLocal<Random>() {
 
-    static {
-        // prefer JDK7 ThreadLocalRandom
-        try {
-            Class clazz = Class.forName("java.util.concurrent.ThreadLocalRandom");
-            if (clazz != null) {
-                Random newInstance = (Random) clazz.newInstance();
-                if (newInstance != null)
-                    random = newInstance;
-            }
+        @Override
+        protected Random initialValue() {
+            return new SecureRandom();
         }
-        catch (Throwable e) {
 
-        }
-    }
+    };
 
 
     @Override
     public AviatorObject call(Map<String, Object> env) {
-        return AviatorDouble.valueOf(random.nextDouble());
+        return AviatorDouble.valueOf(randomLocal.get().nextDouble());
     }
 
 
     @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg) {
-        return AviatorDouble.valueOf(random.nextInt(FunctionUtils.getNumberValue(arg, env).intValue()));
+        return AviatorLong.valueOf(randomLocal.get().nextInt(FunctionUtils.getNumberValue(arg, env).intValue()));
     }
 
 

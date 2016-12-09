@@ -176,8 +176,12 @@ public class FunctionTest {
             assertNotNull(rand1);
             assertTrue(rand1 instanceof Double);
 
-            Object rand2 = AviatorEvaluator.execute("rand()");
-            assertFalse(rand1.equals(rand2));
+            Object rand2 = AviatorEvaluator.execute("rand(100)");
+            assertTrue(rand2 instanceof Long);
+            assertTrue((Long) rand2 < 100);
+
+            Object rand3 = AviatorEvaluator.execute("rand()");
+            assertFalse(rand3.equals(rand1));
         }
         finally {
             AviatorEvaluator.setTrace(false);
@@ -436,6 +440,8 @@ public class FunctionTest {
         assertEquals(Math.cos(99), AviatorEvaluator.exec("math.cos(99)"));
         assertEquals(Math.tan(99), AviatorEvaluator.exec("math.tan(99)"));
         assertEquals(Math.sqrt(99), AviatorEvaluator.exec("math.sqrt(99)"));
+        assertEquals(Math.round(99.9), AviatorEvaluator.exec("math.round(99.9)"));
+        assertEquals(Math.round(99.1), AviatorEvaluator.exec("math.round(99.1)"));
     }
 
 
