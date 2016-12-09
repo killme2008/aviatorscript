@@ -37,6 +37,17 @@ public abstract class AviatorObject {
     public abstract AviatorType getAviatorType();
 
 
+    /**
+     * Returns true if the aviator object is null.
+     * 
+     * @since 3.0.0
+     * @return
+     */
+    public boolean isNull(Map<String, Object> env) {
+        return this.getValue(env) == null;
+    }
+
+
     public AviatorObject match(AviatorObject other, Map<String, Object> env) {
         throw new ExpressionRuntimeException(this.desc(env) + " doesn't support match operation '=~'");
     }
