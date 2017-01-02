@@ -947,6 +947,57 @@ public class GrammarUnitTest {
 
 
     @Test
+    public void testArrayIndexAccessWithMethod() {
+        assertEquals("a", AviatorEvaluator.exec("string.split('a,b,c,d',',')[0]"));
+        assertEquals("b", AviatorEvaluator.exec("string.split('a,b,c,d',',')[1]"));
+        assertEquals("c", AviatorEvaluator.exec("string.split('a,b,c,d',',')[2]"));
+        assertEquals("d", AviatorEvaluator.exec("string.split('a,b,c,d',',')[3]"));
+        try {
+            AviatorEvaluator.exec("string.split('a,b,c,d',',')[4]");
+            fail();
+        }
+        catch (ExpressionRuntimeException e) {
+
+        }
+
+        assertEquals("a", AviatorEvaluator.exec("string.split(s,',')[0]", "a,b,c,d"));
+        assertEquals("b", AviatorEvaluator.exec("string.split(s,',')[1]", "a,b,c,d"));
+        assertEquals("c", AviatorEvaluator.exec("string.split(s,',')[2]", "a,b,c,d"));
+        assertEquals("d", AviatorEvaluator.exec("string.split(s,',')[3]", "a,b,c,d"));
+    }
+
+
+    @Test
+    public void testArrayIndexAccessWithMethodAndBracket() {
+        assertEquals("a", AviatorEvaluator.exec("(string.split('a,b,c,d',','))[0]"));
+        assertEquals("b", AviatorEvaluator.exec("(string.split('a,b,c,d',','))[1]"));
+        assertEquals("c", AviatorEvaluator.exec("(string.split('a,b,c,d',','))[2]"));
+        assertEquals("d", AviatorEvaluator.exec("(string.split('a,b,c,d',','))[3]"));
+        try {
+            AviatorEvaluator.exec("(string.split('a,b,c,d',','))[4]");
+            fail();
+        }
+        catch (ExpressionRuntimeException e) {
+
+        }
+        assertEquals("a", AviatorEvaluator.exec("(string.split(s,','))[0]", "a,b,c,d"));
+        assertEquals("b", AviatorEvaluator.exec("(string.split(s,','))[1]", "a,b,c,d"));
+        assertEquals("c", AviatorEvaluator.exec("(string.split(s,','))[2]", "a,b,c,d"));
+        assertEquals("d", AviatorEvaluator.exec("(string.split(s,','))[3]", "a,b,c,d"));
+    }
+    
+    @Test(expected = CompileExpressionErrorException.class)
+    public void testIllegalArrayIndexAccessWithMethod1(){
+        AviatorEvaluator.exec("string.split('a,b,c,d',',')[0"); 
+    }
+    
+    @Test(expected = CompileExpressionErrorException.class)
+    public void testIllegalArrayIndexAccessWithMethod2(){
+        AviatorEvaluator.exec("string.split('a,b,c,d',','[0]"); 
+    }
+
+
+    @Test
     public void testFunctionCall() {
         Map<String, Object> env = this.createEnv();
         assertEquals(10, AviatorEvaluator.execute(" string.length('hello') + string.length('hello') "));
