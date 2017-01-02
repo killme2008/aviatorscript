@@ -485,6 +485,10 @@ public class ExpressionParser {
                 this.move(true);
             }
             this.parenDepth--;
+            //(...)[index] 
+            if (expectLexeme("[")) {
+                arrayAccess();
+            }
         }
         else if (this.lookhead.getType() == TokenType.Number || this.lookhead.getType() == TokenType.String
                 || this.lookhead.getType() == TokenType.Variable || this.lookhead == Variable.TRUE
@@ -503,24 +507,14 @@ public class ExpressionParser {
             Token<?> prev = this.prevToken;
             if (prev.getType() == TokenType.Variable && this.expectLexeme("(")) {
                 this.method();
+                //method.invoke()[index] 
+                if (expectLexeme("[")) {
+                    arrayAccess();
+                }
             }
             else if (prev.getType() == TokenType.Variable || prev.getLexeme().equals(")")) {
-                // check if it is a array index access
-                boolean hasArray = false;
-                while (this.expectLexeme("[")) {
-                    if (!hasArray) {
-                        this.codeGenerator.onArray(this.prevToken);
-                        this.move(true);
-                        hasArray = true;
-                    }
-                    else {
-                        this.move(true);
-                    }
-                    this.codeGenerator.onArrayIndexStart(this.prevToken);
-                    array();
-                }
-                if (!hasArray)
-                    this.codeGenerator.onConstant(this.prevToken);
+                //var[index]
+                arrayAccess();
             }
             else {
                 this.codeGenerator.onConstant(prev);
@@ -533,6 +527,26 @@ public class ExpressionParser {
             this.reportSyntaxError("invalid value");
         }
 
+    }
+
+
+    private void arrayAccess() {
+        // check if it is a array index access
+        boolean hasArray = false;
+        while (this.expectLexeme("[")) {
+            if (!hasArray) {
+                this.codeGenerator.onArray(this.prevToken);
+                this.move(true);
+                hasArray = true;
+            }
+            else {
+                this.move(true);
+            }
+            this.codeGenerator.onArrayIndexStart(this.prevToken);
+            array();
+        }
+        if (!hasArray)
+            this.codeGenerator.onConstant(this.prevToken);
     }
 
 
