@@ -25,6 +25,7 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 
 /**
@@ -54,23 +55,13 @@ public class SeqMakePredicateFunFunction extends AbstractFunction {
 
     @Override
     public AviatorObject call(Map<String, Object> env) {
-
-        // generate a temp function object as predicate
-        AviatorFunction fun = new SeqPredicateFunction(this.name, this.opType, this.value);
-        final String funName = this.name + "_tmp_" + System.nanoTime();
-        env.put(funName, fun);
-        return new AviatorJavaType(funName);
+        return new AviatorRuntimeJavaType(new SeqPredicateFunction(this.name, this.opType, this.value));
     }
 
 
     @Override
     public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
-
-        // generate a temp function object as predicate
-        AviatorFunction fun = new SeqPredicateFunction(this.name, this.opType, arg1);
-        final String funName = this.name + "_tmp_" + System.nanoTime();
-        env.put(funName, fun);
-        return new AviatorJavaType(funName);
+        return new AviatorRuntimeJavaType(new SeqPredicateFunction(this.name, this.opType, arg1));
     }
 
 

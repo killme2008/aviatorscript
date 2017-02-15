@@ -25,6 +25,7 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorType;
 
 
@@ -54,7 +55,7 @@ public class FunctionUtils {
 
 
     public static Object getJavaObject(AviatorObject arg, Map<String, Object> env) {
-        if (arg.getAviatorType()!=AviatorType.JavaType) {
+        if (arg.getAviatorType() != AviatorType.JavaType) {
             throw new ExpressionRuntimeException(arg.desc(env) + " is not a javaType");
         }
         return env.get(((AviatorJavaType) arg).getName());
@@ -62,9 +63,14 @@ public class FunctionUtils {
 
 
     public static AviatorFunction getFunction(AviatorObject arg, Map<String, Object> env, int arity) {
-        if (arg.getAviatorType()!=AviatorType.JavaType) {
+        if (arg.getAviatorType() != AviatorType.JavaType) {
             throw new ExpressionRuntimeException(arg.desc(env) + " is not a function");
         }
+        // Runtime type.
+        if (arg instanceof AviatorRuntimeJavaType && arg.getValue(env) instanceof AviatorFunction) {
+            return (AviatorFunction) arg.getValue(env);
+        }
+        // resolve by name.
         // special processing for "-" operator
         String name = ((AviatorJavaType) arg).getName();
         if (name.equals("-")) {

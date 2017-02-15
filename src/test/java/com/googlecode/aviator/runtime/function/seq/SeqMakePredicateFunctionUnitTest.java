@@ -24,8 +24,7 @@ public class SeqMakePredicateFunctionUnitTest {
         AviatorJavaType predicateName = (AviatorJavaType) fun.call(env, new AviatorRuntimeJavaType("hello"));
 
         assertNotNull(predicateName);
-        assertEquals(1, env.size());
-        AviatorFunction predicate = (AviatorFunction) env.get(predicateName.getName());
+        AviatorFunction predicate = (AviatorFunction)predicateName.getValue(env);
         assertNotNull(predicate);
         AviatorObject result = predicate.call(null, new AviatorRuntimeJavaType("hello"));
         // equals self
@@ -42,8 +41,7 @@ public class SeqMakePredicateFunctionUnitTest {
         AviatorJavaType predicateName = (AviatorJavaType) fun.call(env);
 
         assertNotNull(predicateName);
-        assertEquals(1, env.size());
-        AviatorFunction predicate = (AviatorFunction) env.get(predicateName.getName());
+        AviatorFunction predicate = (AviatorFunction)predicateName.getValue(env);
         assertNotNull(predicate);
 
         AviatorObject result = predicate.call(null, new AviatorRuntimeJavaType("hello"));
