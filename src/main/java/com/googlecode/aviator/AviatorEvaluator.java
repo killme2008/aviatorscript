@@ -51,11 +51,14 @@ import com.googlecode.aviator.runtime.function.math.MathTanFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
 import com.googlecode.aviator.runtime.function.seq.SeqCountFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqEveryFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
 import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
 import com.googlecode.aviator.runtime.function.string.StringEndsWithFunction;
@@ -277,6 +280,10 @@ public final class AviatorEvaluator {
         addFunction(new SeqSortFunction());
         addFunction(new SeqIncludeFunction());
         addFunction(new SeqCountFunction());
+        addFunction(new SeqEveryFunction());
+        addFunction(new SeqNotAnyFunction());
+        addFunction(new SeqSomeFunction())
+        ;
         addFunction(new SeqMakePredicateFunFunction("seq.eq", OperatorType.EQ));
         addFunction(new SeqMakePredicateFunFunction("seq.neq", OperatorType.NEQ));
         addFunction(new SeqMakePredicateFunFunction("seq.lt", OperatorType.LT));
