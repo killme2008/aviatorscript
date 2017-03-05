@@ -238,6 +238,14 @@ public class FunctionTest {
         assertEquals(0, AviatorEvaluator.execute("count(filter(a,seq.gt(9)))", env));
         assertEquals(0, AviatorEvaluator.execute("count(filter(a,seq.nil()))", env));
         assertEquals(10, AviatorEvaluator.execute("count(filter(a,seq.exists()))", env));
+        
+        //seq.and and seq.or
+        assertEquals(3, AviatorEvaluator.execute("count(filter(a, seq.and(seq.lt(8), seq.gt(4))))", env));
+        assertEquals(4, AviatorEvaluator.execute("count(filter(a, seq.and(seq.lt(8), seq.ge(4))))", env));
+        assertEquals(5, AviatorEvaluator.execute("count(filter(a, seq.and(seq.le(8), seq.ge(4))))", env));
+        assertEquals(5, AviatorEvaluator.execute("count(filter(a, seq.or(seq.gt(8), seq.lt(4))))", env));
+        assertEquals(6, AviatorEvaluator.execute("count(filter(a, seq.or(seq.gt(8), seq.le(4))))", env));
+        assertEquals(7, AviatorEvaluator.execute("count(filter(a, seq.or(seq.ge(8), seq.le(4))))", env));
 
         assertEquals(1, AviatorEvaluator.execute("count(filter(set,seq.true()))", env));
         assertTrue((Boolean) AviatorEvaluator.execute("include(filter(set,seq.true()),true)", env));

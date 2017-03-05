@@ -48,6 +48,8 @@ import com.googlecode.aviator.runtime.function.math.MathRoundFunction;
 import com.googlecode.aviator.runtime.function.math.MathSinFunction;
 import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
 import com.googlecode.aviator.runtime.function.seq.SeqCountFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
@@ -281,6 +283,8 @@ public final class AviatorEvaluator {
         addFunction(new SeqMakePredicateFunFunction("seq.le", OperatorType.LE));
         addFunction(new SeqMakePredicateFunFunction("seq.gt", OperatorType.GT));
         addFunction(new SeqMakePredicateFunFunction("seq.ge", OperatorType.GE));
+        addFunction(new SeqCompsitePredFunFunction("seq.and", LogicOp.AND));
+        addFunction(new SeqCompsitePredFunFunction("seq.or", LogicOp.OR));
         addFunction(new SeqMakePredicateFunFunction("seq.true", OperatorType.EQ, AviatorBoolean.TRUE));
         addFunction(new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
         addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
