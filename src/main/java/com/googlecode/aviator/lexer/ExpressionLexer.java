@@ -292,18 +292,11 @@ public class ExpressionLexer {
             }
             String lexeme = sb.toString();
             if (lexeme.isEmpty()) {
-                throw new ExpressionSyntaxErrorException("Blank variable name after '$'");
+                throw new ExpressionSyntaxErrorException("Blank variable name after '#'");
             }
             Variable variable = new Variable(lexeme, startIndex);
             variable.setQuote(true);
-            // If it is a reserved word(true or false)
-            if (this.symbolTable.contains(lexeme)) {
-                return this.symbolTable.getVariable(lexeme);
-            }
-            else {
-                this.symbolTable.reserve(lexeme, variable);
-                return variable;
-            }
+            return reserverVar(lexeme, variable);
         }
         if (Character.isJavaIdentifierStart(this.peek)) {
             int startIndex = this.iterator.getIndex();
@@ -314,14 +307,7 @@ public class ExpressionLexer {
             } while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.');
             String lexeme = sb.toString();
             Variable variable = new Variable(lexeme, startIndex);
-            // If it is a reserved word(true or false)
-            if (this.symbolTable.contains(lexeme)) {
-                return this.symbolTable.getVariable(lexeme);
-            }
-            else {
-                this.symbolTable.reserve(lexeme, variable);
-                return variable;
-            }
+            return reserverVar(lexeme, variable);
         }
 
         if (isBinaryOP(this.peek)) {
@@ -349,6 +335,18 @@ public class ExpressionLexer {
         Token<Character> token = new CharToken(this.peek, this.iterator.getIndex());
         this.nextChar();
         return token;
+    }
+
+
+    private Token<?> reserverVar(String lexeme, Variable variable) {
+        // If it is a reserved word(true or false)
+        if (this.symbolTable.contains(lexeme)) {
+            return this.symbolTable.getVariable(lexeme);
+        }
+        else {
+            this.symbolTable.reserve(lexeme, variable);
+            return variable;
+        }
     }
 
 
