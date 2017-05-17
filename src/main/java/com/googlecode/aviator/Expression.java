@@ -58,4 +58,13 @@ public interface Expression {
      */
     public List<String> getVariableNames();
 
+
+    /**
+     * Returns this expression's all variable full names in order when using
+     * AviatorEvaluator.EVAL mode,else returns empty set
+     * 
+     * @return
+     */
+    public List<String> getVariableFullNames();
+
 }
