@@ -28,6 +28,7 @@ import java.util.Stack;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
+import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.StringToken;
@@ -281,6 +282,29 @@ public class ExpressionLexer {
         }
 
         // It is a variable
+        if (this.peek == '#') {
+            int startIndex = this.iterator.getIndex();
+            this.nextChar(); // skip $
+            StringBuilder sb = new StringBuilder();
+            while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '[' || peek == ']') {
+                sb.append(this.peek);
+                this.nextChar();
+            }
+            String lexeme = sb.toString();
+            if (lexeme.isEmpty()) {
+                throw new ExpressionSyntaxErrorException("Blank variable name after '$'");
+            }
+            Variable variable = new Variable(lexeme, startIndex);
+            variable.setQuote(true);
+            // If it is a reserved word(true or false)
+            if (this.symbolTable.contains(lexeme)) {
+                return this.symbolTable.getVariable(lexeme);
+            }
+            else {
+                this.symbolTable.reserve(lexeme, variable);
+                return variable;
+            }
+        }
         if (Character.isJavaIdentifierStart(this.peek)) {
             int startIndex = this.iterator.getIndex();
             StringBuilder sb = new StringBuilder();
@@ -298,7 +322,6 @@ public class ExpressionLexer {
                 this.symbolTable.reserve(lexeme, variable);
                 return variable;
             }
-
         }
 
         if (isBinaryOP(this.peek)) {

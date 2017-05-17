@@ -33,6 +33,7 @@ import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
+import com.googlecode.aviator.lexer.token.Variable;
 
 
 public class ExpressionLexerUnitTest {
@@ -369,6 +370,26 @@ public class ExpressionLexerUnitTest {
         assertFalse((Boolean) token.getValue(null));
         assertNull(this.lexer.scan());
 
+    }
+
+
+    @Test
+    public void testQuoteVar() {
+        this.lexer = new ExpressionLexer("#abc");
+        Token<?> token = this.lexer.scan();
+
+        assertEquals(TokenType.Variable, token.getType());
+        assertEquals(token.getValue(null), "abc");
+        assertTrue(((Variable) token).isQuote());
+        assertNull(this.lexer.scan());
+
+        this.lexer = new ExpressionLexer("#abc.array[0].d");
+        token = this.lexer.scan();
+
+        assertEquals(TokenType.Variable, token.getType());
+        assertEquals(token.getValue(null), "abc.array[0].d");
+        assertTrue(((Variable) token).isQuote());
+        assertNull(this.lexer.scan());
     }
 
 
