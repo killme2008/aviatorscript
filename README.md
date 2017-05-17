@@ -7,6 +7,8 @@ Map<String, Object> env = new HashMap<String, Object>();
 env.put("a", a);
 
 AviatorEvaluator.execute("1 + 2 + 3");
+AviatorEvaluator.execute("a[1] + 100", env);
+AviatorEvaluator.execute("'a[1]=' + a[1]", env);
 //求数组长度
 AviatorEvaluator.execute("count(a)", env);
 //求数组总和
