@@ -1,5 +1,17 @@
 [![Build Status](https://travis-ci.org/killme2008/aviator.svg?branch=master)](https://travis-ci.org/killme2008/aviator)
 
+
+```java
+int[] a = ...;
+Map<String, Object> env = new HashMap<String, Object>();
+env.put("a", a);
+
+AviatorEvaluator.execute("1+2+3");
+AviatorEvaluator.execute("count(a)", env);
+AviatorEvaluator.execute("reduce(a,+,0)", env);     
+AviatorEvaluator.execute("seq.every(a,seq.and(seq.ge(0), seq.lt(10)))", env);     
+```
+
 # Intro
 
 Aviator is a lighweith,high performance expression evaluator for java.
@@ -11,8 +23,9 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
 
 # News
 
+* [3.1.0 发布](https://github.com/killme2008/aviator/releases/tag/aviator-3.1.0)。更丰富的逻辑组合函数，深度嵌套访问的引用变量支持。
 * [3.0.1 发布](https://github.com/killme2008/aviator/releases/tag/aviator-3.0.1)。数组索引访问支持函数返回结果。
-* [3.0.0 发布](https://github.com/killme2008/aviator/releases/tag/aviator-3.0.0)。更加方便地实现和加载自定义函数。
+
 
 # Dependency
 
