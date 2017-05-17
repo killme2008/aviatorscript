@@ -17,6 +17,8 @@ public class SeqExample {
         Map<String, Object> env = new HashMap<String, Object>();
         env.put("a", a);
 
+        System.out.println(AviatorEvaluator.execute("a[1] + 100", env));
+        System.out.println(AviatorEvaluator.execute("'a[1]=' + a[1]", env));
         System.out.println(AviatorEvaluator.execute("count(a)", env));
         System.out.println(AviatorEvaluator.execute("reduce(a,+,0)", env));
         System.out.println(AviatorEvaluator.execute("seq.every(a,seq.gt(0))", env));
