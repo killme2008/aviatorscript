@@ -485,7 +485,7 @@ public class ExpressionParser {
                 this.move(true);
             }
             this.parenDepth--;
-            //(...)[index] 
+            // (...)[index]
             if (expectLexeme("[")) {
                 arrayAccess();
             }
@@ -507,13 +507,13 @@ public class ExpressionParser {
             Token<?> prev = this.prevToken;
             if (prev.getType() == TokenType.Variable && this.expectLexeme("(")) {
                 this.method();
-                //method.invoke()[index] 
+                // method.invoke()[index]
                 if (expectLexeme("[")) {
                     arrayAccess();
                 }
             }
             else if (prev.getType() == TokenType.Variable || prev.getLexeme().equals(")")) {
-                //var[index]
+                // var[index]
                 arrayAccess();
             }
             else {
@@ -569,10 +569,12 @@ public class ExpressionParser {
 
 
     private void checkVariableName() {
-        String[] names = this.lookhead.getLexeme().split("\\.");
-        for (String name : names) {
-            if (!isJavaIdentifier(name)) {
-                this.reportSyntaxError("Illegal identifier " + name + ",index=" + this.lookhead.getStartIndex());
+        if (!((Variable) this.lookhead).isQuote()) {
+            String[] names = this.lookhead.getLexeme().split("\\.");
+            for (String name : names) {
+                if (!isJavaIdentifier(name)) {
+                    this.reportSyntaxError("Illegal identifier " + name + ",index=" + this.lookhead.getStartIndex());
+                }
             }
         }
     }
@@ -662,7 +664,8 @@ public class ExpressionParser {
 
 
     private void reportSyntaxError(String message) {
-        throw new ExpressionSyntaxErrorException("Syntax error:" + message + " at " + this.lexer.getCurrentIndex());
+        throw new ExpressionSyntaxErrorException("Syntax error:" + message + " at " + this.lexer.getCurrentIndex()
+                + ", current token: " + this.lookhead);
     }
 
 

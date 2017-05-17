@@ -29,6 +29,17 @@ import java.util.Map;
  */
 public class Variable extends AbstractToken<Object> {
 
+    public boolean isQuote() {
+        return quote;
+    }
+
+
+    public void setQuote(boolean special) {
+        this.quote = special;
+    }
+
+    private boolean quote = false;
+
     /**
      * Boolean value true
      */
@@ -83,6 +94,12 @@ public class Variable extends AbstractToken<Object> {
 
     public Variable(String name, int startIndex) {
         super(startIndex, name);
+    }
+
+
+    @Override
+    public String toString() {
+        return "[type='string',lexeme='$" + getLexeme() + "',index=" + this.getStartIndex() + "]";
     }
 
 }

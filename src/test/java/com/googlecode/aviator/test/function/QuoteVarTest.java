@@ -1,13 +1,17 @@
-package com.googlecode.aviator.example;
+package com.googlecode.aviator.test.function;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
 import com.googlecode.aviator.AviatorEvaluator;
 
+import static org.junit.Assert.assertEquals;
 
-public class VariableExample {
+
+public class QuoteVarTest {
     public static class Bar {
         public Bar() {
             this.name = "bar";
@@ -85,16 +89,14 @@ public class VariableExample {
     }
 
 
-    public static void main(String[] args) {
+    @Test
+    public void testQuoteVar() {
         Foo foo = new Foo(100, 3.14f, new Date());
         Map<String, Object> env = new HashMap<String, Object>();
         env.put("foo", foo);
 
-        String exp =
-                "\"[foo i=\"+ foo.i + \", f=\" + foo.f + \", date.year=\" + (foo.date.year+1900) + \", date.month=\" + foo.date.month + \", bars[0].name=\" + #foo.bars[0].name + \"]\"";
-        String result = (String) AviatorEvaluator.execute(exp, env);
-        System.out.println("Execute expression: " + exp);
-        System.out.println(result);
-
+        assertEquals("bar", AviatorEvaluator.execute("#foo.bars[0].name", env));
+        assertEquals("hello,bar", AviatorEvaluator.execute("'hello,' + #foo.bars[0].name", env));
+        assertEquals(3, AviatorEvaluator.execute("string.length(#foo.bars[0].name)", env));
     }
 }
