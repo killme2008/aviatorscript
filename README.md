@@ -6,13 +6,13 @@ int[] a = ...;
 Map<String, Object> env = new HashMap<String, Object>();
 env.put("a", a);
 
-AviatorEvaluator.execute("1+2+3");
+AviatorEvaluator.execute("1 + 2 + 3");
 //求数组长度
 AviatorEvaluator.execute("count(a)", env);
 //求数组总和
-AviatorEvaluator.execute("reduce(a,+,0)", env);  
+AviatorEvaluator.execute("reduce(a, +, 0)", env);  
 //检测数组每个元素都在 0 <= e < 10 之间。   
-AviatorEvaluator.execute("seq.every(a,seq.and(seq.ge(0), seq.lt(10)))", env);     
+AviatorEvaluator.execute("seq.every(a, seq.and(seq.ge(0), seq.lt(10)))", env);     
 ```
 
 # Intro
