@@ -1,19 +1,16 @@
 /**
- *  Copyright (C) 2010 dennis zhuang (killme2008@gmail.com)
+ * Copyright (C) 2010 dennis zhuang (killme2008@gmail.com)
  *
- *  This library is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published
- *  by the Free Software Foundation; either version 2.1 of the License, or
- *  (at your option) any later version.
+ * This library is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * You should have received a copy of the GNU Lesser General Public License along with this program;
+ * if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  **/
 package com.googlecode.aviator.runtime.function.seq;
@@ -21,7 +18,6 @@ package com.googlecode.aviator.runtime.function.seq;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
-
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
@@ -32,49 +28,48 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 
 /**
- * reduce(col,fun,init) function to reduce seq with function and a initial value
- * value
+ * reduce(col,fun,init) function to reduce seq with function and a initial value value
  * 
  * @author dennis
  * 
  */
 public class SeqReduceFunction extends AbstractFunction {
 
-    @Override
-    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2, AviatorObject arg3) {
-        Object first = arg1.getValue(env);
-        AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 2);
-        if (fun == null) {
-            throw new ExpressionRuntimeException("There is no function named " + ((AviatorJavaType) arg2).getName());
-        }
-        if (first == null) {
-            throw new NullPointerException("null seq");
-        }
-        AviatorObject result = arg3;
-        Class<?> clazz = first.getClass();
+  @Override
+  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
+      AviatorObject arg3) {
+    Object first = arg1.getValue(env);
+    AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 2);
+    if (fun == null) {
+      throw new ExpressionRuntimeException(
+          "There is no function named " + ((AviatorJavaType) arg2).getName());
+    }
+    if (first == null) {
+      throw new NullPointerException("null seq");
+    }
+    AviatorObject result = arg3;
+    Class<?> clazz = first.getClass();
 
-        if (Collection.class.isAssignableFrom(clazz)) {
-            for (Object obj : (Collection<?>) first) {
-                result = fun.call(env, result, new AviatorRuntimeJavaType(obj));
-            }
-        }
-        else if (clazz.isArray()) {
-            int length = Array.getLength(first);
-            for (int i = 0; i < length; i++) {
-                Object obj = Array.get(first, i);
-                result = fun.call(env, result, new AviatorRuntimeJavaType(obj));
-            }
-        }
-        else {
-            throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
-        }
-
-        return result;
+    if (Collection.class.isAssignableFrom(clazz)) {
+      for (Object obj : (Collection<?>) first) {
+        result = fun.call(env, result, new AviatorRuntimeJavaType(obj));
+      }
+    } else if (clazz.isArray()) {
+      int length = Array.getLength(first);
+      for (int i = 0; i < length; i++) {
+        Object obj = Array.get(first, i);
+        result = fun.call(env, result, new AviatorRuntimeJavaType(obj));
+      }
+    } else {
+      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
     }
 
+    return result;
+  }
 
-    public String getName() {
-        return "reduce";
-    }
+
+  public String getName() {
+    return "reduce";
+  }
 
 }

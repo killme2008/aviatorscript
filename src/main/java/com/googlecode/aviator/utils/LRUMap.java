@@ -12,41 +12,41 @@ import java.util.LinkedHashMap;
  * @param <V>
  */
 public class LRUMap<K, V> extends LinkedHashMap<K, V> {
-    static final long serialVersionUID = -1L;
+  static final long serialVersionUID = -1L;
 
-    private int maxCapacity;
-
-
-    public LRUMap(int maxCapacity) {
-        super(16, 0.75f, true);
-        this.maxCapacity = maxCapacity;
-
-    }
+  private int maxCapacity;
 
 
-    public V remove(Object key) {
-        return super.remove(key);
-    }
+  public LRUMap(int maxCapacity) {
+    super(16, 0.75f, true);
+    this.maxCapacity = maxCapacity;
+
+  }
 
 
-    public int size() {
-        return super.size();
-    }
+  public V remove(Object key) {
+    return super.remove(key);
+  }
 
 
-    public V put(K k, V v) {
-        return super.put(k, v);
-    }
+  public int size() {
+    return super.size();
+  }
 
 
-    public V get(Object k) {
-        return super.get(k);
-    }
+  public V put(K k, V v) {
+    return super.put(k, v);
+  }
 
 
-    @Override
-    protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest) {
-        return this.size() > this.maxCapacity;
-    }
+  public V get(Object k) {
+    return super.get(k);
+  }
+
+
+  @Override
+  protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest) {
+    return this.size() > this.maxCapacity;
+  }
 
 }
