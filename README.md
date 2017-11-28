@@ -12,9 +12,9 @@ AviatorEvaluator.execute("'a[1]=' + a[1]", env);
 //求数组长度
 AviatorEvaluator.execute("count(a)", env);
 //求数组总和
-AviatorEvaluator.execute("reduce(a, +, 0)", env);  
-//检测数组每个元素都在 0 <= e < 10 之间。   
-AviatorEvaluator.execute("seq.every(a, seq.and(seq.ge(0), seq.lt(10)))", env);     
+AviatorEvaluator.execute("reduce(a, +, 0)", env);
+//检测数组每个元素都在 0 <= e < 10 之间。
+AviatorEvaluator.execute("seq.every(a, seq.and(seq.ge(0), seq.lt(10)))", env);
 ```
 
 # Intro
@@ -28,6 +28,7 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
 
 # News
 
+* [3.1.1 发布](https://github.com/killme2008/aviator/releases/tag/aviator-3.1.1)。修复 AviatorString 比较运算符存在的 NPE 异常。
 * [3.1.0 发布](https://github.com/killme2008/aviator/releases/tag/aviator-3.1.0)。更丰富的逻辑组合函数，深度嵌套访问的引用变量支持。
 * [3.0.1 发布](https://github.com/killme2008/aviator/releases/tag/aviator-3.0.1)。数组索引访问支持函数返回结果。
 
