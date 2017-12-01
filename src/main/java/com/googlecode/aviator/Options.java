@@ -5,21 +5,21 @@ import java.math.MathContext;
 
 /**
  * Aviator Evaluator Configuration options.
- * 
+ *
  * @author dennis
  *
  */
 public enum Options {
   /**
    * Always use double as BigDecimal, default is false.
-   * 
+   *
    * @since 2.3.4
    */
   ALWAYS_USE_DOUBLE_AS_DECIMAL,
 
   /**
    * Optimize level, default is {@link AviatorEvaluator#EVA}
-   * 
+   *
    * @see AviatorEvaluator#EVAL
    * @see AviatorEvaluator#COMPILE
    */
@@ -27,13 +27,15 @@ public enum Options {
 
   /**
    * Math context for decimal, default is {@link MathContext.DECIMAL128}
-   * 
+   *
    * @see MathContext
    */
   MATH_CONTEXT,
 
   /**
    * Whether to trace code generation,default is false.
+   * 
+   * @deprecated
    */
   TRACE;
 
@@ -43,8 +45,8 @@ public enum Options {
       case TRACE:
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
-        return (val instanceof Integer) && (((Integer) val).intValue() == AviatorEvaluator.EVAL
-            || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
+        return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
+        || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
       case MATH_CONTEXT:
         return val instanceof MathContext;
     }
@@ -54,7 +56,7 @@ public enum Options {
 
   /**
    * Returns the default value of option.
-   * 
+   *
    * @return
    */
   public Object getDefaultValue() {
