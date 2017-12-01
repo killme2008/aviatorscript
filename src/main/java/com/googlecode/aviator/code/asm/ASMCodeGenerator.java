@@ -645,14 +645,13 @@ public class ASMCodeGenerator implements CodeGenerator {
 
     byte[] bytes = this.classWriter.toByteArray();
     try {
-      Class<?> defineClass = this.classLoader.defineClass(this.className, bytes);
+      Class<?> defineClass = ClassDefiner.defineClass(this.className, bytes, this.classLoader);
       Constructor<?> constructor = defineClass.getConstructor(List.class);
       return (Expression) constructor.newInstance(new ArrayList<String>(this.varTokens.keySet()));
     } catch (Exception e) {
       throw new CompileExpressionErrorException("define class error", e);
     }
   }
-
 
   private void end() {
     this.endVisitMethodCode();
