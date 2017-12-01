@@ -41,7 +41,10 @@ public class ClassDefiner {
     }
   }
 
-  static boolean preferClassLoader = false;
+  private static boolean preferClassLoader =
+      Boolean.valueOf(System.getProperty("aviator.preferClassloaderDefiner", "false"));
+
+  private static int errorTimes = 0;
 
   public static final Class<?> defineClass(String className, byte[] bytes,
       AviatorClassLoader classLoader) throws NoSuchFieldException, IllegalAccessException {
@@ -52,7 +55,9 @@ public class ClassDefiner {
         return defineClass;
       } catch (Throwable e) {
         // fallback to class loader mode.
-        preferClassLoader = true;
+        if (errorTimes++ > 10000) {
+          preferClassLoader = true;
+        }
         return classLoader.defineClass(className, bytes);
       }
     } else {
