@@ -75,7 +75,7 @@ public class AviatorPattern extends AviatorObject {
         Matcher m = this.pattern.matcher(aviatorString.lexeme);
         if (m.matches()) {
           boolean captureGroups =
-              AviatorEvaluator.getOption(Options.CAPTURING_GROUPS_IN_PATTERN_MATCHES);
+              AviatorEvaluator.getOption(Options.PUT_CAPTURING_GROUPS_INTO_ENV);
           if (captureGroups && env != null && env != Collections.EMPTY_MAP) {
             int groupCount = m.groupCount();
             for (int i = 0; i <= groupCount; i++) {

@@ -14,7 +14,7 @@ public class Benchmark {
   }
 
   private static void benchCaptureGroupsOptions() {
-    AviatorEvaluator.setOption(Options.CAPTURING_GROUPS_IN_PATTERN_MATCHES, false);
+    AviatorEvaluator.setOption(Options.PUT_CAPTURING_GROUPS_INTO_ENV, false);
     long sum = 0;
     Map<String, Object> env = new HashMap<String, Object>();
 

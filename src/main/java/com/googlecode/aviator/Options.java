@@ -50,10 +50,11 @@ public enum Options {
    */
   TRACE_EVAL,
   /**
-   * Whether to capture groups in pattern matches, default is true.If you don't want the groups, you
-   * can turn it off to get better performance in regular-expression pattern matches.
+   * Whether to put capturing groups into passed-in env map when regular-expression pattern matches,
+   * default is true.If you don't want the groups, you can turn it off to get better performance in
+   * regular-expression pattern matching.
    */
-  CAPTURING_GROUPS_IN_PATTERN_MATCHES;
+  PUT_CAPTURING_GROUPS_INTO_ENV;
 
 
   public boolean isValidValue(Object val) {
@@ -61,7 +62,7 @@ public enum Options {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case TRACE_EVAL:
-      case CAPTURING_GROUPS_IN_PATTERN_MATCHES:
+      case PUT_CAPTURING_GROUPS_INTO_ENV:
       case TRACE:
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
@@ -92,7 +93,7 @@ public enum Options {
         return false;
       case TRACE:
         return Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
-      case CAPTURING_GROUPS_IN_PATTERN_MATCHES:
+      case PUT_CAPTURING_GROUPS_INTO_ENV:
         return true;
     }
     return null;
