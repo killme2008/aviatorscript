@@ -13,7 +13,7 @@ public enum Options {
   /**
    * Always use double as BigDecimal, default is false.
    *
-   * @deprecated This is an name typo option, plase use
+   * @deprecated This is a name typo option, please use
    *             {@link #ALWAYS_USE_DECIMAL_AS_FLOATING_POINT_NUMBER} instead.
    * @since 2.3.4
    */
@@ -48,13 +48,20 @@ public enum Options {
   /**
    * Whether to trace expression evaluating procedure, default is false.
    */
-  TRACE_EVAL;
+  TRACE_EVAL,
+  /**
+   * Whether to capture groups in pattern matches, default is true.If you don't want the groups, you
+   * can turn it off to get better performance in regular-expression pattern matches.
+   */
+  CAPTURING_GROUPS_IN_PATTERN_MATCHES;
+
 
   public boolean isValidValue(Object val) {
     switch (this) {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case TRACE_EVAL:
+      case CAPTURING_GROUPS_IN_PATTERN_MATCHES:
       case TRACE:
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
@@ -85,6 +92,8 @@ public enum Options {
         return false;
       case TRACE:
         return Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
+      case CAPTURING_GROUPS_IN_PATTERN_MATCHES:
+        return true;
     }
     return null;
   }
