@@ -19,14 +19,15 @@ import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
 /**
  * Binary function,includes +,-,*,/,%,!
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class BinaryFunction extends AbstractFunction {
   private final OperatorType opType;
@@ -38,6 +39,7 @@ public class BinaryFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return this.opType.getToken();
   }
@@ -50,25 +52,7 @@ public class BinaryFunction extends AbstractFunction {
 
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
-    AviatorObject left = arg1;
-    AviatorObject right = arg2;
-    switch (this.opType) {
-      case ADD:
-        return left.add(right, env);
-      case SUB:
-        return left.sub(right, env);
-      case MULT:
-        return left.mult(right, env);
-      case DIV:
-        return left.div(right, env);
-      case MOD:
-        return left.mod(right, env);
-      case NOT:
-      case NEG:
-        return this.throwArity(2);
-      default:
-        throw new ExpressionRuntimeException("Invalid binary operator");
-    }
+    return OperationRuntime.eval(arg1, arg2, env, this.opType);
   }
 
 
@@ -76,6 +60,9 @@ public class BinaryFunction extends AbstractFunction {
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     AviatorObject left = arg1;
     switch (this.opType) {
+      case BIT_AND:
+      case BIT_OR:
+      case BIT_XOR:
       case ADD:
       case SUB:
       case MULT:
@@ -83,9 +70,8 @@ public class BinaryFunction extends AbstractFunction {
       case MOD:
         return this.throwArity(1);
       case NOT:
-        return left.not(env);
       case NEG:
-        return left.neg(env);
+        return OperationRuntime.eval(left, null, env, this.opType);
       default:
         throw new ExpressionRuntimeException("Invalid binary operator");
 

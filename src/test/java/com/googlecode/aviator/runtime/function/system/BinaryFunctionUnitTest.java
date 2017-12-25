@@ -1,8 +1,8 @@
 package com.googlecode.aviator.runtime.function.system;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorLong;
@@ -71,12 +71,5 @@ public class BinaryFunctionUnitTest {
     AviatorObject result = fun.call(null, AviatorBoolean.FALSE);
     assertTrue((Boolean) result.getValue(null));
 
-  }
-
-
-  @Test(expected = ExpressionRuntimeException.class)
-  public void testIllegalFunction() {
-    BinaryFunction fun = new BinaryFunction(OperatorType.EQ);
-    AviatorObject result = fun.call(null, AviatorLong.valueOf(10L), AviatorLong.valueOf(11L));
   }
 }

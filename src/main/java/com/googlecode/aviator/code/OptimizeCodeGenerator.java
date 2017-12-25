@@ -36,6 +36,7 @@ import com.googlecode.aviator.lexer.token.StringToken;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
+import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorNumber;
@@ -46,9 +47,9 @@ import com.googlecode.aviator.runtime.type.AviatorString;
 
 /**
  * Optimized code generator
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class OptimizeCodeGenerator implements CodeGenerator {
   private final ASMCodeGenerator asmCodeGenerator;
@@ -102,7 +103,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             break;
           default:
             Map<Integer, DelegateTokenType> index2DelegateType =
-                this.getIndex2DelegateTypeMap(operatorType);
+            this.getIndex2DelegateTypeMap(operatorType);
             final int result =
                 this.executeOperator(i, operatorType, operandCount, index2DelegateType);
             if (result < 0) {
@@ -167,7 +168,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
       }
       // execute it now
-      AviatorObject result = operatorType.eval(args);
+      AviatorObject result = OperationRuntime.eval(args, operatorType);
       // set result as token to tokenList for next executing
       this.tokenList.set(operatorIndex, this.getTokenFromOperand(result));
       return 1;
@@ -213,7 +214,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   /**
    * Get token from executing result
-   * 
+   *
    * @param operand
    * @return
    */
@@ -501,7 +502,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onAdd(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.ADD));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.ADD));
 
   }
 
@@ -516,7 +517,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onAndRight(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.AND));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.AND));
 
   }
 
@@ -530,7 +531,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onDiv(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.DIV));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.DIV));
 
   }
 
@@ -561,7 +562,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onEq(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.EQ));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.EQ));
 
   }
 
@@ -569,7 +570,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onGe(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GE));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GE));
 
   }
 
@@ -577,7 +578,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onGt(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GT));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GT));
 
   }
 
@@ -592,7 +593,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onJoinRight(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.OR));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.OR));
 
   }
 
@@ -600,7 +601,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onLe(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LE));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LE));
 
   }
 
@@ -608,7 +609,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onLt(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LT));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LT));
 
   }
 
@@ -648,7 +649,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onMod(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MOD));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MOD));
 
   }
 
@@ -664,7 +665,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onNeg(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEG));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEG));
 
   }
 
@@ -672,7 +673,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onNeq(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEQ));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEQ));
 
   }
 
@@ -680,7 +681,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onNot(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NOT));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NOT));
 
   }
 
@@ -688,7 +689,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onSub(Token<?> lookhead) {
     this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.SUB));
+    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.SUB));
 
   }
 
