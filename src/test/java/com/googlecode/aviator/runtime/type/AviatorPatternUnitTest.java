@@ -15,13 +15,17 @@
  **/
 package com.googlecode.aviator.runtime.type;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import junit.framework.Assert;
 import org.junit.Test;
+import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import junit.framework.Assert;
 
 
 public class AviatorPatternUnitTest {
@@ -70,7 +74,7 @@ public class AviatorPatternUnitTest {
   public void testAddJavaString() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
     assertEquals("[a-zA-Z]+ is a pattern",
-        p1.add(new AviatorJavaType("s"), createEnvWith("s", " is a pattern")).getValue(null));
+        p1.add(new AviatorJavaType("s"), this.createEnvWith("s", " is a pattern")).getValue(null));
   }
 
 
@@ -100,7 +104,7 @@ public class AviatorPatternUnitTest {
   @Test(expected = ExpressionRuntimeException.class)
   public void testAddJavaNumber() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
-    p1.add(new AviatorJavaType("a"), createEnvWith("a", 400.01f));
+    p1.add(new AviatorJavaType("a"), this.createEnvWith("a", 400.01f));
   }
 
 
@@ -118,7 +122,7 @@ public class AviatorPatternUnitTest {
   @Test(expected = ExpressionRuntimeException.class)
   public void testAddJavaDate() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
-    p1.add(new AviatorJavaType("date"), createEnvWith("date", new Date()));
+    p1.add(new AviatorJavaType("date"), this.createEnvWith("date", new Date()));
   }
 
 
@@ -133,9 +137,9 @@ public class AviatorPatternUnitTest {
   @Test
   public void testMatchJavaString() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
-    assertTrue(
-        (Boolean) p1.match(new AviatorJavaType("s"), createEnvWith("s", "hello")).getValue(null));
-    assertFalse((Boolean) p1.match(new AviatorJavaType("s"), createEnvWith("s", "hello world"))
+    assertTrue((Boolean) p1.match(new AviatorJavaType("s"), this.createEnvWith("s", "hello"))
+        .getValue(null));
+    assertFalse((Boolean) p1.match(new AviatorJavaType("s"), this.createEnvWith("s", "hello world"))
         .getValue(null));
   }
 
@@ -156,16 +160,26 @@ public class AviatorPatternUnitTest {
     assertEquals("-3.4", env.get("$0"));
     assertEquals("-3", env.get("$1"));
     assertEquals(".4", env.get("$2"));
+
+    // Disable putting capturing groups into env
+    try {
+      AviatorEvaluator.setOption(Options.PUT_CAPTURING_GROUPS_INTO_ENV, false);
+      env.clear();
+      assertTrue(p1.match(new AviatorString("-3.4"), env).booleanValue(env));
+      assertEquals(0, env.size());
+    } finally {
+      AviatorEvaluator.setOption(Options.PUT_CAPTURING_GROUPS_INTO_ENV, true);
+    }
   }
 
 
   @Test
   public void testMatchJavaChar() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
-    assertTrue(
-        (Boolean) p1.match(new AviatorJavaType("ch"), createEnvWith("ch", 'a')).getValue(null));
-    assertFalse(
-        (Boolean) p1.match(new AviatorJavaType("ch"), createEnvWith("ch", ' ')).getValue(null));
+    assertTrue((Boolean) p1.match(new AviatorJavaType("ch"), this.createEnvWith("ch", 'a'))
+        .getValue(null));
+    assertFalse((Boolean) p1.match(new AviatorJavaType("ch"), this.createEnvWith("ch", ' '))
+        .getValue(null));
   }
 
 
@@ -195,7 +209,7 @@ public class AviatorPatternUnitTest {
   @Test(expected = ExpressionRuntimeException.class)
   public void testMatchJavaNumber() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
-    p1.match(new AviatorJavaType("num"), createEnvWith("num", 3000L));
+    p1.match(new AviatorJavaType("num"), this.createEnvWith("num", 3000L));
 
   }
 
