@@ -20,7 +20,7 @@ public enum Options {
   ALWAYS_USE_DOUBLE_AS_DECIMAL,
 
   /**
-   * Optimize level, default is {@link AviatorEvaluator#EVA}
+   * Optimize level, default is {@link AviatorEvaluator#EVAL}
    *
    * @see AviatorEvaluator#EVAL
    * @see AviatorEvaluator#COMPILE
