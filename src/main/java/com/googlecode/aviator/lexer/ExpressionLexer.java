@@ -34,9 +34,9 @@ import com.googlecode.aviator.lexer.token.Variable;
 
 /**
  * Expression Lexer,scan tokens from string
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class ExpressionLexer {
   // current char
@@ -58,7 +58,7 @@ public class ExpressionLexer {
 
   /**
    * Push back token
-   * 
+   *
    * @param token
    */
   public void pushback(Token<?> token) {
@@ -203,7 +203,7 @@ public class ExpressionLexer {
           int digit = Character.digit(this.peek, 10);
           if (scientificNotation) {
             int n = digit;
-            nextChar();
+            this.nextChar();
             while (Character.isDigit(this.peek)) {
               n = 10 * n + Character.digit(this.peek, 10);
               this.nextChar();
@@ -237,7 +237,7 @@ public class ExpressionLexer {
         value = new BigInteger(this.getBigNumberLexeme(sb));
       } else if (hasDot) {
         boolean alwaysUseDecimalAsDouble =
-            AviatorEvaluator.getOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL);
+            AviatorEvaluator.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL);
         if (alwaysUseDecimalAsDouble) {
           value = new BigDecimal(sb.toString(),
               (MathContext) AviatorEvaluator.getOption(Options.MATH_CONTEXT));
@@ -266,7 +266,7 @@ public class ExpressionLexer {
       this.nextChar(); // skip $
       StringBuilder sb = new StringBuilder();
       while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '['
-          || peek == ']') {
+          || this.peek == ']') {
         sb.append(this.peek);
         this.nextChar();
       }
@@ -276,7 +276,7 @@ public class ExpressionLexer {
       }
       Variable variable = new Variable(lexeme, startIndex);
       variable.setQuote(true);
-      return reserverVar(lexeme, variable);
+      return this.reserverVar(lexeme, variable);
     }
     if (Character.isJavaIdentifierStart(this.peek)) {
       int startIndex = this.iterator.getIndex();
@@ -287,7 +287,7 @@ public class ExpressionLexer {
       } while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.');
       String lexeme = sb.toString();
       Variable variable = new Variable(lexeme, startIndex);
-      return reserverVar(lexeme, variable);
+      return this.reserverVar(lexeme, variable);
     }
 
     if (isBinaryOP(this.peek)) {

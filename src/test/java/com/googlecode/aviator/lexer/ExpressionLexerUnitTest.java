@@ -237,7 +237,7 @@ public class ExpressionLexerUnitTest {
   @Test
   public void testParseDoubleAsDecimal() {
     try {
-      AviatorEvaluator.setOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL, true);
+      AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
       this.lexer = new ExpressionLexer("3.2");
       Token<?> token = this.lexer.scan();
       assertEquals(TokenType.Number, token.getType());
@@ -245,7 +245,7 @@ public class ExpressionLexerUnitTest {
       assertEquals(new BigDecimal("3.2"), token.getValue(null));
       assertEquals(0, token.getStartIndex());
     } finally {
-      AviatorEvaluator.setOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL, false);
+      AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
     }
   }
 
