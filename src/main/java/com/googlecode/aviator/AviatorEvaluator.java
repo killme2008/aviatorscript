@@ -84,9 +84,9 @@ import com.googlecode.aviator.runtime.type.AviatorNil;
 
 /**
  * Avaitor Expression evaluator
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public final class AviatorEvaluator {
 
@@ -122,10 +122,11 @@ public final class AviatorEvaluator {
 
   /**
    * Configure whether to trace code generation
-   * 
+   *
    * @deprecated please use {@link #setOption(Options, Object)}
    * @param t true is to trace,default is false.
    */
+  @Deprecated
   public static void setTrace(boolean t) {
     setOption(Options.TRACE, t);
   }
@@ -133,7 +134,7 @@ public final class AviatorEvaluator {
 
   /**
    * Adds a evaluator option
-   * 
+   *
    * @since 2.3.4
    * @see Options
    * @param opt
@@ -152,7 +153,7 @@ public final class AviatorEvaluator {
 
   /**
    * Returns the current evaluator option value, returns null if missing.
-   * 
+   *
    * @param opt
    * @return
    */
@@ -168,7 +169,7 @@ public final class AviatorEvaluator {
 
   /**
    * Get current trace output stream,default is System.out
-   * 
+   *
    * @return
    */
   public static OutputStream getTraceOutputStream() {
@@ -178,11 +179,12 @@ public final class AviatorEvaluator {
 
   /**
    * Returns current math context for decimal.
-   * 
+   *
    * @since 2.3.0
    * @deprecated Please use {@link #getOption(Options)}
    * @return
    */
+  @Deprecated
   public static MathContext getMathContext() {
     return getOption(Options.MATH_CONTEXT);
   }
@@ -190,11 +192,12 @@ public final class AviatorEvaluator {
 
   /**
    * Set math context for decimal.
-   * 
+   *
    * @param mathContext
    * @deprecated please use {@link #setOption(Options, Object)}
    * @since 2.3.0
    */
+  @Deprecated
   public static void setMathContext(MathContext mathContext) {
     if (mathContext == null) {
       throw new IllegalArgumentException("null mathContext");
@@ -205,7 +208,7 @@ public final class AviatorEvaluator {
 
   /**
    * Set trace output stream
-   * 
+   *
    * @param traceOutputStream
    */
   public static void setTraceOutputStream(OutputStream traceOutputStream) {
@@ -224,6 +227,9 @@ public final class AviatorEvaluator {
   }
 
   public final static Map<String, Object> FUNC_MAP = new HashMap<String, Object>();
+
+  public final static Map<OperatorType, AviatorFunction> OPS_MAP =
+      new HashMap<OperatorType, AviatorFunction>();
 
   static {
     // Load internal functions
@@ -245,6 +251,10 @@ public final class AviatorEvaluator {
     addFunction(new BinaryFunction(OperatorType.MOD));
     addFunction(new BinaryFunction(OperatorType.NEG));
     addFunction(new BinaryFunction(OperatorType.NOT));
+    addFunction(new BinaryFunction(OperatorType.BIT_AND));
+    addFunction(new BinaryFunction(OperatorType.BIT_OR));
+    addFunction(new BinaryFunction(OperatorType.BIT_XOR));
+    addFunction(new BinaryFunction(OperatorType.BIT_NOT));
 
     // load string lib
     addFunction(new StringContainsFunction());
@@ -300,22 +310,23 @@ public final class AviatorEvaluator {
    * Compiled Expression cache
    */
   private final static ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                             * Compiled
-                                                                                             * expression
-                                                                                             * task
-                                                                                             */> cacheExpressions =
-      new ConcurrentHashMap<String, FutureTask<Expression>>();
+   * Compiled
+   * expression
+   * task
+   */> cacheExpressions =
+   new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
   /**
    * set optimize level,default AviatorEvaluator.EVAL
-   * 
+   *
    * @see #COMPILE
    * @see #EVAL
    * @deprecated please use {@link #setOption(Options, Object)}
-   * 
+   *
    * @param value
    */
+  @Deprecated
   public static void setOptimize(int value) {
     if (value != COMPILE && value != EVAL) {
       throw new IllegalArgumentException("Invlaid optimize option value");
@@ -344,7 +355,7 @@ public final class AviatorEvaluator {
 
   /**
    * Returns classloader
-   * 
+   *
    * @return
    */
   public static AviatorClassLoader getAviatorClassLoader() {
@@ -354,35 +365,36 @@ public final class AviatorEvaluator {
 
   /**
    * Returns classloader
-   * 
+   *
    * @return
    */
   public static AviatorClassLoader getAviatorClassLoader(boolean cached) {
-    if (cached)
+    if (cached) {
       return aviatorClassLoader;
-    else
+    } else {
       return new AviatorClassLoader(Thread.currentThread().getContextClassLoader());
+    }
   }
 
 
   /**
-   * Add a aviator function,it's not thread-safe.
-   * 
+   * Add an aviator function,it's not thread-safe.
+   *
    * @param function
    */
   public static void addFunction(AviatorFunction function) {
     final String name = function.getName();
     if (FUNC_MAP.containsKey(name)) {
-      System.out.println(
-          "[Aviator WARN] The function '" + name + "' is already exists, but you replace it.");
+      System.out.println("[Aviator WARN] The function '" + name
+          + "' is already exists, but is replaced with new one.");
     }
     FUNC_MAP.put(name, function);
   }
 
 
   /**
-   * Remove a aviator function by name,it's not thread-safe.
-   * 
+   * Remove an aviator function by name,it's not thread-safe.
+   *
    * @param name
    * @return
    */
@@ -392,8 +404,8 @@ public final class AviatorEvaluator {
 
 
   /**
-   * get a aviator function by name,throw exception if null
-   * 
+   * Retrieve an aviator function by name,throw exception if not found or null.It's not thread-safe.
+   *
    * @param name
    * @return
    */
@@ -405,10 +417,43 @@ public final class AviatorEvaluator {
     return function;
   }
 
+  /**
+   * Add an operator aviator function,it's not thread-safe.
+   *
+   * @param function
+   */
+  public static void addOpFunction(OperatorType opType, AviatorFunction function) {
+    OPS_MAP.put(opType, function);
+  }
+
+
+  /**
+   * Retrieve an operator aviator function by op type, return null if not found.It's not
+   * thread-safe.
+   *
+   * @since 3.3
+   * @param opType
+   * @return
+   */
+  public static AviatorFunction getOpFunction(OperatorType opType) {
+    return OPS_MAP.get(opType);
+  }
+
+  /**
+   * Remove an operator aviator function by op type, it's not thread-safe.
+   *
+   * @since 3.3
+   * @param opType
+   * @return
+   */
+  public static AviatorFunction removeOpFunction(OperatorType opType) {
+    return OPS_MAP.remove(opType);
+  }
+
 
   /**
    * Check if the function is existed in aviator
-   * 
+   *
    * @param name
    * @return
    */
@@ -416,10 +461,9 @@ public final class AviatorEvaluator {
     return FUNC_MAP.containsKey(name);
   }
 
-
   /**
    * Remove a aviator function
-   * 
+   *
    * @param function
    * @return
    */
@@ -430,10 +474,11 @@ public final class AviatorEvaluator {
 
   /**
    * Configure user defined classloader
-   * 
+   *
    * @deprecated
    * @param aviatorClassLoader
    */
+  @Deprecated
   public static void setAviatorClassLoader(AviatorClassLoader aviatorClassLoader) {
     // AviatorEvaluator.aviatorClassLoader = aviatorClassLoader;
   }
@@ -441,7 +486,7 @@ public final class AviatorEvaluator {
 
   /**
    * Returns a compiled expression in cache
-   * 
+   *
    * @param expression
    * @return
    */
@@ -457,7 +502,7 @@ public final class AviatorEvaluator {
 
   /**
    * Compile a text expression to Expression object
-   * 
+   *
    * @param expression text expression
    * @param cached Whether to cache the compiled result,make true to cache it.
    * @return
@@ -536,7 +581,7 @@ public final class AviatorEvaluator {
 
   /**
    * Compile a text expression to Expression Object without caching
-   * 
+   *
    * @param expression
    * @return
    */
@@ -548,7 +593,7 @@ public final class AviatorEvaluator {
   /**
    * Execute a text expression with values that are variables order in the expression.It only runs
    * in EVAL mode,and it will cache the compiled expression.
-   * 
+   *
    * @param expression
    * @param values
    * @return
@@ -582,7 +627,7 @@ public final class AviatorEvaluator {
 
   /**
    * Execute a text expression with environment
-   * 
+   *
    * @param expression text expression
    * @param env Binding variable environment
    * @param cached Whether to cache the compiled result,make true to cache it.
@@ -599,7 +644,7 @@ public final class AviatorEvaluator {
 
   /**
    * Execute a text expression without caching
-   * 
+   *
    * @param expression
    * @param env
    * @return
@@ -611,7 +656,7 @@ public final class AviatorEvaluator {
 
   /**
    * Invalidate expression cache
-   * 
+   *
    * @param expression
    */
   public static void invalidateCache(String expression) {
@@ -621,7 +666,7 @@ public final class AviatorEvaluator {
 
   /**
    * Execute a text expression without caching and env map.
-   * 
+   *
    * @param expression
    * @return
    */

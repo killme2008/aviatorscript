@@ -60,9 +60,11 @@ import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.NumberToken;
+import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
+import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.utils.TypeUtils;
 
 
@@ -253,7 +255,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onAdd(Token<?> lookhead) {
-    this.doArthOperation("add");
+    this.doArthOperation(OperatorType.ADD, "add");
   }
 
 
@@ -262,13 +264,30 @@ public class ASMCodeGenerator implements CodeGenerator {
    *
    * @param methodName
    */
-  private void doArthOperation(String methodName) {
+  private void doArthOperation(OperatorType opType, String methodName) {
     this.loadEnv();
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        methodName,
-        "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    boolean customOperatorFuncs = OperationRuntime.hasCustomOperatorFunctions();
+    if (!customOperatorFuncs) {
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
+          methodName,
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    } else {
+      this.loadOpType(opType);
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
+          "eval",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      this.popOperand();
+    }
+
     this.popOperand();
     this.popOperand();
+  }
+
+
+  private void loadOpType(OperatorType opType) {
+    this.pushOperand();
+    this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/lexer/token/OperatorType",
+        opType.name(), "Lcom/googlecode/aviator/lexer/token/OperatorType;");
   }
 
 
@@ -295,7 +314,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onSub(Token<?> lookhead) {
-    this.doArthOperation("sub");
+    this.doArthOperation(OperatorType.SUB, "sub");
   }
 
 
@@ -307,7 +326,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onMult(Token<?> lookhead) {
-    this.doArthOperation("mult");
+    this.doArthOperation(OperatorType.MULT, "mult");
   }
 
 
@@ -318,7 +337,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onDiv(Token<?> lookhead) {
-    this.doArthOperation("div");
+    this.doArthOperation(OperatorType.DIV, "div");
   }
 
 
@@ -329,7 +348,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onMod(Token<?> lookhead) {
-    this.doArthOperation("mod");
+    this.doArthOperation(OperatorType.MOD, "mod");
   }
 
 
@@ -1050,39 +1069,39 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onBitAnd(Token<?> lookhead) {
-    this.doArthOperation("bitAnd");
+    this.doArthOperation(OperatorType.BIT_AND, "bitAnd");
   }
 
 
   @Override
   public void onBitOr(Token<?> lookhead) {
-    this.doArthOperation("bitOr");
+    this.doArthOperation(OperatorType.BIT_OR, "bitOr");
   }
 
 
   @Override
   public void onBitXor(Token<?> lookhead) {
-    this.doArthOperation("bitXor");
+    this.doArthOperation(OperatorType.BIT_XOR, "bitXor");
   }
 
 
   @Override
   public void onShiftLeft(Token<?> lookhead) {
-    this.doArthOperation("shiftLeft");
+    this.doArthOperation(OperatorType.SHIFT_LEFT, "shiftLeft");
 
   }
 
 
   @Override
   public void onShiftRight(Token<?> lookhead) {
-    this.doArthOperation("shiftRight");
+    this.doArthOperation(OperatorType.SHIFT_RIGHT, "shiftRight");
 
   }
 
 
   @Override
   public void onUnsignedShiftRight(Token<?> lookhead) {
-    this.doArthOperation("unsignedShiftRight");
+    this.doArthOperation(OperatorType.U_SHIFT_RIGHT, "unsignedShiftRight");
 
   }
 
