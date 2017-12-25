@@ -43,7 +43,10 @@ public class AviatorEvaluatorUnitTest {
   @Test
   public void testDefaultOptionValues() {
     assertEquals(AviatorEvaluator.getOption(Options.TRACE), false);
+    assertEquals(AviatorEvaluator.getOption(Options.TRACE_EVAL), false);
     assertEquals(AviatorEvaluator.getOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL), false);
+    assertEquals(AviatorEvaluator.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL),
+        false);
     assertEquals(AviatorEvaluator.getOption(Options.OPTIMIZE_LEVEL), AviatorEvaluator.EVAL);
     assertEquals(AviatorEvaluator.getOption(Options.MATH_CONTEXT), MathContext.DECIMAL128);
   }

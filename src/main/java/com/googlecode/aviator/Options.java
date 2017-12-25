@@ -13,6 +13,8 @@ public enum Options {
   /**
    * Always use double as BigDecimal, default is false.
    *
+   * @deprecated This is an name typo option, plase use
+   *             {@link #ALWAYS_USE_DECIMAL_AS_FLOATING_POINT_NUMBER} instead.
    * @since 2.3.4
    */
   ALWAYS_USE_DOUBLE_AS_DECIMAL,
@@ -34,14 +36,25 @@ public enum Options {
 
   /**
    * Whether to trace code generation,default is false.
-   * 
+   *
    * @deprecated
    */
-  TRACE;
+  TRACE,
+  /**
+   * Always parsing floating-point number into BigDecial, default is false.It replaces
+   * {@link #ALWAYS_USE_DOUBLE_AS_DECIMAL} option.
+   */
+  ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL,
+  /**
+   * Whether to trace expression evaluating procedure, default is false.
+   */
+  TRACE_EVAL;
 
   public boolean isValidValue(Object val) {
     switch (this) {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
+      case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
+      case TRACE_EVAL:
       case TRACE:
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
@@ -61,12 +74,15 @@ public enum Options {
    */
   public Object getDefaultValue() {
     switch (this) {
+      case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
         return false;
       case OPTIMIZE_LEVEL:
         return AviatorEvaluator.EVAL;
       case MATH_CONTEXT:
         return MathContext.DECIMAL128;
+      case TRACE_EVAL:
+        return false;
       case TRACE:
         return Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
     }
