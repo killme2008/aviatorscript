@@ -72,9 +72,19 @@ public class AviatorString extends AviatorObject {
     }
   }
 
+  private static final ThreadLocal<SimpleDateFormat> DATE_FORMATTER =
+      new ThreadLocal<SimpleDateFormat>() {
+
+        @Override
+        protected SimpleDateFormat initialValue() {
+          return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SS");
+        }
+
+      };
+
   private int tryCompareDate(final Date otherDate) {
     try {
-      final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SS");
+      final SimpleDateFormat simpleDateFormat = DATE_FORMATTER.get();
       final Date thisDate = simpleDateFormat.parse(this.lexeme);
       return thisDate.compareTo(otherDate);
     } catch (final Throwable t) {
