@@ -26,9 +26,9 @@ import com.googlecode.aviator.utils.TypeUtils;
 
 /**
  * Aviator variable
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class AviatorJavaType extends AviatorObject {
 
@@ -429,7 +429,7 @@ public class AviatorJavaType extends AviatorObject {
 
   /**
    * Access array or list element
-   * 
+   *
    * @param env
    * @param indexObject
    * @return
@@ -472,6 +472,13 @@ public class AviatorJavaType extends AviatorObject {
     } else {
       return super.add(other, env);
     }
+  }
+
+  @Override
+  public String desc(Map<String, Object> env) {
+    Object value = this.getValue(env);
+    return this.getAviatorType() + "(" + value + ", "
+    + (value == null ? "null" : value.getClass().getSimpleName()) + ")";
   }
 
 }

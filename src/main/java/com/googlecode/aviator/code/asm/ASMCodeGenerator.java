@@ -255,34 +255,8 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onAdd(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.ADD, "add");
+    this.visitBinOperator(OperatorType.ADD, "add");
   }
-
-
-  /**
-   * Do arithmetic operation
-   *
-   * @param methodName
-   */
-  private void doArthOperation(OperatorType opType, String methodName) {
-    this.loadEnv();
-    boolean customOperatorFuncs = OperationRuntime.hasCustomOperatorFunctions();
-    if (!customOperatorFuncs) {
-      this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-          methodName,
-          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
-    } else {
-      this.loadOpType(opType);
-      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
-          "eval",
-          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
-      this.popOperand();
-    }
-
-    this.popOperand();
-    this.popOperand();
-  }
-
 
   private void loadOpType(OperatorType opType) {
     this.pushOperand();
@@ -314,7 +288,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onSub(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.SUB, "sub");
+    this.visitBinOperator(OperatorType.SUB, "sub");
   }
 
 
@@ -326,7 +300,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onMult(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.MULT, "mult");
+    this.visitBinOperator(OperatorType.MULT, "mult");
   }
 
 
@@ -337,7 +311,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onDiv(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.DIV, "div");
+    this.visitBinOperator(OperatorType.DIV, "div");
   }
 
 
@@ -348,7 +322,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onMod(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.MOD, "mod");
+    this.visitBinOperator(OperatorType.MOD, "mod");
   }
 
 
@@ -358,15 +332,13 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onAndLeft(Token<?> lookhead) {
     this.loadEnv();
+    this.visitLeftBranch(IFEQ, OperatorType.AND);
+  }
+
+
+  private void visitBoolean() {
     this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
         "booleanValue", "(Ljava/util/Map;)Z");
-    Label l0 = this.makeLabel();
-    this.pushLabel0(l0);
-    this.mv.visitJumpInsn(IFEQ, l0);
-
-    this.popOperand(); // boolean object
-    this.popOperand(); // environment
-
   }
 
 
@@ -380,24 +352,42 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onAndRight(Token<?> lookhead) {
-    this.loadEnv();
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "booleanValue", "(Ljava/util/Map;)Z");
-    this.mv.visitJumpInsn(IFEQ, this.peekLabel0());
-    // Result is true
-    this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", "TRUE",
-        "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
-    Label l1 = this.makeLabel();
-    this.mv.visitJumpInsn(GOTO, l1);
-    this.visitLabel(this.popLabel0());
-    // Result is false
-    this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", "FALSE",
-        "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
-    this.visitLabel(l1);
-
+    this.visitRightBranch(IFEQ, OperatorType.AND);
     this.popOperand(); // boolean object
     this.popOperand(); // environment
     this.pushOperand();
+  }
+
+
+  private void visitRightBranch(int ints, OperatorType opType) {
+    if (!OperationRuntime.hasRuntimeContext(opType)) {
+      this.loadEnv();
+      String first = "TRUE";
+      String second = "FALSE";
+      if (opType == OperatorType.OR) {
+        first = "FALSE";
+        second = "TRUE";
+      }
+
+      this.visitBoolean();
+      this.mv.visitJumpInsn(ints, this.peekLabel0());
+      // Result is true
+      this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", first,
+          "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
+      Label l1 = this.makeLabel();
+      this.mv.visitJumpInsn(GOTO, l1);
+      this.visitLabel(this.popLabel0());
+      // Result is false
+      this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean",
+          second, "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
+      this.visitLabel(l1);
+    } else {
+      this.loadOpType(opType);
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
+          "eval",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/runtime/type/AviatorObject;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      this.popOperand();
+    }
   }
 
   /**
@@ -410,8 +400,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onTernaryBoolean(Token<?> lookhead) {
     this.loadEnv();
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "booleanValue", "(Ljava/util/Map;)Z");
+    this.visitBoolean();
     Label l0 = this.makeLabel();
     Label l1 = this.makeLabel();
     this.pushLabel0(l0);
@@ -460,20 +449,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onJoinRight(Token<?> lookhead) {
-    this.loadEnv();
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "booleanValue", "(Ljava/util/Map;)Z");
-    Label l1 = this.makeLabel();
-    this.mv.visitJumpInsn(IFNE, this.peekLabel0());
-    // Result is False
-    this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", "FALSE",
-        "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
-    this.mv.visitJumpInsn(GOTO, l1);
-    this.visitLabel(this.popLabel0());
-    // Result is True
-    this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", "TRUE",
-        "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
-    this.visitLabel(l1);
+    this.visitRightBranch(IFNE, OperatorType.OR);
     this.popOperand();
     this.popOperand();
     this.pushOperand();
@@ -503,34 +479,31 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onJoinLeft(Token<?> lookhead) {
     this.loadEnv();
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "booleanValue", "(Ljava/util/Map;)Z");
-    Label l0 = this.makeLabel();
-    this.pushLabel0(l0);
-    this.mv.visitJumpInsn(IFNE, l0);
+    this.visitLeftBranch(IFNE, OperatorType.OR);
+  }
 
-    this.popOperand();
-    this.popOperand();
 
+  private void visitLeftBranch(int ints, OperatorType opType) {
+    if (!OperationRuntime.hasRuntimeContext(opType)) {
+      this.visitBoolean();
+      Label l0 = this.makeLabel();
+      this.pushLabel0(l0);
+      this.mv.visitJumpInsn(ints, l0);
+      this.popOperand();
+    }
+    this.popOperand();
   }
 
 
   @Override
   public void onEq(Token<?> lookhead) {
-    this.doCompareAndJump(IFNE);
+    this.doCompareAndJump(IFNE, OperatorType.EQ);
   }
 
 
   @Override
   public void onMatch(Token<?> lookhead) {
-    this.mv.visitInsn(SWAP);
-    this.loadEnv();
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "match",
-        "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
-
-    this.popOperand();
-    this.popOperand();
+    this.visitBinOperator(OperatorType.MATCH, "match");
     this.popOperand();
     this.pushOperand();
   }
@@ -538,53 +511,65 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onNeq(Token<?> lookhead) {
-    this.doCompareAndJump(IFEQ);
+    this.doCompareAndJump(IFEQ, OperatorType.NEQ);
   }
 
 
-  private void doCompareAndJump(int ints) {
+  private void doCompareAndJump(int ints, OperatorType opType) {
     this.loadEnv();
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "compare", "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)I");
-    Label l0 = this.makeLabel();
-    Label l1 = this.makeLabel();
-    this.mv.visitJumpInsn(ints, l0);
-    this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", "TRUE",
-        "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
-    this.mv.visitJumpInsn(GOTO, l1);
-    this.visitLabel(l0);
-    this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", "FALSE",
-        "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
-    this.visitLabel(l1);
+    this.visitCompare(ints, opType);
     this.popOperand();
     this.popOperand();
-    this.popOperand();
-    this.pushOperand();
+  }
+
+
+  private void visitCompare(int ints, OperatorType opType) {
+    if (!OperationRuntime.hasRuntimeContext(opType)) {
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
+          "compare", "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)I");
+      Label l0 = this.makeLabel();
+      Label l1 = this.makeLabel();
+      this.mv.visitJumpInsn(ints, l0);
+      this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean",
+          "TRUE", "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
+      this.mv.visitJumpInsn(GOTO, l1);
+      this.visitLabel(l0);
+      this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean",
+          "FALSE", "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
+      this.visitLabel(l1);
+    } else {
+      this.loadOpType(opType);
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
+          "eval",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      this.popOperand();
+    }
+
   }
 
 
   @Override
   public void onGe(Token<?> lookhead) {
-    this.doCompareAndJump(IFLT);
+    this.doCompareAndJump(IFLT, OperatorType.GE);
   }
 
 
   @Override
   public void onGt(Token<?> lookhead) {
-    this.doCompareAndJump(IFLE);
+    this.doCompareAndJump(IFLE, OperatorType.GT);
   }
 
 
   @Override
   public void onLe(Token<?> lookhead) {
-    this.doCompareAndJump(IFGT);
+    this.doCompareAndJump(IFGT, OperatorType.LE);
 
   }
 
 
   @Override
   public void onLt(Token<?> lookhead) {
-    this.doCompareAndJump(IFGE);
+    this.doCompareAndJump(IFGE, OperatorType.LT);
   }
 
 
@@ -604,16 +589,48 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onNot(Token<?> lookhead) {
-    this.pushOperand();
+    this.visitUnaryOperator(OperatorType.NOT, "not");
+  }
 
+  private void visitBinOperator(OperatorType opType, String methodName) {
+    if (!OperationRuntime.hasRuntimeContext(opType)) {
+      // swap arguments for regular-expression match operator.
+      if (opType == OperatorType.MATCH) {
+        this.mv.visitInsn(SWAP);
+      }
+      this.loadEnv();
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
+          methodName,
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    } else {
+      this.loadEnv();
+      this.loadOpType(opType);
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
+          "eval",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      this.popOperand();
+    }
+    this.popOperand();
+    this.popOperand();
+  }
+
+  private void visitUnaryOperator(OperatorType opType, String methodName) {
     this.mv.visitTypeInsn(CHECKCAST, "com/googlecode/aviator/runtime/type/AviatorObject");
-    this.mv.visitVarInsn(ALOAD, 1);
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "not", "(Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    this.loadEnv();
+
+    if (!OperationRuntime.hasRuntimeContext(opType)) {
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
+          methodName, "(Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    } else {
+      this.loadOpType(opType);
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
+          "eval",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      this.popOperand();
+    }
+
 
     this.popOperand();
-    this.popOperand();
-    this.pushOperand();
   }
 
 
@@ -622,14 +639,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onBitNot(Token<?> lookhead) {
-    this.pushOperand();
-    this.mv.visitTypeInsn(CHECKCAST, "com/googlecode/aviator/runtime/type/AviatorObject");
-    this.mv.visitVarInsn(ALOAD, 1);
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "bitNot", "(Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
-    this.popOperand();
-    this.popOperand();
-    this.pushOperand();
+    this.visitUnaryOperator(OperatorType.BIT_NOT, "bitNot");
   }
 
 
@@ -641,15 +651,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onNeg(Token<?> lookhead) {
-    this.pushOperand();
-
-    this.mv.visitTypeInsn(CHECKCAST, "com/googlecode/aviator/runtime/type/AviatorObject");
-    this.mv.visitVarInsn(ALOAD, 1);
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "neg", "(Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
-    this.popOperand();
-    this.popOperand();
-    this.pushOperand();
+    this.visitUnaryOperator(OperatorType.NEG, "neg");
   }
 
 
@@ -974,9 +976,17 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onArrayIndexEnd(Token<?> lookhead) {
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
-        "getElement",
-        "(Ljava/util/Map;Lcom/googlecode/aviator/runtime/type/AviatorObject;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    if (!OperationRuntime.hasRuntimeContext(OperatorType.INDEX)) {
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorObject",
+          "getElement",
+          "(Ljava/util/Map;Lcom/googlecode/aviator/runtime/type/AviatorObject;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    } else {
+      this.loadOpType(OperatorType.INDEX);
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
+          "eval",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/runtime/type/AviatorObject;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      this.popOperand();
+    }
 
     this.popOperand();
     this.popOperand();
@@ -1069,39 +1079,39 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onBitAnd(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.BIT_AND, "bitAnd");
+    this.visitBinOperator(OperatorType.BIT_AND, "bitAnd");
   }
 
 
   @Override
   public void onBitOr(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.BIT_OR, "bitOr");
+    this.visitBinOperator(OperatorType.BIT_OR, "bitOr");
   }
 
 
   @Override
   public void onBitXor(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.BIT_XOR, "bitXor");
+    this.visitBinOperator(OperatorType.BIT_XOR, "bitXor");
   }
 
 
   @Override
   public void onShiftLeft(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.SHIFT_LEFT, "shiftLeft");
+    this.visitBinOperator(OperatorType.SHIFT_LEFT, "shiftLeft");
 
   }
 
 
   @Override
   public void onShiftRight(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.SHIFT_RIGHT, "shiftRight");
+    this.visitBinOperator(OperatorType.SHIFT_RIGHT, "shiftRight");
 
   }
 
 
   @Override
   public void onUnsignedShiftRight(Token<?> lookhead) {
-    this.doArthOperation(OperatorType.U_SHIFT_RIGHT, "unsignedShiftRight");
+    this.visitBinOperator(OperatorType.U_SHIFT_RIGHT, "unsignedShiftRight");
 
   }
 

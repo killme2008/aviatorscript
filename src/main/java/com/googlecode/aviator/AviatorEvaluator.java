@@ -553,7 +553,11 @@ public final class AviatorEvaluator {
     ExpressionLexer lexer = new ExpressionLexer(expression);
     CodeGenerator codeGenerator = newCodeGenerator(cached);
     ExpressionParser parser = new ExpressionParser(lexer, codeGenerator);
-    return parser.parse();
+    Expression exp = parser.parse();
+    if ((boolean) getOption(Options.TRACE_EVAL)) {
+      ((BaseExpression) exp).setExpression(expression);
+    }
+    return exp;
   }
 
 
