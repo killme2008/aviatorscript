@@ -57,6 +57,10 @@ public enum Options {
   PUT_CAPTURING_GROUPS_INTO_ENV;
 
 
+  private static final Boolean TRACE_DEFAULT_VAL = Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
+  private static final Boolean TRACE_EVAL_DEFAULT_VAL = Boolean.valueOf(System.getProperty("aviator.trace_eval", "false"));
+
+
   public boolean isValidValue(Object val) {
     switch (this) {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
@@ -90,9 +94,9 @@ public enum Options {
       case MATH_CONTEXT:
         return MathContext.DECIMAL128;
       case TRACE_EVAL:
-        return false;
+        return TRACE_EVAL_DEFAULT_VAL;
       case TRACE:
-        return Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
+        return TRACE_DEFAULT_VAL;
       case PUT_CAPTURING_GROUPS_INTO_ENV:
         return true;
     }

@@ -150,7 +150,7 @@ public class FunctionTest {
 
   @Test
   public void testSystemFunction() {
-    AviatorEvaluator.setTrace(true);
+    AviatorEvaluator.setOption(Options.TRACE_EVAL, true);
     try {
       // sysdate()
       Object date = AviatorEvaluator.execute("sysdate()");
@@ -176,7 +176,7 @@ public class FunctionTest {
       Object rand3 = AviatorEvaluator.execute("rand()");
       assertFalse(rand3.equals(rand1));
     } finally {
-      AviatorEvaluator.setTrace(false);
+      AviatorEvaluator.setOption(Options.TRACE_EVAL, false);
     }
 
   }
@@ -343,8 +343,8 @@ public class FunctionTest {
     assertEquals(
         4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? !false && true ? 1 & 4 : 0
             : 6L >> 2L * 2L / 4L ^ ~699L + 100L << 4L >> 5L >> 1000L,
-        AviatorEvaluator.execute(
-            "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) : 6 >> 2 * 2 / 4^ ~699 + 100 << 4 >> 5 >> 1000"));
+            AviatorEvaluator.execute(
+                "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) : 6 >> 2 * 2 / 4^ ~699 + 100 << 4 >> 5 >> 1000"));
 
     assertEquals((99 & 7) == (99 & 7) && false, AviatorEvaluator.execute("(99&7)==(99&7)&&false "));
     assertEquals((99 | 7) != (99 | 7) || false, AviatorEvaluator.execute("(99|7)!=(99|7)||false "));
@@ -376,9 +376,9 @@ public class FunctionTest {
     assertEquals(
         4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? !false && true ? 1 & 4 : 0
             : i >> j * k / i ^ ~j + k << i >> j >> 1000L,
-        AviatorEvaluator.execute(
-            "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) :i >> j * k / i ^ ~j + k << i >> j >> 1000",
-            env));
+            AviatorEvaluator.execute(
+                "4 / 2 * 3 - 4 + (5 ^ 5 - 2 & 3) == 4000 ? (!false && true ? 1 & 4 : 0) :i >> j * k / i ^ ~j + k << i >> j >> 1000",
+                env));
 
     assertEquals((i & 7) == (i & 7) && false,
         AviatorEvaluator.execute("(i & 7) == (i & 7) && false ", env));
@@ -642,17 +642,17 @@ public class FunctionTest {
   public void testBigNumberBitOperations() {
     assertEquals(
         new BigInteger("1000000000000000000000000000000000")
-            .xor(new BigInteger("9999999999999999999999")),
+        .xor(new BigInteger("9999999999999999999999")),
         AviatorEvaluator.exec("a^b", new BigInteger("1000000000000000000000000000000000"),
             new BigInteger("9999999999999999999999")));
     assertEquals(
         new BigInteger("1000000000000000000000000000000000")
-            .and(new BigInteger("9999999999999999999999")),
+        .and(new BigInteger("9999999999999999999999")),
         AviatorEvaluator.exec("a&b", new BigInteger("1000000000000000000000000000000000"),
             new BigInteger("9999999999999999999999")));
     assertEquals(
         new BigInteger("1000000000000000000000000000000000")
-            .or(new BigInteger("9999999999999999999999")),
+        .or(new BigInteger("9999999999999999999999")),
         AviatorEvaluator.exec("a|b", new BigInteger("1000000000000000000000000000000000"),
             new BigInteger("9999999999999999999999")));
     assertEquals(new BigInteger("1000000000000000000000000000000000").shiftLeft(2),
