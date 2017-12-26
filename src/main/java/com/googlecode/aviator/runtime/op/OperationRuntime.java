@@ -158,19 +158,14 @@ public class OperationRuntime {
         printTrace(TRACE_PREFIX + opType.token + args[0].desc(env) + " => " + result.desc(env));
         break;
       case 2:
-        if (opType == OperatorType.AND) {
-          if (!args[0].booleanValue(env)) {
-            return;
-          }
-        } else if (opType == OperatorType.OR) {
-          if (args[0].booleanValue(env)) {
-            return;
-          }
-        }
         printTrace(TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + opType.token + WHITE_SPACE
             + args[1].desc(env) + " => " + result.desc(env));
         break;
       case 3:
+        printTrace(
+            TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + "?" + WHITE_SPACE + args[0].desc(env)
+            + WHITE_SPACE + ":" + WHITE_SPACE + args[1].desc(env) + " => " + result.desc(env));
+        break;
     }
   }
 
