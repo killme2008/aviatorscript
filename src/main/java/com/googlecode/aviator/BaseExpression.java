@@ -3,19 +3,19 @@ package com.googlecode.aviator;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 
 /**
  * Base expression
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public abstract class BaseExpression implements Expression {
 
   private List<String> varNames;
   private List<String> varFullNames;
+  private String expression;
 
 
   public BaseExpression(List<String> varNames) {
@@ -33,26 +33,44 @@ public abstract class BaseExpression implements Expression {
   }
 
 
+  /**
+   * Returns the expression string when turn on {@link Options#TRACE_EVAL} option, else returns
+   * null.
+   *
+   * @return expression in string.
+   */
+  public String getExpression() {
+    return this.expression;
+  }
+
+  public void setExpression(String expression) {
+    this.expression = expression;
+  }
+
+
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.googlecode.aviator.IExpression#execute()
    */
+  @Override
   public Object execute() {
     return this.execute(null);
   }
 
 
+  @Override
   public List<String> getVariableFullNames() {
-    return varFullNames;
+    return this.varFullNames;
   }
 
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.googlecode.aviator.IExpression#getVariableNames()
    */
+  @Override
   public List<String> getVariableNames() {
     return this.varNames;
   }

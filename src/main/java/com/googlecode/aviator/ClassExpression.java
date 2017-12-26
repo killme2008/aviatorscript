@@ -18,15 +18,15 @@ package com.googlecode.aviator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.op.OperationRuntime;
 
 
 /**
  * Compiled expression,all generated class inherit this class
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public abstract class ClassExpression extends BaseExpression {
 
@@ -37,16 +37,20 @@ public abstract class ClassExpression extends BaseExpression {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.googlecode.aviator.IExpression#execute(java.util.Map)
    */
+  @Override
   public Object execute(Map<String, Object> env) {
     if (env == null) {
       env = Collections.emptyMap();
     }
 
+    if (OperationRuntime.isTracedEval()) {
+      OperationRuntime.printTrace("Tracing: " + this.getExpression());
+    }
     try {
-      return execute0(env);
+      return this.execute0(env);
     } catch (ExpressionRuntimeException e) {
       throw e;
     } catch (Throwable e) {
@@ -61,7 +65,7 @@ public abstract class ClassExpression extends BaseExpression {
 
   /**
    * Get generated java class
-   * 
+   *
    * @return
    */
   public Class<?> getJavaClass() {

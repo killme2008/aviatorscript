@@ -81,9 +81,9 @@ public enum OperatorType {
 
   TERNARY("?:", 3);
 
-  private String token;
+  public final String token;
 
-  private int operandCount;
+  public final int operandCount;
 
 
   OperatorType(String token, int operandCount) {

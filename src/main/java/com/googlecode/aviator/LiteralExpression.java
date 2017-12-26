@@ -17,14 +17,14 @@ package com.googlecode.aviator;
  **/
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import com.googlecode.aviator.runtime.op.OperationRuntime;
 
 
 /**
  * A literal expression with a fixed result
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class LiteralExpression extends BaseExpression {
 
@@ -37,8 +37,12 @@ public class LiteralExpression extends BaseExpression {
   }
 
 
+  @Override
   public Object execute(Map<String, Object> env) {
-    return result;
+    if (OperationRuntime.isTracedEval()) {
+      OperationRuntime.printTrace("Tracing: " + this.getExpression());
+    }
+    return this.result;
   }
 
 }
