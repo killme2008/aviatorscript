@@ -57,8 +57,10 @@ public enum Options {
   PUT_CAPTURING_GROUPS_INTO_ENV;
 
 
-  private static final Boolean TRACE_DEFAULT_VAL = Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
-  private static final Boolean TRACE_EVAL_DEFAULT_VAL = Boolean.valueOf(System.getProperty("aviator.trace_eval", "false"));
+  private static final Boolean TRACE_DEFAULT_VAL =
+      Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
+  private static final Boolean TRACE_EVAL_DEFAULT_VAL =
+      Boolean.valueOf(System.getProperty("aviator.trace_eval", "false"));
 
 
   public boolean isValidValue(Object val) {
@@ -71,7 +73,7 @@ public enum Options {
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
-        || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
+            || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
       case MATH_CONTEXT:
         return val instanceof MathContext;
     }
