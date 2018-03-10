@@ -48,6 +48,8 @@ public class AviatorJavaType extends AviatorObject {
         return this.name;
     }
 
+
+
     @Override public AviatorObject div(AviatorObject other, Map<String, Object> env) {
         final Object value = this.getValue(env);
         switch (other.getAviatorType()) {
