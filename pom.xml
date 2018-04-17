@@ -37,6 +37,24 @@
 
 	<build>
 		<plugins>
+      <!-- formatter and sortpom -->
+      <plugin>
+	      <groupId>net.revelc.code.formatter</groupId>
+	      <artifactId>formatter-maven-plugin</artifactId>
+	      <version>2.0.1</version>
+	      <configuration>
+		      <configFile>${project.basedir}/eclipse-java-google-style.xml</configFile>
+		      <lineEnding>LF</lineEnding>
+          <encoding>utf-8</encoding>
+	      </configuration>
+	      <executions>
+		      <execution>
+			      <goals>
+				      <goal>format</goal>
+			      </goals>
+		      </execution>
+	      </executions>
+      </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
