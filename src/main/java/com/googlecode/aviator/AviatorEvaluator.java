@@ -118,7 +118,18 @@ public final class AviatorEvaluator {
 
   private static final ConcurrentHashMap<Options, Object> options =
       new ConcurrentHashMap<Options, Object>();
+  /** function missing callback */
+  private static FunctionMissing functionMissing;
 
+
+  /**
+   * Set a function missing callback.
+   * @since 3.3.1
+   * @param funcMissing
+   */
+  public static void setFunctionMissing(FunctionMissing funcMissing) {
+    functionMissing = funcMissing;
+  }
 
   /**
    * Configure whether to trace code generation
@@ -410,7 +421,10 @@ public final class AviatorEvaluator {
    * @return
    */
   public static AviatorFunction getFunction(String name) {
-    final AviatorFunction function = (AviatorFunction) FUNC_MAP.get(name);
+    AviatorFunction function = (AviatorFunction) FUNC_MAP.get(name);
+    if (function == null && functionMissing != null) {
+      function = functionMissing.onFunctionMissing(name);
+    }
     if (function == null) {
       throw new ExpressionRuntimeException("Could not find function named '" + name + "'");
     }
