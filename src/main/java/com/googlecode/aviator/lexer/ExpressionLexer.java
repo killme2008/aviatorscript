@@ -300,12 +300,18 @@ public class ExpressionLexer {
       char left = this.peek;
       int startIndex = this.iterator.getIndex();
       StringBuilder sb = new StringBuilder();
-      while ((this.peek = this.iterator.next()) != left) {
+      char prev = this.peek;
+      while ((this.peek = this.iterator.next()) != left || prev == '\\') {
         if (this.peek == CharacterIterator.DONE) {
           throw new CompileExpressionErrorException("Illegal String " + sb + " at " + startIndex);
         } else {
-          sb.append(this.peek);
+          if (this.peek == left && prev == '\\') {
+            sb.setCharAt(sb.length()-1, this.peek);
+          } else {
+            sb.append(this.peek);
+          }
         }
+        prev = this.peek;
       }
       this.nextChar();
       return new StringToken(sb.toString(), startIndex);
