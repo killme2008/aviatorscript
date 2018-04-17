@@ -306,7 +306,7 @@ public class ExpressionLexer {
           throw new CompileExpressionErrorException("Illegal String " + sb + " at " + startIndex);
         } else {
           if (this.peek == left && prev == '\\') {
-            sb.setCharAt(sb.length()-1, this.peek);
+            sb.setCharAt(sb.length() - 1, this.peek);
           } else {
             sb.append(this.peek);
           }
