@@ -1,10 +1,12 @@
 package com.googlecode.aviator.runtime.op;
 
+import java.io.IOException;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -170,7 +172,12 @@ public class OperationRuntime {
   }
 
   public static void printTrace(String msg) {
-    System.out.println("[Aviator TRACE] " + msg);
+    try {
+      FunctionUtils.getAviatorEvaluatorInstance().getTraceOutputStream()
+          .write(("[Aviator TRACE] " + msg + "\n").getBytes());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public static boolean isTracedEval() {

@@ -111,7 +111,7 @@ public class FunctionUtils {
       rt = (AviatorFunction) env.get(name);
     }
     if (rt == null) {
-      AviatorEvaluatorInstance instance = getAviatorEvaluatorInstance(env);
+      AviatorEvaluatorInstance instance = getAviatorEvaluatorInstance();
       rt = instance.getFunction(name);
     }
     return rt;
@@ -121,10 +121,9 @@ public class FunctionUtils {
   /**
    * Get the current evaluator instance,returns the global instance if not found.
    * 
-   * @param env
    * @return
    */
-  public static AviatorEvaluatorInstance getAviatorEvaluatorInstance(Map<String, Object> env) {
+  public static AviatorEvaluatorInstance getAviatorEvaluatorInstance() {
     AviatorEvaluatorInstance instance = BaseExpression.INSTANCE.get();
     return instance != null ? instance : AviatorEvaluator.getInstance();
   }

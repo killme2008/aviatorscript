@@ -42,8 +42,8 @@ public class LiteralExpression extends BaseExpression {
   public Object execute(Map<String, Object> env) {
     if (OperationRuntime.isTracedEval()) {
       OperationRuntime.printTrace("Tracing: " + this.getExpression());
+      OperationRuntime.printTrace("Result : " + this.getExpression());
     }
-    OperationRuntime.printTrace("Result : " + this.getExpression());
     return this.result;
   }
 
