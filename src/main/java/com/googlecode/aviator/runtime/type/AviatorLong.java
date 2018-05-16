@@ -18,6 +18,7 @@ package com.googlecode.aviator.runtime.type;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.TypeUtils;
 
 
@@ -92,7 +93,7 @@ public class AviatorLong extends AviatorNumber {
         return AviatorBigInt.valueOf(this.toBigInt().divide(other.toBigInt()));
       case Decimal:
         return AviatorDecimal
-            .valueOf(this.toDecimal().divide(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            .valueOf(this.toDecimal().divide(other.toDecimal(), RuntimeUtils.getMathContext()));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() / other.longValue());
       default:
@@ -108,7 +109,7 @@ public class AviatorLong extends AviatorNumber {
         return AviatorBigInt.valueOf(this.toBigInt().add(other.toBigInt()));
       case Decimal:
         return AviatorDecimal
-            .valueOf(this.toDecimal().add(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            .valueOf(this.toDecimal().add(other.toDecimal(), RuntimeUtils.getMathContext()));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() + other.longValue());
       default:
@@ -123,8 +124,8 @@ public class AviatorLong extends AviatorNumber {
       case BigInt:
         return AviatorBigInt.valueOf(this.toBigInt().mod(other.toBigInt()));
       case Decimal:
-        return AviatorDecimal.valueOf(
-            this.toDecimal().remainder(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal
+            .valueOf(this.toDecimal().remainder(other.toDecimal(), RuntimeUtils.getMathContext()));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() % other.longValue());
       default:
@@ -139,8 +140,8 @@ public class AviatorLong extends AviatorNumber {
       case BigInt:
         return AviatorBigInt.valueOf(this.toBigInt().multiply(other.toBigInt()));
       case Decimal:
-        return AviatorDecimal.valueOf(
-            this.toDecimal().multiply(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal
+            .valueOf(this.toDecimal().multiply(other.toDecimal(), RuntimeUtils.getMathContext()));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() * other.longValue());
       default:
@@ -343,8 +344,8 @@ public class AviatorLong extends AviatorNumber {
       case BigInt:
         return AviatorBigInt.valueOf(this.toBigInt().subtract(other.toBigInt()));
       case Decimal:
-        return AviatorDecimal.valueOf(
-            this.toDecimal().subtract(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal
+            .valueOf(this.toDecimal().subtract(other.toDecimal(), RuntimeUtils.getMathContext()));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() - other.longValue());
       default:

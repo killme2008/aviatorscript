@@ -16,11 +16,10 @@
 package com.googlecode.aviator.runtime.function;
 
 import java.util.Map;
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -58,7 +57,6 @@ public class FunctionUtils {
     }
     return result;
   }
-
 
   /**
    * get a object from env
@@ -111,21 +109,10 @@ public class FunctionUtils {
       rt = (AviatorFunction) env.get(name);
     }
     if (rt == null) {
-      AviatorEvaluatorInstance instance = getAviatorEvaluatorInstance();
+      AviatorEvaluatorInstance instance = RuntimeUtils.getInstance();
       rt = instance.getFunction(name);
     }
     return rt;
-  }
-
-
-  /**
-   * Get the current evaluator instance,returns the global instance if not found.
-   * 
-   * @return
-   */
-  public static AviatorEvaluatorInstance getAviatorEvaluatorInstance() {
-    AviatorEvaluatorInstance instance = BaseExpression.INSTANCE.get();
-    return instance != null ? instance : AviatorEvaluator.getInstance();
   }
 
 

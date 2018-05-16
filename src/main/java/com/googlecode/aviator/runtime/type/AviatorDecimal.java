@@ -3,6 +3,7 @@ package com.googlecode.aviator.runtime.type;
 import java.math.BigDecimal;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 
 
 /**
@@ -25,7 +26,7 @@ public class AviatorDecimal extends AviatorNumber {
 
 
   public static final AviatorDecimal valueOf(String d) {
-    return new AviatorDecimal(new BigDecimal(d, AviatorEvaluator.getMathContext()));
+    return new AviatorDecimal(new BigDecimal(d, RuntimeUtils.getMathContext()));
   }
 
 
@@ -35,8 +36,8 @@ public class AviatorDecimal extends AviatorNumber {
       case Double:
         return AviatorDouble.valueOf(this.doubleValue() - other.doubleValue());
       default:
-        return AviatorDecimal.valueOf(
-            this.toDecimal().subtract(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal
+            .valueOf(this.toDecimal().subtract(other.toDecimal(), RuntimeUtils.getMathContext()));
     }
   }
 
@@ -53,8 +54,8 @@ public class AviatorDecimal extends AviatorNumber {
       case Double:
         return AviatorDouble.valueOf(this.doubleValue() * other.doubleValue());
       default:
-        return AviatorDecimal.valueOf(
-            this.toDecimal().multiply(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal
+            .valueOf(this.toDecimal().multiply(other.toDecimal(), RuntimeUtils.getMathContext()));
     }
   }
 
@@ -65,8 +66,8 @@ public class AviatorDecimal extends AviatorNumber {
       case Double:
         return AviatorDouble.valueOf(this.doubleValue() % other.doubleValue());
       default:
-        return AviatorDecimal.valueOf(
-            this.toDecimal().remainder(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal
+            .valueOf(this.toDecimal().remainder(other.toDecimal(), RuntimeUtils.getMathContext()));
     }
   }
 
@@ -78,7 +79,7 @@ public class AviatorDecimal extends AviatorNumber {
         return AviatorDouble.valueOf(this.doubleValue() / other.doubleValue());
       default:
         return AviatorDecimal
-            .valueOf(this.toDecimal().divide(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            .valueOf(this.toDecimal().divide(other.toDecimal(), RuntimeUtils.getMathContext()));
     }
   }
 
@@ -90,7 +91,7 @@ public class AviatorDecimal extends AviatorNumber {
         return AviatorDouble.valueOf(this.doubleValue() + other.doubleValue());
       default:
         return AviatorDecimal
-            .valueOf(this.toDecimal().add(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            .valueOf(this.toDecimal().add(other.toDecimal(), RuntimeUtils.getMathContext()));
     }
   }
 

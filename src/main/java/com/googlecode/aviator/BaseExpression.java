@@ -19,8 +19,6 @@ public abstract class BaseExpression implements Expression {
   private List<String> varFullNames;
   private String expression;
   protected AviatorEvaluatorInstance instance;
-  public static final ThreadLocal<AviatorEvaluatorInstance> INSTANCE =
-      new ThreadLocal<AviatorEvaluatorInstance>();
 
   public BaseExpression(AviatorEvaluatorInstance instance, List<String> varNames) {
     super();

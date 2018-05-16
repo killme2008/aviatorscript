@@ -1,12 +1,10 @@
 package com.googlecode.aviator.runtime.op;
 
-import java.io.IOException;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
-import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
-import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -44,9 +42,9 @@ public class OperationRuntime {
    * @return
    */
   public static AviatorObject eval(AviatorObject[] args, OperatorType opType) {
-    AviatorFunction func = AviatorEvaluator.getOpFunction(opType);
+    AviatorFunction func = RuntimeUtils.getInstance().getOpFunction(opType);
     AviatorObject ret = eval0(args, opType, func);
-    if (isTracedEval()) {
+    if (RuntimeUtils.isTracedEval()) {
       trace(null, opType, ret, args);
     }
     return ret;
@@ -79,9 +77,9 @@ public class OperationRuntime {
    */
   public static AviatorObject eval(AviatorObject arg, Map<String, Object> env,
       OperatorType opType) {
-    AviatorFunction func = AviatorEvaluator.getOpFunction(opType);
+    AviatorFunction func = RuntimeUtils.getInstance().getOpFunction(opType);
     AviatorObject ret = eval0(arg, env, opType, func);
-    if (isTracedEval()) {
+    if (RuntimeUtils.isTracedEval()) {
       trace(env, opType, ret, arg);
     }
     return ret;
@@ -125,9 +123,9 @@ public class OperationRuntime {
   public static AviatorObject eval(AviatorObject left, AviatorObject right, Map<String, Object> env,
       OperatorType opType) {
 
-    AviatorFunction func = AviatorEvaluator.getOpFunction(opType);
+    AviatorFunction func = RuntimeUtils.getInstance().getOpFunction(opType);
     AviatorObject ret = eval0(left, right, env, opType, func);
-    if (isTracedEval()) {
+    if (RuntimeUtils.isTracedEval()) {
       trace(env, opType, ret, left, right);
     }
     return ret;
@@ -146,7 +144,8 @@ public class OperationRuntime {
   }
 
   public static final boolean hasRuntimeContext(OperatorType opType) {
-    return AviatorEvaluator.OPS_MAP.containsKey(opType) || isTracedEval();
+    return RuntimeUtils.getInstance().getOpsMap().containsKey(opType)
+        || RuntimeUtils.isTracedEval();
   }
 
   private static final String WHITE_SPACE = " ";
@@ -157,30 +156,18 @@ public class OperationRuntime {
 
     switch (args.length) {
       case 1:
-        printTrace(TRACE_PREFIX + opType.token + args[0].desc(env) + " => " + result.desc(env));
+        RuntimeUtils.printTrace(
+            TRACE_PREFIX + opType.token + args[0].desc(env) + " => " + result.desc(env));
         break;
       case 2:
-        printTrace(TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + opType.token + WHITE_SPACE
-            + args[1].desc(env) + " => " + result.desc(env));
+        RuntimeUtils.printTrace(TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + opType.token
+            + WHITE_SPACE + args[1].desc(env) + " => " + result.desc(env));
         break;
       case 3:
-        printTrace(
+        RuntimeUtils.printTrace(
             TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + "?" + WHITE_SPACE + args[0].desc(env)
                 + WHITE_SPACE + ":" + WHITE_SPACE + args[1].desc(env) + " => " + result.desc(env));
         break;
     }
-  }
-
-  public static void printTrace(String msg) {
-    try {
-      FunctionUtils.getAviatorEvaluatorInstance().getTraceOutputStream()
-          .write(("[Aviator TRACE] " + msg + "\n").getBytes());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static boolean isTracedEval() {
-    return (boolean) AviatorEvaluator.getOption(Options.TRACE_EVAL);
   }
 }

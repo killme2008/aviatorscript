@@ -17,7 +17,7 @@ package com.googlecode.aviator;
  **/
 import java.util.List;
 import java.util.Map;
-import com.googlecode.aviator.runtime.op.OperationRuntime;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 
 
 /**
@@ -40,9 +40,9 @@ public class LiteralExpression extends BaseExpression {
 
   @Override
   public Object execute(Map<String, Object> env) {
-    if (OperationRuntime.isTracedEval()) {
-      OperationRuntime.printTrace("Tracing: " + this.getExpression());
-      OperationRuntime.printTrace("Result : " + this.getExpression());
+    if (RuntimeUtils.isTracedEval()) {
+      RuntimeUtils.printTrace("Tracing: " + this.getExpression());
+      RuntimeUtils.printTrace("Result : " + this.getExpression());
     }
     return this.result;
   }

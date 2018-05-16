@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
-import com.googlecode.aviator.runtime.op.OperationRuntime;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 
 
 /**
@@ -47,16 +47,14 @@ public abstract class ClassExpression extends BaseExpression {
     if (env == null) {
       env = new HashMap<String, Object>();
     }
-    if (OperationRuntime.isTracedEval()) {
-      OperationRuntime.printTrace("Tracing: " + this.getExpression());
+    if (RuntimeUtils.isTracedEval()) {
+      RuntimeUtils.printTrace("Tracing: " + this.getExpression());
     }
     try {
-      if (this.instance != AviatorEvaluator.getInstance()) {
-        INSTANCE.set(this.instance);
-      }
+      RuntimeUtils.setInstance(this.instance);
       Object result = this.execute0(env);
-      if (OperationRuntime.isTracedEval()) {
-        OperationRuntime.printTrace("Result : " + result);
+      if (RuntimeUtils.isTracedEval()) {
+        RuntimeUtils.printTrace("Result : " + result);
       }
       return result;
     } catch (ExpressionRuntimeException e) {
@@ -64,9 +62,7 @@ public abstract class ClassExpression extends BaseExpression {
     } catch (Throwable e) {
       throw new ExpressionRuntimeException("Execute expression error", e);
     } finally {
-      if (this.instance != AviatorEvaluator.getInstance()) {
-        INSTANCE.remove();
-      }
+      RuntimeUtils.removeInstance();
     }
 
   }

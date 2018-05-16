@@ -10,6 +10,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 
 
 /**
@@ -24,15 +25,17 @@ public class AviatorScriptEngine extends AbstractScriptEngine implements Compila
   // 缓存编译结果
   private boolean cached = true;
   private final AviatorScriptEngineFactory factory;
+  private AviatorEvaluatorInstance evaluator;
 
 
   public AviatorScriptEngine(AviatorScriptEngineFactory factory) {
     this.factory = factory;
+    this.evaluator = new AviatorEvaluatorInstance();
   }
 
 
   public CompiledScript compile(String script) throws ScriptException {
-    return new CompiledAviatorScript(this, AviatorEvaluator.compile(script, this.cached));
+    return new CompiledAviatorScript(this, evaluator.compile(script, this.cached));
   }
 
 

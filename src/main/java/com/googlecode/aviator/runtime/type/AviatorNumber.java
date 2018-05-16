@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.TypeUtils;
 
 
@@ -253,7 +254,7 @@ public abstract class AviatorNumber extends AviatorObject {
     } else if (TypeUtils.isBigInt(this.number)) {
       return new BigDecimal(this.toBigInt());
     } else {
-      return new BigDecimal(this.number.doubleValue(), AviatorEvaluator.getMathContext());
+      return new BigDecimal(this.number.doubleValue(), RuntimeUtils.getMathContext());
     }
   }
 }
