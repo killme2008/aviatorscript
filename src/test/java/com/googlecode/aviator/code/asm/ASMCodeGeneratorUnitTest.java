@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
@@ -46,7 +47,8 @@ public class ASMCodeGeneratorUnitTest {
           }
         });
 
-    this.codeGenerator = new ASMCodeGenerator(classloader, System.out, true);
+    this.codeGenerator =
+        new ASMCodeGenerator(new AviatorEvaluatorInstance(), classloader, System.out, true);
     this.codeGenerator.start();
   }
 

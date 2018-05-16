@@ -18,6 +18,7 @@ package com.googlecode.aviator.parser;
 import java.util.HashSet;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
@@ -60,9 +61,13 @@ public class ExpressionParser {
 
   private boolean inPattern = false;
 
+  private AviatorEvaluatorInstance instance;
 
-  public ExpressionParser(ExpressionLexer lexer, CodeGenerator codeGenerator) {
+
+  public ExpressionParser(AviatorEvaluatorInstance instance, ExpressionLexer lexer,
+      CodeGenerator codeGenerator) {
     super();
+    this.instance = instance;
     this.lexer = lexer;
     this.lookhead = this.lexer.scan();
     if (this.lookhead == null) {
@@ -422,7 +427,7 @@ public class ExpressionParser {
       if (lexeme.equals("-")) {
         lexeme = "-sub";
       }
-      return AviatorEvaluator.containsFunction(lexeme);
+      return this.instance.containsFunction(lexeme);
     } else {
       this.back();
       return false;

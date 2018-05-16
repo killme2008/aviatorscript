@@ -17,6 +17,9 @@ package com.googlecode.aviator.runtime.function;
 
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.BaseExpression;
+import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -33,6 +36,13 @@ import com.googlecode.aviator.runtime.type.AviatorType;
  */
 public class FunctionUtils {
 
+  /**
+   * Get string value from env.
+   * 
+   * @param arg the var name
+   * @param env
+   * @return
+   */
   public static final String getStringValue(AviatorObject arg, Map<String, Object> env) {
     String result = null;
 
@@ -50,6 +60,13 @@ public class FunctionUtils {
   }
 
 
+  /**
+   * get a object from env
+   * 
+   * @param arg the var name
+   * @param env
+   * @return
+   */
   public static Object getJavaObject(AviatorObject arg, Map<String, Object> env) {
     if (arg.getAviatorType() != AviatorType.JavaType) {
       throw new ExpressionRuntimeException(arg.desc(env) + " is not a javaType");
@@ -58,6 +75,19 @@ public class FunctionUtils {
   }
 
 
+  /**
+   * Get a function from env in follow orders:
+   * <ul>
+   * <li>arg value</li>
+   * <li>env</li>
+   * <li>current evaluator instance.</li>
+   * </ul>
+   * 
+   * @param arg
+   * @param env
+   * @param arity
+   * @return
+   */
   public static AviatorFunction getFunction(AviatorObject arg, Map<String, Object> env, int arity) {
     if (arg.getAviatorType() != AviatorType.JavaType) {
       throw new ExpressionRuntimeException(arg.desc(env) + " is not a function");
@@ -81,12 +111,32 @@ public class FunctionUtils {
       rt = (AviatorFunction) env.get(name);
     }
     if (rt == null) {
-      rt = AviatorEvaluator.getFunction(name);
+      AviatorEvaluatorInstance instance = getAviatorEvaluatorInstance(env);
+      rt = instance.getFunction(name);
     }
     return rt;
   }
 
 
+  /**
+   * Get the current evaluator instance,returns the global instance if not found.
+   * 
+   * @param env
+   * @return
+   */
+  public static AviatorEvaluatorInstance getAviatorEvaluatorInstance(Map<String, Object> env) {
+    AviatorEvaluatorInstance instance = BaseExpression.INSTANCE.get();
+    return instance != null ? instance : AviatorEvaluator.getInstance();
+  }
+
+
+  /**
+   * Get a number from env.
+   * 
+   * @param arg1 the var
+   * @param env
+   * @return
+   */
   public static final Number getNumberValue(AviatorObject arg1, Map<String, Object> env) {
     return (Number) arg1.getValue(env);
   }

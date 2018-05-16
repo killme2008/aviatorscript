@@ -22,6 +22,7 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Stack;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
@@ -47,12 +48,14 @@ public class ExpressionLexer {
   private final SymbolTable symbolTable;
   // Tokens buffer
   private final Stack<Token<?>> tokenBuffer = new Stack<Token<?>>();
+  private AviatorEvaluatorInstance instance;
 
 
-  public ExpressionLexer(String expression) {
+  public ExpressionLexer(AviatorEvaluatorInstance instance, String expression) {
     this.iterator = new StringCharacterIterator(expression);
     this.symbolTable = new SymbolTable();
     this.peek = this.iterator.current();
+    this.instance = instance;
   }
 
 
@@ -232,15 +235,15 @@ public class ExpressionLexer {
       Number value;
       if (isBigDecimal) {
         value = new BigDecimal(this.getBigNumberLexeme(sb),
-            (MathContext) AviatorEvaluator.getOption(Options.MATH_CONTEXT));
+            (MathContext) instance.getOption(Options.MATH_CONTEXT));
       } else if (isBigInt) {
         value = new BigInteger(this.getBigNumberLexeme(sb));
       } else if (hasDot) {
         boolean alwaysUseDecimalAsDouble =
-            AviatorEvaluator.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL);
+            instance.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL);
         if (alwaysUseDecimalAsDouble) {
-          value = new BigDecimal(sb.toString(),
-              (MathContext) AviatorEvaluator.getOption(Options.MATH_CONTEXT));
+          value =
+              new BigDecimal(sb.toString(), (MathContext) instance.getOption(Options.MATH_CONTEXT));
         } else {
           value = dval;
         }

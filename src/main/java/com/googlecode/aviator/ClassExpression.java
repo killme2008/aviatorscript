@@ -16,6 +16,7 @@
 package com.googlecode.aviator;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -30,9 +31,10 @@ import com.googlecode.aviator.runtime.op.OperationRuntime;
  */
 public abstract class ClassExpression extends BaseExpression {
 
-  public ClassExpression(List<String> varNames) {
-    super(varNames);
+  public ClassExpression(AviatorEvaluatorInstance instance, List<String> varNames) {
+    super(instance, varNames);
   }
+
 
 
   /*
@@ -43,18 +45,24 @@ public abstract class ClassExpression extends BaseExpression {
   @Override
   public Object execute(Map<String, Object> env) {
     if (env == null) {
-      env = Collections.emptyMap();
+      env = new HashMap<String, Object>();
     }
-
     if (OperationRuntime.isTracedEval()) {
       OperationRuntime.printTrace("Tracing: " + this.getExpression());
     }
     try {
-      return this.execute0(env);
+      INSTANCE.set(this.instance);
+      Object result = this.execute0(env);
+      if (OperationRuntime.isTracedEval()) {
+        OperationRuntime.printTrace("Result : " + result);
+      }
+      return result;
     } catch (ExpressionRuntimeException e) {
       throw e;
     } catch (Throwable e) {
       throw new ExpressionRuntimeException("Execute expression error", e);
+    } finally {
+      INSTANCE.remove();
     }
 
   }

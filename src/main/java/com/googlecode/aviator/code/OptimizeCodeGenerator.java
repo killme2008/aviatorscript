@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.LiteralExpression;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
@@ -35,6 +36,7 @@ import com.googlecode.aviator.lexer.token.PatternToken;
 import com.googlecode.aviator.lexer.token.StringToken;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
+import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -57,12 +59,14 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   private final List<Token<?>> tokenList = new ArrayList<Token<?>>();
 
   private boolean trace = false;
+  private AviatorEvaluatorInstance instance;
 
 
-  public OptimizeCodeGenerator(ClassLoader classLoader, OutputStream traceOutStream,
-      boolean trace) {
+  public OptimizeCodeGenerator(AviatorEvaluatorInstance instance, ClassLoader classLoader,
+      OutputStream traceOutStream, boolean trace) {
+    this.instance = instance;
     this.asmCodeGenerator =
-        new ASMCodeGenerator(AviatorEvaluator.getAviatorClassLoader(), traceOutStream, trace);
+        new ASMCodeGenerator(instance, (AviatorClassLoader) classLoader, traceOutStream, trace);
     this.trace = trace;
 
   }
@@ -342,11 +346,12 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     // Last token is a literal token,then return a LiteralExpression
     if (this.tokenList.size() <= 1) {
       if (this.tokenList.isEmpty()) {
-        return new LiteralExpression(null, new ArrayList<String>(variables.keySet()));
+        return new LiteralExpression(instance, null, new ArrayList<String>(variables.keySet()));
       }
       final Token<?> lastToken = this.tokenList.get(0);
       if (this.isLiteralToken(lastToken)) {
-        return new LiteralExpression(this.getAviatorObjectFromToken(lastToken).getValue(null),
+        return new LiteralExpression(instance,
+            this.getAviatorObjectFromToken(lastToken).getValue(null),
             new ArrayList<String>(variables.keySet()));
       }
     }

@@ -52,6 +52,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.asm.ClassWriter;
 import com.googlecode.aviator.asm.Label;
@@ -76,6 +77,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class ASMCodeGenerator implements CodeGenerator {
   private static final String FIELD_PREFIX = "var_";
+  private AviatorEvaluatorInstance instance;
   // Class Writer to generate class
   // private final ClassWriter clazzWriter;
   // Trace visitor
@@ -125,8 +127,10 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
-  public ASMCodeGenerator(AviatorClassLoader classLoader, OutputStream traceOut, boolean trace) {
+  public ASMCodeGenerator(AviatorEvaluatorInstance instance, AviatorClassLoader classLoader,
+      OutputStream traceOut, boolean trace) {
     this.classLoader = classLoader;
+    this.instance = instance;
     // Generate inner class name
     this.className = "Script_" + System.currentTimeMillis() + "_" + CLASS_COUNTER.getAndIncrement();
     // Auto compute frames
@@ -189,13 +193,14 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   private void makeConstructor() {
     {
-      this.mv =
-          this.classWriter.visitMethod(ACC_PUBLIC, "<init>", "(Ljava/util/List;)V", null, null);
+      this.mv = this.classWriter.visitMethod(ACC_PUBLIC, "<init>",
+          "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;)V", null, null);
       this.mv.visitCode();
       this.mv.visitVarInsn(ALOAD, 0);
       this.mv.visitVarInsn(ALOAD, 1);
+      this.mv.visitVarInsn(ALOAD, 2);
       this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/ClassExpression", "<init>",
-          "(Ljava/util/List;)V");
+          "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;)V");
       if (!this.innerVarMap.isEmpty()) {
         for (Map.Entry<String, String> entry : this.innerVarMap.entrySet()) {
           String outterName = entry.getKey();
@@ -233,7 +238,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 
   private void visitClass() {
-    this.classWriter.visit(AviatorEvaluator.BYTECODE_VER, ACC_PUBLIC + ACC_SUPER, this.className,
+    this.classWriter.visit(instance.getBytecodeVersion(), ACC_PUBLIC + ACC_SUPER, this.className,
         null, "com/googlecode/aviator/ClassExpression", null);
   }
 
@@ -667,8 +672,10 @@ public class ASMCodeGenerator implements CodeGenerator {
     byte[] bytes = this.classWriter.toByteArray();
     try {
       Class<?> defineClass = ClassDefiner.defineClass(this.className, bytes, this.classLoader);
-      Constructor<?> constructor = defineClass.getConstructor(List.class);
-      return (Expression) constructor.newInstance(new ArrayList<String>(this.varTokens.keySet()));
+      Constructor<?> constructor =
+          defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class);
+      return (Expression) constructor.newInstance(this.instance,
+          new ArrayList<String>(this.varTokens.keySet()));
     } catch (Exception e) {
       throw new CompileExpressionErrorException("define class error", e);
     }

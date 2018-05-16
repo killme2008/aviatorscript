@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class CustomFunctionLoader {
@@ -34,10 +36,11 @@ public class CustomFunctionLoader {
    * 
    * @return
    */
-  public static void load() {
+  public static List<AviatorFunction> load() {
     InputStream in = null;
     InputStreamReader inreader = null;
     BufferedReader reader = null;
+    List<AviatorFunction> ret = new ArrayList<>();
     try {
       in = CustomFunctionLoader.class.getClassLoader()
           .getResourceAsStream(CUSTOM_FUNCTION_LIST_FILE);
@@ -52,7 +55,10 @@ public class CustomFunctionLoader {
             continue;
           }
           if (line.length() > 0) {
-            loadClass(line);
+            AviatorFunction func = loadClass(line);
+            if (func != null) {
+              ret.add(func);
+            }
           }
         }
       }
@@ -67,22 +73,25 @@ public class CustomFunctionLoader {
         info("Total " + tatalCustomFunctions + " custom functions loaded.");
       }
     }
+    return ret;
   }
 
 
-  public static void loadClass(String className) {
+  public static AviatorFunction loadClass(String className) {
     info("Loading custom aviator function class: '" + className + "'.");
     try {
+      @SuppressWarnings("unchecked")
       Class<AviatorFunction> clazz = (Class<AviatorFunction>) Class.forName(className);
       AviatorFunction func = clazz.newInstance();
       if (func != null) {
-        AviatorEvaluator.addFunction(func);
         tatalCustomFunctions++;
       }
+      return func;
     } catch (Throwable e) {
       error("Load custom aviator function class: " + className + "' failed with error:"
           + e.getMessage() + ".");
     }
+    return null;
   }
 
 

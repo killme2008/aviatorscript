@@ -3,6 +3,7 @@ package com.googlecode.aviator.runtime.function;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;

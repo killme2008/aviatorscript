@@ -31,8 +31,9 @@ public class LiteralExpression extends BaseExpression {
   private final Object result;
 
 
-  public LiteralExpression(Object result, List<String> varNames) {
-    super(varNames);
+  public LiteralExpression(AviatorEvaluatorInstance instance, Object result,
+      List<String> varNames) {
+    super(instance, varNames);
     this.result = result;
   }
 
@@ -42,6 +43,7 @@ public class LiteralExpression extends BaseExpression {
     if (OperationRuntime.isTracedEval()) {
       OperationRuntime.printTrace("Tracing: " + this.getExpression());
     }
+    OperationRuntime.printTrace("Result : " + this.getExpression());
     return this.result;
   }
 

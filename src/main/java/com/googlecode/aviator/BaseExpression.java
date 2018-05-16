@@ -1,8 +1,10 @@
 package com.googlecode.aviator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -16,11 +18,14 @@ public abstract class BaseExpression implements Expression {
   private List<String> varNames;
   private List<String> varFullNames;
   private String expression;
+  protected AviatorEvaluatorInstance instance;
+  public static final ThreadLocal<AviatorEvaluatorInstance> INSTANCE =
+      new ThreadLocal<AviatorEvaluatorInstance>();
 
-
-  public BaseExpression(List<String> varNames) {
+  public BaseExpression(AviatorEvaluatorInstance instance, List<String> varNames) {
     super();
     this.varFullNames = varNames;
+    this.instance = instance;
     LinkedHashSet<String> tmp = new LinkedHashSet<String>(varNames.size());
     // process nested names
     for (String name : varNames) {
