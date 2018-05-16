@@ -51,7 +51,9 @@ public abstract class ClassExpression extends BaseExpression {
       OperationRuntime.printTrace("Tracing: " + this.getExpression());
     }
     try {
-      INSTANCE.set(this.instance);
+      if (this.instance != AviatorEvaluator.getInstance()) {
+        INSTANCE.set(this.instance);
+      }
       Object result = this.execute0(env);
       if (OperationRuntime.isTracedEval()) {
         OperationRuntime.printTrace("Result : " + result);
@@ -62,7 +64,9 @@ public abstract class ClassExpression extends BaseExpression {
     } catch (Throwable e) {
       throw new ExpressionRuntimeException("Execute expression error", e);
     } finally {
-      INSTANCE.remove();
+      if (this.instance != AviatorEvaluator.getInstance()) {
+        INSTANCE.remove();
+      }
     }
 
   }
