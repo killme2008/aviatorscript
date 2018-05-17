@@ -21,7 +21,6 @@ import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import org.apache.commons.beanutils.PropertyUtils;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
@@ -32,54 +31,56 @@ import java.util.Map;
  * @author dennis
  */
 public class SeqPredicateFunction extends AbstractFunction {
-    private final String name;
-    private final OperatorType opType;
-    private final AviatorObject value;
-    private final AviatorObject propertyName;
+  private final String name;
+  private final OperatorType opType;
+  private final AviatorObject value;
+  private final AviatorObject propertyName;
 
-    public SeqPredicateFunction(String name, OperatorType opType, AviatorObject value) {
-        this(name, opType, value, null);
+  public SeqPredicateFunction(String name, OperatorType opType, AviatorObject value) {
+    this(name, opType, value, null);
+  }
+
+  public SeqPredicateFunction(String name, OperatorType opType, AviatorObject value,
+      AviatorObject propertyName) {
+    this.name = name;
+    this.opType = opType;
+    this.value = value;
+    this.propertyName = propertyName;
+  }
+
+  @Override
+  public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+    if (propertyName != null) {
+      try {
+        Object property = PropertyUtils.getNestedProperty(arg1.getValue(env),
+            (String) propertyName.getValue(env));
+        arg1 = new AviatorRuntimeJavaType(property);
+      } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        throw new IllegalArgumentException(
+            arg1.desc(env) + " map propertyName(" + propertyName + ")fail.");
+      }
     }
-
-    public SeqPredicateFunction(String name, OperatorType opType, AviatorObject value, AviatorObject propertyName) {
-        this.name = name;
-        this.opType = opType;
-        this.value = value;
-        this.propertyName = propertyName;
+    switch (this.opType) {
+      case EQ:
+        return arg1.compare(this.value, env) == 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+      case NEQ:
+        return arg1.compare(this.value, env) != 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+      case LT:
+        return arg1.compare(this.value, env) < 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+      case LE:
+        return arg1.compare(this.value, env) <= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+      case GE:
+        return arg1.compare(this.value, env) >= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+      case GT:
+        return arg1.compare(this.value, env) > 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+      default:
+        throw new ExpressionRuntimeException(this.getName() + " is not a relation operator");
     }
-
-    @Override
-    public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
-        if (propertyName != null) {
-            try {
-                Object property = PropertyUtils.getNestedProperty(arg1.getValue(env),
-                        (String) propertyName.getValue(env));
-                arg1 = new AviatorRuntimeJavaType(property);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new IllegalArgumentException(arg1.desc(env) + " map propertyName(" + propertyName + ")fail.");
-            }
-        }
-        switch (this.opType) {
-            case EQ:
-                return arg1.compare(this.value, env) == 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
-            case NEQ:
-                return arg1.compare(this.value, env) != 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
-            case LT:
-                return arg1.compare(this.value, env) < 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
-            case LE:
-                return arg1.compare(this.value, env) <= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
-            case GE:
-                return arg1.compare(this.value, env) >= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
-            case GT:
-                return arg1.compare(this.value, env) > 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
-            default:
-                throw new ExpressionRuntimeException(this.getName() + " is not a relation operator");
-        }
-    }
+  }
 
 
-    public String getName() {
-        return this.name;
-    }
+  public String getName() {
+    return this.name;
+  }
 
 }
