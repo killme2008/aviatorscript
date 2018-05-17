@@ -15,13 +15,11 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.util.Map;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
-import com.googlecode.aviator.runtime.type.AviatorFunction;
-import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import java.util.Map;
 
 
 /**
@@ -60,6 +58,10 @@ public class SeqMakePredicateFunFunction extends AbstractFunction {
     return new AviatorRuntimeJavaType(new SeqPredicateFunction(this.name, this.opType, arg1));
   }
 
+  @Override
+  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+    return new AviatorRuntimeJavaType(new SeqPredicateFunction(this.name, this.opType, arg1, arg2));
+  }
 
   public String getName() {
     return this.name;

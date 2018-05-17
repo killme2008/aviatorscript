@@ -1,11 +1,15 @@
 package com.googlecode.aviator.runtime.function.seq;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.runtime.type.AviatorString;
+import org.junit.Test;
+import java.util.HashMap;
+import java.util.Map;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class SeqPredicateFunctionUnitTest {
@@ -109,5 +113,17 @@ public class SeqPredicateFunctionUnitTest {
     SeqPredicateFunction fun =
         new SeqPredicateFunction("and", OperatorType.AND, new AviatorRuntimeJavaType("hello"));
     AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"));
+  }
+
+  @Test
+  public void testPredicate_property() {
+    Map<String, String> data = new HashMap<>();
+    for (int i = 0; i < 5; i++) {
+      data.put("key" + i, "value" + i);
+    }
+    SeqPredicateFunction predicate = new SeqPredicateFunction("eq_temp_1", OperatorType.EQ,
+        new AviatorString("value1"), new AviatorString("key1"));
+    AviatorObject result = predicate.call(null, new AviatorRuntimeJavaType(data));
+    assertTrue(result.booleanValue(null));
   }
 }

@@ -1,40 +1,28 @@
 /**
  * Copyright (C) 2010 dennis zhuang (killme2008@gmail.com)
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
  * 2.1 of the License, or (at your option) any later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License along with this program;
  * if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
  **/
 package com.googlecode.aviator.test.function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import org.junit.Test;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
+import static org.junit.Assert.*;
 
 
 public class FunctionTest {
@@ -702,5 +690,84 @@ public class FunctionTest {
     assertTrue((Boolean) AviatorEvaluator
         .execute("'A' == 'A' || 'B' == 'B' && 'ABCD' == t &&  'A' == 'A'"));
 
+  }
+
+  @Test
+  public void testSeqFilterListWithProperty() {
+    List<User> users = new ArrayList<>(3);
+    users.add(new User(1L, 25, "张三"));
+    users.add(new User(2L, 26, "李四"));
+    users.add(new User(3L, 27, "王五"));
+    Map<String, Object> env = new HashMap<>();
+    env.put("data", users);
+    Object result =
+        AviatorEvaluator.execute("filter(data,seq.and(seq.gt(25,'age'),seq.eq('李四','name')))", env);
+    List list = (List) result;
+    assertEquals(1, list.size());
+    for (Object o : list) {
+      User user = (User) o;
+      assertEquals("李四", user.getName());
+      assertTrue(user.getAge() > 25);
+    }
+  }
+
+  @Test
+  public void testSeqFilterMapWithProperty() {
+    Map<Long, User> idUserMap = new HashMap<>(3);
+    idUserMap.put(1L, new User(1L, 25, "张三"));
+    idUserMap.put(2L, new User(2L, 26, "李四"));
+    idUserMap.put(3L, new User(3L, 27, "王五"));
+    Map<String, Object> env = new HashMap<>();
+    env.put("data", idUserMap);
+    Object result = AviatorEvaluator
+        .execute("filter(data,seq.and(seq.gt(25,'value.age'),seq.eq('李四','value.name')))", env);
+    Map map = (Map) result;
+    assertEquals(1, map.size());
+    for (Object o : map.values()) {
+      User user = (User) o;
+      assertEquals("李四", user.getName());
+      assertTrue(user.getAge() > 25);
+    }
+  }
+
+  public static class User {
+    private Long id;
+    private Integer age;
+    private String name;
+
+    public User(Long id, Integer age, String name) {
+      this.id = id;
+      this.age = age;
+      this.name = name;
+    }
+
+    public Long getId() {
+      return id;
+    }
+
+    public void setId(Long id) {
+      this.id = id;
+    }
+
+    public Integer getAge() {
+      return age;
+    }
+
+    public void setAge(Integer age) {
+      this.age = age;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public String toString() {
+      return "User{" + "id=" + id + ", age=" + age + ", name='" + name + '\'' + '}';
+    }
   }
 }

@@ -16,10 +16,7 @@
 package com.googlecode.aviator.runtime.function.seq;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
@@ -62,6 +59,21 @@ public class SeqFilterFunction extends AbstractFunction {
       for (Object obj : (Collection<?>) first) {
         if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
           result.add(obj);
+        }
+      }
+      return new AviatorRuntimeJavaType(result);
+    } else if (Map.class.isAssignableFrom(clazz)) {
+      Map<Object, Object> result;
+      try {
+        result = (Map<Object, Object>) clazz.newInstance();
+      } catch (Throwable t) {
+        // ignore
+        result = new HashMap<>();
+      }
+      Map<?, ?> map = (Map<?, ?>) first;
+      for (Map.Entry<?, ?> entry : map.entrySet()) {
+        if (fun.call(env, new AviatorRuntimeJavaType(entry)).booleanValue(env)) {
+          result.put(entry.getKey(), entry.getValue());
         }
       }
       return new AviatorRuntimeJavaType(result);
