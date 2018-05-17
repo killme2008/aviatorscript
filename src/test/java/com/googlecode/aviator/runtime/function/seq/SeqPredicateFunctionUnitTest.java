@@ -6,10 +6,8 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorString;
 import org.junit.Test;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -118,15 +116,13 @@ public class SeqPredicateFunctionUnitTest {
   }
 
   @Test
-  public void testPredicate_property(){
+  public void testPredicate_property() {
     Map<String, String> data = new HashMap<>();
     for (int i = 0; i < 5; i++) {
       data.put("key" + i, "value" + i);
     }
-    SeqPredicateFunction predicate =
-            new SeqPredicateFunction("eq_temp_1", OperatorType.EQ
-                    , new AviatorString("value1")
-                    , new AviatorString("key1"));
+    SeqPredicateFunction predicate = new SeqPredicateFunction("eq_temp_1", OperatorType.EQ,
+        new AviatorString("value1"), new AviatorString("key1"));
     AviatorObject result = predicate.call(null, new AviatorRuntimeJavaType(data));
     assertTrue(result.booleanValue(null));
   }

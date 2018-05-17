@@ -17,7 +17,6 @@ package com.googlecode.aviator.runtime.function.seq;
 
 import java.lang.reflect.Array;
 import java.util.*;
-
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
@@ -63,21 +62,21 @@ public class SeqFilterFunction extends AbstractFunction {
         }
       }
       return new AviatorRuntimeJavaType(result);
-    } else if(Map.class.isAssignableFrom(clazz)){
-        Map<Object, Object> result;
-        try {
-            result = (Map<Object, Object>) clazz.newInstance();
-        } catch (Throwable t) {
-            // ignore
-            result = new HashMap<>();
+    } else if (Map.class.isAssignableFrom(clazz)) {
+      Map<Object, Object> result;
+      try {
+        result = (Map<Object, Object>) clazz.newInstance();
+      } catch (Throwable t) {
+        // ignore
+        result = new HashMap<>();
+      }
+      Map<?, ?> map = (Map<?, ?>) first;
+      for (Map.Entry<?, ?> entry : map.entrySet()) {
+        if (fun.call(env, new AviatorRuntimeJavaType(entry)).booleanValue(env)) {
+          result.put(entry.getKey(), entry.getValue());
         }
-        Map<?, ?> map = (Map<?, ?>) first;
-        for (Map.Entry<?, ?> entry : map.entrySet()) {
-            if (fun.call(env, new AviatorRuntimeJavaType(entry)).booleanValue(env)) {
-                result.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return new AviatorRuntimeJavaType(result);
+      }
+      return new AviatorRuntimeJavaType(result);
     } else if (clazz.isArray()) {
       // Object[] seq = (Object[]) first;
       List<Object> result = new ArrayList<Object>();
