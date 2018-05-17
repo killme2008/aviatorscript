@@ -51,13 +51,14 @@ public class SeqPredicateFunction extends AbstractFunction {
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     if (propertyName != null) {
+      String propertyNameStr = propertyName.stringValue(env);
+      Object target = arg1.getValue(env);
       try {
-        Object property = PropertyUtils.getNestedProperty(arg1.getValue(env),
-            (String) propertyName.getValue(env));
+        Object property = PropertyUtils.getNestedProperty(target, propertyNameStr);
         arg1 = new AviatorRuntimeJavaType(property);
       } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
         throw new IllegalArgumentException(
-            arg1.desc(env) + " map propertyName(" + propertyName + ")fail.");
+            "Fail to get property <" + propertyNameStr + "> from <" + arg1.desc(env) + ">", e);
       }
     }
     switch (this.opType) {
