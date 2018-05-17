@@ -22,14 +22,18 @@ import com.googlecode.aviator.lexer.token.Token;
 
 /**
  * Fake CodeGenerator,transform infix expression to postfix expression
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class FakeCodeGenerator implements CodeGenerator {
   private StringBuffer sb = new StringBuffer();
 
   private boolean wasFirst = true;
+
+
+  @Override
+  public void setParser(ExpressionParser parser) {}
 
 
   public void reset() {
@@ -38,6 +42,7 @@ public class FakeCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
   public Expression getResult() {
     return null;
   }
@@ -48,6 +53,7 @@ public class FakeCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
   public void onAdd(Token<?> lookhead) {
     this.appendToken("+");
   }
@@ -63,192 +69,248 @@ public class FakeCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
   public void onAndLeft(Token<?> lookhead) {
 
   }
 
 
+  @Override
   public void onAndRight(Token<?> lookhead) {
     this.appendToken("&&");
 
   }
 
 
+  @Override
   public void onJoinRight(Token<?> lookhead) {
     this.appendToken("||");
   }
 
 
+  @Override
   public void onTernaryBoolean(Token<?> lookhead) {
 
   }
 
 
+  @Override
   public void onTernaryLeft(Token<?> lookhead) {
 
   }
 
 
+  @Override
   public void onTernaryRight(Token<?> lookhead) {
     this.appendToken("?:");
   }
 
 
+  @Override
   public void onConstant(Token<?> lookhead) {
     this.appendToken(lookhead.getLexeme());
   }
 
 
+  @Override
   public void onDiv(Token<?> lookhead) {
     this.appendToken("/");
 
   }
 
 
+  @Override
   public void onEq(Token<?> lookhead) {
     this.appendToken("==");
 
   }
 
 
+  @Override
   public void onGe(Token<?> lookhead) {
     this.appendToken(">=");
 
   }
 
 
+  @Override
   public void onGt(Token<?> lookhead) {
     this.appendToken(">");
 
   }
 
 
+  @Override
   public void onJoinLeft(Token<?> lookhead) {
 
   }
 
 
+  @Override
   public void onLe(Token<?> lookhead) {
     this.appendToken("<=");
 
   }
 
 
+  @Override
   public void onLt(Token<?> lookhead) {
     this.appendToken("<");
 
   }
 
 
+  @Override
   public void onMatch(Token<?> lookhead) {
     this.appendToken("=~");
 
   }
 
 
+  @Override
   public void onMod(Token<?> lookhead) {
     this.appendToken("%");
 
   }
 
 
+  @Override
   public void onMult(Token<?> lookhead) {
     this.appendToken("*");
 
   }
 
 
+  @Override
   public void onNeg(Token<?> lookhead) {
     this.appendToken("-");
 
   }
 
 
+  @Override
   public void onNeq(Token<?> lookhead) {
     this.appendToken("!=");
 
   }
 
 
+  @Override
   public void onNot(Token<?> lookhead) {
     this.appendToken("!");
 
   }
 
 
+  @Override
   public void onSub(Token<?> lookhead) {
     this.appendToken("-");
   }
 
 
+  @Override
   public void onMethodInvoke(Token<?> lookhead) {
     this.appendToken("method<invoked>");
 
   }
 
 
+  @Override
   public void onMethodName(Token<?> lookhead) {
 
   }
 
 
+  @Override
   public void onMethodParameter(Token<?> lookhead) {
 
   }
 
 
+  @Override
   public void onArray(Token<?> lookhead) {
     this.appendToken(lookhead.getLexeme());
   }
 
 
+  @Override
   public void onArrayIndexStart(Token<?> token) {
 
   }
 
 
+  @Override
   public void onArrayIndexEnd(Token<?> lookhead) {
     this.appendToken("[]");
 
   }
 
 
+  @Override
   public void onBitAnd(Token<?> lookhead) {
     this.appendToken("&");
 
   }
 
 
+  @Override
   public void onBitNot(Token<?> lookhead) {
     this.appendToken("~");
 
   }
 
 
+  @Override
   public void onBitOr(Token<?> lookhead) {
     this.appendToken("|");
 
   }
 
 
+  @Override
   public void onBitXor(Token<?> lookhead) {
     this.appendToken("^");
 
   }
 
 
+  @Override
   public void onShiftLeft(Token<?> lookhead) {
     this.appendToken("<<");
 
   }
 
 
+  @Override
+  public void onLambdaDefineStart(Token<?> lookhead) {
+
+  }
+
+
+  @Override
+  public void onLambdaBodyStart(Token<?> lookhead) {
+
+  }
+
+
+  @Override
+  public void onLambdaArgument(Token<?> lookhead) {}
+
+
+  @Override
+  public void onLambdaBodyEnd(Token<?> lookhead) {
+    this.appendToken("lambda<defined>");
+  }
+
+
+  @Override
   public void onShiftRight(Token<?> lookhead) {
     this.appendToken(">>");
 
   }
 
 
+  @Override
   public void onUnsignedShiftRight(Token<?> lookhead) {
     this.appendToken(">>>");
 

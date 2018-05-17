@@ -17,15 +17,18 @@ package com.googlecode.aviator.code;
 
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.lexer.token.Token;
+import com.googlecode.aviator.parser.ExpressionParser;
 
 
 /**
  * Code generator interface
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public interface CodeGenerator {
+
+  public void setParser(ExpressionParser parser);
 
   public void onShiftRight(Token<?> lookhead);
 
@@ -110,27 +113,27 @@ public interface CodeGenerator {
 
   public void onNeg(Token<?> lookhead);
 
-
   public Expression getResult();
-
 
   public void onConstant(Token<?> lookhead);
 
-
   public void onMethodName(Token<?> lookhead);
-
 
   public void onMethodParameter(Token<?> lookhead);
 
-
   public void onMethodInvoke(Token<?> lookhead);
 
+  public void onLambdaDefineStart(Token<?> lookhead);
+
+  public void onLambdaArgument(Token<?> lookhead);
+
+  public void onLambdaBodyStart(Token<?> lookhead);
+
+  public void onLambdaBodyEnd(Token<?> lookhead);
 
   public void onArray(Token<?> lookhead);
 
-
   public void onArrayIndexStart(Token<?> token);
-
 
   public void onArrayIndexEnd(Token<?> lookhead);
 

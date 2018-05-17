@@ -15,7 +15,7 @@ public class DelegateToken extends AbstractToken<Token<?>> {
   private final DelegateTokenType delegateTokenType;
 
   public static enum DelegateTokenType {
-    And_Left, Join_Left, Ternary_Boolean, Ternary_Left, Array, Index_Start, Method_Name, Method_Param
+    And_Left, Join_Left, Ternary_Boolean, Ternary_Left, Array, Index_Start, Method_Name, Method_Param, Lambda_Define, Lambda_Argument, Lambda_Body_Start, Lambda_Body_End
   }
 
 

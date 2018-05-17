@@ -51,20 +51,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.ClassExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.asm.ClassWriter;
 import com.googlecode.aviator.asm.Label;
 import com.googlecode.aviator.asm.MethodVisitor;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.code.LambdaGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
+import com.googlecode.aviator.parser.ExpressionParser;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.utils.TypeUtils;
 
@@ -76,7 +79,9 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public class ASMCodeGenerator implements CodeGenerator {
-  private static final String FIELD_PREFIX = "var_";
+
+  private static final String FIELD_PREFIX = "f";
+  // evaluator instance
   private AviatorEvaluatorInstance instance;
   // Class Writer to generate class
   // private final ClassWriter clazzWriter;
@@ -90,6 +95,10 @@ public class ASMCodeGenerator implements CodeGenerator {
   private final String className;
   // Class loader to define generated class
   private final AviatorClassLoader classLoader;
+  // lambda function generator
+  private LambdaGenerator lambdaGenerator;
+  // parser
+  private ExpressionParser parser;
 
   private static final AtomicLong CLASS_COUNTER = new AtomicLong();
 
@@ -115,9 +124,17 @@ public class ASMCodeGenerator implements CodeGenerator {
   private final Map<Label, Map<String/* inner name */, Integer/* local index */>> labelNameIndexMap =
       new HashMap<Label, Map<String, Integer>>();
 
+  private Map<String, LambdaFunction> lambdas;
+
   private static final Label START_LABEL = new Label();
 
   private Label currentLabel = START_LABEL;
+
+
+  @Override
+  public void setParser(ExpressionParser parser) {
+    this.parser = parser;
+  }
 
 
   private void setMaxStacks(int newMaxStacks) {
@@ -674,8 +691,10 @@ public class ASMCodeGenerator implements CodeGenerator {
       Class<?> defineClass = ClassDefiner.defineClass(this.className, bytes, this.classLoader);
       Constructor<?> constructor =
           defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class);
-      return (Expression) constructor.newInstance(this.instance,
+      ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
           new ArrayList<String>(this.varTokens.keySet()));
+      exp.setLambdas(this.lambdas);
+      return exp;
     } catch (Exception e) {
       throw new CompileExpressionErrorException("define class error", e);
     }
@@ -1006,6 +1025,46 @@ public class ASMCodeGenerator implements CodeGenerator {
     return this.maxLocals++;
   }
 
+
+
+  @Override
+  public void onLambdaDefineStart(Token<?> lookhead) {
+    if (this.lambdaGenerator == null) {
+      // TODO cache?
+      this.lambdaGenerator = new LambdaGenerator(instance, this, false);
+    } else {
+      throw new CompileExpressionErrorException("Nested lambda");
+    }
+  }
+
+  @Override
+  public void onLambdaArgument(Token<?> lookhead) {
+    this.lambdaGenerator.addParameter(lookhead.getLexeme());
+  }
+
+  @Override
+  public void onLambdaBodyStart(Token<?> lookhead) {
+    this.parser.setCodeGenerator(this.lambdaGenerator);
+  }
+
+  @Override
+  public void onLambdaBodyEnd(Token<?> lookhead) {
+    this.lambdaGenerator.compileCallMethod();
+    LambdaFunction func = this.lambdaGenerator.getFunction();
+    if (this.lambdas == null) {
+      lambdas = new HashMap<String, LambdaFunction>();
+    }
+    this.lambdas.put(func.getName(), func);
+    this.mv.visitVarInsn(ALOAD, 0);
+    this.mv.visitLdcInsn(func.getName());
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, this.className, "getLambda",
+        "(Ljava/lang/String;)Lcom/googlecode/aviator/runtime/function/LambdaFunction;");
+    this.pushOperand();
+    this.pushOperand();
+    this.popOperand();
+    this.lambdaGenerator = null;
+    this.parser.setCodeGenerator(this);
+  }
 
   @Override
   public void onMethodName(Token<?> lookhead) {

@@ -45,6 +45,14 @@ public class ExpressionParserUnitTest {
     this.parser.parse();
   }
 
+  @Test
+  public void testLambda() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "fn(x,y)-> x+y end"), this.codeGenerator);
+    this.parser.parse();
+    assertEquals("x y + lambda<defined>", this.codeGenerator.getPostFixExpression());
+  }
+
 
   @Test(expected = ExpressionSyntaxErrorException.class)
   public void testIllegalIdentifier2() {

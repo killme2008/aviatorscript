@@ -17,7 +17,6 @@ package com.googlecode.aviator.parser;
 
 import java.util.HashSet;
 import java.util.Set;
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.code.CodeGenerator;
@@ -26,15 +25,15 @@ import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.PatternToken;
 import com.googlecode.aviator.lexer.token.Token;
-import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
+import com.googlecode.aviator.lexer.token.Variable;
 
 
 /**
  * Syntex parser for expression
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class ExpressionParser {
   private final ExpressionLexer lexer;
@@ -52,16 +51,23 @@ public class ExpressionParser {
 
   private Token<?> prevToken;
 
-  private final CodeGenerator codeGenerator;
+  private CodeGenerator codeGenerator;
 
   // Paren depth
   private int parenDepth = 0;
 
   private int bracketDepth = 0;
 
+  private int lambdaDepth = 0;
+
   private boolean inPattern = false;
 
   private AviatorEvaluatorInstance instance;
+
+
+  public void setCodeGenerator(CodeGenerator codeGenerator) {
+    this.codeGenerator = codeGenerator;
+  }
 
 
   public ExpressionParser(AviatorEvaluatorInstance instance, ExpressionLexer lexer,
@@ -74,6 +80,7 @@ public class ExpressionParser {
       throw new ExpressionSyntaxErrorException("Blank expression");
     }
     this.codeGenerator = codeGenerator;
+    this.codeGenerator.setParser(this);
   }
 
 
@@ -94,25 +101,6 @@ public class ExpressionParser {
       } else {
         this.reportSyntaxError("expect ':'");
       }
-    } else {
-      if (this.expectLexeme(")")) {
-        if (this.parenDepth > 0) {
-          return;
-        } else {
-          this.reportSyntaxError("Insert '(' to complete Expression");
-        }
-      }
-      if (this.expectLexeme("]")) {
-        if (this.bracketDepth > 0) {
-          return;
-        } else {
-          this.reportSyntaxError("Insert '[' to complete Expression");
-        }
-      }
-      if (!this.expectLexeme("(") && !this.expectLexeme("[")) {
-        this.reportSyntaxError("illegal expression");
-      }
-
     }
   }
 
@@ -470,10 +458,14 @@ public class ExpressionParser {
       // function
       Token<?> prev = this.prevToken;
       if (prev.getType() == TokenType.Variable && this.expectLexeme("(")) {
-        this.method();
-        // method.invoke()[index]
-        if (expectLexeme("[")) {
-          arrayAccess();
+        if (prev.getLexeme().equals("fn")) {
+          this.lambda();
+        } else {
+          this.method();
+          // method.invoke()[index]
+          if (expectLexeme("[")) {
+            arrayAccess();
+          }
         }
       } else if (prev.getType() == TokenType.Variable || prev.getLexeme().equals(")")) {
         // var[index]
@@ -487,6 +479,60 @@ public class ExpressionParser {
       this.reportSyntaxError("invalid value");
     }
 
+  }
+
+  private void lambda() {
+    this.parenDepth++;
+    this.codeGenerator.onLambdaDefineStart(this.prevToken);
+    this.lambdaDepth++;
+    this.move(true);
+    if (!this.expectLexeme(")")) {
+      lambdaArgument();
+
+      while (this.expectLexeme(",")) {
+        this.move(true);
+        lambdaArgument();
+      }
+    }
+    if (!this.expectLexeme(")")) {
+      this.reportSyntaxError("insert ')' to complete expression");
+    } else {
+      this.parenDepth--;
+      this.move(true);
+      if (this.expectLexeme("-")) {
+        this.move(true);
+        if (this.expectLexeme(">")) {
+          this.codeGenerator.onLambdaBodyStart(lookhead);
+          this.move(true);
+          this.ternary();
+          if (this.lookhead.getType() == TokenType.Variable
+              && this.lookhead.getLexeme().equals("end")) {
+            this.codeGenerator.onLambdaBodyEnd(lookhead);
+            this.lambdaDepth--;
+            this.move(true);
+          } else {
+            reportSyntaxError("Expect lambda end, but is:" + this.lookhead.getLexeme());
+          }
+        } else {
+          reportSyntaxError("Expect lambda body, but is:" + this.lookhead.getLexeme());
+        }
+      }
+    }
+  }
+
+
+  private void lambdaArgument() {
+    if (this.lookhead.getType() == TokenType.Variable) {
+      if (!isJavaIdentifier(this.lookhead.getLexeme())) {
+        this.reportSyntaxError("Illegal argument name: " + this.lookhead.getLexeme() + ",index="
+            + this.lookhead.getStartIndex());
+      }
+      this.codeGenerator.onLambdaArgument(this.lookhead);
+      this.move(true);
+    } else {
+      this.reportSyntaxError("Expect argument name,but is: " + this.lookhead.getLexeme() + ",index="
+          + this.lookhead.getStartIndex());
+    }
   }
 
 
@@ -504,8 +550,9 @@ public class ExpressionParser {
       this.codeGenerator.onArrayIndexStart(this.prevToken);
       array();
     }
-    if (!hasArray)
+    if (!hasArray) {
       this.codeGenerator.onConstant(this.prevToken);
+    }
   }
 
 
@@ -565,7 +612,7 @@ public class ExpressionParser {
 
   /**
    * Test whether a given string is a valid Java identifier.
-   * 
+   *
    * @param id string which should be checked
    * @return <code>true</code> if a valid identifier
    */
@@ -652,6 +699,9 @@ public class ExpressionParser {
     }
     if (this.bracketDepth > 0) {
       this.reportSyntaxError("insert ']' to complete Expression");
+    }
+    if (this.lambdaDepth > 0) {
+      this.reportSyntaxError("insert 'end' to complete lambda Expression");
     }
     if (this.lookhead != null) {
       // The lookhead should be null, it's the end.

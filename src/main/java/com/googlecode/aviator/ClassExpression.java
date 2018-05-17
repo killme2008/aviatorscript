@@ -15,12 +15,12 @@
  **/
 package com.googlecode.aviator;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
 
 
 /**
@@ -31,11 +31,24 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
  */
 public abstract class ClassExpression extends BaseExpression {
 
+  protected Map<String, LambdaFunction> lambdas;
+
+
+  public void setLambdas(Map<String, LambdaFunction> lambdas) {
+    this.lambdas = lambdas;
+  }
+
   public ClassExpression(AviatorEvaluatorInstance instance, List<String> varNames) {
     super(instance, varNames);
   }
 
-
+  public LambdaFunction getLambda(String name) {
+    LambdaFunction ret = this.lambdas.get(name);
+    if (ret == null) {
+      throw new ExpressionRuntimeException("Lambda " + name + " not found");
+    }
+    return ret;
+  }
 
   /*
    * (non-Javadoc)

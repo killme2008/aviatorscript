@@ -553,7 +553,7 @@ public final class AviatorEvaluatorInstance {
   }
 
 
-  private CodeGenerator newCodeGenerator(boolean cached) {
+  public CodeGenerator newCodeGenerator(boolean cached) {
     switch (getOptimizeLevel()) {
       case AviatorEvaluator.COMPILE:
         ASMCodeGenerator asmCodeGenerator = new ASMCodeGenerator(this,

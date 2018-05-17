@@ -3,61 +3,86 @@ package com.googlecode.aviator.runtime.function;
 import java.util.Map;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorType;
 
 
 /**
  * Abstract function implementation
- * 
+ *
  * @author boyan
  * @Date 2011-7-12
- * 
+ *
  */
-public abstract class AbstractFunction implements AviatorFunction {
+public abstract class AbstractFunction extends AviatorObject implements AviatorFunction {
   public AviatorObject throwArity(int n) {
     String name = this.getName();
     throw new IllegalArgumentException("Wrong number of args (" + n + ") passed to: " + name);
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env) {
     return this.throwArity(0);
   }
 
 
+  @Override
+  public int compare(AviatorObject other, Map<String, Object> env) {
+    throw new UnsupportedOperationException("Lambda function can't be compared.");
+  }
+
+
+  @Override
+  public AviatorType getAviatorType() {
+    return AviatorType.Lambda;
+  }
+
+  @Override
+  public Object getValue(Map<String, Object> env) {
+    return this;
+  }
+
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     return this.throwArity(1);
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
     return this.throwArity(2);
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3) {
     return this.throwArity(3);
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4) {
     return this.throwArity(4);
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5) {
     return this.throwArity(5);
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6) {
     return this.throwArity(6);
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7) {
@@ -65,6 +90,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8) {
@@ -72,6 +98,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9) {
@@ -79,6 +106,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10) {
@@ -86,6 +114,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -94,6 +123,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -102,6 +132,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -110,6 +141,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -118,6 +150,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -127,6 +160,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -136,6 +170,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -145,6 +180,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -154,6 +190,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -164,6 +201,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
@@ -174,6 +212,7 @@ public abstract class AbstractFunction implements AviatorFunction {
   }
 
 
+  @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,

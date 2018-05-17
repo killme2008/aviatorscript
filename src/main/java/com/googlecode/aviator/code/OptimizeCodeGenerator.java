@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.LiteralExpression;
@@ -36,8 +35,9 @@ import com.googlecode.aviator.lexer.token.PatternToken;
 import com.googlecode.aviator.lexer.token.StringToken;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
-import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.lexer.token.Variable;
+import com.googlecode.aviator.parser.AviatorClassLoader;
+import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -69,6 +69,12 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         new ASMCodeGenerator(instance, (AviatorClassLoader) classLoader, traceOutStream, trace);
     this.trace = trace;
 
+  }
+
+
+  @Override
+  public void setParser(ExpressionParser parser) {
+    this.asmCodeGenerator.setParser(parser);
   }
 
 
@@ -482,6 +488,18 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             case Method_Param:
               this.asmCodeGenerator.onMethodParameter(realToken);
               break;
+            case Lambda_Define:
+              this.asmCodeGenerator.onLambdaDefineStart(realToken);
+              break;
+            case Lambda_Argument:
+              this.asmCodeGenerator.onLambdaArgument(realToken);
+              break;
+            case Lambda_Body_Start:
+              this.asmCodeGenerator.onLambdaBodyStart(realToken);
+              break;
+            case Lambda_Body_End:
+              this.asmCodeGenerator.onLambdaBodyEnd(realToken);
+              break;
           }
           break;
 
@@ -648,6 +666,38 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
         DelegateTokenType.Method_Param));
 
+  }
+
+
+
+  @Override
+  public void onLambdaDefineStart(Token<?> lookhead) {
+    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        DelegateTokenType.Lambda_Define));
+
+  }
+
+
+  @Override
+  public void onLambdaArgument(Token<?> lookhead) {
+    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        DelegateTokenType.Lambda_Argument));
+
+  }
+
+
+  @Override
+  public void onLambdaBodyStart(Token<?> lookhead) {
+    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        DelegateTokenType.Lambda_Body_Start));
+
+  }
+
+
+  @Override
+  public void onLambdaBodyEnd(Token<?> lookhead) {
+    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        DelegateTokenType.Lambda_Body_End));
   }
 
 

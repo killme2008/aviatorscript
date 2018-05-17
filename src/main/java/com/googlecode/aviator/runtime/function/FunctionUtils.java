@@ -17,7 +17,6 @@ package com.googlecode.aviator.runtime.function;
 
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -29,15 +28,15 @@ import com.googlecode.aviator.runtime.type.AviatorType;
 
 /**
  * Function helper
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class FunctionUtils {
 
   /**
    * Get string value from env.
-   * 
+   *
    * @param arg the var name
    * @param env
    * @return
@@ -60,7 +59,7 @@ public class FunctionUtils {
 
   /**
    * get a object from env
-   * 
+   *
    * @param arg the var name
    * @param env
    * @return
@@ -80,19 +79,23 @@ public class FunctionUtils {
    * <li>env</li>
    * <li>current evaluator instance.</li>
    * </ul>
-   * 
+   *
    * @param arg
    * @param env
    * @param arity
    * @return
    */
   public static AviatorFunction getFunction(AviatorObject arg, Map<String, Object> env, int arity) {
-    if (arg.getAviatorType() != AviatorType.JavaType) {
+    if (arg.getAviatorType() != AviatorType.JavaType
+        && arg.getAviatorType() != AviatorType.Lambda) {
       throw new ExpressionRuntimeException(arg.desc(env) + " is not a function");
     }
     // Runtime type.
     if (arg instanceof AviatorRuntimeJavaType && arg.getValue(env) instanceof AviatorFunction) {
       return (AviatorFunction) arg.getValue(env);
+    }
+    if (arg instanceof AviatorFunction) {
+      return (AviatorFunction) arg;
     }
     // resolve by name.
     // special processing for "-" operator
@@ -118,7 +121,7 @@ public class FunctionUtils {
 
   /**
    * Get a number from env.
-   * 
+   *
    * @param arg1 the var
    * @param env
    * @return
