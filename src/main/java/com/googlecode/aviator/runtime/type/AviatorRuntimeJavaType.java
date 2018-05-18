@@ -27,7 +27,10 @@ import java.util.Map;
 public class AviatorRuntimeJavaType extends AviatorJavaType {
   private final Object object;
 
-  public static AviatorRuntimeJavaType valueOf(Object object) {
+  public static AviatorObject valueOf(Object object) {
+    if (object instanceof AviatorObject) {
+      return (AviatorObject) object;
+    }
     return new AviatorRuntimeJavaType(object);
   }
 

@@ -1,10 +1,10 @@
 package com.googlecode.aviator.runtime.function;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.ChainedMap;
 
 /**
  * All lamabda function base class
@@ -26,10 +26,7 @@ public abstract class LambdaFunction extends AbstractFunction {
   }
 
   protected Map<String, Object> getEnv(Map<String, Object> parentEnv, AviatorObject... args) {
-    Map<String, Object> env = new HashMap<String, Object>();
-    if (parentEnv != null) {
-      env.putAll(parentEnv);
-    }
+    Map<String, Object> env = new ChainedMap<String, Object>(parentEnv);
     int i = 0;
     for (String name : arguments) {
       env.put(name, args[i++].getValue(env));

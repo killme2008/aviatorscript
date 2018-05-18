@@ -16,7 +16,11 @@
 package com.googlecode.aviator.runtime.function.seq;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
@@ -28,9 +32,9 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 /**
  * filter(seq,predicate) to filter seq by predicate
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class SeqFilterFunction extends AbstractFunction {
 
@@ -68,7 +72,7 @@ public class SeqFilterFunction extends AbstractFunction {
         result = (Map<Object, Object>) clazz.newInstance();
       } catch (Throwable t) {
         // ignore
-        result = new HashMap<>();
+        result = new HashMap<Object, Object>();
       }
       Map<?, ?> map = (Map<?, ?>) first;
       for (Map.Entry<?, ?> entry : map.entrySet()) {
@@ -95,6 +99,7 @@ public class SeqFilterFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "filter";
   }

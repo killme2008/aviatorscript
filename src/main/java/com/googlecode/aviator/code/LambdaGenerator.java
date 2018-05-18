@@ -174,7 +174,7 @@ public class LambdaGenerator implements CodeGenerator {
           "(Ljava/util/Map;)Ljava/lang/Object;");
       this.mv.visitMethodInsn(INVOKESTATIC,
           "com/googlecode/aviator/runtime/type/AviatorRuntimeJavaType", "valueOf",
-          "(Ljava/lang/Object;)Lcom/googlecode/aviator/runtime/type/AviatorRuntimeJavaType;");
+          "(Ljava/lang/Object;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
       this.mv.visitInsn(ARETURN);
       this.mv.visitMaxs(6, 1);
       this.mv.visitEnd();

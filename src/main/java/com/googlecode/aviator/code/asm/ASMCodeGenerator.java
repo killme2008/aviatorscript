@@ -882,7 +882,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
-  private String getInvokeMethodDesc(int paramCount) {
+  private static String getInvokeMethodDesc(int paramCount) {
     StringBuilder sb = new StringBuilder("(Ljava/util/Map;");
     if (paramCount <= 20) {
       for (int i = 0; i < paramCount; i++) {
@@ -1085,12 +1085,21 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onMethodName(Token<?> lookhead) {
-    String outtterMethodName = lookhead.getLexeme();
-    String innerMethodName = this.innerMethodMap.get(outtterMethodName);
-    if (innerMethodName != null) {
-      this.loadAviatorFunction(outtterMethodName, innerMethodName);
+    String outtterMethodName = "lambda";
+    if (lookhead != null) {
+      outtterMethodName = lookhead.getLexeme();
+      String innerMethodName = this.innerMethodMap.get(outtterMethodName);
+      if (innerMethodName != null) {
+        this.loadAviatorFunction(outtterMethodName, innerMethodName);
+      } else {
+        this.createAviatorFunctionObject(outtterMethodName);
+      }
     } else {
-      this.createAviatorFunctionObject(outtterMethodName);
+      this.loadEnv();
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/RuntimeUtils",
+          "getFunction",
+          "(Ljava/lang/Object;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
+      this.popOperand();
     }
     this.loadEnv();
     this.methodMetaDataStack.push(new MethodMetaData(outtterMethodName));
@@ -1153,8 +1162,8 @@ public class ASMCodeGenerator implements CodeGenerator {
   private void createAviatorFunctionObject(String methodName) {
     this.pushOperand();
     this.mv.visitLdcInsn(methodName);
-    this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/AviatorEvaluator", "getFunction",
-        "(Ljava/lang/String;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
+    this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/RuntimeUtils",
+        "getFunction", "(Ljava/lang/String;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
     this.popOperand();
     this.pushOperand();
   }

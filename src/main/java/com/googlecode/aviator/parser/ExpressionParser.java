@@ -509,8 +509,8 @@ public class ExpressionParser {
           this.lambda();
         } else {
           this.method();
-          // method.invoke()[index]
           if (expectChar('[')) {
+            // array access after method, such as " method.invoke()[index]"
             arrayAccess();
           }
         }
@@ -527,6 +527,7 @@ public class ExpressionParser {
     }
 
   }
+
 
   private void lambda() {
     this.lambdaDepth++;
@@ -640,26 +641,34 @@ public class ExpressionParser {
     }
   }
 
-
   private void method() {
-    this.parenDepth++;
-    this.depthState.add(DepthState.Parent);
-    this.codeGenerator.onMethodName(this.prevToken);
-    this.move(true);
-    if (!this.expectChar(')')) {
-      this.ternary();
-      this.codeGenerator.onMethodParameter(this.lookhead);
-      while (this.expectChar(',')) {
-        this.move(true);
+    boolean wasFirst = true;
+    // May be call chain, such as "s(1)(2)(3)"
+    while (this.expectChar('(')) {
+      this.parenDepth++;
+      this.depthState.add(DepthState.Parent);
+      if (wasFirst) {
+        this.codeGenerator.onMethodName(this.prevToken);
+        wasFirst = false;
+      } else {
+        this.codeGenerator.onMethodName(null);
+      }
+      this.move(true);
+      if (!this.expectChar(')')) {
         this.ternary();
         this.codeGenerator.onMethodParameter(this.lookhead);
+        while (this.expectChar(',')) {
+          this.move(true);
+          this.ternary();
+          this.codeGenerator.onMethodParameter(this.lookhead);
+        }
       }
-    }
-    if (this.expectChar(')')) {
-      this.parenDepth--;
-      this.depthState.removeLast();
-      this.move(true);
-      this.codeGenerator.onMethodInvoke(this.lookhead);
+      if (this.expectChar(')')) {
+        this.parenDepth--;
+        this.depthState.removeLast();
+        this.move(true);
+        this.codeGenerator.onMethodInvoke(this.lookhead);
+      }
     }
   }
 
@@ -724,15 +733,12 @@ public class ExpressionParser {
 
 
   private void reportSyntaxError(String message) {
-    int index = this.lookhead != null ? nextTokenIndex() : this.lexer.getCurrentIndex();
+    int index =
+        this.lookhead != null ? this.lookhead.getStartIndex() : this.lexer.getCurrentIndex();
     throw new ExpressionSyntaxErrorException(
         "Syntax error:" + message + " at " + index + ", current token: " + this.lookhead);
   }
 
-  private int nextTokenIndex() {
-    return this.lookhead.getStartIndex()
-        + (this.lookhead.getLexeme() != null ? this.lookhead.getLexeme().length() : 0);
-  }
 
 
   public void move(boolean analyse) {

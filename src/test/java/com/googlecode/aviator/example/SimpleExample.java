@@ -1,9 +1,9 @@
 package com.googlecode.aviator.example;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
 
 
 public class SimpleExample {
@@ -20,11 +20,11 @@ public class SimpleExample {
     }
     env.put("a", value);
     env.put("x", 1);
-    Object s = AviatorEvaluator.execute(
-        "filter(a, lambda(x) -> boolean(seq.some(x, lambda(y) ->println(y+count(x)); y+count(x)>0 end)) end)",
-        env);
+    LambdaFunction s = (LambdaFunction) AviatorEvaluator
+        .execute("lambda(x) ->  lambda(y) -> lambda(z) -> x +y +z end end end", env);
+    AviatorEvaluator.getInstance().getFuncMap().put("s", s);
+    env.put("z", 100);
 
-
-    System.out.println(Arrays.toString((Object[]) s));
+    System.out.println(AviatorEvaluator.execute("s(1)(2)(3)", env));
   }
 }
