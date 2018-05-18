@@ -77,6 +77,8 @@ public interface CodeGenerator {
 
   public void onTernaryRight(Token<?> lookhead);
 
+  public void onTernaryEnd(Token<?> lookhead);
+
 
   public void onJoinLeft(Token<?> lookhead);
 

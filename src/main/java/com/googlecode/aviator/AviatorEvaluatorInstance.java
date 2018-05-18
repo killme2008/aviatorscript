@@ -69,6 +69,7 @@ import com.googlecode.aviator.runtime.function.string.StringSplitFunction;
 import com.googlecode.aviator.runtime.function.string.StringStartsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringSubStringFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;
+import com.googlecode.aviator.runtime.function.system.BooleanFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
@@ -86,7 +87,7 @@ import com.googlecode.aviator.runtime.type.AviatorNil;
 
 /**
  * A aviator evaluator instance
- * 
+ *
  * @author dennis
  *
  */
@@ -109,7 +110,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Set a function missing callback.
-   * 
+   *
    * @since 3.3.1
    * @param funcMissing
    */
@@ -155,7 +156,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Returns the generated java classes byte code version, 1.6 by defualt.
-   * 
+   *
    * @return
    */
   public int getBytecodeVersion() {
@@ -165,7 +166,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Set the generated java classes java byte code version.
-   * 
+   *
    * @see Opcodes#V1_6
    * @param bytecodeVersion
    */
@@ -176,7 +177,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Get the evaluator instance options
-   * 
+   *
    * @return
    */
   public ConcurrentHashMap<Options, Object> getOptions() {
@@ -186,7 +187,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Returns the functions map
-   * 
+   *
    * @return
    */
   public Map<String, Object> getFuncMap() {
@@ -196,7 +197,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Returns the operators map.
-   * 
+   *
    * @return
    */
   public Map<OperatorType, AviatorFunction> getOpsMap() {
@@ -249,6 +250,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new RandomFunction());
     addFunction(new NowFunction());
     addFunction(new LongFunction());
+    addFunction(new BooleanFunction());
     addFunction(new DoubleFunction());
     addFunction(new StrFunction());
     addFunction(new Date2StringFunction());
@@ -321,10 +323,10 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                      * Compiled
-                                                                                      * expression
-                                                                                      * task
-                                                                                      */> cacheExpressions =
+                                                                                     * Compiled
+                                                                                     * expression
+                                                                                     * task
+                                                                                     */> cacheExpressions =
       new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
@@ -376,6 +378,9 @@ public final class AviatorEvaluatorInstance {
    */
   public void addFunction(AviatorFunction function) {
     final String name = function.getName();
+    if ("lambda".equals(name)) {
+      throw new IllegalArgumentException("Invalid function name, lambda is a keyword.");
+    }
     if (funcMap.containsKey(name)) {
       System.out.println("[Aviator WARN] The function '" + name
           + "' is already exists, but is replaced with new one.");
@@ -546,7 +551,6 @@ public final class AviatorEvaluatorInstance {
       RuntimeUtils.removeInstance();
     }
   }
-
 
   private int getOptimizeLevel() {
     return getOption(Options.OPTIMIZE_LEVEL);

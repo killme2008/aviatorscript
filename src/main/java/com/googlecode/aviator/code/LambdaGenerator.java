@@ -33,6 +33,7 @@ import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
+import com.googlecode.aviator.parser.ExpressionParser.DepthInfo;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 
 /**
@@ -51,13 +52,15 @@ public class LambdaGenerator implements CodeGenerator {
   private String className;
   private static final AtomicLong LAMBDA_COUNTER = new AtomicLong();
   private MethodVisitor mv;
+  private DepthInfo scopeInfo;
 
   public LambdaGenerator(AviatorEvaluatorInstance instance, CodeGenerator parentCodeGenerator,
-      boolean cached) {
+      ExpressionParser parser, boolean cached) {
     this.arguments = new ArrayList<String>();
     this.instance = instance;
     this.parentCodeGenerator = parentCodeGenerator;
     this.codeGenerator = instance.newCodeGenerator(cached);
+    this.codeGenerator.setParser(parser);
     this.classLoader = instance.getAviatorClassLoader(cached);
     // Generate lambda class name
     this.className =
@@ -69,6 +72,15 @@ public class LambdaGenerator implements CodeGenerator {
     this.makeGetName();
   }
 
+
+  public DepthInfo getScopeInfo() {
+    return scopeInfo;
+  }
+
+
+  public void setScopeInfo(DepthInfo scopeInfo) {
+    this.scopeInfo = scopeInfo;
+  }
 
 
   @Override
@@ -314,6 +326,12 @@ public class LambdaGenerator implements CodeGenerator {
     codeGenerator.onTernaryRight(lookhead);
   }
 
+
+
+  @Override
+  public void onTernaryEnd(Token<?> lookhead) {
+    this.codeGenerator.onTernaryEnd(lookhead);
+  }
 
 
   @Override

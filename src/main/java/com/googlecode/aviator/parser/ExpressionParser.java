@@ -16,6 +16,7 @@
 package com.googlecode.aviator.parser;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
@@ -53,22 +54,66 @@ public class ExpressionParser {
 
   private CodeGenerator codeGenerator;
 
-  // Paren depth
   private int parenDepth = 0;
 
   private int bracketDepth = 0;
 
   private int lambdaDepth = 0;
 
+  private LinkedList<DepthState> depthState = new LinkedList<DepthState>();
+
+
+  private static enum DepthState {
+    Parent, Bracket, Lambda
+  }
+
   private boolean inPattern = false;
 
   private AviatorEvaluatorInstance instance;
 
 
+  public CodeGenerator getCodeGenerator() {
+    return codeGenerator;
+  }
+
   public void setCodeGenerator(CodeGenerator codeGenerator) {
     this.codeGenerator = codeGenerator;
   }
 
+  public static class DepthInfo {
+    private int parenDepth;
+
+    private int bracketDepth;
+
+    private int lambdaDepth;
+
+    private LinkedList<DepthState> depthState;
+
+    public DepthInfo(int parenDepth, int bracketDepth, int lambdaDepth,
+        LinkedList<DepthState> depthState) {
+      super();
+      this.parenDepth = parenDepth;
+      this.bracketDepth = bracketDepth;
+      this.lambdaDepth = lambdaDepth;
+      this.depthState = depthState;
+    }
+  }
+
+  public DepthInfo enterScope() {
+    DepthInfo info = new DepthInfo(parenDepth, bracketDepth, lambdaDepth, depthState);
+    this.parenDepth = 0;
+    this.bracketDepth = 0;
+    this.lambdaDepth = 0;
+    this.depthState = new LinkedList<DepthState>();
+    return info;
+  }
+
+  public void restoreScope(DepthInfo info) {
+    this.parenDepth = info.parenDepth;
+    this.bracketDepth = info.bracketDepth;
+    this.lambdaDepth = info.lambdaDepth;
+    this.depthState = info.depthState;
+  }
 
   public ExpressionParser(AviatorEvaluatorInstance instance, ExpressionLexer lexer,
       CodeGenerator codeGenerator) {
@@ -86,14 +131,14 @@ public class ExpressionParser {
 
   public void ternary() {
     this.join();
-    if (this.lookhead == null || this.expectLexeme(":") || this.expectLexeme(",")) {
+    if (this.lookhead == null || this.expectChar(':') || this.expectChar(',')) {
       return;
     }
-    if (this.expectLexeme("?")) {
+    if (this.expectChar('?')) {
       this.move(true);
       this.codeGenerator.onTernaryBoolean(this.lookhead);
       this.ternary();
-      if (this.expectLexeme(":")) {
+      if (this.expectChar(':')) {
         this.move(true);
         this.codeGenerator.onTernaryLeft(this.lookhead);
         this.ternary();
@@ -133,21 +178,20 @@ public class ExpressionParser {
 
 
   private boolean isJoinToken() {
-    return this.expectLexeme("|");
+    return this.expectChar('|');
   }
 
 
-  private boolean expectLexeme(String s) {
+  private boolean expectChar(char ch) {
     if (this.lookhead == null) {
       return false;
     }
-    return this.lookhead.getType() == TokenType.Char
-        && ((CharToken) this.lookhead).getLexeme().equals(s);
+    return this.lookhead.getType() == TokenType.Char && ((CharToken) this.lookhead).getCh() == ch;
   }
 
 
   private boolean isAndToken() {
-    return this.expectLexeme("&");
+    return this.expectChar('&');
   }
 
 
@@ -172,7 +216,7 @@ public class ExpressionParser {
   public void xor() {
     this.bitAnd();
     while (true) {
-      if (this.expectLexeme("^")) {
+      if (this.expectChar('^')) {
         this.move(true);
         this.bitAnd();
         this.codeGenerator.onBitXor(this.lookhead);
@@ -225,13 +269,13 @@ public class ExpressionParser {
   public void equality() {
     this.rel();
     while (true) {
-      if (this.expectLexeme("=")) {
+      if (this.expectChar('=')) {
         this.move(true);
-        if (this.expectLexeme("=")) {
+        if (this.expectChar('=')) {
           this.move(true);
           this.rel();
           this.codeGenerator.onEq(this.lookhead);
-        } else if (this.expectLexeme("~")) {
+        } else if (this.expectChar('~')) {
           // It is a regular expression
           this.move(true);
           this.rel();
@@ -239,9 +283,9 @@ public class ExpressionParser {
         } else {
           this.reportSyntaxError("Aviator doesn't support assignment");
         }
-      } else if (this.expectLexeme("!")) {
+      } else if (this.expectChar('!')) {
         this.move(true);
-        if (this.expectLexeme("=")) {
+        if (this.expectChar('=')) {
           this.move(true);
           this.rel();
           this.codeGenerator.onNeq(this.lookhead);
@@ -258,9 +302,9 @@ public class ExpressionParser {
   public void rel() {
     this.shift();
     while (true) {
-      if (this.expectLexeme("<")) {
+      if (this.expectChar('<')) {
         this.move(true);
-        if (this.expectLexeme("=")) {
+        if (this.expectChar('=')) {
           this.move(true);
           this.expr();
           this.codeGenerator.onLe(this.lookhead);
@@ -268,9 +312,9 @@ public class ExpressionParser {
           this.expr();
           this.codeGenerator.onLt(this.lookhead);
         }
-      } else if (this.expectLexeme(">")) {
+      } else if (this.expectChar('>')) {
         this.move(true);
-        if (this.expectLexeme("=")) {
+        if (this.expectChar('=')) {
           this.move(true);
           this.expr();
           this.codeGenerator.onGe(this.lookhead);
@@ -288,9 +332,9 @@ public class ExpressionParser {
   public void shift() {
     this.expr();
     while (true) {
-      if (this.expectLexeme("<")) {
+      if (this.expectChar('<')) {
         this.move(true);
-        if (this.expectLexeme("<")) {
+        if (this.expectChar('<')) {
           this.move(true);
           this.expr();
           this.codeGenerator.onShiftLeft(this.lookhead);
@@ -298,11 +342,11 @@ public class ExpressionParser {
           this.back();
           break;
         }
-      } else if (this.expectLexeme(">")) {
+      } else if (this.expectChar('>')) {
         this.move(true);
-        if (this.expectLexeme(">")) {
+        if (this.expectChar('>')) {
           this.move(true);
-          if (this.expectLexeme(">")) {
+          if (this.expectChar('>')) {
             this.move(true);
             this.expr();
             this.codeGenerator.onUnsignedShiftRight(this.lookhead);
@@ -325,11 +369,11 @@ public class ExpressionParser {
   public void expr() {
     this.term();
     while (true) {
-      if (this.expectLexeme("+")) {
+      if (this.expectChar('+')) {
         this.move(true);
         this.term();
         this.codeGenerator.onAdd(this.lookhead);
-      } else if (this.expectLexeme("-")) {
+      } else if (this.expectChar('-')) {
         this.move(true);
         this.term();
         this.codeGenerator.onSub(this.lookhead);
@@ -343,15 +387,15 @@ public class ExpressionParser {
   public void term() {
     this.unary();
     while (true) {
-      if (this.expectLexeme("*")) {
+      if (this.expectChar('*')) {
         this.move(true);
         this.unary();
         this.codeGenerator.onMult(this.lookhead);
-      } else if (this.expectLexeme("/")) {
+      } else if (this.expectChar('/')) {
         this.move(true);
         this.unary();
         this.codeGenerator.onDiv(this.lookhead);
-      } else if (this.expectLexeme("%")) {
+      } else if (this.expectChar('%')) {
         this.move(true);
         this.unary();
         this.codeGenerator.onMod(this.lookhead);
@@ -363,30 +407,30 @@ public class ExpressionParser {
 
 
   public void unary() {
-    if (this.expectLexeme("!")) {
+    if (this.expectChar('!')) {
       this.move(true);
       // check if it is a seq function call,"!" as variable
-      if (this.expectLexeme(",") || this.expectLexeme(")")) {
+      if (this.expectChar(',') || this.expectChar(')')) {
         this.back();
         this.factor();
       } else {
         this.unary();
         this.codeGenerator.onNot(this.lookhead);
       }
-    } else if (this.expectLexeme("-")) {
+    } else if (this.expectChar('-')) {
       this.move(true);
       // check if it is a seq function call,"!" as variable
-      if (this.expectLexeme(",") || this.expectLexeme(")")) {
+      if (this.expectChar(',') || this.expectChar(')')) {
         this.back();
         this.factor();
       } else {
         this.unary();
         this.codeGenerator.onNeg(this.lookhead);
       }
-    } else if (this.expectLexeme("~")) {
+    } else if (this.expectChar('~')) {
       this.move(true);
       // check if it is a seq function call,"~" as variable
-      if (this.expectLexeme(",") || this.expectLexeme(")")) {
+      if (this.expectChar(',') || this.expectChar(')')) {
         this.back();
         this.factor();
       } else {
@@ -409,7 +453,7 @@ public class ExpressionParser {
     CharToken charToken = (CharToken) token;
 
     this.move(true);
-    if (this.expectLexeme(",") || this.expectLexeme(")")) {
+    if (this.expectChar(',') || this.expectChar(')')) {
       this.back();
       String lexeme = String.valueOf(charToken.getCh());
       if (lexeme.equals("-")) {
@@ -422,23 +466,23 @@ public class ExpressionParser {
     }
   }
 
-
   public void factor() {
     if (this.lookhead == null) {
       this.reportSyntaxError("invalid value");
     }
-    if (this.expectLexeme("(")) {
+    if (this.expectChar('(')) {
       this.parenDepth++;
+      this.depthState.add(DepthState.Parent);
       this.move(true);
       this.ternary();
-      if (!this.expectLexeme(")")) {
-        this.reportSyntaxError("insert ')' to complete Expression");
-      } else {
+      if (this.expectChar(')')) {
         this.move(true);
+        this.parenDepth--;
+        this.depthState.removeLast();
       }
-      this.parenDepth--;
+
       // (...)[index]
-      if (expectLexeme("[")) {
+      if (expectChar('[')) {
         arrayAccess();
       }
     } else if (this.lookhead.getType() == TokenType.Number
@@ -451,29 +495,32 @@ public class ExpressionParser {
       // binary operation as variable for seq functions
       if (this.lookhead.getType() == TokenType.Char) {
         CharToken charToken = (CharToken) this.lookhead;
+        if (!ExpressionLexer.isBinaryOP(charToken.getCh())) {
+          this.reportSyntaxError("Unexpect char '" + charToken.getCh() + "'");
+        }
         // make it as variable
         this.lookhead = new Variable(charToken.getLexeme(), charToken.getStartIndex());
       }
       this.move(true);
       // function
       Token<?> prev = this.prevToken;
-      if (prev.getType() == TokenType.Variable && this.expectLexeme("(")) {
-        if (prev.getLexeme().equals("fn")) {
+      if (prev.getType() == TokenType.Variable && this.expectChar('(')) {
+        if (prev == Variable.LAMBDA) {
           this.lambda();
         } else {
           this.method();
           // method.invoke()[index]
-          if (expectLexeme("[")) {
+          if (expectChar('[')) {
             arrayAccess();
           }
         }
-      } else if (prev.getType() == TokenType.Variable || prev.getLexeme().equals(")")) {
+      } else if (prev.getType() == TokenType.Variable || prev.getLexeme().equals(')')) {
         // var[index]
         arrayAccess();
       } else {
         this.codeGenerator.onConstant(prev);
       }
-    } else if (this.expectLexeme("/")) {
+    } else if (this.expectChar('/')) {
       this.pattern();
     } else {
       this.reportSyntaxError("invalid value");
@@ -482,40 +529,47 @@ public class ExpressionParser {
   }
 
   private void lambda() {
-    this.parenDepth++;
-    this.codeGenerator.onLambdaDefineStart(this.prevToken);
     this.lambdaDepth++;
+    this.depthState.add(DepthState.Lambda);
+    this.codeGenerator.onLambdaDefineStart(this.prevToken);
+    this.parenDepth++;
+    this.depthState.add(DepthState.Parent);
     this.move(true);
-    if (!this.expectLexeme(")")) {
+    if (!this.expectChar(')')) {
       lambdaArgument();
 
-      while (this.expectLexeme(",")) {
+      while (this.expectChar(',')) {
         this.move(true);
         lambdaArgument();
       }
     }
-    if (!this.expectLexeme(")")) {
-      this.reportSyntaxError("insert ')' to complete expression");
-    } else {
+    if (this.expectChar(')')) {
       this.parenDepth--;
+      this.depthState.removeLast();
       this.move(true);
-      if (this.expectLexeme("-")) {
+      if (this.expectChar('-')) {
         this.move(true);
-        if (this.expectLexeme(">")) {
+        if (this.expectChar('>')) {
           this.codeGenerator.onLambdaBodyStart(lookhead);
           this.move(true);
-          this.ternary();
+          this.statement();
           if (this.lookhead.getType() == TokenType.Variable
               && this.lookhead.getLexeme().equals("end")) {
             this.codeGenerator.onLambdaBodyEnd(lookhead);
             this.lambdaDepth--;
+            this.depthState.removeLast();
+
             this.move(true);
           } else {
             reportSyntaxError("Expect lambda end, but is:" + this.lookhead.getLexeme());
           }
         } else {
+          // TODO may be a method call lambda(x,y)
           reportSyntaxError("Expect lambda body, but is:" + this.lookhead.getLexeme());
         }
+      } else {
+        // TODO may be a method call lambda(x,y)
+        reportSyntaxError("Expect lambda body, but is:" + this.lookhead.getLexeme());
       }
     }
   }
@@ -539,7 +593,7 @@ public class ExpressionParser {
   private void arrayAccess() {
     // check if it is a array index access
     boolean hasArray = false;
-    while (this.expectLexeme("[")) {
+    while (this.expectChar('[')) {
       if (!hasArray) {
         this.codeGenerator.onArray(this.prevToken);
         this.move(true);
@@ -558,16 +612,16 @@ public class ExpressionParser {
 
   private void array() {
     this.bracketDepth++;
+    this.depthState.add(DepthState.Bracket);
     if (RESERVED_WORDS.contains(this.prevToken.getLexeme())) {
       throw new ExpressionSyntaxErrorException(
           this.prevToken.getLexeme() + " could not use [] operator");
     }
 
     this.ternary();
-    if (!this.expectLexeme("]")) {
-      this.reportSyntaxError("insert ']' to complete Expression");
-    } else {
+    if (this.expectChar(']')) {
       this.bracketDepth--;
+      this.depthState.removeLast();
       this.move(true);
       this.codeGenerator.onArrayIndexEnd(this.lookhead);
     }
@@ -589,21 +643,21 @@ public class ExpressionParser {
 
   private void method() {
     this.parenDepth++;
+    this.depthState.add(DepthState.Parent);
     this.codeGenerator.onMethodName(this.prevToken);
     this.move(true);
-    if (!this.expectLexeme(")")) {
+    if (!this.expectChar(')')) {
       this.ternary();
       this.codeGenerator.onMethodParameter(this.lookhead);
-      while (this.expectLexeme(",")) {
+      while (this.expectChar(',')) {
         this.move(true);
         this.ternary();
         this.codeGenerator.onMethodParameter(this.lookhead);
       }
     }
-    if (!this.expectLexeme(")")) {
-      this.reportSyntaxError("insert ')' to complete expression");
-    } else {
+    if (this.expectChar(')')) {
       this.parenDepth--;
+      this.depthState.removeLast();
       this.move(true);
       this.codeGenerator.onMethodInvoke(this.lookhead);
     }
@@ -648,7 +702,7 @@ public class ExpressionParser {
     this.inPattern = true;
     StringBuffer sb = new StringBuffer();
     while (this.lookhead != null) {
-      while (!this.expectLexeme("/")) {
+      while (!this.expectChar('/')) {
         sb.append(this.lookhead.getLexeme());
         this.move(false);
       }
@@ -670,8 +724,14 @@ public class ExpressionParser {
 
 
   private void reportSyntaxError(String message) {
-    throw new ExpressionSyntaxErrorException("Syntax error:" + message + " at "
-        + this.lexer.getCurrentIndex() + ", current token: " + this.lookhead);
+    int index = this.lookhead != null ? nextTokenIndex() : this.lexer.getCurrentIndex();
+    throw new ExpressionSyntaxErrorException(
+        "Syntax error:" + message + " at " + index + ", current token: " + this.lookhead);
+  }
+
+  private int nextTokenIndex() {
+    return this.lookhead.getStartIndex()
+        + (this.lookhead.getLexeme() != null ? this.lookhead.getLexeme().length() : 0);
   }
 
 
@@ -693,21 +753,48 @@ public class ExpressionParser {
 
 
   public Expression parse() {
-    this.ternary();
-    if (this.parenDepth > 0) {
-      this.reportSyntaxError("insert ')' to complete Expression");
-    }
-    if (this.bracketDepth > 0) {
-      this.reportSyntaxError("insert ']' to complete Expression");
-    }
-    if (this.lambdaDepth > 0) {
-      this.reportSyntaxError("insert 'end' to complete lambda Expression");
-    }
+    statement();
     if (this.lookhead != null) {
       // The lookhead should be null, it's the end.
       this.reportSyntaxError("Unexpect token '" + this.lookhead.getLexeme() + "'");
     }
     return this.codeGenerator.getResult();
+  }
+
+
+  private void statement() {
+    this.ternary();
+    this.ensureDepthState();
+    while (this.expectChar(';')) {
+      this.codeGenerator.onTernaryEnd(lookhead);
+      this.move(true);
+      this.ternary();
+      this.ensureDepthState();
+    }
+  }
+
+
+  private void ensureDepthState() {
+    DepthState state = this.depthState.peekLast();
+    if (state != null) {
+      switch (state) {
+        case Parent:
+          if (this.parenDepth > 0) {
+            this.reportSyntaxError("insert ')' to complete Expression");
+          }
+          break;
+        case Bracket:
+          if (this.bracketDepth > 0) {
+            this.reportSyntaxError("insert ']' to complete Expression");
+          }
+          break;
+        case Lambda:
+          if (this.lambdaDepth > 0) {
+            this.reportSyntaxError("insert 'end' to complete lambda Expression");
+          }
+          break;
+      }
+    }
   }
 
 }

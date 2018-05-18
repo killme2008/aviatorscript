@@ -39,6 +39,7 @@ import static com.googlecode.aviator.asm.Opcodes.INVOKESPECIAL;
 import static com.googlecode.aviator.asm.Opcodes.INVOKESTATIC;
 import static com.googlecode.aviator.asm.Opcodes.INVOKEVIRTUAL;
 import static com.googlecode.aviator.asm.Opcodes.NEW;
+import static com.googlecode.aviator.asm.Opcodes.POP;
 import static com.googlecode.aviator.asm.Opcodes.PUTFIELD;
 import static com.googlecode.aviator.asm.Opcodes.RETURN;
 import static com.googlecode.aviator.asm.Opcodes.SWAP;
@@ -129,6 +130,8 @@ public class ASMCodeGenerator implements CodeGenerator {
   private static final Label START_LABEL = new Label();
 
   private Label currentLabel = START_LABEL;
+
+  private CodeGenerator lastCodeGenerator;
 
 
   @Override
@@ -460,6 +463,13 @@ public class ASMCodeGenerator implements CodeGenerator {
     this.popOperand(); // pop one boolean
   }
 
+
+  @Override
+  public void onTernaryEnd(Token<?> lookhead) {
+    while (--this.operandsCount > 0) {
+      this.mv.visitInsn(POP);
+    }
+  }
 
   private Label popLabel1() {
     return this.l1stack.pop();
@@ -1031,7 +1041,8 @@ public class ASMCodeGenerator implements CodeGenerator {
   public void onLambdaDefineStart(Token<?> lookhead) {
     if (this.lambdaGenerator == null) {
       // TODO cache?
-      this.lambdaGenerator = new LambdaGenerator(instance, this, false);
+      this.lambdaGenerator = new LambdaGenerator(instance, this, this.parser, false);
+      this.lambdaGenerator.setScopeInfo(this.parser.enterScope());
     } else {
       throw new CompileExpressionErrorException("Nested lambda");
     }
@@ -1044,6 +1055,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onLambdaBodyStart(Token<?> lookhead) {
+    lastCodeGenerator = this.parser.getCodeGenerator();
     this.parser.setCodeGenerator(this.lambdaGenerator);
   }
 
@@ -1062,8 +1074,9 @@ public class ASMCodeGenerator implements CodeGenerator {
     this.pushOperand();
     this.pushOperand();
     this.popOperand();
+    this.parser.restoreScope(this.lambdaGenerator.getScopeInfo());
     this.lambdaGenerator = null;
-    this.parser.setCodeGenerator(this);
+    this.parser.setCodeGenerator(this.lastCodeGenerator);
   }
 
   @Override

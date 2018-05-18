@@ -21,7 +21,6 @@ import java.math.MathContext;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Stack;
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
@@ -50,14 +49,12 @@ public class ExpressionLexer {
   private final Stack<Token<?>> tokenBuffer = new Stack<Token<?>>();
   private AviatorEvaluatorInstance instance;
 
-
   public ExpressionLexer(AviatorEvaluatorInstance instance, String expression) {
     this.iterator = new StringCharacterIterator(expression);
     this.symbolTable = new SymbolTable();
     this.peek = this.iterator.current();
     this.instance = instance;
   }
-
 
   /**
    * Push back token
@@ -327,7 +324,7 @@ public class ExpressionLexer {
 
 
   private Token<?> reserverVar(String lexeme, Variable variable) {
-    // If it is a reserved word(true or false)
+    // If it is a reserved word(true/false/nil/lambda)
     if (this.symbolTable.contains(lexeme)) {
       return this.symbolTable.getVariable(lexeme);
     } else {

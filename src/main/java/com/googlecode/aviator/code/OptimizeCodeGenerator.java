@@ -500,6 +500,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             case Lambda_Body_End:
               this.asmCodeGenerator.onLambdaBodyEnd(realToken);
               break;
+            case Ternay_End:
+              this.asmCodeGenerator.onTernaryEnd(realToken);
+              break;
           }
           break;
 
@@ -769,6 +772,13 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   public void onTernaryRight(Token<?> lookhead) {
     this.tokenList.add(
         new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.TERNARY));
+  }
+
+
+  @Override
+  public void onTernaryEnd(Token<?> lookhead) {
+    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
+        DelegateTokenType.Ternay_End));
   }
 
 

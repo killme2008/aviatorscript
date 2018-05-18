@@ -20,9 +20,9 @@ import java.util.Map;
 
 /**
  * Variable token
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class Variable extends AbstractToken<Object> {
 
@@ -74,11 +74,26 @@ public class Variable extends AbstractToken<Object> {
   };
 
 
+  /**
+   * Lambda keyword
+   */
+  public static final Variable LAMBDA = new Variable("lambda", -1) {
+
+    @Override
+    public Object getValue(Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+
+  @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
     return TokenType.Variable;
   }
 
 
+  @Override
   public Object getValue(Map<String, Object> env) {
     if (env != null) {
       return env.get(this.lexeme);

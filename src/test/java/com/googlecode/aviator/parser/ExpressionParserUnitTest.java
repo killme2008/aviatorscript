@@ -15,7 +15,7 @@
  **/
 package com.googlecode.aviator.parser;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class ExpressionParserUnitTest {
   @Test
   public void testLambda() {
     this.parser = new ExpressionParser(this.instance,
-        new ExpressionLexer(this.instance, "fn(x,y)-> x+y end"), this.codeGenerator);
+        new ExpressionLexer(this.instance, "lambda(x,y)-> x+y end"), this.codeGenerator);
     this.parser.parse();
     assertEquals("x y + lambda<defined>", this.codeGenerator.getPostFixExpression());
   }
