@@ -10,8 +10,8 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * Cast value to double,double(a) eg.
  *
  * @author dennis
- * @Date 2011-6-23
- * @since 1.1.1
+ * @Date 2018-5-18
+ * @since 4.0.0
  *
  */
 public class BooleanFunction extends AbstractFunction {

@@ -75,7 +75,7 @@ public abstract class ClassExpression extends BaseExpression {
     } catch (Throwable e) {
       throw new ExpressionRuntimeException("Execute expression error", e);
     } finally {
-      RuntimeUtils.removeInstance();
+      RuntimeUtils.removeInstance(this.instance);
     }
 
   }

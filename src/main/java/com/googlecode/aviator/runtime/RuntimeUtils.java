@@ -8,7 +8,7 @@ import com.googlecode.aviator.Options;
 
 /**
  * Runtime utils
- * 
+ *
  * @author dennis
  *
  */
@@ -19,7 +19,7 @@ public final class RuntimeUtils {
 
   /**
    * Get the current evaluator instance,returns the global instance if not found.
-   * 
+   *
    * @return
    */
   public static final AviatorEvaluatorInstance getInstance() {
@@ -49,8 +49,10 @@ public final class RuntimeUtils {
     }
   }
 
-  public static void removeInstance() {
-    RuntimeUtils.INSTANCE.remove();
+  public static void removeInstance(AviatorEvaluatorInstance instance) {
+    if (instance != AviatorEvaluator.getInstance()) {
+      RuntimeUtils.INSTANCE.remove();
+    }
   }
 
   public static final ThreadLocal<AviatorEvaluatorInstance> INSTANCE =

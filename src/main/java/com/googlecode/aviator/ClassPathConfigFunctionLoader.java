@@ -1,15 +1,21 @@
 package com.googlecode.aviator;
 
-import com.googlecode.aviator.runtime.type.AviatorFunction;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import com.googlecode.aviator.runtime.type.AviatorFunction;
 
-
-public class CustomFunctionLoader {
+/**
+ * A function loader that loads function from classpath config file.
+ *
+ * @author dennis
+ *
+ */
+public class ClassPathConfigFunctionLoader implements FunctionLoader {
 
   private static String CUSTOM_FUNCTION_LIST_FILE =
       System.getenv("com.googlecode.aviator.custom_function_config_file");
@@ -18,6 +24,26 @@ public class CustomFunctionLoader {
     if (CUSTOM_FUNCTION_LIST_FILE == null || CUSTOM_FUNCTION_LIST_FILE.trim().length() == 0) {
       CUSTOM_FUNCTION_LIST_FILE = "aviator_functions.config";
     }
+  }
+
+  private static class StaticHolder {
+    private static ClassPathConfigFunctionLoader INSTANCE = new ClassPathConfigFunctionLoader();
+  }
+
+  public static ClassPathConfigFunctionLoader getInstance() {
+    return StaticHolder.INSTANCE;
+  }
+
+  private Map<String, AviatorFunction> functions = Collections.emptyMap();
+
+  private ClassPathConfigFunctionLoader() {
+    this.functions = this.load();
+  }
+
+
+  @Override
+  public AviatorFunction onFunctionNotFound(String name) {
+    return this.functions.get(name);
   }
 
 
@@ -33,16 +59,16 @@ public class CustomFunctionLoader {
 
   /**
    * Load custom functions from config file, default is "aviator_functions.config" in classpath.
-   * 
+   *
    * @return
    */
-  public static List<AviatorFunction> load() {
+  private Map<String, AviatorFunction> load() {
     InputStream in = null;
     InputStreamReader inreader = null;
     BufferedReader reader = null;
-    List<AviatorFunction> ret = new ArrayList<>();
+    Map<String, AviatorFunction> ret = new HashMap<String, AviatorFunction>();
     try {
-      in = CustomFunctionLoader.class.getClassLoader()
+      in = ClassPathConfigFunctionLoader.class.getClassLoader()
           .getResourceAsStream(CUSTOM_FUNCTION_LIST_FILE);
       if (in != null) {
         inreader = new InputStreamReader(in);
@@ -57,7 +83,7 @@ public class CustomFunctionLoader {
           if (line.length() > 0) {
             AviatorFunction func = loadClass(line);
             if (func != null) {
-              ret.add(func);
+              ret.put(func.getName(), func);
             }
           }
         }
@@ -77,7 +103,7 @@ public class CustomFunctionLoader {
   }
 
 
-  public static AviatorFunction loadClass(String className) {
+  private AviatorFunction loadClass(String className) {
     info("Loading custom aviator function class: '" + className + "'.");
     try {
       @SuppressWarnings("unchecked")

@@ -62,6 +62,7 @@ import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.LambdaGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.Token;
@@ -706,6 +707,9 @@ public class ASMCodeGenerator implements CodeGenerator {
       exp.setLambdas(this.lambdas);
       return exp;
     } catch (Exception e) {
+      if (e.getCause() instanceof ExpressionRuntimeException) {
+        throw (ExpressionRuntimeException) e.getCause();
+      }
       throw new CompileExpressionErrorException("define class error", e);
     }
   }

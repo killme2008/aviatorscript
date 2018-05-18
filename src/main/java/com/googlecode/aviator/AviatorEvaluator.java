@@ -17,69 +17,10 @@ package com.googlecode.aviator;
 
 import java.io.OutputStream;
 import java.math.MathContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.FutureTask;
-import com.googlecode.aviator.asm.Opcodes;
-import com.googlecode.aviator.code.CodeGenerator;
-import com.googlecode.aviator.code.OptimizeCodeGenerator;
-import com.googlecode.aviator.code.asm.ASMCodeGenerator;
-import com.googlecode.aviator.exception.CompileExpressionErrorException;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
-import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
-import com.googlecode.aviator.parser.ExpressionParser;
-import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
-import com.googlecode.aviator.runtime.function.math.MathCosFunction;
-import com.googlecode.aviator.runtime.function.math.MathLog10Function;
-import com.googlecode.aviator.runtime.function.math.MathLogFunction;
-import com.googlecode.aviator.runtime.function.math.MathPowFunction;
-import com.googlecode.aviator.runtime.function.math.MathRoundFunction;
-import com.googlecode.aviator.runtime.function.math.MathSinFunction;
-import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
-import com.googlecode.aviator.runtime.function.math.MathTanFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
-import com.googlecode.aviator.runtime.function.seq.SeqCountFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqEveryFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
-import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
-import com.googlecode.aviator.runtime.function.string.StringEndsWithFunction;
-import com.googlecode.aviator.runtime.function.string.StringIndexOfFunction;
-import com.googlecode.aviator.runtime.function.string.StringJoinFunction;
-import com.googlecode.aviator.runtime.function.string.StringLengthFunction;
-import com.googlecode.aviator.runtime.function.string.StringReplaceAllFunction;
-import com.googlecode.aviator.runtime.function.string.StringReplaceFirstFunction;
-import com.googlecode.aviator.runtime.function.string.StringSplitFunction;
-import com.googlecode.aviator.runtime.function.string.StringStartsWithFunction;
-import com.googlecode.aviator.runtime.function.string.StringSubStringFunction;
-import com.googlecode.aviator.runtime.function.system.BinaryFunction;
-import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
-import com.googlecode.aviator.runtime.function.system.DoubleFunction;
-import com.googlecode.aviator.runtime.function.system.LongFunction;
-import com.googlecode.aviator.runtime.function.system.NowFunction;
-import com.googlecode.aviator.runtime.function.system.PrintFunction;
-import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
-import com.googlecode.aviator.runtime.function.system.RandomFunction;
-import com.googlecode.aviator.runtime.function.system.StrFunction;
-import com.googlecode.aviator.runtime.function.system.String2DateFunction;
-import com.googlecode.aviator.runtime.function.system.SysDateFunction;
-import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
-import com.googlecode.aviator.runtime.type.AviatorNil;
 
 
 /**
@@ -107,23 +48,29 @@ public final class AviatorEvaluator {
 
   /**
    * The global evaluator's functions map.
+   *
    * @deprecated please use instance's field.
    * @see AviatorEvaluatorInstance#getFuncMap()
    */
+  @Deprecated
   public static final Map<String, Object> FUNC_MAP = getInstance().getFuncMap();
 
   /**
    * The global evaluator's operators map.
+   *
    * @deprecated please use instance's field.
    * @see AviatorEvaluatorInstance#getOpsMap()
    */
+  @Deprecated
   public static final Map<OperatorType, AviatorFunction> OPS_MAP = getInstance().getOpsMap();
 
   /**
    * The global evaluator's byte code version.
+   *
    * @deprecated
    * @see AviatorEvaluatorInstance#getBytecodeVersion()
    */
+  @Deprecated
   public static int BYTECODE_VER = getInstance().getBytecodeVersion();
 
 
@@ -136,13 +83,25 @@ public final class AviatorEvaluator {
   }
 
   /**
-   * Set a function missing callback.
-   * 
-   * @since 3.3.1
-   * @param funcMissing
+   * Adds a function loader.
+   *
+   * @see FunctionLoader
+   * @since 4.0.0
+   * @param loader
    */
-  public static void setFunctionMissing(FunctionMissing funcMissing) {
-    getInstance().setFunctionMissing(funcMissing);
+  public static void addFunctionLoader(FunctionLoader loader) {
+    getInstance().addFunctionLoader(loader);
+  }
+
+  /**
+   * Removes a function loader.
+   *
+   * @see FunctionLoader
+   * @since 4.0.0
+   * @param loader
+   */
+  public static void removeFunctionLoader(FunctionLoader loader) {
+    getInstance().removeFunctionLoader(loader);
   }
 
   /**

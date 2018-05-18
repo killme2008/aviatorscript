@@ -20,6 +20,7 @@ package com.googlecode.aviator;
 import java.io.OutputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +89,7 @@ import com.googlecode.aviator.runtime.type.AviatorNil;
 /**
  * A aviator evaluator instance
  *
+ * @since 4.0.0
  * @author dennis
  *
  */
@@ -104,20 +106,36 @@ public final class AviatorEvaluatorInstance {
 
   private final ConcurrentHashMap<Options, Object> options =
       new ConcurrentHashMap<Options, Object>();
-  /** function missing callback */
-  private FunctionMissing functionMissing;
+  /** function loader list */
+  private List<FunctionLoader> functionLoaders;
 
 
   /**
-   * Set a function missing callback.
+   * Adds a function loader
    *
-   * @since 3.3.1
-   * @param funcMissing
+   * @see FunctionLoader
+   * @since 4.0.0
+   * @param loader
    */
-  public void setFunctionMissing(FunctionMissing funcMissing) {
-    functionMissing = funcMissing;
+  public void addFunctionLoader(FunctionLoader loader) {
+    if (this.functionLoaders == null) {
+      functionLoaders = new ArrayList<FunctionLoader>();
+    }
+    functionLoaders.add(loader);
   }
 
+  /**
+   * Remove a function loader
+   *
+   * @since 4.0.0
+   * @param loader
+   */
+  public void removeFunctionLoader(FunctionLoader loader) {
+    if (this.functionLoaders == null) {
+      return;
+    }
+    this.functionLoaders.remove(loader);
+  }
 
   /**
    * Adds a evaluator option
@@ -215,7 +233,6 @@ public final class AviatorEvaluatorInstance {
   }
 
 
-
   /**
    * Set trace output stream
    *
@@ -241,7 +258,8 @@ public final class AviatorEvaluatorInstance {
   private final Map<OperatorType, AviatorFunction> opsMap =
       new HashMap<OperatorType, AviatorFunction>();
 
-  {
+
+  private void loadLib() {
     // Load internal functions
     // load sys lib
     addFunction(new SysDateFunction());
@@ -313,10 +331,6 @@ public final class AviatorEvaluatorInstance {
         new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
     addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
     addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
-    // load custom functions.
-    for (AviatorFunction func : CustomFunctionLoader.load()) {
-      addFunction(func);
-    }
   }
 
   /**
@@ -335,7 +349,8 @@ public final class AviatorEvaluatorInstance {
    * Create a aviator evaluator instance.
    */
   public AviatorEvaluatorInstance() {
-
+    this.loadLib();
+    this.addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
   }
 
 
@@ -408,8 +423,13 @@ public final class AviatorEvaluatorInstance {
    */
   public AviatorFunction getFunction(String name) {
     AviatorFunction function = (AviatorFunction) funcMap.get(name);
-    if (function == null && functionMissing != null) {
-      function = functionMissing.onFunctionMissing(name);
+    if (function == null && functionLoaders != null) {
+      for (FunctionLoader loader : functionLoaders) {
+        function = loader.onFunctionNotFound(name);
+        if (function != null) {
+          break;
+        }
+      }
     }
     if (function == null) {
       throw new ExpressionRuntimeException("Could not find function named '" + name + "'");
@@ -548,7 +568,7 @@ public final class AviatorEvaluatorInstance {
       }
       return exp;
     } finally {
-      RuntimeUtils.removeInstance();
+      RuntimeUtils.removeInstance(this);
     }
   }
 
