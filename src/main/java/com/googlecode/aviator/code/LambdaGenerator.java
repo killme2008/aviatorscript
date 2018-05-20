@@ -19,6 +19,8 @@ import static com.googlecode.aviator.asm.Opcodes.INVOKESPECIAL;
 import static com.googlecode.aviator.asm.Opcodes.INVOKESTATIC;
 import static com.googlecode.aviator.asm.Opcodes.INVOKEVIRTUAL;
 import static com.googlecode.aviator.asm.Opcodes.RETURN;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,8 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.parser.ExpressionParser.DepthInfo;
-import com.googlecode.aviator.runtime.function.LambdaFunction;
+import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
+import com.googlecode.aviator.utils.Env;
 
 /**
  * Lambda function generator
@@ -95,17 +98,19 @@ public class LambdaGenerator implements CodeGenerator {
   private void makeConstructor() {
     {
       this.mv = this.classWriter.visitMethod(ACC_PUBLIC, "<init>",
-          "(Ljava/util/List;Lcom/googlecode/aviator/Expression;)V", null, null);
+          "(Ljava/util/List;Lcom/googlecode/aviator/Expression;Lcom/googlecode/aviator/utils/Env;)V",
+          null, null);
       this.mv.visitCode();
       this.mv.visitVarInsn(ALOAD, 0);
       this.mv.visitVarInsn(ALOAD, 1);
       this.mv.visitVarInsn(ALOAD, 2);
+      this.mv.visitVarInsn(ALOAD, 3);
       this.mv.visitMethodInsn(INVOKESPECIAL,
           "com/googlecode/aviator/runtime/function/LambdaFunction", "<init>",
-          "(Ljava/util/List;Lcom/googlecode/aviator/Expression;)V");
+          "(Ljava/util/List;Lcom/googlecode/aviator/Expression;Lcom/googlecode/aviator/utils/Env;)V");
 
       this.mv.visitInsn(RETURN);
-      this.mv.visitMaxs(3, 1);
+      this.mv.visitMaxs(4, 1);
       this.mv.visitEnd();
     }
   }
@@ -167,7 +172,7 @@ public class LambdaGenerator implements CodeGenerator {
       }
       this.mv.visitVarInsn(ALOAD, arrayIndex);
       this.mv.visitMethodInsn(INVOKEVIRTUAL,
-          "com/googlecode/aviator/runtime/function/LambdaFunction", "getEnv",
+          "com/googlecode/aviator/runtime/function/LambdaFunction", "newEnv",
           "(Ljava/util/Map;[Lcom/googlecode/aviator/runtime/type/AviatorObject;)Ljava/util/Map;");
 
       this.mv.visitMethodInsn(INVOKEINTERFACE, "com/googlecode/aviator/Expression", "execute",
@@ -195,22 +200,25 @@ public class LambdaGenerator implements CodeGenerator {
     this.classWriter.visitEnd();
   }
 
-  public LambdaFunction getFunction() {
+  public LambdaFunctionBootstrap getLmabdaBootstrap() {
     Expression expression = this.getResult();
     this.endVisitClass();
     byte[] bytes = this.classWriter.toByteArray();
     try {
       Class<?> defineClass = ClassDefiner.defineClass(this.className, bytes, this.classLoader);
-      Constructor<?> constructor = defineClass.getConstructor(List.class, Expression.class);
-
-      return (LambdaFunction) constructor.newInstance(this.arguments, expression);
+      Constructor<?> constructor =
+          defineClass.getConstructor(List.class, Expression.class, Env.class);
+      // MethodHandle methodHandle = MethodHandles.lookup().findConstructor(defineClass,
+      // MethodType.methodType(Void.class, List.class, Expression.class, Env.class));
+      MethodHandle methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
+      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, arguments);
     } catch (Exception e) {
       throw new CompileExpressionErrorException("define lambda class error", e);
     }
   }
 
 
-  public void addParameter(String name) {
+  public void addArgument(String name) {
     this.arguments.add(name);
   }
 
@@ -417,12 +425,10 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
 
-
   @Override
   public Expression getResult() {
     return codeGenerator.getResult();
   }
-
 
 
   @Override

@@ -69,7 +69,7 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
-import com.googlecode.aviator.runtime.function.LambdaFunction;
+import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
@@ -134,7 +134,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   /**
    * Compiled lambda functions.
    */
-  private Map<String, LambdaFunction> lambdas;
+  private Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
 
   private static final Label START_LABEL = new Label();
 
@@ -716,7 +716,7 @@ public class ASMCodeGenerator implements CodeGenerator {
           defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class);
       ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
           new ArrayList<String>(this.varTokens.keySet()));
-      exp.setLambdas(this.lambdas);
+      exp.setLambdaBootstraps(lambdaBootstraps);
       return exp;
     } catch (Exception e) {
       if (e.getCause() instanceof ExpressionRuntimeException) {
@@ -1063,13 +1063,13 @@ public class ASMCodeGenerator implements CodeGenerator {
       this.lambdaGenerator = new LambdaGenerator(instance, this, this.parser, false);
       this.lambdaGenerator.setScopeInfo(this.parser.enterScope());
     } else {
-      throw new CompileExpressionErrorException("Nested lambda");
+      throw new CompileExpressionErrorException("Compile lambda error");
     }
   }
 
   @Override
   public void onLambdaArgument(Token<?> lookhead) {
-    this.lambdaGenerator.addParameter(lookhead.getLexeme());
+    this.lambdaGenerator.addArgument(lookhead.getLexeme());
   }
 
   @Override
@@ -1081,17 +1081,19 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onLambdaBodyEnd(Token<?> lookhead) {
     this.lambdaGenerator.compileCallMethod();
-    LambdaFunction func = this.lambdaGenerator.getFunction();
-    if (this.lambdas == null) {
-      lambdas = new HashMap<String, LambdaFunction>();
+    LambdaFunctionBootstrap func = this.lambdaGenerator.getLmabdaBootstrap();
+    if (this.lambdaBootstraps == null) {
+      lambdaBootstraps = new HashMap<String, LambdaFunctionBootstrap>();
     }
-    this.lambdas.put(func.getName(), func);
+    this.lambdaBootstraps.put(func.getName(), func);
     this.mv.visitVarInsn(ALOAD, 0);
+    this.loadEnv();
     this.mv.visitLdcInsn(func.getName());
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, this.className, "getLambda",
-        "(Ljava/lang/String;)Lcom/googlecode/aviator/runtime/function/LambdaFunction;");
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, this.className, "newLambda",
+        "(Lcom/googlecode/aviator/utils/Env;Ljava/lang/String;)Lcom/googlecode/aviator/runtime/function/LambdaFunction;");
     this.pushOperand();
     this.pushOperand();
+    this.popOperand();
     this.popOperand();
     this.parser.restoreScope(this.lambdaGenerator.getScopeInfo());
     this.lambdaGenerator = null;

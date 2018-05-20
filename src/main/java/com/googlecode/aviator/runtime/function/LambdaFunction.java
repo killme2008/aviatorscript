@@ -14,19 +14,26 @@ import com.googlecode.aviator.utils.Env;
  */
 public abstract class LambdaFunction extends AbstractFunction {
 
+  // the arguments.
   protected List<String> arguments;
 
+  // the compiled lambda body expression
   protected Expression expression;
 
+  // closure context
+  protected Env context;
 
-  public LambdaFunction(List<String> arguments, Expression expression) {
+  public LambdaFunction(List<String> arguments, Expression expression, Env context) {
     super();
     this.arguments = arguments;
+    this.context = context;
     this.expression = expression;
   }
 
-  protected Map<String, Object> getEnv(Map<String, Object> parentEnv, AviatorObject... args) {
-    Env env = new Env(parentEnv);
+  protected Map<String, Object> newEnv(Map<String, Object> parentEnv, AviatorObject... args) {
+    Env env = new Env(context, parentEnv);
+    env.setInstance(((Env) parentEnv).getInstance());
+
     int i = 0;
     for (String name : arguments) {
       env.put(name, args[i++].getValue(env));

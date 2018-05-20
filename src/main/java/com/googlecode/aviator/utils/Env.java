@@ -26,9 +26,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 
 /**
  * Expression execute environment.Modifed from ChainedMap in jibx.
@@ -66,6 +68,9 @@ public class Env implements Map<String, Object> {
   private static final Map<String, Object> EMPTY_ENV =
       Collections.unmodifiableMap(new HashMap<String, Object>());
 
+  /**
+   * Constructs an env instance with empty state.
+   */
   public Env() {
     this(EMPTY_ENV);
   }
@@ -77,6 +82,11 @@ public class Env implements Map<String, Object> {
    */
   public Env(Map<String, Object> defaults) {
     mDefaults = defaults;
+  }
+
+  public Env(Map<String, Object> defaults, Map<String, Object> overrides) {
+    mDefaults = defaults;
+    mOverrides = overrides;
   }
 
   /**
@@ -142,6 +152,12 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Object get(Object key) {
+    if (key.equals(RuntimeUtils.INSTANCE_VAR)) {
+      return this.instance;
+    }
+    if (key.equals(RuntimeUtils.ENV_VAR)) {
+      return this;
+    }
     if (getmOverrides(true).containsKey(key)) {
       return getmOverrides(true).get(key);
     } else {
@@ -168,6 +184,8 @@ public class Env implements Map<String, Object> {
   public Set<String> keySet() {
     Set<String> ret = new HashSet<String>(mDefaults.keySet());
     ret.addAll(this.getmOverrides(true).keySet());
+    ret.add("__env__");
+    ret.add("__instance__");
     return ret;
   }
 
@@ -236,6 +254,38 @@ public class Env implements Map<String, Object> {
   @Override
   public Collection<Object> values() {
     return getmOverrides(true).values();
+  }
+
+
+
+  /**
+   * Gets the map as a String.
+   *
+   * @return a string version of the map
+   */
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer(32 * size());
+    buf.append("{__instance__=").append(this.instance).append(", __env__=<this>");
+
+    Iterator<String> it = keySet().iterator();
+    boolean hasNext = it.hasNext();
+    if (hasNext) {
+      buf.append(", ");
+    }
+    while (hasNext) {
+      String key = it.next();
+      Object value = get(key);
+      buf.append(key).append('=').append(value == this ? "(this Map)" : value);
+
+      hasNext = it.hasNext();
+      if (hasNext) {
+        buf.append(',').append(' ');
+      }
+    }
+
+    buf.append('}');
+    return buf.toString();
   }
 
   private Map<String, Object> getmOverrides(boolean readOnly) {

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Env;
@@ -32,23 +33,28 @@ import com.googlecode.aviator.utils.Env;
  */
 public abstract class ClassExpression extends BaseExpression {
 
-  protected Map<String, LambdaFunction> lambdas;
+  protected Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
 
 
-  public void setLambdas(Map<String, LambdaFunction> lambdas) {
-    this.lambdas = lambdas;
+
+  public Map<String, LambdaFunctionBootstrap> getLambdaBootstraps() {
+    return lambdaBootstraps;
+  }
+
+  public void setLambdaBootstraps(Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
+    this.lambdaBootstraps = lambdaBootstraps;
   }
 
   public ClassExpression(AviatorEvaluatorInstance instance, List<String> varNames) {
     super(instance, varNames);
   }
 
-  public LambdaFunction getLambda(String name) {
-    LambdaFunction ret = this.lambdas.get(name);
-    if (ret == null) {
+  public LambdaFunction newLambda(Env env, String name) {
+    LambdaFunctionBootstrap bootstrap = this.lambdaBootstraps.get(name);
+    if (bootstrap == null) {
       throw new ExpressionRuntimeException("Lambda " + name + " not found");
     }
-    return ret;
+    return bootstrap.newInstance(env);
   }
 
   /*

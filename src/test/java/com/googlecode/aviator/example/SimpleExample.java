@@ -19,11 +19,13 @@ public class SimpleExample {
       System.out.println();
     }
     env.put("a", value);
-    env.put("x", 1);
-    LambdaFunction s = (LambdaFunction) AviatorEvaluator
-        .execute("lambda(x) ->  lambda(y) -> lambda(z) -> x +y +z end end end", env);
+    env.put("x", 4);
+    env.put("y", 5);
+    LambdaFunction s = (LambdaFunction) AviatorEvaluator.execute(
+        "lambda(x) -> println(#__env__); lambda(y) -> println(#__env__);lambda(z) ->println(#__env__); x +y +z end end end",
+        env);
     AviatorEvaluator.getInstance().getFuncMap().put("s", s);
-    env.put("z", 100);
+    env.put("z", 6);
 
     System.out.println(AviatorEvaluator.execute("s(1)(2)(3)", env));
   }
