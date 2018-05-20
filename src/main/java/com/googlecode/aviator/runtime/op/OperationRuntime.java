@@ -1,7 +1,6 @@
 package com.googlecode.aviator.runtime.op;
 
 import java.util.Map;
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.RuntimeUtils;
@@ -41,27 +40,28 @@ public class OperationRuntime {
    * @param opType
    * @return
    */
-  public static AviatorObject eval(AviatorObject[] args, OperatorType opType) {
-    AviatorFunction func = RuntimeUtils.getInstance().getOpFunction(opType);
-    AviatorObject ret = eval0(args, opType, func);
-    if (RuntimeUtils.isTracedEval()) {
+  public static AviatorObject eval(Map<String, Object> env, AviatorObject[] args,
+      OperatorType opType) {
+    AviatorFunction func = RuntimeUtils.getInstance(env).getOpFunction(opType);
+    AviatorObject ret = eval0(env, args, opType, func);
+    if (RuntimeUtils.isTracedEval(env)) {
       trace(null, opType, ret, args);
     }
     return ret;
   }
 
-  private static AviatorObject eval0(AviatorObject[] args, OperatorType opType,
-      AviatorFunction func) {
+  private static AviatorObject eval0(Map<String, Object> env, AviatorObject[] args,
+      OperatorType opType, AviatorFunction func) {
     if (func == null) {
-      return opType.eval(args, null);
+      return opType.eval(args, env);
     } else {
       switch (args.length) {
         case 1:
-          return func.call(null, args[0]);
+          return func.call(env, args[0]);
         case 2:
-          return func.call(null, args[0], args[1]);
+          return func.call(env, args[0], args[1]);
         case 3:
-          return func.call(null, args[0], args[1], args[2]);
+          return func.call(env, args[0], args[1], args[2]);
       }
       throw new ExpressionRuntimeException("Too many arguments.");
     }
@@ -77,9 +77,9 @@ public class OperationRuntime {
    */
   public static AviatorObject eval(AviatorObject arg, Map<String, Object> env,
       OperatorType opType) {
-    AviatorFunction func = RuntimeUtils.getInstance().getOpFunction(opType);
+    AviatorFunction func = RuntimeUtils.getInstance(env).getOpFunction(opType);
     AviatorObject ret = eval0(arg, env, opType, func);
-    if (RuntimeUtils.isTracedEval()) {
+    if (RuntimeUtils.isTracedEval(env)) {
       trace(env, opType, ret, arg);
     }
     return ret;
@@ -123,9 +123,9 @@ public class OperationRuntime {
   public static AviatorObject eval(AviatorObject left, AviatorObject right, Map<String, Object> env,
       OperatorType opType) {
 
-    AviatorFunction func = RuntimeUtils.getInstance().getOpFunction(opType);
+    AviatorFunction func = RuntimeUtils.getInstance(env).getOpFunction(opType);
     AviatorObject ret = eval0(left, right, env, opType, func);
-    if (RuntimeUtils.isTracedEval()) {
+    if (RuntimeUtils.isTracedEval(env)) {
       trace(env, opType, ret, left, right);
     }
     return ret;
@@ -143,9 +143,9 @@ public class OperationRuntime {
     }
   }
 
-  public static final boolean hasRuntimeContext(OperatorType opType) {
-    return RuntimeUtils.getInstance().getOpsMap().containsKey(opType)
-        || RuntimeUtils.isTracedEval();
+  public static final boolean hasRuntimeContext(Map<String, Object> env, OperatorType opType) {
+    return RuntimeUtils.getInstance(env).getOpsMap().containsKey(opType)
+        || RuntimeUtils.isTracedEval(env);
   }
 
   private static final String WHITE_SPACE = " ";
@@ -156,15 +156,15 @@ public class OperationRuntime {
 
     switch (args.length) {
       case 1:
-        RuntimeUtils.printTrace(
+        RuntimeUtils.printTrace(env,
             TRACE_PREFIX + opType.token + args[0].desc(env) + " => " + result.desc(env));
         break;
       case 2:
-        RuntimeUtils.printTrace(TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + opType.token
+        RuntimeUtils.printTrace(env, TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + opType.token
             + WHITE_SPACE + args[1].desc(env) + " => " + result.desc(env));
         break;
       case 3:
-        RuntimeUtils.printTrace(
+        RuntimeUtils.printTrace(env,
             TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + "?" + WHITE_SPACE + args[0].desc(env)
                 + WHITE_SPACE + ":" + WHITE_SPACE + args[1].desc(env) + " => " + result.desc(env));
         break;

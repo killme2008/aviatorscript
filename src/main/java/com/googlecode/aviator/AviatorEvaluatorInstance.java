@@ -37,7 +37,6 @@ import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
-import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -348,11 +347,10 @@ public final class AviatorEvaluatorInstance {
   /**
    * Create a aviator evaluator instance.
    */
-  public AviatorEvaluatorInstance() {
+  AviatorEvaluatorInstance() {
     this.loadLib();
     this.addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
   }
-
 
   /**
    * Clear all cached compiled expression
@@ -557,19 +555,14 @@ public final class AviatorEvaluatorInstance {
 
 
   private Expression innerCompile(final String expression, boolean cached) {
-    try {
-      RuntimeUtils.setInstance(this);
-      ExpressionLexer lexer = new ExpressionLexer(this, expression);
-      CodeGenerator codeGenerator = newCodeGenerator(cached);
-      ExpressionParser parser = new ExpressionParser(this, lexer, codeGenerator);
-      Expression exp = parser.parse();
-      if ((boolean) getOption(Options.TRACE_EVAL)) {
-        ((BaseExpression) exp).setExpression(expression);
-      }
-      return exp;
-    } finally {
-      RuntimeUtils.removeInstance(this);
+    ExpressionLexer lexer = new ExpressionLexer(this, expression);
+    CodeGenerator codeGenerator = newCodeGenerator(cached);
+    ExpressionParser parser = new ExpressionParser(this, lexer, codeGenerator);
+    Expression exp = parser.parse();
+    if ((boolean) getOption(Options.TRACE_EVAL)) {
+      ((BaseExpression) exp).setExpression(expression);
     }
+    return exp;
   }
 
   private int getOptimizeLevel() {

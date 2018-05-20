@@ -18,7 +18,6 @@ package com.googlecode.aviator.runtime.type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.TypeUtils;
@@ -26,9 +25,9 @@ import com.googlecode.aviator.utils.TypeUtils;
 
 /**
  * Aviator number type
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public abstract class AviatorNumber extends AviatorObject {
   protected Number number;
@@ -76,12 +75,12 @@ public abstract class AviatorNumber extends AviatorObject {
       case Decimal:
       case Long:
       case Double:
-        return this.innerAdd((AviatorNumber) other);
+        return this.innerAdd(env, (AviatorNumber) other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerAdd(AviatorNumber.valueOf(otherValue));
+          return this.innerAdd(env, AviatorNumber.valueOf(otherValue));
         } else if (otherValue instanceof String) {
           return new AviatorString(this.number.toString() + otherValue);
         } else {
@@ -101,12 +100,12 @@ public abstract class AviatorNumber extends AviatorObject {
       case Decimal:
       case Long:
       case Double:
-        return this.innerSub((AviatorNumber) other);
+        return this.innerSub(env, (AviatorNumber) other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerSub(AviatorNumber.valueOf(otherValue));
+          return this.innerSub(env, AviatorNumber.valueOf(otherValue));
         } else {
           return super.sub(other, env);
         }
@@ -124,12 +123,12 @@ public abstract class AviatorNumber extends AviatorObject {
       case Decimal:
       case Long:
       case Double:
-        return this.innerMod((AviatorNumber) other);
+        return this.innerMod(env, (AviatorNumber) other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerMod(AviatorNumber.valueOf(otherValue));
+          return this.innerMod(env, AviatorNumber.valueOf(otherValue));
         } else {
           return super.mod(other, env);
         }
@@ -146,12 +145,12 @@ public abstract class AviatorNumber extends AviatorObject {
       case Decimal:
       case Long:
       case Double:
-        return this.innerDiv((AviatorNumber) other);
+        return this.innerDiv(env, (AviatorNumber) other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerDiv(AviatorNumber.valueOf(otherValue));
+          return this.innerDiv(env, AviatorNumber.valueOf(otherValue));
         } else {
           return super.div(other, env);
         }
@@ -169,12 +168,12 @@ public abstract class AviatorNumber extends AviatorObject {
       case Decimal:
       case Long:
       case Double:
-        return this.innerMult((AviatorNumber) other);
+        return this.innerMult(env, (AviatorNumber) other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerMult(AviatorNumber.valueOf(otherValue));
+          return this.innerMult(env, AviatorNumber.valueOf(otherValue));
         } else {
           return super.mult(other, env);
         }
@@ -195,7 +194,7 @@ public abstract class AviatorNumber extends AviatorObject {
       case Decimal:
       case Long:
       case Double:
-        return this.innerCompare((AviatorNumber) other);
+        return this.innerCompare(env, (AviatorNumber) other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
@@ -203,7 +202,7 @@ public abstract class AviatorNumber extends AviatorObject {
           return 1;
         }
         if (otherValue instanceof Number) {
-          return this.innerCompare(AviatorNumber.valueOf(otherValue));
+          return this.innerCompare(env, AviatorNumber.valueOf(otherValue));
         } else {
           throw new ExpressionRuntimeException("Could not compare " + this + " with " + other);
         }
@@ -216,22 +215,22 @@ public abstract class AviatorNumber extends AviatorObject {
   }
 
 
-  public abstract AviatorObject innerSub(AviatorNumber other);
+  public abstract AviatorObject innerSub(Map<String, Object> env, AviatorNumber other);
 
 
-  public abstract AviatorObject innerMult(AviatorNumber other);
+  public abstract AviatorObject innerMult(Map<String, Object> env, AviatorNumber other);
 
 
-  public abstract AviatorObject innerMod(AviatorNumber other);
+  public abstract AviatorObject innerMod(Map<String, Object> env, AviatorNumber other);
 
 
-  public abstract AviatorObject innerDiv(AviatorNumber other);
+  public abstract AviatorObject innerDiv(Map<String, Object> env, AviatorNumber other);
 
 
-  public abstract AviatorObject innerAdd(AviatorNumber other);
+  public abstract AviatorObject innerAdd(Map<String, Object> env, AviatorNumber other);
 
 
-  public abstract int innerCompare(AviatorNumber other);
+  public abstract int innerCompare(Map<String, Object> env, AviatorNumber other);
 
 
   public long longValue() {
@@ -248,13 +247,13 @@ public abstract class AviatorNumber extends AviatorObject {
   }
 
 
-  public final BigDecimal toDecimal() {
+  public final BigDecimal toDecimal(Map<String, Object> env) {
     if (TypeUtils.isDecimal(this.number)) {
       return (BigDecimal) this.number;
     } else if (TypeUtils.isBigInt(this.number)) {
       return new BigDecimal(this.toBigInt());
     } else {
-      return new BigDecimal(this.number.doubleValue(), RuntimeUtils.getMathContext());
+      return new BigDecimal(this.number.doubleValue(), RuntimeUtils.getMathContext(env));
     }
   }
 }

@@ -1,10 +1,10 @@
 package com.googlecode.aviator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -76,6 +76,13 @@ public abstract class BaseExpression implements Expression {
   @Override
   public List<String> getVariableNames() {
     return this.varNames;
+  }
+
+
+  protected Env newEnv(Map<String, Object> map) {
+    Env env = new Env(map);
+    env.setInstance(this.instance);
+    return env;
   }
 
 }

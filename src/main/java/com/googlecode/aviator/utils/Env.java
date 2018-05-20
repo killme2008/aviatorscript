@@ -23,26 +23,51 @@
 package com.googlecode.aviator.utils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 
 /**
- * Partial implementation of {@link java.util.Map} which provides a merged view of a defaults map
- * with an overrides map. Although this can be used as a map for most purposes, methods which return
- * live views of the keys or values in the map only take into account the overrides, not the
- * defaults.
+ * Expression execute environment.Modifed from ChainedMap in jibx.
+ *
+ * @author dennis
+ *
+ * @param <String>
+ * @param <Object>
  */
-public class ChainedMap<K, V> implements Map<K, V> {
+public class Env implements Map<String, Object> {
   /** Default values map. */
-  private final Map<K, V> mDefaults;
+  private final Map<String, Object> mDefaults;
+
+  /**
+   * Current evaluator instance that executes current expression.
+   */
+  private AviatorEvaluatorInstance instance;
+
 
   /** Override values map. */
-  private final Map<K, V> mOverrides;
+  private Map<String, Object> mOverrides;
 
-  public Map<K, V> getDefaults() {
+  public Map<String, Object> getDefaults() {
     return mDefaults;
+  }
+
+  public AviatorEvaluatorInstance getInstance() {
+    return instance;
+  }
+
+  public void setInstance(AviatorEvaluatorInstance instance) {
+    this.instance = instance;
+  }
+
+  private static final Map<String, Object> EMPTY_ENV =
+      Collections.unmodifiableMap(new HashMap<String, Object>());
+
+  public Env() {
+    this(EMPTY_ENV);
   }
 
   /**
@@ -50,9 +75,8 @@ public class ChainedMap<K, V> implements Map<K, V> {
    *
    * @param defaults map providing defaults for keys not set directly
    */
-  public ChainedMap(Map<K, V> defaults) {
+  public Env(Map<String, Object> defaults) {
     mDefaults = defaults;
-    mOverrides = new HashMap<K, V>();
   }
 
   /**
@@ -60,7 +84,12 @@ public class ChainedMap<K, V> implements Map<K, V> {
    */
   @Override
   public void clear() {
-    mDefaults.clear();
+    if (mDefaults != EMPTY_ENV) {
+      mDefaults.clear();
+    }
+    if (mOverrides != null && mOverrides != EMPTY_ENV) {
+      mOverrides.clear();
+    }
   }
 
   /**
@@ -73,8 +102,9 @@ public class ChainedMap<K, V> implements Map<K, V> {
    */
   @Override
   public boolean containsKey(Object key) {
-    if (mOverrides.containsKey(key)) {
-      return mOverrides.get(key) != null;
+    Map<String, Object> overrides = getmOverrides(true);
+    if (overrides.containsKey(key)) {
+      return overrides.get(key) != null;
     } else {
       return mDefaults.containsKey(key);
     }
@@ -88,7 +118,7 @@ public class ChainedMap<K, V> implements Map<K, V> {
    */
   @Override
   public boolean containsValue(Object value) {
-    return mOverrides.containsValue(value) || mDefaults.containsValue(value);
+    return getmOverrides(true).containsValue(value) || mDefaults.containsValue(value);
   }
 
   /**
@@ -97,9 +127,9 @@ public class ChainedMap<K, V> implements Map<K, V> {
    * @return override entries
    */
   @Override
-  public Set<Entry<K, V>> entrySet() {
-    Set<Entry<K, V>> ret = new HashSet<Entry<K, V>>(mDefaults.entrySet());
-    ret.addAll(this.mOverrides.entrySet());
+  public Set<Entry<String, Object>> entrySet() {
+    Set<Entry<String, Object>> ret = new HashSet<Entry<String, Object>>(mDefaults.entrySet());
+    ret.addAll(this.getmOverrides(true).entrySet());
     return ret;
   }
 
@@ -111,9 +141,9 @@ public class ChainedMap<K, V> implements Map<K, V> {
    * @return value (<code>null</code> if key not present)
    */
   @Override
-  public V get(Object key) {
-    if (mOverrides.containsKey(key)) {
-      return mOverrides.get(key);
+  public Object get(Object key) {
+    if (getmOverrides(true).containsKey(key)) {
+      return getmOverrides(true).get(key);
     } else {
       return mDefaults.get(key);
     }
@@ -126,7 +156,7 @@ public class ChainedMap<K, V> implements Map<K, V> {
    */
   @Override
   public boolean isEmpty() {
-    return mOverrides.isEmpty();
+    return getmOverrides(true).isEmpty() && this.mDefaults.isEmpty();
   }
 
   /**
@@ -135,9 +165,9 @@ public class ChainedMap<K, V> implements Map<K, V> {
    * @return keys
    */
   @Override
-  public Set<K> keySet() {
-    Set<K> ret = new HashSet<K>(mDefaults.keySet());
-    ret.addAll(this.mOverrides.keySet());
+  public Set<String> keySet() {
+    Set<String> ret = new HashSet<String>(mDefaults.keySet());
+    ret.addAll(this.getmOverrides(true).keySet());
     return ret;
   }
 
@@ -149,15 +179,16 @@ public class ChainedMap<K, V> implements Map<K, V> {
    * @return previous value for key (from default map, if not present in overrides)
    */
   @Override
-  public V put(K key, V value) {
+  public Object put(String key, Object value) {
     Object prior;
-    if (mOverrides.containsKey(key)) {
-      prior = mOverrides.put(key, value);
+    Map<String, Object> overrides = getmOverrides(false);
+    if (overrides.containsKey(key)) {
+      prior = overrides.put(key, value);
     } else {
-      mOverrides.put(key, value);
+      overrides.put(key, value);
       prior = mDefaults.get(key);
     }
-    return (V) prior;
+    return prior;
   }
 
   /**
@@ -167,7 +198,7 @@ public class ChainedMap<K, V> implements Map<K, V> {
    */
   @Override
   public void putAll(Map map) {
-    mOverrides.putAll(map);
+    getmOverrides(false).putAll(map);
   }
 
   /**
@@ -179,9 +210,9 @@ public class ChainedMap<K, V> implements Map<K, V> {
    * @return previous value for key
    */
   @Override
-  public V remove(Object key) {
-    if (mOverrides.containsKey(key)) {
-      return mOverrides.remove(key);
+  public Object remove(Object key) {
+    if (getmOverrides(false).containsKey(key)) {
+      return getmOverrides(false).remove(key);
     } else {
       return mDefaults.remove(key);
     }
@@ -194,7 +225,7 @@ public class ChainedMap<K, V> implements Map<K, V> {
    */
   @Override
   public int size() {
-    return mOverrides.size();
+    return getmOverrides(true).size();
   }
 
   /**
@@ -203,7 +234,17 @@ public class ChainedMap<K, V> implements Map<K, V> {
    * @return values
    */
   @Override
-  public Collection<V> values() {
-    return mOverrides.values();
+  public Collection<Object> values() {
+    return getmOverrides(true).values();
+  }
+
+  private Map<String, Object> getmOverrides(boolean readOnly) {
+    if (mOverrides == null) {
+      if (readOnly) {
+        return EMPTY_ENV;
+      }
+      mOverrides = new HashMap<String, Object>();
+    }
+    return mOverrides;
   }
 }

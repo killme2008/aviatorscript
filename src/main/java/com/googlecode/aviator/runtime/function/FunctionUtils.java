@@ -112,7 +112,7 @@ public class FunctionUtils {
       rt = (AviatorFunction) env.get(name);
     }
     if (rt == null) {
-      AviatorEvaluatorInstance instance = RuntimeUtils.getInstance();
+      AviatorEvaluatorInstance instance = RuntimeUtils.getInstance(env);
       rt = instance.getFunction(name);
     }
     return rt;

@@ -21,6 +21,7 @@ import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
+import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -56,32 +57,26 @@ public abstract class ClassExpression extends BaseExpression {
    * @see com.googlecode.aviator.IExpression#execute(java.util.Map)
    */
   @Override
-  public Object execute(Map<String, Object> env) {
-    if (env == null) {
-      env = new HashMap<String, Object>();
+  public Object execute(Map<String, Object> map) {
+    if (map == null) {
+      map = new HashMap<String, Object>();
     }
-    if (RuntimeUtils.isTracedEval()) {
-      RuntimeUtils.printTrace("Tracing: " + this.getExpression());
-    }
+    Env env = newEnv(map);
     try {
-      RuntimeUtils.setInstance(this.instance);
       Object result = this.execute0(env);
-      if (RuntimeUtils.isTracedEval()) {
-        RuntimeUtils.printTrace("Result : " + result);
+      if (RuntimeUtils.isTracedEval(env)) {
+        RuntimeUtils.printTrace(env, "Result : " + result);
       }
       return result;
     } catch (ExpressionRuntimeException e) {
       throw e;
     } catch (Throwable e) {
       throw new ExpressionRuntimeException("Execute expression error", e);
-    } finally {
-      RuntimeUtils.removeInstance(this.instance);
     }
-
   }
 
 
-  public abstract Object execute0(Map<String, Object> env);
+  public abstract Object execute0(Env env);
 
 
   /**

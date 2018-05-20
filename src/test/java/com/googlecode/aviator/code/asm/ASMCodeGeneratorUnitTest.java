@@ -15,7 +15,10 @@
  **/
 package com.googlecode.aviator.code.asm;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -24,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
@@ -42,13 +45,14 @@ public class ASMCodeGeneratorUnitTest {
   public void setUp() {
     final AviatorClassLoader classloader =
         AccessController.doPrivileged(new PrivilegedAction<AviatorClassLoader>() {
+          @Override
           public AviatorClassLoader run() {
             return new AviatorClassLoader(Thread.currentThread().getContextClassLoader());
           }
         });
 
     this.codeGenerator =
-        new ASMCodeGenerator(new AviatorEvaluatorInstance(), classloader, System.out, true);
+        new ASMCodeGenerator(AviatorEvaluator.newInstance(), classloader, System.out, true);
     this.codeGenerator.start();
   }
 

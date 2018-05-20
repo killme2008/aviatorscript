@@ -73,6 +73,14 @@ public final class AviatorEvaluator {
   @Deprecated
   public static int BYTECODE_VER = getInstance().getBytecodeVersion();
 
+  /**
+   * Create a aviator evaluator instance.
+   *
+   * @return
+   */
+  public static AviatorEvaluatorInstance newInstance() {
+    return new AviatorEvaluatorInstance();
+  }
 
   private static class StaticHolder {
     private static AviatorEvaluatorInstance INSTANCE = new AviatorEvaluatorInstance();

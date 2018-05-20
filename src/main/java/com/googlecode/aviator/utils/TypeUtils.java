@@ -18,15 +18,15 @@ package com.googlecode.aviator.utils;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import com.googlecode.aviator.AviatorEvaluator;
+import java.util.Map;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 
 
 /**
  * Java type to aviator type utilities
- * 
+ *
  * @author boyan
- * 
+ *
  */
 public class TypeUtils {
 
@@ -60,29 +60,30 @@ public class TypeUtils {
 
 
   public static int comapreLong(long x, long y) {
-    if (x > y)
+    if (x > y) {
       return 1;
-    else if (x < y)
+    } else if (x < y) {
       return -1;
-    else
+    } else {
       return 0;
+    }
   }
 
 
   /**
    * newton method to get natural logarithm
-   * 
+   *
    * @param x
    * @return
    */
-  public static BigDecimal ln(BigDecimal x) {
+  public static BigDecimal ln(Map<String, Object> env, BigDecimal x) {
     if (x.equals(BigDecimal.ONE)) {
       return BigDecimal.ZERO;
     }
 
     x = x.subtract(BigDecimal.ONE);
     BigDecimal ret = new BigDecimal(NEWTON_METHOD_REPEATS + 1);
-    MathContext mathContext = RuntimeUtils.getMathContext();
+    MathContext mathContext = RuntimeUtils.getMathContext(env);
     for (long i = NEWTON_METHOD_REPEATS; i >= 0; i--) {
       BigDecimal N = new BigDecimal(i / 2 + 1).pow(2);
       N = N.multiply(x, mathContext);

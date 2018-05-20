@@ -35,6 +35,7 @@ import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.utils.Env;
 
 
 public class FunctionTest {
@@ -479,8 +480,11 @@ public class FunctionTest {
     assertEquals(new BigInteger("199999999999999999999999999999998"),
         AviatorEvaluator.exec("99999999999999999999999999999999+99999999999999999999999999999999"));
 
+    Env env = new Env(null);
+    env.setInstance(AviatorEvaluator.getInstance());
     assertEquals(
-        new BigDecimal("99999999999999999999999999999999.99999999", RuntimeUtils.getMathContext()),
+        new BigDecimal("99999999999999999999999999999999.99999999",
+            RuntimeUtils.getMathContext(env)),
         AviatorEvaluator.exec("99999999999999999999999999999999.99999999M"));
   }
 

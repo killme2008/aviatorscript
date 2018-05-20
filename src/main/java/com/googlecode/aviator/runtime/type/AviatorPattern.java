@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
@@ -76,7 +75,7 @@ public class AviatorPattern extends AviatorObject {
         Matcher m = this.pattern.matcher(aviatorString.lexeme);
         if (m.matches()) {
           boolean captureGroups =
-              RuntimeUtils.getInstance().getOption(Options.PUT_CAPTURING_GROUPS_INTO_ENV);
+              RuntimeUtils.getInstance(env).getOption(Options.PUT_CAPTURING_GROUPS_INTO_ENV);
           if (captureGroups && env != null && env != Collections.EMPTY_MAP) {
             int groupCount = m.groupCount();
             for (int i = 0; i <= groupCount; i++) {

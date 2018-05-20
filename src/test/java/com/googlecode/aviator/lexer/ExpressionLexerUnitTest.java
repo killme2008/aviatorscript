@@ -38,7 +38,7 @@ public class ExpressionLexerUnitTest {
 
   @Before
   public void setup() {
-    this.instance = new AviatorEvaluatorInstance();
+    this.instance = AviatorEvaluator.newInstance();
   }
 
 

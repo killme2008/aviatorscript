@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
+import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
@@ -34,7 +35,7 @@ public class ExpressionParserUnitTest {
   @Before
   public void setUp() {
     this.codeGenerator = new FakeCodeGenerator();
-    this.instance = new AviatorEvaluatorInstance();
+    this.instance = AviatorEvaluator.newInstance();
   }
 
 

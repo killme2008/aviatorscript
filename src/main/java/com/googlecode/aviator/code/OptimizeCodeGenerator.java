@@ -45,6 +45,7 @@ import com.googlecode.aviator.runtime.type.AviatorNumber;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorPattern;
 import com.googlecode.aviator.runtime.type.AviatorString;
+import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -178,7 +179,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
       }
       // execute it now
-      AviatorObject result = OperationRuntime.eval(args, operatorType);
+      Env env = new Env();
+      env.setInstance(this.instance);
+      AviatorObject result = OperationRuntime.eval(env, args, operatorType);
       // set result as token to tokenList for next executing
       this.tokenList.set(operatorIndex, this.getTokenFromOperand(result));
       return 1;
