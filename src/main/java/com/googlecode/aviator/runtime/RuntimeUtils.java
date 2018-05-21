@@ -18,9 +18,6 @@ import com.googlecode.aviator.utils.Env;
  */
 public final class RuntimeUtils {
 
-  public static final String INSTANCE_VAR = "__evaluator__";
-  public static final String ENV_VAR = "__env__";
-
   private RuntimeUtils() {
 
   }

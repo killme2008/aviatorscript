@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.runtime.RuntimeUtils;
 
 /**
  * Expression execute environment.Modifed from ChainedMap in jibx.
@@ -152,12 +151,6 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Object get(Object key) {
-    if (key.equals(RuntimeUtils.INSTANCE_VAR)) {
-      return this.instance;
-    }
-    if (key.equals(RuntimeUtils.ENV_VAR)) {
-      return this;
-    }
     if (getmOverrides(true).containsKey(key)) {
       return getmOverrides(true).get(key);
     } else {
@@ -266,7 +259,7 @@ public class Env implements Map<String, Object> {
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer(32 * size());
-    buf.append("{__instance__=").append(this.instance).append(", __env__=<this>");
+    buf.append("{__evaluator__=").append(this.instance).append(", __env__=<this>");
 
     Iterator<String> it = keySet().iterator();
     boolean hasNext = it.hasNext();
