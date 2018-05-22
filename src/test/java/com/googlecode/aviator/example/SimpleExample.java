@@ -8,7 +8,6 @@ import com.googlecode.aviator.runtime.function.LambdaFunction;
 
 public class SimpleExample {
   public static void main(String[] args) {
-    AviatorEvaluator.setOptimize(AviatorEvaluator.COMPILE);
     Map<String, Object> env = new HashMap<>();
     int[][] value = new int[10][10];
     for (int i = 0; i < 10; i++) {
@@ -18,15 +17,16 @@ public class SimpleExample {
       }
       System.out.println();
     }
-    env.put("a", value);
+    env.put("d", 100);
     env.put("x", 4);
     env.put("y", 5);
     LambdaFunction s = (LambdaFunction) AviatorEvaluator.execute(
-        "lambda(x) -> println(#__env__); lambda(y) -> println(#__env__);lambda(z) ->println(#__env__); x +y +z end end end",
+        "lambda(x) -> println(#__env__);lambda(y) -> println(#__env__);lambda(z) ->println(#__env__); x +y +z+d end end end",
         env);
     AviatorEvaluator.getInstance().getFuncMap().put("s", s);
     env.put("z", 6);
 
-    System.out.println(AviatorEvaluator.execute("s(1)(2)(3)", env));
+    System.out.println(AviatorEvaluator.execute(
+        "println(x);println(y);println(z);s(1)(2)(3);println(x);println(y);println(z)", env));
   }
 }

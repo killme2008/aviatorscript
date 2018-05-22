@@ -30,9 +30,9 @@ public abstract class LambdaFunction extends AbstractFunction {
     this.expression = expression;
   }
 
-  protected Map<String, Object> newEnv(Map<String, Object> parentEnv, AviatorObject... args) {
-    Env env = new Env(context, parentEnv);
-    env.setInstance(((Env) parentEnv).getInstance());
+  protected Map<String, Object> newEnv(AviatorObject... args) {
+    Env env = new Env(context);
+    env.setInstance(context.getInstance());
 
     int i = 0;
     for (String name : arguments) {

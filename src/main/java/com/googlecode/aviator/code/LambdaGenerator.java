@@ -157,8 +157,6 @@ public class LambdaGenerator implements CodeGenerator {
           "Lcom/googlecode/aviator/Expression;");
       // this pointer
       this.mv.visitIntInsn(ALOAD, 0);
-      // load parent env
-      this.mv.visitVarInsn(ALOAD, 1);
       // new array
       this.mv.visitLdcInsn(argsNumber);
       this.mv.visitTypeInsn(Opcodes.ANEWARRAY, "com/googlecode/aviator/runtime/type/AviatorObject");
@@ -173,7 +171,7 @@ public class LambdaGenerator implements CodeGenerator {
       this.mv.visitVarInsn(ALOAD, arrayIndex);
       this.mv.visitMethodInsn(INVOKEVIRTUAL,
           "com/googlecode/aviator/runtime/function/LambdaFunction", "newEnv",
-          "(Ljava/util/Map;[Lcom/googlecode/aviator/runtime/type/AviatorObject;)Ljava/util/Map;");
+          "([Lcom/googlecode/aviator/runtime/type/AviatorObject;)Ljava/util/Map;");
 
       this.mv.visitMethodInsn(INVOKEINTERFACE, "com/googlecode/aviator/Expression", "execute",
           "(Ljava/util/Map;)Ljava/lang/Object;");
@@ -181,12 +179,11 @@ public class LambdaGenerator implements CodeGenerator {
           "com/googlecode/aviator/runtime/type/AviatorRuntimeJavaType", "valueOf",
           "(Ljava/lang/Object;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
       this.mv.visitInsn(ARETURN);
-      this.mv.visitMaxs(6, 1);
+      this.mv.visitMaxs(5, 1);
       this.mv.visitEnd();
     } else {
-      // TODO
+      throw new CompileExpressionErrorException("Lambda function arguments number at most 20.");
     }
-
   }
 
   private void visitClass() {
@@ -447,8 +444,6 @@ public class LambdaGenerator implements CodeGenerator {
   public void onMethodParameter(Token<?> lookhead) {
     codeGenerator.onMethodParameter(lookhead);
   }
-
-
 
   @Override
   public void onMethodInvoke(Token<?> lookhead) {

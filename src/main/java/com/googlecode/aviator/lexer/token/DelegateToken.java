@@ -1,6 +1,7 @@
 package com.googlecode.aviator.lexer.token;
 
 import java.util.Map;
+import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 
 
 /**
@@ -13,10 +14,23 @@ public class DelegateToken extends AbstractToken<Token<?>> {
 
   private final Token<?> token;
   private final DelegateTokenType delegateTokenType;
+  private LambdaFunctionBootstrap lambdaFunctionBootstrap;
+
+
+
+  public LambdaFunctionBootstrap getLambdaFunctionBootstrap() {
+    return lambdaFunctionBootstrap;
+  }
+
+
+  public void setLambdaFunctionBootstrap(LambdaFunctionBootstrap lambdaFunctionBootstrap) {
+    this.lambdaFunctionBootstrap = lambdaFunctionBootstrap;
+  }
+
 
   public static enum DelegateTokenType {
     And_Left, Join_Left, Ternary_Boolean, Ternary_Left, Array, Index_Start, //
-    Method_Name, Method_Param, Lambda_Define, Lambda_Argument, Lambda_Body_Start, Lambda_Body_End, //
+    Method_Name, Method_Param, Lambda_New, //
     Ternay_End
   }
 

@@ -152,6 +152,10 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Object get(Object key) {
+    // Should check ENV_VAR at first
+    if (Variable.ENV_VAR.equals(key)) {
+      return this;
+    }
     Map<String, Object> overrides = getmOverrides(true);
     Object ret = null;
     if (overrides.containsKey(key)) {
@@ -160,10 +164,6 @@ public class Env implements Map<String, Object> {
       ret = mDefaults.get(key);
     }
     if (ret == null) {
-      // check for internal vars
-      if (Variable.ENV_VAR.equals(key)) {
-        return this;
-      }
       if (Variable.INSTANCE_VAR.equals(key)) {
         return this.instance;
       }
@@ -190,8 +190,6 @@ public class Env implements Map<String, Object> {
   public Set<String> keySet() {
     Set<String> ret = new HashSet<String>(mDefaults.keySet());
     ret.addAll(this.getmOverrides(true).keySet());
-    ret.add("__env__");
-    ret.add("__instance__");
     return ret;
   }
 
@@ -263,7 +261,6 @@ public class Env implements Map<String, Object> {
   }
 
 
-
   /**
    * Gets the map as a String.
    *
@@ -272,7 +269,9 @@ public class Env implements Map<String, Object> {
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer(32 * size());
-    buf.append("{__evaluator__=").append(this.instance).append(", __env__=<this>");
+    buf.append(super.toString()).append("{"). //
+        append(Variable.INSTANCE_VAR).append("=").append(this.instance).append(", ").//
+        append(Variable.ENV_VAR).append("=").append("<this>");
 
     Iterator<String> it = keySet().iterator();
     boolean hasNext = it.hasNext();
@@ -282,7 +281,7 @@ public class Env implements Map<String, Object> {
     while (hasNext) {
       String key = it.next();
       Object value = get(key);
-      buf.append(key).append('=').append(value == this ? "(this Map)" : value);
+      buf.append(key).append('=').append(value == this ? "<this>" : value);
 
       hasNext = it.hasNext();
       if (hasNext) {

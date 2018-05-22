@@ -16,16 +16,19 @@
 package com.googlecode.aviator.code;
 
 import java.io.OutputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.LiteralExpression;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
+import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.DelegateToken;
 import com.googlecode.aviator.lexer.token.DelegateToken.DelegateTokenType;
 import com.googlecode.aviator.lexer.token.NumberToken;
@@ -38,6 +41,8 @@ import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
+import com.googlecode.aviator.parser.ScopeInfo;
+import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -54,28 +59,69 @@ import com.googlecode.aviator.utils.Env;
  * @author dennis
  *
  */
-public class OptimizeCodeGenerator implements CodeGenerator {
-  private final ASMCodeGenerator asmCodeGenerator;
+public class OptimizeCodeGenerator implements CodeGenerator, Parser {
+  private CodeGenerator codeGen;
 
   private final List<Token<?>> tokenList = new ArrayList<Token<?>>();
 
+  private LambdaGenerator lambdaGenerator;
+
+  private CodeGenerator parentCodeGenerator;
+
   private boolean trace = false;
   private AviatorEvaluatorInstance instance;
+  // the expression parser
+  private Parser parser;
 
+  /**
+   * Compiled lambda functions.
+   */
+  private Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
 
   public OptimizeCodeGenerator(AviatorEvaluatorInstance instance, ClassLoader classLoader,
       OutputStream traceOutStream, boolean trace) {
     this.instance = instance;
-    this.asmCodeGenerator =
+    this.codeGen =
         new ASMCodeGenerator(instance, (AviatorClassLoader) classLoader, traceOutStream, trace);
+    // the parser is self.
+    this.codeGen.setParser(this);
     this.trace = trace;
+  }
 
+  public void setCodeGenParser(Parser parser) {
+    this.codeGen.setParser(parser);
+  }
+
+  @Override
+  public void setParser(Parser parser) {
+    this.parser = parser;
   }
 
 
   @Override
-  public void setParser(Parser parser) {
-    this.asmCodeGenerator.setParser(parser);
+  public CodeGenerator getCodeGenerator() {
+    return this.codeGen;
+  }
+
+
+  @Override
+  public void setCodeGenerator(CodeGenerator codeGenerator) {
+    this.codeGen = codeGenerator;
+  }
+
+
+  private Queue<ScopeInfo> scopes = new ArrayDeque<ScopeInfo>();
+
+  @Override
+  public ScopeInfo enterScope() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public void restoreScope(ScopeInfo info) {
+    // TODO Auto-generated method stub
   }
 
 
@@ -327,6 +373,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
           DelegateToken delegateToken = (DelegateToken) token;
           if (delegateToken.getDelegateTokenType() == DelegateTokenType.Method_Name) {
             Token<?> realToken = delegateToken.getToken();
+            if (realToken == null) {
+              continue;
+            }
             if (realToken.getType() == TokenType.Variable) {
               String methodName = token.getLexeme();
               if (!methods.containsKey(methodName)) {
@@ -366,15 +415,16 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     }
 
     // get result from asm
-    return this.asmCodeGenerator.getResult();
+    return this.codeGen.getResult();
   }
 
 
   private void callASM(Map<String, Integer/* counter */> variables,
       Map<String, Integer/* counter */> methods) {
-    this.asmCodeGenerator.initVariables(variables);
-    this.asmCodeGenerator.initMethods(methods);
-    this.asmCodeGenerator.start();
+    ((ASMCodeGenerator) this.codeGen).initVariables(variables);
+    ((ASMCodeGenerator) this.codeGen).initMethods(methods);
+    ((ASMCodeGenerator) this.codeGen).setLambdaBootstraps(lambdaBootstraps);
+    ((ASMCodeGenerator) this.codeGen).start();
 
     for (int i = 0; i < this.tokenList.size(); i++) {
       Token<?> token = this.tokenList.get(i);
@@ -384,82 +434,82 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
           switch (op.getOperatorType()) {
             case ADD:
-              this.asmCodeGenerator.onAdd(token);
+              this.codeGen.onAdd(token);
               break;
             case SUB:
-              this.asmCodeGenerator.onSub(token);
+              this.codeGen.onSub(token);
               break;
             case MULT:
-              this.asmCodeGenerator.onMult(token);
+              this.codeGen.onMult(token);
               break;
             case DIV:
-              this.asmCodeGenerator.onDiv(token);
+              this.codeGen.onDiv(token);
               break;
             case MOD:
-              this.asmCodeGenerator.onMod(token);
+              this.codeGen.onMod(token);
               break;
             case EQ:
-              this.asmCodeGenerator.onEq(token);
+              this.codeGen.onEq(token);
               break;
             case NEQ:
-              this.asmCodeGenerator.onNeq(token);
+              this.codeGen.onNeq(token);
               break;
             case LT:
-              this.asmCodeGenerator.onLt(token);
+              this.codeGen.onLt(token);
               break;
             case LE:
-              this.asmCodeGenerator.onLe(token);
+              this.codeGen.onLe(token);
               break;
             case GT:
-              this.asmCodeGenerator.onGt(token);
+              this.codeGen.onGt(token);
               break;
             case GE:
-              this.asmCodeGenerator.onGe(token);
+              this.codeGen.onGe(token);
               break;
             case NOT:
-              this.asmCodeGenerator.onNot(token);
+              this.codeGen.onNot(token);
               break;
             case NEG:
-              this.asmCodeGenerator.onNeg(token);
+              this.codeGen.onNeg(token);
               break;
             case AND:
-              this.asmCodeGenerator.onAndRight(token);
+              this.codeGen.onAndRight(token);
               break;
             case OR:
-              this.asmCodeGenerator.onJoinRight(token);
+              this.codeGen.onJoinRight(token);
               break;
             case FUNC:
-              this.asmCodeGenerator.onMethodInvoke(token);
+              this.codeGen.onMethodInvoke(token);
               break;
             case INDEX:
-              this.asmCodeGenerator.onArrayIndexEnd(token);
+              this.codeGen.onArrayIndexEnd(token);
               break;
             case MATCH:
-              this.asmCodeGenerator.onMatch(token);
+              this.codeGen.onMatch(token);
               break;
             case TERNARY:
-              this.asmCodeGenerator.onTernaryRight(token);
+              this.codeGen.onTernaryRight(token);
               break;
             case BIT_AND:
-              this.asmCodeGenerator.onBitAnd(token);
+              this.codeGen.onBitAnd(token);
               break;
             case BIT_OR:
-              this.asmCodeGenerator.onBitOr(token);
+              this.codeGen.onBitOr(token);
               break;
             case BIT_XOR:
-              this.asmCodeGenerator.onBitXor(token);
+              this.codeGen.onBitXor(token);
               break;
             case BIT_NOT:
-              this.asmCodeGenerator.onBitNot(token);
+              this.codeGen.onBitNot(token);
               break;
             case SHIFT_LEFT:
-              this.asmCodeGenerator.onShiftLeft(token);
+              this.codeGen.onShiftLeft(token);
               break;
             case SHIFT_RIGHT:
-              this.asmCodeGenerator.onShiftRight(token);
+              this.codeGen.onShiftRight(token);
               break;
             case U_SHIFT_RIGHT:
-              this.asmCodeGenerator.onUnsignedShiftRight(token);
+              this.codeGen.onUnsignedShiftRight(token);
               break;
           }
           break;
@@ -468,49 +518,41 @@ public class OptimizeCodeGenerator implements CodeGenerator {
           final Token<?> realToken = delegateToken.getToken();
           switch (delegateToken.getDelegateTokenType()) {
             case And_Left:
-              this.asmCodeGenerator.onAndLeft(realToken);
+              this.codeGen.onAndLeft(realToken);
               break;
             case Join_Left:
-              this.asmCodeGenerator.onJoinLeft(realToken);
+              this.codeGen.onJoinLeft(realToken);
               break;
             case Array:
-              this.asmCodeGenerator.onArray(realToken);
+              this.codeGen.onArray(realToken);
               break;
             case Index_Start:
-              this.asmCodeGenerator.onArrayIndexStart(realToken);
+              this.codeGen.onArrayIndexStart(realToken);
               break;
             case Ternary_Boolean:
-              this.asmCodeGenerator.onTernaryBoolean(realToken);
+              this.codeGen.onTernaryBoolean(realToken);
               break;
             case Ternary_Left:
-              this.asmCodeGenerator.onTernaryLeft(realToken);
+              this.codeGen.onTernaryLeft(realToken);
               break;
             case Method_Name:
-              this.asmCodeGenerator.onMethodName(realToken);
+              this.codeGen.onMethodName(realToken);
               break;
             case Method_Param:
-              this.asmCodeGenerator.onMethodParameter(realToken);
+              this.codeGen.onMethodParameter(realToken);
               break;
-            case Lambda_Define:
-              this.asmCodeGenerator.onLambdaDefineStart(realToken);
-              break;
-            case Lambda_Argument:
-              this.asmCodeGenerator.onLambdaArgument(realToken);
-              break;
-            case Lambda_Body_Start:
-              this.asmCodeGenerator.onLambdaBodyStart(realToken);
-              break;
-            case Lambda_Body_End:
-              this.asmCodeGenerator.onLambdaBodyEnd(realToken);
+            case Lambda_New:
+              ((ASMCodeGenerator) this.codeGen)
+                  .genNewLambdaCode(delegateToken.getLambdaFunctionBootstrap());
               break;
             case Ternay_End:
-              this.asmCodeGenerator.onTernaryEnd(realToken);
+              this.codeGen.onTernaryEnd(realToken);
               break;
           }
           break;
 
         default:
-          this.asmCodeGenerator.onConstant(token);
+          this.codeGen.onConstant(token);
           break;
       }
 
@@ -678,32 +720,44 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onLambdaDefineStart(Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Lambda_Define));
-
+    if (this.lambdaGenerator == null) {
+      // TODO cache?
+      this.lambdaGenerator = new LambdaGenerator(instance, this, this.parser, false);
+      this.lambdaGenerator.setScopeInfo(this.parser.enterScope());
+    } else {
+      throw new CompileExpressionErrorException("Compile lambda error");
+    }
   }
 
 
   @Override
   public void onLambdaArgument(Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Lambda_Argument));
-
+    this.lambdaGenerator.addArgument(lookhead.getLexeme());
   }
 
 
   @Override
   public void onLambdaBodyStart(Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Lambda_Body_Start));
-
+    parentCodeGenerator = this.parser.getCodeGenerator();
+    this.parser.setCodeGenerator(this.lambdaGenerator);
   }
 
 
   @Override
   public void onLambdaBodyEnd(Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Lambda_Body_End));
+    this.lambdaGenerator.compileCallMethod();
+    LambdaFunctionBootstrap bootstrap = this.lambdaGenerator.getLmabdaBootstrap();
+    if (this.lambdaBootstraps == null) {
+      lambdaBootstraps = new HashMap<String, LambdaFunctionBootstrap>();
+    }
+    this.lambdaBootstraps.put(bootstrap.getName(), bootstrap);
+    DelegateToken token = new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(),
+        lookhead, DelegateTokenType.Lambda_New);
+    token.setLambdaFunctionBootstrap(bootstrap);
+    this.tokenList.add(token);
+    this.parser.restoreScope(this.lambdaGenerator.getScopeInfo());
+    this.lambdaGenerator = null;
+    this.parser.setCodeGenerator(this.parentCodeGenerator);
   }
 
 

@@ -866,6 +866,11 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+  public void setLambdaBootstraps(Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
+    this.lambdaBootstraps = lambdaBootstraps;
+  }
+
+
   public void initVariables(Map<String, Integer/* counter */> varTokens) {
     this.varTokens = varTokens;
     for (String outterVarName : varTokens.keySet()) {
@@ -945,7 +950,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       }
     }
     this.mv.visitMethodInsn(INVOKEINTERFACE, "com/googlecode/aviator/runtime/type/AviatorFunction",
-        "call", this.getInvokeMethodDesc(parameterCount));
+        "call", getInvokeMethodDesc(parameterCount));
 
     this.popOperand(); // method object
     this.popOperand(); // env map
@@ -1081,23 +1086,28 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onLambdaBodyEnd(Token<?> lookhead) {
     this.lambdaGenerator.compileCallMethod();
-    LambdaFunctionBootstrap func = this.lambdaGenerator.getLmabdaBootstrap();
+    LambdaFunctionBootstrap bootstrap = this.lambdaGenerator.getLmabdaBootstrap();
     if (this.lambdaBootstraps == null) {
       lambdaBootstraps = new HashMap<String, LambdaFunctionBootstrap>();
     }
-    this.lambdaBootstraps.put(func.getName(), func);
+    this.lambdaBootstraps.put(bootstrap.getName(), bootstrap);
+    genNewLambdaCode(bootstrap);
+    this.parser.restoreScope(this.lambdaGenerator.getScopeInfo());
+    this.lambdaGenerator = null;
+    this.parser.setCodeGenerator(this.parentCodeGenerator);
+  }
+
+
+  public void genNewLambdaCode(LambdaFunctionBootstrap bootstrap) {
     this.mv.visitVarInsn(ALOAD, 0);
     this.loadEnv();
-    this.mv.visitLdcInsn(func.getName());
+    this.mv.visitLdcInsn(bootstrap.getName());
     this.mv.visitMethodInsn(INVOKEVIRTUAL, this.className, "newLambda",
         "(Lcom/googlecode/aviator/utils/Env;Ljava/lang/String;)Lcom/googlecode/aviator/runtime/function/LambdaFunction;");
     this.pushOperand();
     this.pushOperand();
     this.popOperand();
     this.popOperand();
-    this.parser.restoreScope(this.lambdaGenerator.getScopeInfo());
-    this.lambdaGenerator = null;
-    this.parser.setCodeGenerator(this.parentCodeGenerator);
   }
 
   @Override
