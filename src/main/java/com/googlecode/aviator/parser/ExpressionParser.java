@@ -24,6 +24,8 @@ import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.CharToken;
+import com.googlecode.aviator.lexer.token.DelegateToken;
+import com.googlecode.aviator.lexer.token.DelegateToken.DelegateTokenType;
 import com.googlecode.aviator.lexer.token.PatternToken;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
@@ -68,7 +70,9 @@ public class ExpressionParser implements Parser {
   private AviatorEvaluatorInstance instance;
 
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   *
    * @see com.googlecode.aviator.parser.Parser#getCodeGenerator()
    */
   @Override
@@ -76,15 +80,20 @@ public class ExpressionParser implements Parser {
     return codeGenerator;
   }
 
-  /* (non-Javadoc)
-   * @see com.googlecode.aviator.parser.Parser#setCodeGenerator(com.googlecode.aviator.code.CodeGenerator)
+  /*
+   * (non-Javadoc)
+   *
+   * @see com.googlecode.aviator.parser.Parser#setCodeGenerator(com.googlecode.aviator.code.
+   * CodeGenerator)
    */
   @Override
   public void setCodeGenerator(CodeGenerator codeGenerator) {
     this.codeGenerator = codeGenerator;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   *
    * @see com.googlecode.aviator.parser.Parser#enterScope()
    */
   @Override
@@ -97,8 +106,11 @@ public class ExpressionParser implements Parser {
     return info;
   }
 
-  /* (non-Javadoc)
-   * @see com.googlecode.aviator.parser.Parser#restoreScope(com.googlecode.aviator.parser.ExpressionParser.DepthInfo)
+  /*
+   * (non-Javadoc)
+   *
+   * @see com.googlecode.aviator.parser.Parser#restoreScope(com.googlecode.aviator.parser.
+   * ExpressionParser.DepthInfo)
    */
   @Override
   public void restoreScope(ScopeInfo info) {
@@ -555,15 +567,15 @@ public class ExpressionParser implements Parser {
 
             this.move(true);
           } else {
-            reportSyntaxError("Expect lambda end, but is:" + this.lookhead.getLexeme());
+            reportSyntaxError("Expect lambda 'end', but is: '" + this.lookhead.getLexeme() + "'");
           }
         } else {
           // TODO may be a method call lambda(x,y)
-          reportSyntaxError("Expect lambda body, but is:" + this.lookhead.getLexeme());
+          reportSyntaxError("Expect lambda body, but is: '" + this.lookhead.getLexeme() + "'");
         }
       } else {
         // TODO may be a method call lambda(x,y)
-        reportSyntaxError("Expect lambda body, but is:" + this.lookhead.getLexeme());
+        reportSyntaxError("Expect lambda body, but is: '" + this.lookhead.getLexeme() + "'");
       }
     }
   }
@@ -644,7 +656,8 @@ public class ExpressionParser implements Parser {
         this.codeGenerator.onMethodName(this.prevToken);
         wasFirst = false;
       } else {
-        this.codeGenerator.onMethodName(null);
+        this.codeGenerator.onMethodName(new DelegateToken(this.lookhead.getStartIndex(),
+            this.lookhead, DelegateTokenType.Method_Name));
       }
       this.move(true);
       if (!this.expectChar(')')) {
@@ -726,10 +739,11 @@ public class ExpressionParser implements Parser {
 
 
   private void reportSyntaxError(String message) {
-    int index =
-        this.lookhead != null ? this.lookhead.getStartIndex() : this.lexer.getCurrentIndex();
+    int index = this.lookhead != null && this.lookhead.getStartIndex() > 0
+        ? this.lookhead.getStartIndex() : this.lexer.getCurrentIndex();
     throw new ExpressionSyntaxErrorException(
-        "Syntax error:" + message + " at " + index + ", current token: " + this.lookhead);
+        "Syntax error:" + message + " at " + index + ", current token: " + this.lookhead
+            + ". Parsing expression: `" + this.lexer.getScanString() + "^^`");
   }
 
 

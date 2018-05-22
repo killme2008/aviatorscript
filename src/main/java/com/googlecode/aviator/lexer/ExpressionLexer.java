@@ -48,9 +48,11 @@ public class ExpressionLexer {
   // Tokens buffer
   private final Stack<Token<?>> tokenBuffer = new Stack<Token<?>>();
   private AviatorEvaluatorInstance instance;
+  private String expression;
 
   public ExpressionLexer(AviatorEvaluatorInstance instance, String expression) {
     this.iterator = new StringCharacterIterator(expression);
+    this.expression = expression;
     this.symbolTable = new SymbolTable();
     this.peek = this.iterator.current();
     this.instance = instance;
@@ -322,6 +324,9 @@ public class ExpressionLexer {
     return token;
   }
 
+  public String getScanString() {
+    return this.expression.substring(0, this.iterator.getIndex());
+  }
 
   private Token<?> reserverVar(String lexeme, Variable variable) {
     // If it is a reserved word(true/false/nil/lambda)

@@ -29,7 +29,6 @@ public class Variable extends AbstractToken<Object> {
   public static final String INSTANCE_VAR = "__instance__";
   public static final String ENV_VAR = "__env__";
 
-
   public boolean isQuote() {
     return quote;
   }
@@ -114,7 +113,11 @@ public class Variable extends AbstractToken<Object> {
 
   @Override
   public String toString() {
-    return "[type='string',lexeme='$" + getLexeme() + "',index=" + this.getStartIndex() + "]";
+    String index = ",index=" + getStartIndex();
+    if (getStartIndex() == -1) {
+      index = "";
+    }
+    return "[type='variable',lexeme='" + getLexeme() + "'" + index + "]";
   }
 
 }

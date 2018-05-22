@@ -55,6 +55,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.ClassExpression;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.asm.ClassWriter;
 import com.googlecode.aviator.asm.Label;
 import com.googlecode.aviator.asm.MethodVisitor;
@@ -66,6 +67,7 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.Token;
+import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
@@ -1113,7 +1115,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onMethodName(Token<?> lookhead) {
     String outtterMethodName = "lambda";
-    if (lookhead != null) {
+    if (lookhead.getType() != TokenType.Delegate) {
       outtterMethodName = lookhead.getLexeme();
       String innerMethodName = this.innerMethodMap.get(outtterMethodName);
       if (innerMethodName != null) {
@@ -1127,6 +1129,11 @@ public class ASMCodeGenerator implements CodeGenerator {
           "getFunction",
           "(Ljava/lang/Object;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
       this.popOperand();
+    }
+    if (this.instance.getOption(Options.TRACE_EVAL)) {
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/function/TraceFunction",
+          "wrapTrace",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorFunction;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
     }
     this.loadEnv();
     this.methodMetaDataStack.push(new MethodMetaData(outtterMethodName));

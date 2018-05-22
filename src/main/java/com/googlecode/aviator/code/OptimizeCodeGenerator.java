@@ -16,14 +16,12 @@
 package com.googlecode.aviator.code;
 
 import java.io.OutputStream;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.LiteralExpression;
@@ -41,7 +39,6 @@ import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
-import com.googlecode.aviator.parser.ScopeInfo;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -59,8 +56,8 @@ import com.googlecode.aviator.utils.Env;
  * @author dennis
  *
  */
-public class OptimizeCodeGenerator implements CodeGenerator, Parser {
-  private CodeGenerator codeGen;
+public class OptimizeCodeGenerator implements CodeGenerator {
+  private ASMCodeGenerator codeGen;
 
   private final List<Token<?>> tokenList = new ArrayList<Token<?>>();
 
@@ -83,45 +80,14 @@ public class OptimizeCodeGenerator implements CodeGenerator, Parser {
     this.instance = instance;
     this.codeGen =
         new ASMCodeGenerator(instance, (AviatorClassLoader) classLoader, traceOutStream, trace);
-    // the parser is self.
-    this.codeGen.setParser(this);
     this.trace = trace;
   }
 
-  public void setCodeGenParser(Parser parser) {
-    this.codeGen.setParser(parser);
-  }
 
   @Override
   public void setParser(Parser parser) {
     this.parser = parser;
-  }
-
-
-  @Override
-  public CodeGenerator getCodeGenerator() {
-    return this.codeGen;
-  }
-
-
-  @Override
-  public void setCodeGenerator(CodeGenerator codeGenerator) {
-    this.codeGen = codeGenerator;
-  }
-
-
-  private Queue<ScopeInfo> scopes = new ArrayDeque<ScopeInfo>();
-
-  @Override
-  public ScopeInfo enterScope() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public void restoreScope(ScopeInfo info) {
-    // TODO Auto-generated method stub
+    this.codeGen.setParser(parser);
   }
 
 
@@ -421,10 +387,10 @@ public class OptimizeCodeGenerator implements CodeGenerator, Parser {
 
   private void callASM(Map<String, Integer/* counter */> variables,
       Map<String, Integer/* counter */> methods) {
-    ((ASMCodeGenerator) this.codeGen).initVariables(variables);
-    ((ASMCodeGenerator) this.codeGen).initMethods(methods);
-    ((ASMCodeGenerator) this.codeGen).setLambdaBootstraps(lambdaBootstraps);
-    ((ASMCodeGenerator) this.codeGen).start();
+    this.codeGen.initVariables(variables);
+    this.codeGen.initMethods(methods);
+    this.codeGen.setLambdaBootstraps(lambdaBootstraps);
+    this.codeGen.start();
 
     for (int i = 0; i < this.tokenList.size(); i++) {
       Token<?> token = this.tokenList.get(i);
@@ -542,8 +508,7 @@ public class OptimizeCodeGenerator implements CodeGenerator, Parser {
               this.codeGen.onMethodParameter(realToken);
               break;
             case Lambda_New:
-              ((ASMCodeGenerator) this.codeGen)
-                  .genNewLambdaCode(delegateToken.getLambdaFunctionBootstrap());
+              this.codeGen.genNewLambdaCode(delegateToken.getLambdaFunctionBootstrap());
               break;
             case Ternay_End:
               this.codeGen.onTernaryEnd(realToken);

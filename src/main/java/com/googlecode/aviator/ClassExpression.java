@@ -15,7 +15,7 @@
  **/
 package com.googlecode.aviator;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -34,7 +34,6 @@ import com.googlecode.aviator.utils.Env;
 public abstract class ClassExpression extends BaseExpression {
 
   protected Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
-
 
 
   public Map<String, LambdaFunctionBootstrap> getLambdaBootstraps() {
@@ -65,7 +64,7 @@ public abstract class ClassExpression extends BaseExpression {
   @Override
   public Object execute(Map<String, Object> map) {
     if (map == null) {
-      map = new HashMap<String, Object>();
+      map = Collections.emptyMap();
     }
     Env env = newEnv(map);
     try {
