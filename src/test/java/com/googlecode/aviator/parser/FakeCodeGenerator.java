@@ -18,7 +18,6 @@ package com.googlecode.aviator.parser;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.lexer.token.Token;
-import com.googlecode.aviator.parser.ExpressionParser.DepthInfo;
 
 
 /**
@@ -34,7 +33,7 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void setParser(ExpressionParser parser) {
+  public void setParser(Parser parser) {
     this.parser = parser;
   }
 
@@ -290,9 +289,9 @@ public class FakeCodeGenerator implements CodeGenerator {
   }
 
 
-  private DepthInfo scopeInfo;
+  private ScopeInfo scopeInfo;
 
-  private ExpressionParser parser;
+  private Parser parser;
 
   @Override
   public void onLambdaDefineStart(Token<?> lookhead) {

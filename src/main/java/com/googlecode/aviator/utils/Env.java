@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.lexer.token.Variable;
 
 /**
  * Expression execute environment.Modifed from ChainedMap in jibx.
@@ -151,11 +152,23 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Object get(Object key) {
-    if (getmOverrides(true).containsKey(key)) {
-      return getmOverrides(true).get(key);
+    Map<String, Object> overrides = getmOverrides(true);
+    Object ret = null;
+    if (overrides.containsKey(key)) {
+      ret = overrides.get(key);
     } else {
-      return mDefaults.get(key);
+      ret = mDefaults.get(key);
     }
+    if (ret == null) {
+      // check for internal vars
+      if (Variable.ENV_VAR.equals(key)) {
+        return this;
+      }
+      if (Variable.INSTANCE_VAR.equals(key)) {
+        return this.instance;
+      }
+    }
+    return ret;
   }
 
   /**

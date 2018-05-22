@@ -68,7 +68,7 @@ import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
-import com.googlecode.aviator.parser.ExpressionParser;
+import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.utils.Env;
@@ -105,7 +105,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   // lambda function generator
   private LambdaGenerator lambdaGenerator;
   // parser
-  private ExpressionParser parser;
+  private Parser parser;
 
   private static final AtomicLong CLASS_COUNTER = new AtomicLong();
 
@@ -146,7 +146,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   private CodeGenerator parentCodeGenerator;
 
   @Override
-  public void setParser(ExpressionParser parser) {
+  public void setParser(Parser parser) {
     this.parser = parser;
   }
 

@@ -17,7 +17,7 @@ package com.googlecode.aviator.code;
 
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.lexer.token.Token;
-import com.googlecode.aviator.parser.ExpressionParser;
+import com.googlecode.aviator.parser.Parser;
 
 
 /**
@@ -28,7 +28,7 @@ import com.googlecode.aviator.parser.ExpressionParser;
  */
 public interface CodeGenerator {
 
-  public void setParser(ExpressionParser parser);
+  public void setParser(Parser parser);
 
   public void onShiftRight(Token<?> lookhead);
 

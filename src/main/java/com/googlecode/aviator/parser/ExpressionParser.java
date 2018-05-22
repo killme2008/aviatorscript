@@ -36,7 +36,7 @@ import com.googlecode.aviator.lexer.token.Variable;
  * @author dennis
  *
  */
-public class ExpressionParser {
+public class ExpressionParser implements Parser {
   private final ExpressionLexer lexer;
 
   static final Set<String> RESERVED_WORDS = new HashSet<String>();
@@ -63,44 +63,33 @@ public class ExpressionParser {
   private LinkedList<DepthState> depthState = new LinkedList<DepthState>();
 
 
-  private static enum DepthState {
-    Parent, Bracket, Lambda
-  }
-
   private boolean inPattern = false;
 
   private AviatorEvaluatorInstance instance;
 
 
+  /* (non-Javadoc)
+   * @see com.googlecode.aviator.parser.Parser#getCodeGenerator()
+   */
+  @Override
   public CodeGenerator getCodeGenerator() {
     return codeGenerator;
   }
 
+  /* (non-Javadoc)
+   * @see com.googlecode.aviator.parser.Parser#setCodeGenerator(com.googlecode.aviator.code.CodeGenerator)
+   */
+  @Override
   public void setCodeGenerator(CodeGenerator codeGenerator) {
     this.codeGenerator = codeGenerator;
   }
 
-  public static class DepthInfo {
-    private int parenDepth;
-
-    private int bracketDepth;
-
-    private int lambdaDepth;
-
-    private LinkedList<DepthState> depthState;
-
-    public DepthInfo(int parenDepth, int bracketDepth, int lambdaDepth,
-        LinkedList<DepthState> depthState) {
-      super();
-      this.parenDepth = parenDepth;
-      this.bracketDepth = bracketDepth;
-      this.lambdaDepth = lambdaDepth;
-      this.depthState = depthState;
-    }
-  }
-
-  public DepthInfo enterScope() {
-    DepthInfo info = new DepthInfo(parenDepth, bracketDepth, lambdaDepth, depthState);
+  /* (non-Javadoc)
+   * @see com.googlecode.aviator.parser.Parser#enterScope()
+   */
+  @Override
+  public ScopeInfo enterScope() {
+    ScopeInfo info = new ScopeInfo(parenDepth, bracketDepth, lambdaDepth, depthState);
     this.parenDepth = 0;
     this.bracketDepth = 0;
     this.lambdaDepth = 0;
@@ -108,7 +97,11 @@ public class ExpressionParser {
     return info;
   }
 
-  public void restoreScope(DepthInfo info) {
+  /* (non-Javadoc)
+   * @see com.googlecode.aviator.parser.Parser#restoreScope(com.googlecode.aviator.parser.ExpressionParser.DepthInfo)
+   */
+  @Override
+  public void restoreScope(ScopeInfo info) {
     this.parenDepth = info.parenDepth;
     this.bracketDepth = info.bracketDepth;
     this.lambdaDepth = info.lambdaDepth;

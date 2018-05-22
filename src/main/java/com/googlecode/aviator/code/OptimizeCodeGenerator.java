@@ -37,7 +37,7 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
-import com.googlecode.aviator.parser.ExpressionParser;
+import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -74,7 +74,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void setParser(ExpressionParser parser) {
+  public void setParser(Parser parser) {
     this.asmCodeGenerator.setParser(parser);
   }
 

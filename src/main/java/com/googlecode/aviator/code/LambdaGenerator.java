@@ -34,8 +34,8 @@ import com.googlecode.aviator.code.asm.ClassDefiner;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.AviatorClassLoader;
-import com.googlecode.aviator.parser.ExpressionParser;
-import com.googlecode.aviator.parser.ExpressionParser.DepthInfo;
+import com.googlecode.aviator.parser.Parser;
+import com.googlecode.aviator.parser.ScopeInfo;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.utils.Env;
 
@@ -55,10 +55,10 @@ public class LambdaGenerator implements CodeGenerator {
   private String className;
   private static final AtomicLong LAMBDA_COUNTER = new AtomicLong();
   private MethodVisitor mv;
-  private DepthInfo scopeInfo;
+  private ScopeInfo scopeInfo;
 
   public LambdaGenerator(AviatorEvaluatorInstance instance, CodeGenerator parentCodeGenerator,
-      ExpressionParser parser, boolean cached) {
+      Parser parser, boolean cached) {
     this.arguments = new ArrayList<String>();
     this.instance = instance;
     this.parentCodeGenerator = parentCodeGenerator;
@@ -76,18 +76,18 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
 
-  public DepthInfo getScopeInfo() {
+  public ScopeInfo getScopeInfo() {
     return scopeInfo;
   }
 
 
-  public void setScopeInfo(DepthInfo scopeInfo) {
+  public void setScopeInfo(ScopeInfo scopeInfo) {
     this.scopeInfo = scopeInfo;
   }
 
 
   @Override
-  public void setParser(ExpressionParser parser) {
+  public void setParser(Parser parser) {
     this.codeGenerator.setParser(parser);
   }
 

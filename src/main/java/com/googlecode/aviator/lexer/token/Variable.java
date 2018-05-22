@@ -26,6 +26,10 @@ import java.util.Map;
  */
 public class Variable extends AbstractToken<Object> {
 
+  public static final String INSTANCE_VAR = "__instance__";
+  public static final String ENV_VAR = "__env__";
+
+
   public boolean isQuote() {
     return quote;
   }
