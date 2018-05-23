@@ -22,6 +22,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -255,7 +256,7 @@ public final class AviatorEvaluatorInstance {
   private final Map<String, Object> funcMap = new HashMap<String, Object>();
 
   private final Map<OperatorType, AviatorFunction> opsMap =
-      new HashMap<OperatorType, AviatorFunction>();
+      new IdentityHashMap<OperatorType, AviatorFunction>();
 
 
   private void loadLib() {

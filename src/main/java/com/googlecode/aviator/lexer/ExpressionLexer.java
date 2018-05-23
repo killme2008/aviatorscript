@@ -49,6 +49,8 @@ public class ExpressionLexer {
   private final Stack<Token<?>> tokenBuffer = new Stack<Token<?>>();
   private AviatorEvaluatorInstance instance;
   private String expression;
+  private MathContext mathContext;
+  private boolean parseFloatIntoDecimal;
 
   public ExpressionLexer(AviatorEvaluatorInstance instance, String expression) {
     this.iterator = new StringCharacterIterator(expression);
@@ -56,6 +58,9 @@ public class ExpressionLexer {
     this.symbolTable = new SymbolTable();
     this.peek = this.iterator.current();
     this.instance = instance;
+    this.mathContext = this.instance.getOption(Options.MATH_CONTEXT);
+    this.parseFloatIntoDecimal =
+        this.instance.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL);
   }
 
   /**
@@ -233,16 +238,12 @@ public class ExpressionLexer {
           || this.peek == 'e' || this.peek == 'M' || this.peek == 'N');
       Number value;
       if (isBigDecimal) {
-        value = new BigDecimal(this.getBigNumberLexeme(sb),
-            (MathContext) instance.getOption(Options.MATH_CONTEXT));
+        value = new BigDecimal(this.getBigNumberLexeme(sb), this.mathContext);
       } else if (isBigInt) {
         value = new BigInteger(this.getBigNumberLexeme(sb));
       } else if (hasDot) {
-        boolean alwaysUseDecimalAsDouble =
-            instance.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL);
-        if (alwaysUseDecimalAsDouble) {
-          value =
-              new BigDecimal(sb.toString(), (MathContext) instance.getOption(Options.MATH_CONTEXT));
+        if (this.parseFloatIntoDecimal) {
+          value = new BigDecimal(sb.toString(), this.mathContext);
         } else {
           value = dval;
         }

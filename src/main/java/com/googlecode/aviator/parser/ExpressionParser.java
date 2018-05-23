@@ -171,9 +171,7 @@ public class ExpressionParser implements Parser {
       } else {
         if (this.lookhead == null) {
           break;
-        }
-
-        else {
+        } else {
           break;
         }
       }

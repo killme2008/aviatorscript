@@ -21,14 +21,14 @@ public class SimpleExample {
     }
     env.put("d", 100);
     env.put("x", 4);
+    env.put("4", "test");
     env.put("y", 5);
     LambdaFunction s = (LambdaFunction) AviatorEvaluator.execute(
-        "lambda(x) -> println(x);println(y);lambda(y) -> println(#__env__);lambda(z) ->println(#__env__); x +y +z+d end end end",
+        "lambda(x) -> println(#__env__);lambda(y) -> println(#__env__);lambda(z) ->println(#__env__); x +y +z+d end end end",
         env);
     AviatorEvaluator.getInstance().getFuncMap().put("s", s);
     env.put("z", 6);
 
-    System.out.println(AviatorEvaluator.execute(
-        "println(x);println(y);println(z);s(1)(2)(3);println(x);println(y);println(z)", env));
+    System.out.println(AviatorEvaluator.execute("#4", env));
   }
 }

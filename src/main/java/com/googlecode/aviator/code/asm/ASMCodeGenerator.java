@@ -46,8 +46,9 @@ import static com.googlecode.aviator.asm.Opcodes.SWAP;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -121,17 +122,16 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   private int fieldCounter = 0;
 
-  private final Map<String/* variable name */, String/* inner var name */> innerVarMap =
-      new HashMap<String, String>();
+  private Map<String/* variable name */, String/* inner var name */> innerVars =
+      Collections.emptyMap();
+  private Map<String/* method name */, String/* inner method name */> innerMethodMap =
+      Collections.emptyMap();
 
-  private final Map<String/* method name */, String/* inner method name */> innerMethodMap =
-      new HashMap<String, String>();
-
-  private Map<String, Integer/* counter */> varTokens = new LinkedHashMap<String, Integer>();
-  private Map<String, Integer/* counter */> methodTokens = new HashMap<String, Integer>();
+  private Map<String, Integer/* counter */> varTokens = Collections.emptyMap();
+  private Map<String, Integer/* counter */> methodTokens = Collections.emptyMap();
 
   private final Map<Label, Map<String/* inner name */, Integer/* local index */>> labelNameIndexMap =
-      new HashMap<Label, Map<String, Integer>>();
+      new IdentityHashMap<Label, Map<String, Integer>>();
 
   /**
    * Compiled lambda functions.
@@ -236,8 +236,8 @@ public class ASMCodeGenerator implements CodeGenerator {
       this.mv.visitVarInsn(ALOAD, 2);
       this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/ClassExpression", "<init>",
           "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;)V");
-      if (!this.innerVarMap.isEmpty()) {
-        for (Map.Entry<String, String> entry : this.innerVarMap.entrySet()) {
+      if (!this.innerVars.isEmpty()) {
+        for (Map.Entry<String, String> entry : this.innerVars.entrySet()) {
           String outterName = entry.getKey();
           String innerName = entry.getValue();
           this.mv.visitVarInsn(ALOAD, 0);
@@ -817,7 +817,7 @@ public class ASMCodeGenerator implements CodeGenerator {
           this.pushOperand();
         } else {
           String outterVarName = variable.getLexeme();
-          String innerVarName = this.innerVarMap.get(outterVarName);
+          String innerVarName = this.innerVars.get(outterVarName);
           if (innerVarName != null) {
             // Is it stored in local?
             Map<String, Integer> name2Index = this.labelNameIndexMap.get(this.currentLabel);
@@ -875,10 +875,11 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   public void initVariables(Map<String, Integer/* counter */> varTokens) {
     this.varTokens = varTokens;
+    this.innerVars = new HashMap<String, String>(varTokens.size());
     for (String outterVarName : varTokens.keySet()) {
       // Use inner variable name instead of outter variable name
       String innerVarName = this.getInnerName(outterVarName);
-      this.innerVarMap.put(outterVarName, innerVarName);
+      this.innerVars.put(outterVarName, innerVarName);
       this.classWriter.visitField(ACC_PRIVATE + ACC_FINAL, innerVarName,
           "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;", null, null).visitEnd();
 
@@ -888,13 +889,13 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   public void initMethods(Map<String, Integer/* counter */> methods) {
     this.methodTokens = methods;
+    this.innerMethodMap = new HashMap<String, String>(methods.size());
     for (String outterMethodName : methods.keySet()) {
       // Use inner method name instead of outter method name
       String innerMethodName = this.getInnerName(outterMethodName);
       this.innerMethodMap.put(outterMethodName, innerMethodName);
       this.classWriter.visitField(ACC_PRIVATE + ACC_FINAL, innerMethodName,
           "Lcom/googlecode/aviator/runtime/type/AviatorFunction;", null, null).visitEnd();
-
     }
   }
 
