@@ -444,12 +444,12 @@ public class ExpressionParser implements Parser {
       this.factor();
     }
 
-    if (expectChar('[')) {
-      // (...)[index]
-      arrayAccess();
-    } else if (expectChar('(')) {
-      // May be call chain, such as "s(1)(2)(3)"
-      while (this.expectChar('(')) {
+    while (expectChar('[') || expectChar('(')) {
+      if (expectChar('[')) {
+        // (...)[index]
+        arrayAccess();
+      } else if (expectChar('(')) {
+        // May be call chain, such as "s(1)(2)(3)"
         this.parenDepth++;
         this.depthState.add(DepthState.Parent);
         this.codeGenerator.onMethodName(new DelegateToken(this.lookhead.getStartIndex(),
@@ -472,6 +472,7 @@ public class ExpressionParser implements Parser {
         }
       }
     }
+
   }
 
   public static final CharToken LEFT_PAREN = new CharToken('(', -1);
@@ -537,14 +538,9 @@ public class ExpressionParser implements Parser {
           this.lambda();
         } else {
           this.method();
-          if (expectChar('[')) {
-            // array access after method, such as " method.invoke()[index]"
-            arrayAccess();
-          }
         }
-      } else if (prev.getType() == TokenType.Variable || prev.getLexeme().equals(')')) {
-        // var[index]
-        arrayAccess();
+      } else if (prev.getType() == TokenType.Variable) {
+        this.arrayAccess();
       } else {
         this.codeGenerator.onConstant(prev);
       }
