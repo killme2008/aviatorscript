@@ -443,6 +443,35 @@ public class ExpressionParser implements Parser {
     } else {
       this.factor();
     }
+
+    if (expectChar('[')) {
+      // (...)[index]
+      arrayAccess();
+    } else if (expectChar('(')) {
+      // May be call chain, such as "s(1)(2)(3)"
+      while (this.expectChar('(')) {
+        this.parenDepth++;
+        this.depthState.add(DepthState.Parent);
+        this.codeGenerator.onMethodName(new DelegateToken(this.lookhead.getStartIndex(),
+            this.lookhead, DelegateTokenType.Method_Name));
+        this.move(true);
+        if (!this.expectChar(')')) {
+          this.ternary();
+          this.codeGenerator.onMethodParameter(this.lookhead);
+          while (this.expectChar(',')) {
+            this.move(true);
+            this.ternary();
+            this.codeGenerator.onMethodParameter(this.lookhead);
+          }
+        }
+        if (this.expectChar(')')) {
+          this.parenDepth--;
+          this.depthState.removeLast();
+          this.move(true);
+          this.codeGenerator.onMethodInvoke(this.lookhead);
+        }
+      }
+    }
   }
 
   public static final CharToken LEFT_PAREN = new CharToken('(', -1);
@@ -484,10 +513,6 @@ public class ExpressionParser implements Parser {
         this.depthState.removeLast();
       }
 
-      // (...)[index]
-      if (expectChar('[')) {
-        arrayAccess();
-      }
     } else if (this.lookhead.getType() == TokenType.Number
         || this.lookhead.getType() == TokenType.String
         || this.lookhead.getType() == TokenType.Variable || this.lookhead == Variable.TRUE
@@ -645,18 +670,10 @@ public class ExpressionParser implements Parser {
   }
 
   private void method() {
-    boolean wasFirst = true;
-    // May be call chain, such as "s(1)(2)(3)"
-    while (this.expectChar('(')) {
+    if (this.expectChar('(')) {
       this.parenDepth++;
       this.depthState.add(DepthState.Parent);
-      if (wasFirst) {
-        this.codeGenerator.onMethodName(this.prevToken);
-        wasFirst = false;
-      } else {
-        this.codeGenerator.onMethodName(new DelegateToken(this.lookhead.getStartIndex(),
-            this.lookhead, DelegateTokenType.Method_Name));
-      }
+      this.codeGenerator.onMethodName(this.prevToken);
       this.move(true);
       if (!this.expectChar(')')) {
         this.ternary();
