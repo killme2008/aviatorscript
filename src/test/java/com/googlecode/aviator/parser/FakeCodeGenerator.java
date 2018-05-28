@@ -15,6 +15,7 @@
  **/
 package com.googlecode.aviator.parser;
 
+import java.util.Stack;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.lexer.token.Token;
@@ -30,6 +31,9 @@ public class FakeCodeGenerator implements CodeGenerator {
   private StringBuffer sb = new StringBuffer();
 
   private boolean wasFirst = true;
+
+  private Stack<ScopeInfo> scopes = new Stack<ScopeInfo>();
+  private Parser parser;
 
 
   @Override
@@ -288,14 +292,9 @@ public class FakeCodeGenerator implements CodeGenerator {
 
   }
 
-
-  private ScopeInfo scopeInfo;
-
-  private Parser parser;
-
   @Override
   public void onLambdaDefineStart(Token<?> lookhead) {
-    this.scopeInfo = parser.enterScope();
+    this.scopes.push(this.parser.enterScope());
   }
 
 
@@ -312,8 +311,7 @@ public class FakeCodeGenerator implements CodeGenerator {
   @Override
   public void onLambdaBodyEnd(Token<?> lookhead) {
     this.appendToken("lambda<defined>");
-    this.parser.restoreScope(scopeInfo);
-    scopeInfo = null;
+    this.parser.restoreScope(this.scopes.pop());
   }
 
 

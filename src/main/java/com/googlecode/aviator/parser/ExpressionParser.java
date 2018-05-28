@@ -578,7 +578,7 @@ public class ExpressionParser implements Parser {
           this.codeGenerator.onLambdaBodyStart(lookhead);
           this.move(true);
           this.statement();
-          if (this.lookhead.getType() == TokenType.Variable
+          if (this.lookhead != null && this.lookhead.getType() == TokenType.Variable
               && this.lookhead.getLexeme().equals("end")) {
             this.codeGenerator.onLambdaBodyEnd(lookhead);
             this.lambdaDepth--;
@@ -586,30 +586,34 @@ public class ExpressionParser implements Parser {
 
             this.move(true);
           } else {
-            reportSyntaxError("Expect lambda 'end', but is: '" + this.lookhead.getLexeme() + "'");
+            reportSyntaxError("Expect lambda 'end', but is: '" + currentTokenLexeme() + "'");
           }
         } else {
           // TODO may be a method call lambda(x,y)
-          reportSyntaxError("Expect lambda body, but is: '" + this.lookhead.getLexeme() + "'");
+          reportSyntaxError("Expect lambda body, but is: '" + currentTokenLexeme() + "'");
         }
       } else {
         // TODO may be a method call lambda(x,y)
-        reportSyntaxError("Expect lambda body, but is: '" + this.lookhead.getLexeme() + "'");
+        reportSyntaxError("Expect lambda body, but is: '" + currentTokenLexeme() + "'");
       }
     }
+  }
+
+  private String currentTokenLexeme() {
+    return this.lookhead == null ? "END_OF_STRING" : this.lookhead.getLexeme();
   }
 
 
   private void lambdaArgument() {
     if (this.lookhead.getType() == TokenType.Variable) {
       if (!isJavaIdentifier(this.lookhead.getLexeme())) {
-        this.reportSyntaxError("Illegal argument name: " + this.lookhead.getLexeme() + ",index="
+        this.reportSyntaxError("Illegal argument name: " + currentTokenLexeme() + ",index="
             + this.lookhead.getStartIndex());
       }
       this.codeGenerator.onLambdaArgument(this.lookhead);
       this.move(true);
     } else {
-      this.reportSyntaxError("Expect argument name,but is: " + this.lookhead.getLexeme() + ",index="
+      this.reportSyntaxError("Expect argument name,but is: " + currentTokenLexeme() + ",index="
           + this.lookhead.getStartIndex());
     }
   }
@@ -780,7 +784,7 @@ public class ExpressionParser implements Parser {
     statement();
     if (this.lookhead != null) {
       // The lookhead should be null, it's the end.
-      this.reportSyntaxError("Unexpect token '" + this.lookhead.getLexeme() + "'");
+      this.reportSyntaxError("Unexpect token '" + currentTokenLexeme() + "'");
     }
     return this.codeGenerator.getResult();
   }
@@ -801,6 +805,7 @@ public class ExpressionParser implements Parser {
   private void ensureDepthState() {
     DepthState state = this.depthState.peekLast();
     if (state != null) {
+      back();
       switch (state) {
         case Parent:
           if (this.parenDepth > 0) {

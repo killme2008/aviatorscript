@@ -47,18 +47,88 @@ public class ExpressionParserUnitTest {
   }
 
   @Test
-  public void testLambda() {
+  public void testLambda1() {
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "lambda(x,y)-> x+y end"), this.codeGenerator);
     this.parser.parse();
     assertEquals("x y + lambda<defined>", this.codeGenerator.getPostFixExpression());
   }
 
+  @Test
+  public void testLambda2() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "lambda(x)-> lambda(y) -> x +y end end"),
+        this.codeGenerator);
+    this.parser.parse();
+    assertEquals("x y + lambda<defined> lambda<defined>",
+        this.codeGenerator.getPostFixExpression());
+  }
+
+  @Test
+  public void testLambda3() {
+    this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance,
+        "lambda(x)-> lambda(y) -> lambda(z) ->  x +y+z  end end end"), this.codeGenerator);
+    this.parser.parse();
+    assertEquals("x y + z + lambda<defined> lambda<defined> lambda<defined>",
+        this.codeGenerator.getPostFixExpression());
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testLambdaMissingEnd() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "lambda(x)-> lambda(y) -> x +y end"),
+        this.codeGenerator);
+    this.parser.parse();
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testLambdaMissingArrow() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "lambda(x) x +y end"), this.codeGenerator);
+    this.parser.parse();
+  }
 
   @Test(expected = ExpressionSyntaxErrorException.class)
   public void testIllegalIdentifier2() {
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "a.null"),
         this.codeGenerator);
+    this.parser.parse();
+  }
+
+  @Test
+  public void testStatement1() {
+    this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "x+y;x-y"),
+        this.codeGenerator);
+    this.parser.parse();
+    assertEquals("x y + ; x y -", this.codeGenerator.getPostFixExpression());
+  }
+
+  @Test
+  public void testStatement2() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "println(3+2);4"), this.codeGenerator);
+    this.parser.parse();
+    assertEquals("3 2 + method<invoked> ; 4", this.codeGenerator.getPostFixExpression());
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testIllegalStatement1() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "println(3+2;4"), this.codeGenerator);
+    this.parser.parse();
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testIllegalStatement2() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "println(3+2);4-"), this.codeGenerator);
+    this.parser.parse();
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testIllegalStatement3() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "println(3+2;);4"), this.codeGenerator);
     this.parser.parse();
   }
 
