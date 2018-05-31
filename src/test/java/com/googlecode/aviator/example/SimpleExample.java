@@ -29,6 +29,6 @@ public class SimpleExample {
     AviatorEvaluator.getInstance().getFuncMap().put("s", s);
     env.put("z", 6);
 
-    System.out.println(AviatorEvaluator.execute("#4", env));
+    System.out.println(AviatorEvaluator.execute("s(1)(2)(3)", env));
   }
 }
