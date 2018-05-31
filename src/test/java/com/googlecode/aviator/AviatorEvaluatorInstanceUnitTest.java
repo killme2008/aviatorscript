@@ -16,6 +16,7 @@
 package com.googlecode.aviator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -27,6 +28,8 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
+import com.googlecode.aviator.lexer.token.OperatorType;
+import com.googlecode.aviator.runtime.type.AviatorFunction;
 
 
 public class AviatorEvaluatorInstanceUnitTest {
@@ -63,6 +66,23 @@ public class AviatorEvaluatorInstanceUnitTest {
       assertTrue(true);
     }
   }
+
+  @Test
+  public void testInstanceCustomOperator() {
+    AviatorFunction func = (AviatorFunction) this.instance.execute("lambda(x,y) -> x-y end");
+    this.instance.addOpFunction(OperatorType.ADD, func);
+    assertEquals(-1, this.instance.execute("3+4"));
+    assertEquals(7, AviatorEvaluator.execute("3+4"));
+    assertEquals(7, AviatorEvaluator.newInstance().execute("3+4"));
+  }
+
+  @Test
+  public void testInstanceOptions() {
+    this.instance.setOption(Options.TRACE_EVAL, true);
+    assertTrue((boolean) this.instance.getOption(Options.TRACE_EVAL));
+    assertFalse((boolean) AviatorEvaluator.newInstance().getOption(Options.TRACE_EVAL));
+  }
+
 
   @Test
   public void testCompileWithoutCache() {

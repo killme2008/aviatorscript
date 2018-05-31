@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.LiteralExpression;
@@ -46,6 +47,7 @@ import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorNumber;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorPattern;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorString;
 import com.googlecode.aviator.utils.Env;
 
@@ -246,6 +248,26 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   private Token<?> getTokenFromOperand(AviatorObject operand) {
     Token<?> token = null;
     switch (operand.getAviatorType()) {
+      case JavaType:
+        if (operand instanceof AviatorRuntimeJavaType) {
+          Object val = operand.getValue(null);
+          if (val == null) {
+            token = Variable.NIL;
+          } else if (val instanceof Number) {
+            token = new NumberToken((Number) val, val.toString());
+          } else if (val instanceof String || val instanceof Character) {
+            token = new StringToken(val.toString(), -1);
+          } else if (val instanceof Pattern) {
+            token = new PatternToken(((Pattern) val).pattern(), -1);
+          } else if (val instanceof Boolean) {
+            token = (boolean) val ? Variable.TRUE : Variable.FALSE;
+          } else {
+            throw new CompileExpressionErrorException("Invalid operand:" + operand.desc(null));
+          }
+        } else {
+          throw new CompileExpressionErrorException("Invalid operand:" + operand.desc(null));
+        }
+        break;
       case Boolean:
         token = operand.booleanValue(null) ? Variable.TRUE : Variable.FALSE;
         break;

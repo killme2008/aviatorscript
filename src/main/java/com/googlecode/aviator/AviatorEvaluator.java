@@ -257,6 +257,30 @@ public final class AviatorEvaluator {
     getInstance().addFunction(function);
   }
 
+  /**
+   * Define a function by name and expression.
+   *
+   * @param name the function name
+   * @param expression the expression to be executed and it's result must be a function.
+   * @since 4.0.0
+   */
+  public void defineFunction(String name, String expression) {
+    getInstance().defineFunction(name, expression);
+  }
+
+
+  /**
+   * Define a function by name and expression with the execution env.
+   *
+   * @param name the function name
+   * @param expression the expression to be executed and it's result must be a function.
+   * @param env the expression execution env
+   * @since 4.0.0
+   */
+  public void defineFunction(String name, String expression, Map<String, Object> env) {
+    getInstance().defineFunction(name, expression, env);
+  }
+
 
   /**
    * Remove an aviator function by name,it's not thread-safe.
