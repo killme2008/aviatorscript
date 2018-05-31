@@ -22,9 +22,9 @@ import com.googlecode.aviator.lexer.token.Variable;
 
 /**
  * Symbol table
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class SymbolTable {
 
@@ -35,12 +35,13 @@ public class SymbolTable {
     reserve("true", Variable.TRUE);
     reserve("false", Variable.FALSE);
     reserve("nil", Variable.NIL);
+    reserve("lambda", Variable.LAMBDA);
   }
 
 
   /**
    * Reserve variable
-   * 
+   *
    * @param name
    * @param value
    */
@@ -51,7 +52,7 @@ public class SymbolTable {
 
   /**
    * Check variable has been reserved?
-   * 
+   *
    * @param name
    * @return
    */
@@ -62,7 +63,7 @@ public class SymbolTable {
 
   /**
    * Get symbold table
-   * 
+   *
    * @return
    */
   public Map<String, Variable> getTable() {
@@ -72,7 +73,7 @@ public class SymbolTable {
 
   /**
    * Get variable by name
-   * 
+   *
    * @param name
    * @return
    */

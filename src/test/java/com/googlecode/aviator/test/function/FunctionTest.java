@@ -14,15 +14,28 @@
  **/
 package com.googlecode.aviator.test.function;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
-import org.junit.Test;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-import static org.junit.Assert.*;
+import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.utils.Env;
 
 
 public class FunctionTest {
@@ -467,9 +480,11 @@ public class FunctionTest {
     assertEquals(new BigInteger("199999999999999999999999999999998"),
         AviatorEvaluator.exec("99999999999999999999999999999999+99999999999999999999999999999999"));
 
+    Env env = new Env(null);
+    env.setInstance(AviatorEvaluator.getInstance());
     assertEquals(
         new BigDecimal("99999999999999999999999999999999.99999999",
-            AviatorEvaluator.getMathContext()),
+            RuntimeUtils.getMathContext(env)),
         AviatorEvaluator.exec("99999999999999999999999999999999.99999999M"));
   }
 

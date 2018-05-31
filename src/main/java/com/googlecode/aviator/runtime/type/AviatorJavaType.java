@@ -477,8 +477,8 @@ public class AviatorJavaType extends AviatorObject {
   @Override
   public String desc(Map<String, Object> env) {
     Object value = this.getValue(env);
-    return this.getAviatorType() + "(" + value + ", "
-        + (value == null ? "null" : value.getClass().getSimpleName()) + ")";
+    return "<" + this.getAviatorType() + ", " + value + ", "
+        + (value == null ? "null" : value.getClass().getSimpleName()) + ">";
   }
 
 }

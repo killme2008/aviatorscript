@@ -34,7 +34,7 @@ public interface Expression {
    * @param env Binding variable environment
    * @return
    */
-  public abstract Object execute(Map<String, Object> env);
+  Object execute(Map<String, Object> env);
 
 
   /**
@@ -42,7 +42,7 @@ public interface Expression {
    * 
    * @return
    */
-  public abstract Object execute();
+  Object execute();
 
 
   /**
@@ -52,7 +52,7 @@ public interface Expression {
    * @see com.googlecode.aviator.AviatorEvaluator#EVAL
    * @return
    */
-  public List<String> getVariableNames();
+  List<String> getVariableNames();
 
 
   /**
@@ -61,6 +61,6 @@ public interface Expression {
    * 
    * @return
    */
-  public List<String> getVariableFullNames();
+  List<String> getVariableFullNames();
 
 }

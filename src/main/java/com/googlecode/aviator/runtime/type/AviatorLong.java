@@ -16,16 +16,16 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.util.Map;
-import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
  * Aviator long type
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class AviatorLong extends AviatorNumber {
 
@@ -69,12 +69,12 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public int innerCompare(AviatorNumber other) {
+  public int innerCompare(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
         return this.toBigInt().compareTo(other.toBigInt());
       case Decimal:
-        return this.toDecimal().compareTo(other.toDecimal());
+        return this.toDecimal(env).compareTo(other.toDecimal(env));
       case Long:
         return TypeUtils.comapreLong(this.longValue(), other.longValue());
       case Double:
@@ -86,13 +86,13 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject innerDiv(AviatorNumber other) {
+  public AviatorObject innerDiv(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
         return AviatorBigInt.valueOf(this.toBigInt().divide(other.toBigInt()));
       case Decimal:
-        return AviatorDecimal
-            .valueOf(this.toDecimal().divide(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal.valueOf(
+            this.toDecimal(env).divide(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() / other.longValue());
       default:
@@ -102,13 +102,13 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject innerAdd(AviatorNumber other) {
+  public AviatorObject innerAdd(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
         return AviatorBigInt.valueOf(this.toBigInt().add(other.toBigInt()));
       case Decimal:
-        return AviatorDecimal
-            .valueOf(this.toDecimal().add(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal.valueOf(
+            this.toDecimal(env).add(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() + other.longValue());
       default:
@@ -118,13 +118,13 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject innerMod(AviatorNumber other) {
+  public AviatorObject innerMod(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
         return AviatorBigInt.valueOf(this.toBigInt().mod(other.toBigInt()));
       case Decimal:
         return AviatorDecimal.valueOf(
-            this.toDecimal().remainder(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            this.toDecimal(env).remainder(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() % other.longValue());
       default:
@@ -134,13 +134,13 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject innerMult(AviatorNumber other) {
+  public AviatorObject innerMult(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
         return AviatorBigInt.valueOf(this.toBigInt().multiply(other.toBigInt()));
       case Decimal:
         return AviatorDecimal.valueOf(
-            this.toDecimal().multiply(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            this.toDecimal(env).multiply(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() * other.longValue());
       default:
@@ -338,13 +338,13 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject innerSub(AviatorNumber other) {
+  public AviatorObject innerSub(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
         return AviatorBigInt.valueOf(this.toBigInt().subtract(other.toBigInt()));
       case Decimal:
         return AviatorDecimal.valueOf(
-            this.toDecimal().subtract(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            this.toDecimal(env).subtract(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.number.longValue() - other.longValue());
       default:

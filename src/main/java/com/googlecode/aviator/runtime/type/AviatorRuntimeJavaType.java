@@ -20,16 +20,22 @@ import java.util.Map;
 
 /**
  * Aviator runtime java type,used by when generate runtime result.
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class AviatorRuntimeJavaType extends AviatorJavaType {
   private final Object object;
 
+  public static AviatorObject valueOf(Object object) {
+    if (object instanceof AviatorObject) {
+      return (AviatorObject) object;
+    }
+    return new AviatorRuntimeJavaType(object);
+  }
 
   public AviatorRuntimeJavaType(Object object) {
-    super("unknow");
+    super("unknown");
     this.object = object;
   }
 

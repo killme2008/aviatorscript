@@ -22,9 +22,9 @@ import com.googlecode.aviator.utils.TypeUtils;
 
 /**
  * Aviator root object
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public abstract class AviatorObject {
   public abstract int compare(AviatorObject other, Map<String, Object> env);
@@ -35,7 +35,7 @@ public abstract class AviatorObject {
 
   /**
    * Returns true if the aviator object is null.
-   * 
+   *
    * @since 3.0.0
    * @return
    */
@@ -61,7 +61,7 @@ public abstract class AviatorObject {
 
 
   public String desc(Map<String, Object> env) {
-    return this.getAviatorType() + "(" + this.getValue(env) + ")";
+    return "<" + this.getAviatorType() + ", " + this.getValue(env) + ">";
   }
 
 
@@ -166,7 +166,7 @@ public abstract class AviatorObject {
 
   /**
    * Access array or list element
-   * 
+   *
    * @param env
    * @param indexObject
    * @return

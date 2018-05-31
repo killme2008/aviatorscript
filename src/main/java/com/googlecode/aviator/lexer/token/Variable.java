@@ -20,11 +20,14 @@ import java.util.Map;
 
 /**
  * Variable token
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class Variable extends AbstractToken<Object> {
+
+  public static final String INSTANCE_VAR = "__instance__";
+  public static final String ENV_VAR = "__env__";
 
   public boolean isQuote() {
     return quote;
@@ -74,11 +77,26 @@ public class Variable extends AbstractToken<Object> {
   };
 
 
+  /**
+   * Lambda keyword
+   */
+  public static final Variable LAMBDA = new Variable("lambda", -1) {
+
+    @Override
+    public Object getValue(Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+
+  @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
     return TokenType.Variable;
   }
 
 
+  @Override
   public Object getValue(Map<String, Object> env) {
     if (env != null) {
       return env.get(this.lexeme);
@@ -95,7 +113,11 @@ public class Variable extends AbstractToken<Object> {
 
   @Override
   public String toString() {
-    return "[type='string',lexeme='$" + getLexeme() + "',index=" + this.getStartIndex() + "]";
+    String index = ",index=" + getStartIndex();
+    if (getStartIndex() == -1) {
+      index = "";
+    }
+    return "[type='variable',lexeme='" + getLexeme() + "'" + index + "]";
   }
 
 }

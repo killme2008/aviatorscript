@@ -1,84 +1,104 @@
 package com.googlecode.aviator.runtime.function;
 
 import java.util.Map;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.runtime.type.AviatorType;
-
 
 /**
- * Abstract function implementation
+ * Trace eval function.
  *
- * @author boyan
- * @Date 2011-7-12
+ * @author dennis
  *
  */
-public abstract class AbstractFunction extends AviatorObject implements AviatorFunction {
-  public AviatorObject throwArity(int n) {
-    String name = this.getName();
-    throw new IllegalArgumentException("Wrong number of args (" + n + ") passed to: " + name);
+public class TraceFunction implements AviatorFunction {
+
+  private AviatorFunction rawFunc;
+
+
+
+  private TraceFunction(AviatorFunction rawFunc) {
+    super();
+    this.rawFunc = rawFunc;
   }
 
+  public static AviatorFunction wrapTrace(AviatorFunction func) {
+    return new TraceFunction(func);
+  }
+
+  private void trace(Map<String, Object> env, Object... args) {
+    StringBuilder sb = new StringBuilder();
+    boolean wasFirst = true;
+    for (Object arg : args) {
+      if (wasFirst) {
+        wasFirst = false;
+      } else {
+        sb.append(",");
+      }
+      if (arg instanceof String) {
+        sb.append(arg.toString());
+      } else {
+        sb.append(((AviatorObject) arg).desc(env));
+      }
+    }
+    RuntimeUtils.printTrace(env, "Func   : " + this.getName() + "(" + sb.toString() + ")");
+  }
+
+  @Override
+  public String getName() {
+    return this.rawFunc.getName();
+  }
 
   @Override
   public AviatorObject call(Map<String, Object> env) {
-    return this.throwArity(0);
+    trace(env);
+    return this.rawFunc.call(env);
   }
 
-
-  @Override
-  public int compare(AviatorObject other, Map<String, Object> env) {
-    throw new UnsupportedOperationException("Lambda function can't be compared.");
-  }
-
-
-  @Override
-  public AviatorType getAviatorType() {
-    return AviatorType.Lambda;
-  }
-
-  @Override
-  public Object getValue(Map<String, Object> env) {
-    return this;
-  }
 
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
-    return this.throwArity(1);
+    trace(env, arg1);
+    return this.rawFunc.call(env, arg1);
   }
 
 
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
-    return this.throwArity(2);
+    trace(env, arg1, arg2);
+    return rawFunc.call(env, arg1, arg2);
   }
 
 
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3) {
-    return this.throwArity(3);
+    trace(env, arg1, arg2, arg3);
+    return rawFunc.call(env, arg1, arg2, arg3);
   }
 
 
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4) {
-    return this.throwArity(4);
+    trace(env, arg1, arg2, arg3, arg4);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4);
   }
 
 
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5) {
-    return this.throwArity(5);
+    trace(env, arg1, arg2, arg3, arg4, arg5);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5);
   }
 
 
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6) {
-    return this.throwArity(6);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6);
   }
 
 
@@ -86,7 +106,8 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7) {
-    return this.throwArity(7);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
   }
 
 
@@ -94,7 +115,8 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8) {
-    return this.throwArity(8);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
   }
 
 
@@ -102,7 +124,8 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9) {
-    return this.throwArity(9);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
   }
 
 
@@ -110,7 +133,8 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10) {
-    return this.throwArity(10);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
   }
 
 
@@ -119,7 +143,8 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
       AviatorObject arg11) {
-    return this.throwArity(11);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
   }
 
 
@@ -128,7 +153,9 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
       AviatorObject arg11, AviatorObject arg12) {
-    return this.throwArity(12);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
+        arg12);
   }
 
 
@@ -137,7 +164,9 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
       AviatorObject arg11, AviatorObject arg12, AviatorObject arg13) {
-    return this.throwArity(13);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
+        arg12, arg13);
   }
 
 
@@ -146,7 +175,10 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
       AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14) {
-    return this.throwArity(14);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+        arg14);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
+        arg12, arg13, arg14);
   }
 
 
@@ -156,7 +188,10 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
       AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
       AviatorObject arg15) {
-    return this.throwArity(15);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+        arg14, arg15);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
+        arg12, arg13, arg14, arg15);
   }
 
 
@@ -166,7 +201,10 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
       AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
       AviatorObject arg15, AviatorObject arg16) {
-    return this.throwArity(16);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+        arg14, arg15, arg16);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
+        arg12, arg13, arg14, arg15, arg16);
   }
 
 
@@ -176,7 +214,10 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
       AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
       AviatorObject arg15, AviatorObject arg16, AviatorObject arg17) {
-    return this.throwArity(17);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+        arg14, arg15, arg16, arg17);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
+        arg12, arg13, arg14, arg15, arg16, arg17);
   }
 
 
@@ -186,7 +227,10 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
       AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
       AviatorObject arg15, AviatorObject arg16, AviatorObject arg17, AviatorObject arg18) {
-    return this.throwArity(18);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+        arg14, arg15, arg16, arg17, arg18);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
+        arg12, arg13, arg14, arg15, arg16, arg17, arg18);
   }
 
 
@@ -197,7 +241,10 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
       AviatorObject arg15, AviatorObject arg16, AviatorObject arg17, AviatorObject arg18,
       AviatorObject arg19) {
-    return this.throwArity(19);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+        arg14, arg15, arg16, arg17, arg18, arg19);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
+        arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19);
   }
 
 
@@ -208,7 +255,10 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
       AviatorObject arg15, AviatorObject arg16, AviatorObject arg17, AviatorObject arg18,
       AviatorObject arg19, AviatorObject arg20) {
-    return this.throwArity(20);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+        arg14, arg15, arg16, arg17, arg18, arg19, arg20);
+    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
+        arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20);
   }
 
 
@@ -219,7 +269,9 @@ public abstract class AbstractFunction extends AviatorObject implements AviatorF
       AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
       AviatorObject arg15, AviatorObject arg16, AviatorObject arg17, AviatorObject arg18,
       AviatorObject arg19, AviatorObject arg20, AviatorObject... args) {
-    return this.throwArity(21);
+    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+        arg14, arg15, arg16, arg17, arg18, arg19, arg20, "...");
+    return this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10,
+        arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, args);
   }
-
 }
