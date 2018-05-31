@@ -180,6 +180,12 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+
+  LambdaGenerator getLambdaGenerator() {
+    return lambdaGenerator;
+  }
+
+
   public void start() {
     this.makeConstructor();
     this.startVisitMethodCode();
@@ -256,8 +262,9 @@ public class ASMCodeGenerator implements CodeGenerator {
           String outterName = entry.getKey();
           String innerName = entry.getValue();
           this.mv.visitVarInsn(ALOAD, 0);
+          this.mv.visitVarInsn(ALOAD, 1);
           this.mv.visitLdcInsn(outterName);
-          this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/AviatorEvaluator",
+          this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/AviatorEvaluatorInstance",
               "getFunction",
               "(Ljava/lang/String;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
           this.mv.visitFieldInsn(PUTFIELD, this.className, innerName,

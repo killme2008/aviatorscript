@@ -392,6 +392,16 @@ public final class AviatorEvaluatorInstance {
    */
   public void addFunction(AviatorFunction function) {
     final String name = function.getName();
+    addFunction(name, function);
+  }
+
+  /**
+   * Adds a function with the name
+   *
+   * @param name
+   * @param function
+   */
+  public void addFunction(final String name, AviatorFunction function) {
     if ("lambda".equals(name)) {
       throw new IllegalArgumentException("Invalid function name, lambda is a keyword.");
     }
@@ -400,6 +410,17 @@ public final class AviatorEvaluatorInstance {
           + "' is already exists, but is replaced with new one.");
     }
     funcMap.put(name, function);
+  }
+
+  /**
+   * Define a function by name and expression.
+   *
+   * @param name
+   * @param expression
+   */
+  public void defineFunction(String name, String expression) {
+    AviatorFunction function = (AviatorFunction) this.exec(expression);
+    this.addFunction(name, function);
   }
 
 

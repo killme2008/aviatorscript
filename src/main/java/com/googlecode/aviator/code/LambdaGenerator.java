@@ -157,6 +157,8 @@ public class LambdaGenerator implements CodeGenerator {
           "Lcom/googlecode/aviator/Expression;");
       // this pointer
       this.mv.visitIntInsn(ALOAD, 0);
+      // load env
+      this.mv.visitIntInsn(ALOAD, 1);
       // new array
       this.mv.visitLdcInsn(argsNumber);
       this.mv.visitTypeInsn(Opcodes.ANEWARRAY, "com/googlecode/aviator/runtime/type/AviatorObject");
@@ -171,10 +173,11 @@ public class LambdaGenerator implements CodeGenerator {
       this.mv.visitVarInsn(ALOAD, arrayIndex);
       this.mv.visitMethodInsn(INVOKEVIRTUAL,
           "com/googlecode/aviator/runtime/function/LambdaFunction", "newEnv",
-          "([Lcom/googlecode/aviator/runtime/type/AviatorObject;)Ljava/util/Map;");
-
+          "(Ljava/util/Map;[Lcom/googlecode/aviator/runtime/type/AviatorObject;)Ljava/util/Map;");
+      // execute body expression
       this.mv.visitMethodInsn(INVOKEINTERFACE, "com/googlecode/aviator/Expression", "execute",
           "(Ljava/util/Map;)Ljava/lang/Object;");
+      // get the result
       this.mv.visitMethodInsn(INVOKESTATIC,
           "com/googlecode/aviator/runtime/type/AviatorRuntimeJavaType", "valueOf",
           "(Ljava/lang/Object;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
