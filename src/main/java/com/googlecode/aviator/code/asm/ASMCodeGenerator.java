@@ -181,6 +181,11 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 
 
+  public AviatorClassLoader getClassLoader() {
+    return classLoader;
+  }
+
+
   LambdaGenerator getLambdaGenerator() {
     return lambdaGenerator;
   }
@@ -720,7 +725,8 @@ public class ASMCodeGenerator implements CodeGenerator {
 
     byte[] bytes = this.classWriter.toByteArray();
     try {
-      Class<?> defineClass = ClassDefiner.defineClass(this.className, bytes, this.classLoader);
+      Class<?> defineClass =
+          ClassDefiner.defineClass(this.className, Expression.class, bytes, this.classLoader);
       Constructor<?> constructor =
           defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class);
       ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
@@ -1075,7 +1081,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   public void onLambdaDefineStart(Token<?> lookhead) {
     if (this.lambdaGenerator == null) {
       // TODO cache?
-      this.lambdaGenerator = new LambdaGenerator(instance, this, this.parser, false);
+      this.lambdaGenerator = new LambdaGenerator(instance, this, this.parser, this.classLoader);
       this.lambdaGenerator.setScopeInfo(this.parser.enterScope());
     } else {
       throw new CompileExpressionErrorException("Compile lambda error");

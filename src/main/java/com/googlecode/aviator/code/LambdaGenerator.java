@@ -37,6 +37,7 @@ import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.ScopeInfo;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Env;
 
 /**
@@ -58,13 +59,13 @@ public class LambdaGenerator implements CodeGenerator {
   private ScopeInfo scopeInfo;
 
   public LambdaGenerator(AviatorEvaluatorInstance instance, CodeGenerator parentCodeGenerator,
-      Parser parser, boolean cached) {
+      Parser parser, AviatorClassLoader classLoader) {
     this.arguments = new ArrayList<String>();
     this.instance = instance;
     this.parentCodeGenerator = parentCodeGenerator;
-    this.codeGenerator = instance.newCodeGenerator(cached);
+    this.codeGenerator = instance.newCodeGenerator(classLoader);
     this.codeGenerator.setParser(parser);
-    this.classLoader = instance.getAviatorClassLoader(cached);
+    this.classLoader = classLoader;
     // Generate lambda class name
     this.className =
         "Lambda_" + System.currentTimeMillis() + "_" + LAMBDA_COUNTER.getAndIncrement();
@@ -205,7 +206,8 @@ public class LambdaGenerator implements CodeGenerator {
     this.endVisitClass();
     byte[] bytes = this.classWriter.toByteArray();
     try {
-      Class<?> defineClass = ClassDefiner.defineClass(this.className, bytes, this.classLoader);
+      Class<?> defineClass =
+          ClassDefiner.defineClass(this.className, LambdaFunction.class, bytes, this.classLoader);
       Constructor<?> constructor =
           defineClass.getConstructor(List.class, Expression.class, Env.class);
       // MethodHandle methodHandle = MethodHandles.lookup().findConstructor(defineClass,

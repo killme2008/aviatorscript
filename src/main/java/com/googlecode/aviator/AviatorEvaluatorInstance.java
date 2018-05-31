@@ -606,19 +606,24 @@ public final class AviatorEvaluatorInstance {
 
 
   public CodeGenerator newCodeGenerator(boolean cached) {
+    AviatorClassLoader classLoader = getAviatorClassLoader(cached);
+    return newCodeGenerator(classLoader);
+
+  }
+
+  public CodeGenerator newCodeGenerator(AviatorClassLoader classLoader) {
     switch (getOptimizeLevel()) {
       case AviatorEvaluator.COMPILE:
-        ASMCodeGenerator asmCodeGenerator = new ASMCodeGenerator(this,
-            getAviatorClassLoader(cached), traceOutputStream, (Boolean) getOption(Options.TRACE));
+        ASMCodeGenerator asmCodeGenerator = new ASMCodeGenerator(this, classLoader,
+            traceOutputStream, (Boolean) getOption(Options.TRACE));
         asmCodeGenerator.start();
         return asmCodeGenerator;
       case AviatorEvaluator.EVAL:
-        return new OptimizeCodeGenerator(this, getAviatorClassLoader(cached), traceOutputStream,
+        return new OptimizeCodeGenerator(this, classLoader, traceOutputStream,
             (Boolean) getOption(Options.TRACE));
       default:
         throw new IllegalArgumentException("Unknow option " + getOptimizeLevel());
     }
-
   }
 
 

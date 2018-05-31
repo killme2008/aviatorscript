@@ -77,6 +77,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
    */
   private Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
 
+
   public OptimizeCodeGenerator(AviatorEvaluatorInstance instance, ClassLoader classLoader,
       OutputStream traceOutStream, boolean trace) {
     this.instance = instance;
@@ -709,7 +710,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   public void onLambdaDefineStart(Token<?> lookhead) {
     if (this.lambdaGenerator == null) {
       // TODO cache?
-      this.lambdaGenerator = new LambdaGenerator(instance, this, this.parser, false);
+      this.lambdaGenerator =
+          new LambdaGenerator(instance, this, this.parser, this.codeGen.getClassLoader());
       this.lambdaGenerator.setScopeInfo(this.parser.enterScope());
     } else {
       throw new CompileExpressionErrorException("Compile lambda error");
