@@ -164,7 +164,7 @@ public class FunctionTest {
       Object now = AviatorEvaluator.execute("now()");
       assertNotNull(now);
       assertTrue(now instanceof Long);
-      assertEquals((Long) now, System.currentTimeMillis(), 5L);
+      assertEquals((Long) now, System.currentTimeMillis(), 10L);
 
       // rand()
       Object rand1 = AviatorEvaluator.execute("rand()");
