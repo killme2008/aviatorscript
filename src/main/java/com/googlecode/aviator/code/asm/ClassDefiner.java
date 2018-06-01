@@ -40,7 +40,7 @@ public class ClassDefiner {
     }
   }
 
-  private static boolean isPreferClassLoaderDefinerByDefault() {
+  public static boolean isJDK7() {
     String version = (System.getProperty("java.version"));
     try {
       return version != null && version.startsWith("1.7");
@@ -50,14 +50,8 @@ public class ClassDefiner {
   }
 
   private static boolean preferClassLoader =
-      Boolean.valueOf(System.getProperty("aviator.preferClassloaderDefiner",
-          String.valueOf(isPreferClassLoaderDefinerByDefault())));
+      Boolean.valueOf(System.getProperty("aviator.preferClassloaderDefiner", "false"));
 
-  static {
-    if (preferClassLoader) {
-      System.out.println("[Aviator WARN] aviator.preferClassloaderDefiner=" + preferClassLoader);
-    }
-  }
 
   private static int errorTimes = 0;
 
@@ -72,10 +66,15 @@ public class ClassDefiner {
         if (errorTimes++ > 10000) {
           preferClassLoader = true;
         }
-        return classLoader.defineClass(className, bytes);
+        return defineClassByClassLoader(className, bytes, classLoader);
       }
     } else {
-      return classLoader.defineClass(className, bytes);
+      return defineClassByClassLoader(className, bytes, classLoader);
     }
+  }
+
+  public static Class<?> defineClassByClassLoader(String className, byte[] bytes,
+      AviatorClassLoader classLoader) {
+    return classLoader.defineClass(className, bytes);
   }
 }

@@ -264,7 +264,7 @@ public final class AviatorEvaluator {
    * @param expression the expression to be executed and it's result must be a function.
    * @since 4.0.0
    */
-  public void defineFunction(String name, String expression) {
+  public static void defineFunction(String name, String expression) {
     getInstance().defineFunction(name, expression);
   }
 
@@ -277,7 +277,7 @@ public final class AviatorEvaluator {
    * @param env the expression execution env
    * @since 4.0.0
    */
-  public void defineFunction(String name, String expression, Map<String, Object> env) {
+  public static void defineFunction(String name, String expression, Map<String, Object> env) {
     getInstance().defineFunction(name, expression, env);
   }
 
