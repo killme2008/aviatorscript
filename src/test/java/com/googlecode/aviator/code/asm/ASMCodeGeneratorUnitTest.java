@@ -15,7 +15,10 @@
  **/
 package com.googlecode.aviator.code.asm;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -24,13 +27,20 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.code.LambdaGenerator;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.PatternToken;
 import com.googlecode.aviator.lexer.token.StringToken;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
+import com.googlecode.aviator.parser.Parser;
+import com.googlecode.aviator.parser.ScopeInfo;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
+import com.googlecode.aviator.runtime.type.AviatorJavaType;
 
 
 public class ASMCodeGeneratorUnitTest {
@@ -41,12 +51,14 @@ public class ASMCodeGeneratorUnitTest {
   public void setUp() {
     final AviatorClassLoader classloader =
         AccessController.doPrivileged(new PrivilegedAction<AviatorClassLoader>() {
+          @Override
           public AviatorClassLoader run() {
             return new AviatorClassLoader(Thread.currentThread().getContextClassLoader());
           }
         });
 
-    this.codeGenerator = new ASMCodeGenerator(classloader, System.out, true);
+    this.codeGenerator =
+        new ASMCodeGenerator(AviatorEvaluator.newInstance(), classloader, System.out, true);
     this.codeGenerator.start();
   }
 
@@ -498,6 +510,50 @@ public class ASMCodeGeneratorUnitTest {
     assertTrue(result instanceof Date);
   }
 
+  @Test
+  public void testOnLambdaDefine() throws Exception {
+    this.codeGenerator.setParser(new Parser() {
+
+      @Override
+      public void setCodeGenerator(CodeGenerator codeGenerator) {
+
+      }
+
+      @Override
+      public void restoreScope(ScopeInfo info) {
+
+      }
+
+      @Override
+      public CodeGenerator getCodeGenerator() {
+        return codeGenerator;
+      }
+
+      @Override
+      public ScopeInfo enterScope() {
+        return null;
+      }
+    });
+    assertNull(this.codeGenerator.getLambdaGenerator());
+    this.codeGenerator.onLambdaDefineStart(new Variable("lambda", 0));
+    LambdaGenerator lambdaGenerator = this.codeGenerator.getLambdaGenerator();
+    assertNotNull(lambdaGenerator);
+    codeGenerator.onLambdaArgument(new Variable("x", 1));
+    codeGenerator.onLambdaArgument(new Variable("y", 2));
+    codeGenerator.onLambdaBodyStart(new Variable(">", 3));
+    lambdaGenerator.onConstant(new Variable("x", 4));
+    lambdaGenerator.onConstant(new Variable("y", 5));
+    lambdaGenerator.onAdd(null);
+    codeGenerator.onLambdaBodyEnd(new Variable("end", 7));
+    HashMap<String, Object> env = new HashMap<String, Object>();
+    env.put("x", 2);
+    env.put("y", 3);
+    Object result = this.eval(env);
+    assertTrue(result instanceof LambdaFunction);
+    assertEquals(5, ((LambdaFunction) result)
+        .call(env, new AviatorJavaType("x"), new AviatorJavaType("y")).getValue(env));
+    assertNull(this.codeGenerator.getLambdaGenerator());
+  }
 
   @Test
   public void testOnMethod_withTwoArguments() throws Exception {

@@ -977,6 +977,30 @@ public class GrammarUnitTest {
   }
 
   @Test
+  public void testStatement() {
+    assertEquals(4, AviatorEvaluator.execute("5;3;4"));
+    assertEquals(4, AviatorEvaluator.execute("5;1+2;4"));
+    assertEquals(4, AviatorEvaluator.exec("5;1+2;a", 4));
+    assertEquals(4, AviatorEvaluator.exec("(3+a)*4;1+2;println(b);a", 4, 5));
+
+    Map<String, Object> env = this.createEnv();
+    assertEquals(3.0, (Double) AviatorEvaluator
+        .execute("d+10*a ; string.length('hello')>5? math.abs(d):math.log10(a) ", env), 0.001);
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testIllegalStatement1() {
+    assertEquals(4, AviatorEvaluator.execute("5;3+;4"));
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testIllegalStatement2() {
+    assertEquals(4,
+        AviatorEvaluator.execute("d+10*a ; string.length('hello')>5? math.abs(d);4:math.log10(a)"));
+  }
+
+
+  @Test
   public void testScientificNotationBiggerSmaller() {
     assertEquals(4E81 / 3E9, AviatorEvaluator.execute("4E81/3E9"));
     assertEquals(1E9 / 2E101, AviatorEvaluator.execute("1E9/2E101"));

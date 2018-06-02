@@ -3,17 +3,17 @@ package com.googlecode.aviator;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 
 /**
- * Function missing callback when function not found.
- * 
+ * Function loader to load function when function not found.
+ *
  * @author dennis
  *
  */
-public interface FunctionMissing {
+public interface FunctionLoader {
 
   /**
    * Invoked when function not found
-   * 
+   *
    * @param name function name
    */
-  public AviatorFunction onFunctionMissing(String name);
+  public AviatorFunction onFunctionNotFound(String name);
 }

@@ -14,15 +14,29 @@
  **/
 package com.googlecode.aviator.test.function;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
-import org.junit.Test;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-import static org.junit.Assert.*;
+import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.utils.Env;
 
 
 public class FunctionTest {
@@ -151,7 +165,7 @@ public class FunctionTest {
       Object now = AviatorEvaluator.execute("now()");
       assertNotNull(now);
       assertTrue(now instanceof Long);
-      assertEquals((Long) now, System.currentTimeMillis(), 5L);
+      assertEquals((Long) now, System.currentTimeMillis(), 10L);
 
       // rand()
       Object rand1 = AviatorEvaluator.execute("rand()");
@@ -467,9 +481,11 @@ public class FunctionTest {
     assertEquals(new BigInteger("199999999999999999999999999999998"),
         AviatorEvaluator.exec("99999999999999999999999999999999+99999999999999999999999999999999"));
 
+    Env env = new Env(null);
+    env.setInstance(AviatorEvaluator.getInstance());
     assertEquals(
         new BigDecimal("99999999999999999999999999999999.99999999",
-            AviatorEvaluator.getMathContext()),
+            RuntimeUtils.getMathContext(env)),
         AviatorEvaluator.exec("99999999999999999999999999999999.99999999M"));
   }
 
@@ -693,13 +709,31 @@ public class FunctionTest {
   }
 
   @Test
+  public void testDisablePropertySyntaxSugar() {
+    Map<String, Object> env = createUsersEnv();
+    String username = (String) AviatorEvaluator.execute("#data.[0].name", env);
+    assertEquals(username, "张三");
+    AviatorEvaluator.setOption(Options.ENABLE_PROPERTY_SYNTAX_SUGAR, false);
+    assertNull(AviatorEvaluator.execute("#data.[0].name", env));
+    AviatorEvaluator.setOption(Options.ENABLE_PROPERTY_SYNTAX_SUGAR, true);
+  }
+
+  @Test
+  public void testPropertyNilNotFound() {
+    Map<String, Object> env = createUsersEnv();
+    try {
+      AviatorEvaluator.execute("#data[0].name", env);
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertTrue(true);
+    }
+    AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, true);
+    assertNull(AviatorEvaluator.execute("#data[0].name", env));
+  }
+
+  @Test
   public void testSeqFilterListWithProperty() {
-    List<User> users = new ArrayList<>(3);
-    users.add(new User(1L, 25, "张三"));
-    users.add(new User(2L, 26, "李四"));
-    users.add(new User(3L, 27, "王五"));
-    Map<String, Object> env = new HashMap<>();
-    env.put("data", users);
+    Map<String, Object> env = createUsersEnv();
     Object result =
         AviatorEvaluator.execute("filter(data,seq.and(seq.gt(25,'age'),seq.eq('李四','name')))", env);
     List list = (List) result;
@@ -709,6 +743,17 @@ public class FunctionTest {
       assertEquals("李四", user.getName());
       assertTrue(user.getAge() > 25);
     }
+  }
+
+
+  private Map<String, Object> createUsersEnv() {
+    List<User> users = new ArrayList<>(3);
+    users.add(new User(1L, 25, "张三"));
+    users.add(new User(2L, 26, "李四"));
+    users.add(new User(3L, 27, "王五"));
+    Map<String, Object> env = new HashMap<>();
+    env.put("data", users);
+    return env;
   }
 
   @Test

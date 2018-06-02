@@ -1,13 +1,15 @@
 package com.googlecode.aviator.runtime.function.seq;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.TestUtils;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.utils.Env;
 
 
 public class SeqMapFunctionUnitTest {
@@ -35,9 +37,10 @@ public class SeqMapFunctionUnitTest {
       strs.add("hello");
     }
     SeqMapFunction fun = new SeqMapFunction();
+    Env env = TestUtils.getTestEnv();
     AviatorObject result =
-        fun.call(null, new AviatorRuntimeJavaType(strs), new AviatorJavaType("string.length"));
-    LinkedList array = (LinkedList) result.getValue(null);
+        fun.call(env, new AviatorRuntimeJavaType(strs), new AviatorJavaType("string.length"));
+    LinkedList array = (LinkedList) result.getValue(env);
     for (Object i : array) {
       assertEquals(5, i);
     }
@@ -46,10 +49,11 @@ public class SeqMapFunctionUnitTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testMap_String() {
+    Env env = TestUtils.getTestEnv();
     SeqMapFunction fun = new SeqMapFunction();
 
     AviatorObject result =
-        fun.call(null, new AviatorRuntimeJavaType("hello"), new AviatorJavaType("string.length"));
+        fun.call(env, new AviatorRuntimeJavaType("hello"), new AviatorJavaType("string.length"));
   }
 
 }

@@ -28,9 +28,9 @@ import com.googlecode.aviator.utils.TypeUtils;
 
 /**
  * math.log(d) function
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class MathLogFunction extends AbstractFunction {
 
@@ -39,9 +39,9 @@ public class MathLogFunction extends AbstractFunction {
 
     Number num = FunctionUtils.getNumberValue(arg1, env);
     if (TypeUtils.isDecimal(num)) {
-      return new AviatorDecimal(TypeUtils.ln((BigDecimal) num));
+      return new AviatorDecimal(TypeUtils.ln(env, (BigDecimal) num));
     } else if (TypeUtils.isBigInt(num)) {
-      return new AviatorDecimal(TypeUtils.ln(new BigDecimal((BigInteger) num)));
+      return new AviatorDecimal(TypeUtils.ln(env, new BigDecimal((BigInteger) num)));
     } else {
       return new AviatorDouble(Math.log(num.doubleValue()));
     }

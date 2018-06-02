@@ -19,7 +19,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
-import com.googlecode.aviator.runtime.op.OperationRuntime;
+import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
+import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
+import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -30,10 +33,28 @@ import com.googlecode.aviator.runtime.op.OperationRuntime;
  */
 public abstract class ClassExpression extends BaseExpression {
 
-  public ClassExpression(List<String> varNames) {
-    super(varNames);
+  protected Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
+
+
+  public Map<String, LambdaFunctionBootstrap> getLambdaBootstraps() {
+    return lambdaBootstraps;
   }
 
+  public void setLambdaBootstraps(Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
+    this.lambdaBootstraps = lambdaBootstraps;
+  }
+
+  public ClassExpression(AviatorEvaluatorInstance instance, List<String> varNames) {
+    super(instance, varNames);
+  }
+
+  public LambdaFunction newLambda(Env env, String name) {
+    LambdaFunctionBootstrap bootstrap = this.lambdaBootstraps.get(name);
+    if (bootstrap == null) {
+      throw new ExpressionRuntimeException("Lambda " + name + " not found");
+    }
+    return bootstrap.newInstance(env);
+  }
 
   /*
    * (non-Javadoc)
@@ -41,26 +62,26 @@ public abstract class ClassExpression extends BaseExpression {
    * @see com.googlecode.aviator.IExpression#execute(java.util.Map)
    */
   @Override
-  public Object execute(Map<String, Object> env) {
-    if (env == null) {
-      env = Collections.emptyMap();
+  public Object execute(Map<String, Object> map) {
+    if (map == null) {
+      map = Collections.emptyMap();
     }
-
-    if (OperationRuntime.isTracedEval()) {
-      OperationRuntime.printTrace("Tracing: " + this.getExpression());
-    }
+    Env env = newEnv(map);
     try {
-      return this.execute0(env);
+      Object result = this.execute0(env);
+      if (RuntimeUtils.isTracedEval(env)) {
+        RuntimeUtils.printTrace(env, "Result : " + result);
+      }
+      return result;
     } catch (ExpressionRuntimeException e) {
       throw e;
     } catch (Throwable e) {
       throw new ExpressionRuntimeException("Execute expression error", e);
     }
-
   }
 
 
-  public abstract Object execute0(Map<String, Object> env);
+  public abstract Object execute0(Env env);
 
 
   /**

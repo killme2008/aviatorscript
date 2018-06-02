@@ -3,12 +3,12 @@ package com.googlecode.aviator.runtime.function.math;
 import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import com.googlecode.aviator.TestUtils;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorNumber;
+import com.googlecode.aviator.utils.Env;
 
 
 public class MathAbsFunctionUnitTest extends BaseMathFunctionUnitTestForOneArgument {
@@ -20,22 +20,22 @@ public class MathAbsFunctionUnitTest extends BaseMathFunctionUnitTestForOneArgum
 
   @Test
   public void testCall() {
-    assertEquals(3, this.function.call(null, AviatorNumber.valueOf(-3)).getValue(null));
-    assertEquals(3.9, this.function.call(null, AviatorNumber.valueOf(-3.9)).getValue(null));
-    assertEquals(400, this.function.call(null, AviatorNumber.valueOf(400)).getValue(null));
+    Env env = TestUtils.getTestEnv();
+    assertEquals(3, this.function.call(env, AviatorNumber.valueOf(-3)).getValue(null));
+    assertEquals(3.9, this.function.call(env, AviatorNumber.valueOf(-3.9)).getValue(null));
+    assertEquals(400, this.function.call(env, AviatorNumber.valueOf(400)).getValue(null));
     assertEquals(new BigInteger("300000000000000000000000000000000"),
         this.function
-            .call(null, AviatorNumber.valueOf(new BigInteger("-300000000000000000000000000000000")))
+            .call(env, AviatorNumber.valueOf(new BigInteger("-300000000000000000000000000000000")))
             .getValue(null));
     assertEquals(new BigDecimal("300000000000000000000000000000000.0000002223333"),
         this.function
-            .call(null,
+            .call(env,
                 AviatorNumber
                     .valueOf(new BigDecimal("-300000000000000000000000000000000.0000002223333")))
             .getValue(null));
-    assertEquals(400, this.function.call(null, AviatorNumber.valueOf(400)).getValue(null));
+    assertEquals(400, this.function.call(env, AviatorNumber.valueOf(400)).getValue(null));
 
-    Map<String, Object> env = new HashMap<String, Object>();
     env.put("a", 300);
     env.put("b", -3.14);
     env.put("c", new BigInteger("-300000000000000000000000000000000"));

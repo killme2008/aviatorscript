@@ -2,15 +2,15 @@ package com.googlecode.aviator.runtime.type;
 
 import java.math.BigInteger;
 import java.util.Map;
-import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 
 
 /**
  * Aviator Big Integer
- * 
+ *
  * @since 2.3.0
  * @author dennis<killme2008@gmail.com>
- * 
+ *
  */
 public class AviatorBigInt extends AviatorLong {
 
@@ -58,11 +58,11 @@ public class AviatorBigInt extends AviatorLong {
 
 
   @Override
-  public AviatorObject innerSub(AviatorNumber other) {
+  public AviatorObject innerSub(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case Decimal:
         return AviatorDecimal.valueOf(
-            this.toDecimal().subtract(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            this.toDecimal(env).subtract(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Double:
         return AviatorDouble.valueOf(this.doubleValue() - other.doubleValue());
       default:
@@ -72,11 +72,11 @@ public class AviatorBigInt extends AviatorLong {
 
 
   @Override
-  public AviatorObject innerMult(AviatorNumber other) {
+  public AviatorObject innerMult(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case Decimal:
         return AviatorDecimal.valueOf(
-            this.toDecimal().multiply(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            this.toDecimal(env).multiply(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Double:
         return AviatorDouble.valueOf(this.doubleValue() * other.doubleValue());
       default:
@@ -86,11 +86,11 @@ public class AviatorBigInt extends AviatorLong {
 
 
   @Override
-  public AviatorObject innerMod(AviatorNumber other) {
+  public AviatorObject innerMod(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case Decimal:
         return AviatorDecimal.valueOf(
-            this.toDecimal().remainder(other.toDecimal(), AviatorEvaluator.getMathContext()));
+            this.toDecimal(env).remainder(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Double:
         return AviatorDouble.valueOf(this.doubleValue() % other.doubleValue());
       default:
@@ -100,11 +100,11 @@ public class AviatorBigInt extends AviatorLong {
 
 
   @Override
-  public AviatorObject innerDiv(AviatorNumber other) {
+  public AviatorObject innerDiv(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case Decimal:
-        return AviatorDecimal
-            .valueOf(this.toDecimal().divide(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal.valueOf(
+            this.toDecimal(env).divide(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Double:
         return AviatorDouble.valueOf(this.doubleValue() / other.doubleValue());
       default:
@@ -114,11 +114,11 @@ public class AviatorBigInt extends AviatorLong {
 
 
   @Override
-  public AviatorNumber innerAdd(AviatorNumber other) {
+  public AviatorNumber innerAdd(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case Decimal:
-        return AviatorDecimal
-            .valueOf(this.toDecimal().add(other.toDecimal(), AviatorEvaluator.getMathContext()));
+        return AviatorDecimal.valueOf(
+            this.toDecimal(env).add(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Double:
         return AviatorDouble.valueOf(this.doubleValue() + other.doubleValue());
       default:
@@ -128,10 +128,10 @@ public class AviatorBigInt extends AviatorLong {
 
 
   @Override
-  public int innerCompare(AviatorNumber other) {
+  public int innerCompare(Map<String, Object> env, AviatorNumber other) {
     switch (other.getAviatorType()) {
       case Decimal:
-        return this.toDecimal().compareTo(other.toDecimal());
+        return this.toDecimal(env).compareTo(other.toDecimal(env));
       case Double:
         return Double.compare(this.doubleValue(), other.doubleValue());
       default:

@@ -22,7 +22,9 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
+import com.googlecode.aviator.TestUtils;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.Env;
 
 
 public class AviatorNumberUnitTest {
@@ -373,158 +375,155 @@ public class AviatorNumberUnitTest {
 
 
   public void testArthOperationWithNumber(OperatorType operatorType) {
-
+    Env env = TestUtils.getTestEnv();
     switch (operatorType) {
       case Add:
         this.reset();
-        assertEquals(6.3, this.a.add(this.b, null).getValue(null));
+        assertEquals(6.3, this.a.add(this.b, env).getValue(env));
         this.reset();
-        assertEquals(6.3, this.b.add(this.a, null).getValue(null));
+        assertEquals(6.3, this.b.add(this.a, env).getValue(env));
         this.reset();
-        assertEquals(7.6, this.a.add(this.d, null).getValue(null));
+        assertEquals(7.6, this.a.add(this.d, env).getValue(env));
         this.reset();
-        assertEquals(7.6, this.d.add(this.a, null).getValue(null));
+        assertEquals(7.6, this.d.add(this.a, env).getValue(env));
         this.reset();
-        assertEquals(1003, this.b.add(this.c, null).getValue(null));
+        assertEquals(1003, this.b.add(this.c, env).getValue(env));
         this.reset();
-        assertEquals(1003, this.c.add(this.b, null).getValue(null));
+        assertEquals(1003, this.c.add(this.b, env).getValue(env));
         this.reset();
-        assertEquals(7.3, this.b.add(this.d, null).getValue(null));
+        assertEquals(7.3, this.b.add(this.d, env).getValue(env));
         this.reset();
-        assertEquals(7.3, this.d.add(this.b, null).getValue(null));
+        assertEquals(7.3, this.d.add(this.b, env).getValue(env));
 
-        assertEquals(new BigInteger("92233720368547758074"),
-            this.b.add(this.e, null).getValue(null));
-        assertEquals(new BigInteger("92233720368547759071"),
-            this.c.add(this.e, null).getValue(null));
-        assertEquals(9.223372036854776E18, this.a.add(this.e, null).getValue(null));
+        assertEquals(new BigInteger("92233720368547758074"), this.b.add(this.e, env).getValue(env));
+        assertEquals(new BigInteger("92233720368547759071"), this.c.add(this.e, env).getValue(env));
+        assertEquals(9.223372036854776E18, this.a.add(this.e, env).getValue(env));
 
         assertEquals(new BigDecimal("92233720368547758074.1001"),
-            this.b.add(this.f, null).getValue(null));
+            this.b.add(this.f, env).getValue(env));
         assertEquals(new BigDecimal("92233720368547759071.1001"),
-            this.c.add(this.f, null).getValue(null));
-        assertEquals(9.223372036854776E19, this.a.add(this.f, null).getValue(null));
+            this.c.add(this.f, env).getValue(env));
+        assertEquals(9.223372036854776E19, this.a.add(this.f, env).getValue(env));
         break;
       case Sub:
         this.reset();
-        assertEquals(0.3, this.a.sub(this.b, null).getValue(null));
+        assertEquals(0.3, this.a.sub(this.b, env).getValue(env));
         this.reset();
-        assertEquals(-0.3, this.b.sub(this.a, null).getValue(null));
+        assertEquals(-0.3, this.b.sub(this.a, env).getValue(env));
         this.reset();
-        assertEquals(-1.0, this.a.sub(this.d, null).getValue(null));
+        assertEquals(-1.0, this.a.sub(this.d, env).getValue(env));
         this.reset();
-        assertEquals(1.0, this.d.sub(this.a, null).getValue(null));
+        assertEquals(1.0, this.d.sub(this.a, env).getValue(env));
         this.reset();
-        assertEquals(-997, this.b.sub(this.c, null).getValue(null));
+        assertEquals(-997, this.b.sub(this.c, env).getValue(env));
         this.reset();
-        assertEquals(997, this.c.sub(this.b, null).getValue(null));
+        assertEquals(997, this.c.sub(this.b, env).getValue(env));
         this.reset();
-        assertEquals(-1.3, this.b.sub(this.d, null).getValue(null));
+        assertEquals(-1.3, this.b.sub(this.d, env).getValue(env));
         this.reset();
-        assertEquals(1.3, this.d.sub(this.b, null).getValue(null));
+        assertEquals(1.3, this.d.sub(this.b, env).getValue(env));
 
         assertEquals(new BigInteger("-92233720368547758068"),
-            this.b.sub(this.e, null).getValue(null));
+            this.b.sub(this.e, env).getValue(env));
         assertEquals(new BigInteger("-92233720368547757071"),
-            this.c.sub(this.e, null).getValue(null));
-        assertEquals(-9.223372036854776E19, this.a.sub(this.e, null).getValue(null));
+            this.c.sub(this.e, env).getValue(env));
+        assertEquals(-9.223372036854776E19, this.a.sub(this.e, env).getValue(env));
 
         assertEquals(new BigDecimal("-92233720368547758068.1001"),
-            this.b.sub(this.f, null).getValue(null));
+            this.b.sub(this.f, env).getValue(env));
         assertEquals(new BigDecimal("-92233720368547757071.1001"),
-            this.c.sub(this.f, null).getValue(null));
-        assertEquals(-9.223372036854776E19, this.a.sub(this.f, null).getValue(null));
+            this.c.sub(this.f, env).getValue(env));
+        assertEquals(-9.223372036854776E19, this.a.sub(this.f, env).getValue(env));
         break;
       case Mult:
         this.reset();
-        assertEquals(9.9, this.a.mult(this.b, null).getValue(null));
+        assertEquals(9.9, this.a.mult(this.b, env).getValue(env));
         this.reset();
-        assertEquals(9.9, this.b.mult(this.a, null).getValue(null));
+        assertEquals(9.9, this.b.mult(this.a, env).getValue(env));
         this.reset();
-        assertEquals(14.19, this.a.mult(this.d, null).getValue(null));
+        assertEquals(14.19, this.a.mult(this.d, env).getValue(env));
         this.reset();
-        assertEquals(14.19, this.d.mult(this.a, null).getValue(null));
+        assertEquals(14.19, this.d.mult(this.a, env).getValue(env));
         this.reset();
-        assertEquals(3000, this.b.mult(this.c, null).getValue(null));
+        assertEquals(3000, this.b.mult(this.c, env).getValue(env));
         this.reset();
-        assertEquals(3000, this.c.mult(this.b, null).getValue(null));
+        assertEquals(3000, this.c.mult(this.b, env).getValue(env));
         this.reset();
-        assertEquals(12.9, this.b.mult(this.d, null).getValue(null));
+        assertEquals(12.9, this.b.mult(this.d, env).getValue(env));
         this.reset();
-        assertEquals(12.9, this.d.mult(this.b, null).getValue(null));
+        assertEquals(12.9, this.d.mult(this.b, env).getValue(env));
 
         assertEquals(new BigInteger("276701161105643274213"),
-            this.b.mult(this.e, null).getValue(null));
+            this.b.mult(this.e, env).getValue(env));
         assertEquals(new BigInteger("92233720368547758071000"),
-            this.c.mult(this.e, null).getValue(null));
-        assertEquals(3.043712772162076E20, this.a.mult(this.e, null).getValue(null));
+            this.c.mult(this.e, env).getValue(env));
+        assertEquals(3.043712772162076E20, this.a.mult(this.e, env).getValue(env));
 
         assertEquals(new BigDecimal("276701161105643274213.3003"),
-            this.b.mult(this.f, null).getValue(null));
+            this.b.mult(this.f, env).getValue(env));
         assertEquals(new BigDecimal("92233720368547758071100.1000"),
-            this.c.mult(this.f, null).getValue(null));
-        assertEquals(3.043712772162076E20, this.a.mult(this.f, null).getValue(null));
+            this.c.mult(this.f, env).getValue(env));
+        assertEquals(3.043712772162076E20, this.a.mult(this.f, env).getValue(env));
         break;
 
       case Div:
         this.reset();
         // 3.3 3 1000 4.3
-        assertEquals(1.1, (Double) this.a.div(this.b, null).getValue(null), 0.001);
+        assertEquals(1.1, (Double) this.a.div(this.b, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(0.90909090, (Double) this.b.div(this.a, null).getValue(null), 0.001);
+        assertEquals(0.90909090, (Double) this.b.div(this.a, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(0.76744, (Double) this.a.div(this.d, null).getValue(null), 0.001);
+        assertEquals(0.76744, (Double) this.a.div(this.d, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(1.30303030, (Double) this.d.div(this.a, null).getValue(null), 0.001);
+        assertEquals(1.30303030, (Double) this.d.div(this.a, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(0, this.b.div(this.c, null).getValue(null));
+        assertEquals(0, this.b.div(this.c, env).getValue(env));
         this.reset();
-        assertEquals(333, this.c.div(this.b, null).getValue(null));
+        assertEquals(333, this.c.div(this.b, env).getValue(env));
         this.reset();
-        assertEquals(0.6976744, (Double) this.b.div(this.d, null).getValue(null), 0.001);
+        assertEquals(0.6976744, (Double) this.b.div(this.d, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(1.433333333, (Double) this.d.div(this.b, null).getValue(null), 0.001);
+        assertEquals(1.433333333, (Double) this.d.div(this.b, env).getValue(env), 0.001);
 
-        assertEquals(new BigInteger("30744573456182586023"),
-            this.e.div(this.b, null).getValue(null));
-        assertEquals(new BigInteger("92233720368547758"), this.e.div(this.c, null).getValue(null));
-        assertEquals(2.794961223289326E19, this.e.div(this.a, null).getValue(null));
+        assertEquals(new BigInteger("30744573456182586023"), this.e.div(this.b, env).getValue(env));
+        assertEquals(new BigInteger("92233720368547758"), this.e.div(this.c, env).getValue(env));
+        assertEquals(2.794961223289326E19, this.e.div(this.a, env).getValue(env));
 
         assertEquals(new BigDecimal("3.252606517456513302336211867796323E-20"),
-            this.b.div(this.f, null).getValue(null));
+            this.b.div(this.f, env).getValue(env));
         assertEquals(new BigDecimal("1.084202172485504434112070622598774E-17"),
-            this.c.div(this.f, null).getValue(null));
-        assertEquals(3.577867169202164E-20, this.a.div(this.f, null).getValue(null));
+            this.c.div(this.f, env).getValue(env));
+        assertEquals(3.577867169202164E-20, this.a.div(this.f, env).getValue(env));
         break;
       case Mod:
         this.reset();
-        assertEquals(0.3, (Double) this.a.mod(this.b, null).getValue(null), 0.001);
+        assertEquals(0.3, (Double) this.a.mod(this.b, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(3.0, (Double) this.b.mod(this.a, null).getValue(null), 0.001);
+        assertEquals(3.0, (Double) this.b.mod(this.a, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(3.3, (Double) this.a.mod(this.d, null).getValue(null), 0.001);
+        assertEquals(3.3, (Double) this.a.mod(this.d, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(1.0, (Double) this.d.mod(this.a, null).getValue(null), 0.001);
+        assertEquals(1.0, (Double) this.d.mod(this.a, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(3, this.b.mod(this.c, null).getValue(null));
+        assertEquals(3, this.b.mod(this.c, env).getValue(env));
         this.reset();
-        assertEquals(1, this.c.mod(this.b, null).getValue(null));
+        assertEquals(1, this.c.mod(this.b, env).getValue(env));
         this.reset();
-        assertEquals(3.0, (Double) this.b.mod(this.d, null).getValue(null), 0.001);
+        assertEquals(3.0, (Double) this.b.mod(this.d, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(1.3, (Double) this.d.mod(this.b, null).getValue(null), 0.001);
+        assertEquals(1.3, (Double) this.d.mod(this.b, env).getValue(env), 0.001);
 
-        assertEquals(new BigInteger("2"), this.e.mod(this.b, null).getValue(null));
-        assertEquals(new BigInteger("71"), this.e.mod(this.c, null).getValue(null));
-        assertEquals(0.0, this.e.mod(this.a, null).getValue(null));
+        assertEquals(new BigInteger("2"), this.e.mod(this.b, env).getValue(env));
+        assertEquals(new BigInteger("71"), this.e.mod(this.c, env).getValue(env));
+        assertEquals(0.0, this.e.mod(this.a, env).getValue(env));
 
-        assertEquals(new BigDecimal("3"), this.b.mod(this.f, null).getValue(null));
-        assertEquals(new BigDecimal("1000"), this.c.mod(this.f, null).getValue(null));
-        assertEquals(3.3, this.a.mod(this.f, null).getValue(null));
+        assertEquals(new BigDecimal("3"), this.b.mod(this.f, env).getValue(env));
+        assertEquals(new BigDecimal("1000"), this.c.mod(this.f, env).getValue(env));
+        assertEquals(3.3, this.a.mod(this.f, env).getValue(env));
 
-        assertEquals(new BigDecimal("2.1001"), this.f.mod(this.b, null).getValue(null));
-        assertEquals(new BigDecimal("71.1001"), this.f.mod(this.c, null).getValue(null));
-        assertEquals(0.0, this.f.mod(this.a, null).getValue(null));
+        assertEquals(new BigDecimal("2.1001"), this.f.mod(this.b, env).getValue(env));
+        assertEquals(new BigDecimal("71.1001"), this.f.mod(this.c, env).getValue(env));
+        assertEquals(0.0, this.f.mod(this.a, env).getValue(env));
         break;
     }
   }

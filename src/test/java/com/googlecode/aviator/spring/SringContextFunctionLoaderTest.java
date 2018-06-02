@@ -8,15 +8,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.googlecode.aviator.AviatorEvaluator;
 
-public class SpringContextFunctionMissingTest {
+public class SringContextFunctionLoaderTest {
 
-  private SpringContextFunctionMissing funcMissing;
+  private SringContextFunctionLoader loader;
 
   @Before
   public void setUp() {
     ApplicationContext ctx = new ClassPathXmlApplicationContext("context.xml");
-    funcMissing = new SpringContextFunctionMissing(ctx);
-    AviatorEvaluator.setFunctionMissing(funcMissing);
+    loader = new SringContextFunctionLoader(ctx);
+    AviatorEvaluator.addFunctionLoader(loader);
   }
 
   @Test
@@ -26,7 +26,7 @@ public class SpringContextFunctionMissingTest {
 
   @AfterClass
   public static void tearDown() {
-    AviatorEvaluator.setFunctionMissing(null);
+    AviatorEvaluator.addFunctionLoader(null);
   }
 
 }

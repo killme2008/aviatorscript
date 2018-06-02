@@ -5,8 +5,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 
 public class SimpleExample {
   public static void main(String[] args) {
-    String s = (String) AviatorEvaluator.execute("'\"你好\\''");
-
-    System.out.println(s);
+    Long result = (Long) AviatorEvaluator.execute("1+2+3");
+    System.out.println(result);
   }
 }

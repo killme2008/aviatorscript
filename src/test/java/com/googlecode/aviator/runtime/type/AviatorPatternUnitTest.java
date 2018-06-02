@@ -24,7 +24,9 @@ import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.TestUtils;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.Env;
 import junit.framework.Assert;
 
 
@@ -109,7 +111,7 @@ public class AviatorPatternUnitTest {
 
 
   private Map<String, Object> createEnvWith(String name, Object obj) {
-    Map<String, Object> env = new HashMap<String, Object>();
+    Env env = TestUtils.getTestEnv();
     if (name != null) {
       env.put(name, obj);
     }
@@ -128,9 +130,10 @@ public class AviatorPatternUnitTest {
 
   @Test
   public void testMatchString() {
+    Env env = TestUtils.getTestEnv();
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
-    assertTrue((Boolean) p1.match(new AviatorString("hello"), null).getValue(null));
-    assertFalse((Boolean) p1.match(new AviatorString("hello world"), null).getValue(null));
+    assertTrue((Boolean) p1.match(new AviatorString("hello"), env).getValue(env));
+    assertFalse((Boolean) p1.match(new AviatorString("hello world"), env).getValue(env));
   }
 
 
@@ -148,7 +151,7 @@ public class AviatorPatternUnitTest {
   public void testPatternGroup() {
     //
     AviatorPattern p1 = new AviatorPattern("-\\d+\\.\\d+");
-    Map<String, Object> env = new HashMap<String, Object>();
+    Env env = TestUtils.getTestEnv();
     p1.match(new AviatorString("-3.4"), env);
     assertEquals(1, env.size());
     assertEquals("-3.4", env.get("$0"));

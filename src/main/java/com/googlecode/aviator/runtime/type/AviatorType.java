@@ -17,10 +17,10 @@ package com.googlecode.aviator.runtime.type;
 
 /**
  * Aviator types
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public enum AviatorType {
-  Long, Double, String, JavaType, Boolean, Pattern, Nil, Method, BigInt, Decimal;
+  Long, Double, String, JavaType, Boolean, Pattern, Nil, Method, BigInt, Decimal, Lambda;
 }

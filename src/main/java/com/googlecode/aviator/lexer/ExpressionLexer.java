@@ -21,7 +21,7 @@ import java.math.MathContext;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Stack;
-import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
@@ -47,14 +47,21 @@ public class ExpressionLexer {
   private final SymbolTable symbolTable;
   // Tokens buffer
   private final Stack<Token<?>> tokenBuffer = new Stack<Token<?>>();
+  private AviatorEvaluatorInstance instance;
+  private String expression;
+  private MathContext mathContext;
+  private boolean parseFloatIntoDecimal;
 
-
-  public ExpressionLexer(String expression) {
+  public ExpressionLexer(AviatorEvaluatorInstance instance, String expression) {
     this.iterator = new StringCharacterIterator(expression);
+    this.expression = expression;
     this.symbolTable = new SymbolTable();
     this.peek = this.iterator.current();
+    this.instance = instance;
+    this.mathContext = this.instance.getOption(Options.MATH_CONTEXT);
+    this.parseFloatIntoDecimal =
+        this.instance.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL);
   }
-
 
   /**
    * Push back token
@@ -231,16 +238,12 @@ public class ExpressionLexer {
           || this.peek == 'e' || this.peek == 'M' || this.peek == 'N');
       Number value;
       if (isBigDecimal) {
-        value = new BigDecimal(this.getBigNumberLexeme(sb),
-            (MathContext) AviatorEvaluator.getOption(Options.MATH_CONTEXT));
+        value = new BigDecimal(this.getBigNumberLexeme(sb), this.mathContext);
       } else if (isBigInt) {
         value = new BigInteger(this.getBigNumberLexeme(sb));
       } else if (hasDot) {
-        boolean alwaysUseDecimalAsDouble =
-            AviatorEvaluator.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL);
-        if (alwaysUseDecimalAsDouble) {
-          value = new BigDecimal(sb.toString(),
-              (MathContext) AviatorEvaluator.getOption(Options.MATH_CONTEXT));
+        if (this.parseFloatIntoDecimal) {
+          value = new BigDecimal(sb.toString(), this.mathContext);
         } else {
           value = dval;
         }
@@ -322,9 +325,12 @@ public class ExpressionLexer {
     return token;
   }
 
+  public String getScanString() {
+    return this.expression.substring(0, this.iterator.getIndex());
+  }
 
   private Token<?> reserverVar(String lexeme, Variable variable) {
-    // If it is a reserved word(true or false)
+    // If it is a reserved word(true/false/nil/lambda)
     if (this.symbolTable.contains(lexeme)) {
       return this.symbolTable.getVariable(lexeme);
     } else {
