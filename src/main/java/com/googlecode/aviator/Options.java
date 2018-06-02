@@ -54,7 +54,19 @@ public enum Options {
    * default is true.If you don't want the groups, you can turn it off to get better performance in
    * regular-expression pattern matching.
    */
-  PUT_CAPTURING_GROUPS_INTO_ENV;
+  PUT_CAPTURING_GROUPS_INTO_ENV,
+
+  /**
+   * Enable property access syntax sugar, use common-beantuils to access property such as "a.b.c"
+   * etc. Default value is true, enable this behaviour.
+   */
+  ENABLE_PROPERTY_SYNTAX_SUGAR,
+
+  /**
+   * When enable property access syntax sugar, returns nil if the property value is not found or
+   * throws exception.Default value is false,disabled this behaviour.
+   */
+  NIL_WHEN_PROPERTY_NOT_FOUND;
 
 
   private static final Boolean TRACE_DEFAULT_VAL =
@@ -70,6 +82,8 @@ public enum Options {
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
       case TRACE:
+      case ENABLE_PROPERTY_SYNTAX_SUGAR:
+      case NIL_WHEN_PROPERTY_NOT_FOUND:
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
@@ -90,6 +104,10 @@ public enum Options {
     switch (this) {
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
+        return false;
+      case ENABLE_PROPERTY_SYNTAX_SUGAR:
+        return true;
+      case NIL_WHEN_PROPERTY_NOT_FOUND:
         return false;
       case OPTIMIZE_LEVEL:
         return AviatorEvaluator.EVAL;

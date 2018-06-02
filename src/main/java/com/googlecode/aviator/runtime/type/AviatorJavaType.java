@@ -21,7 +21,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.beanutils.PropertyUtils;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -242,18 +244,24 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public Object getValue(Map<String, Object> env) {
-    try {
-      if (env != null) {
-        if (this.name.contains(".")) {
+
+    if (env != null) {
+      if (this.name.contains(".") && RuntimeUtils.getInstance(env)
+          .<Boolean>getOption(Options.ENABLE_PROPERTY_SYNTAX_SUGAR)) {
+        try {
           return PropertyUtils.getProperty(env, this.name);
-        } else {
-          return env.get(this.name);
+        } catch (Throwable t) {
+          if (RuntimeUtils.getInstance(env)
+              .<Boolean>getOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND)) {
+            return null;
+          } else {
+            throw new ExpressionRuntimeException("Could not find variable " + this.name, t);
+          }
         }
       }
-      return null;
-    } catch (Throwable t) {
-      throw new ExpressionRuntimeException("Could not find variable " + this.name, t);
+      return env.get(this.name);
     }
+    return null;
   }
 
   @Override
