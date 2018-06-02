@@ -22,6 +22,7 @@
  */
 package com.googlecode.aviator.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -247,7 +248,7 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public int size() {
-    return getmOverrides(true).size();
+    return keySet().size();
   }
 
   /**
@@ -257,7 +258,11 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Collection<Object> values() {
-    return getmOverrides(true).values();
+    Collection<Object> vals = new ArrayList<Object>();
+    for (String key : this.keySet()) {
+      vals.add(get(key));
+    }
+    return vals;
   }
 
 

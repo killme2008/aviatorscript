@@ -1,6 +1,7 @@
 package com.googlecode.aviator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.util.HashMap;
@@ -8,7 +9,7 @@ import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 
-public class LambdaTest {
+public class LambdaUnitTest {
 
   @Test
   public void testSimpleLambda() {
@@ -26,7 +27,7 @@ public class LambdaTest {
 
   @Test
   public void testLambdaScope() {
-    Map<String, Object> env = new HashMap<>();
+    Map<String, Object> env = new HashMap<String, Object>();
     env.put("a", 1);
     env.put("x", 2);
     assertEquals(AviatorEvaluator.execute("lambda(a) -> a end(x)", env), 2);
@@ -43,7 +44,7 @@ public class LambdaTest {
 
   @Test
   public void testLambdaClosure() {
-    Map<String, Object> env = new HashMap<>();
+    Map<String, Object> env = new HashMap<String, Object>();
     env.put("x", 1);
     env.put("y", 2);
     env.put("z", 3);
@@ -74,10 +75,34 @@ public class LambdaTest {
     Foo foo = new Foo();
     foo.setA(99);
 
-    Map<String, Object> env = new HashMap<>();
+    Map<String, Object> env = new HashMap<String, Object>();
     env.put("foo", foo);
 
     assertEquals(AviatorEvaluator.execute("lambda(x) -> x.a end(foo)", env), 99);
+  }
+
+  @Test
+  public void testSpecialVars() {
+    Map<String, Object> env = new HashMap<String, Object>();
+    env.put("a", "a");
+    env.put("b", 3.2);
+    Object c = new Object();
+    env.put("c", c);
+
+    assertTrue((boolean) AviatorEvaluator.execute("#__env__.a=='a'", env));
+    assertTrue((boolean) AviatorEvaluator.execute("#__env__.b==3.2", env));
+    assertTrue((boolean) AviatorEvaluator.execute("#__env__.c!=nil", env));
+
+    Map<String, Object> result = (Map<String, Object>) AviatorEvaluator.execute("#__env__", env);
+
+    assertEquals(3, result.size());
+    assertEquals("a", result.get("a"));
+    assertEquals(3.2, result.get("b"));
+    assertSame(c, result.get("c"));
+
+    assertSame(AviatorEvaluator.getInstance(), AviatorEvaluator.execute("#__instance__"));
+    AviatorEvaluatorInstance instance = AviatorEvaluator.newInstance();
+    assertSame(instance, instance.execute("#__instance__"));
   }
 
   @Test
@@ -86,7 +111,7 @@ public class LambdaTest {
     for (int i = 0; i < 100; i++) {
       a[i] = i;
     }
-    Map<String, Object> env = new HashMap<>();
+    Map<String, Object> env = new HashMap<String, Object>();
     env.put("a", a);
 
     // map
