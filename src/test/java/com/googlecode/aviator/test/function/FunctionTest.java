@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.math.BigDecimal;
@@ -708,13 +709,31 @@ public class FunctionTest {
   }
 
   @Test
+  public void testDisablePropertySyntaxSugar() {
+    Map<String, Object> env = createUsersEnv();
+    String username = (String) AviatorEvaluator.execute("#data.[0].name", env);
+    assertEquals(username, "张三");
+    AviatorEvaluator.setOption(Options.ENABLE_PROPERTY_SYNTAX_SUGAR, false);
+    assertNull(AviatorEvaluator.execute("#data.[0].name", env));
+    AviatorEvaluator.setOption(Options.ENABLE_PROPERTY_SYNTAX_SUGAR, true);
+  }
+
+  @Test
+  public void testPropertyNilNotFound() {
+    Map<String, Object> env = createUsersEnv();
+    try {
+      AviatorEvaluator.execute("#data[0].name", env);
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertTrue(true);
+    }
+    AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, true);
+    assertNull(AviatorEvaluator.execute("#data[0].name", env));
+  }
+
+  @Test
   public void testSeqFilterListWithProperty() {
-    List<User> users = new ArrayList<>(3);
-    users.add(new User(1L, 25, "张三"));
-    users.add(new User(2L, 26, "李四"));
-    users.add(new User(3L, 27, "王五"));
-    Map<String, Object> env = new HashMap<>();
-    env.put("data", users);
+    Map<String, Object> env = createUsersEnv();
     Object result =
         AviatorEvaluator.execute("filter(data,seq.and(seq.gt(25,'age'),seq.eq('李四','name')))", env);
     List list = (List) result;
@@ -724,6 +743,17 @@ public class FunctionTest {
       assertEquals("李四", user.getName());
       assertTrue(user.getAge() > 25);
     }
+  }
+
+
+  private Map<String, Object> createUsersEnv() {
+    List<User> users = new ArrayList<>(3);
+    users.add(new User(1L, 25, "张三"));
+    users.add(new User(2L, 26, "李四"));
+    users.add(new User(3L, 27, "王五"));
+    Map<String, Object> env = new HashMap<>();
+    env.put("data", users);
+    return env;
   }
 
   @Test
