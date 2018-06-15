@@ -45,10 +45,6 @@ public class FunctionUtils {
     String result = null;
 
     final Object value = arg.getValue(env);
-    if (value == null && arg.getAviatorType() == AviatorType.JavaType) {
-      throw new NullPointerException(
-          "There is no string named" + ((AviatorJavaType) arg).getName());
-    }
     if (value instanceof Character) {
       result = value.toString();
     } else {
