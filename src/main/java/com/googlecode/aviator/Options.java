@@ -1,6 +1,10 @@
 package com.googlecode.aviator;
 
 import java.math.MathContext;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -66,9 +70,28 @@ public enum Options {
    * When enable property access syntax sugar, returns nil if the property value is not found or
    * throws exception.Default value is false,disabled this behaviour.
    */
-  NIL_WHEN_PROPERTY_NOT_FOUND;
+  NIL_WHEN_PROPERTY_NOT_FOUND,
+  /**
+   * Future function executor,default is a {@link Executors#newCachedThreadPool()}.
+   */
+  FUTURE_EXECUTOR;
 
 
+  /**
+   * Default executor for future function.
+   */
+  private static final ExecutorService DEFAULT_FUTURE_THREAD_POOL =
+      Executors.newCachedThreadPool(new ThreadFactory() {
+        AtomicInteger counter = new AtomicInteger(0);
+
+        @Override
+        public Thread newThread(Runnable r) {
+          Thread t = new Thread(r);
+          t.setDaemon(true);
+          t.setName("AviatorFutureExecutor-" + counter.incrementAndGet());
+          return t;
+        }
+      });
   private static final Boolean TRACE_DEFAULT_VAL =
       Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
   private static final Boolean TRACE_EVAL_DEFAULT_VAL =
@@ -90,6 +113,8 @@ public enum Options {
             || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
       case MATH_CONTEXT:
         return val instanceof MathContext;
+      case FUTURE_EXECUTOR:
+        return val instanceof ExecutorService;
     }
     return false;
   }
@@ -119,6 +144,8 @@ public enum Options {
         return TRACE_DEFAULT_VAL;
       case PUT_CAPTURING_GROUPS_INTO_ENV:
         return true;
+      case FUTURE_EXECUTOR:
+        return DEFAULT_FUTURE_THREAD_POOL;
     }
     return null;
   }

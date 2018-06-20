@@ -38,6 +38,8 @@ import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
+import com.googlecode.aviator.runtime.function.concurrent.AwaitFunction;
+import com.googlecode.aviator.runtime.function.concurrent.FutureFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -331,6 +333,10 @@ public final class AviatorEvaluatorInstance {
         new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
     addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
     addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
+
+    // concurrent
+    addFunction(new FutureFunction());
+    addFunction(new AwaitFunction());
   }
 
   /**
