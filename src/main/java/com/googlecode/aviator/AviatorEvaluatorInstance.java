@@ -546,6 +546,28 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
+  /**
+   * Returns true when the expression is in cache.
+   *
+   * @param expression
+   * @return
+   * @since 4.0.0
+   */
+  public boolean isExpressionCached(String expression) {
+    return this.getCachedExpression(expression) != null;
+  }
+
+  /**
+   * Returns the number of cached expressions.
+   *
+   * @since 4.0.0
+   * @return
+   */
+  public int getExpressionCacheSize() {
+    return this.cacheExpressions.size();
+  }
+
+
 
   /**
    * Compile a text expression to Expression object

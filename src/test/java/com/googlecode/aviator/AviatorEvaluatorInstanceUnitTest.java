@@ -158,8 +158,12 @@ public class AviatorEvaluatorInstanceUnitTest {
 
   @Test
   public void testCompileCache() {
+    assertEquals(0, this.instance.getExpressionCacheSize());
+    assertFalse(this.instance.isExpressionCached("1+3"));
     Expression exp1 = this.instance.compile("1+3", true);
     Expression exp2 = this.instance.compile("1+3", true);
+    assertEquals(1, this.instance.getExpressionCacheSize());
+    assertTrue(this.instance.isExpressionCached("1+3"));
     assertNotNull(exp1);
     assertNotNull(exp2);
     assertSame(exp1, exp2);
@@ -176,10 +180,16 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertNotNull(exp1);
     assertNotNull(exp2);
     assertSame(exp1, exp2);
+    assertEquals(1, this.instance.getExpressionCacheSize());
+    assertTrue(this.instance.isExpressionCached("1+3"));
 
     this.instance.invalidateCache("1+3");
+    assertFalse(this.instance.isExpressionCached("1+3"));
+    assertEquals(0, this.instance.getExpressionCacheSize());
     Expression exp3 = this.instance.compile("1+3", true);
     assertNotSame(exp1, exp3);
+    assertEquals(1, this.instance.getExpressionCacheSize());
+    assertTrue(this.instance.isExpressionCached("1+3"));
 
     assertEquals(4, exp1.execute(null));
     assertEquals(4, exp2.execute(null));
