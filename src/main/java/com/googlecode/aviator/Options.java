@@ -74,7 +74,16 @@ public enum Options {
   /**
    * Future function executor,default is a {@link Executors#newCachedThreadPool()}.
    */
-  FUTURE_EXECUTOR;
+  FUTURE_EXECUTOR,
+
+  /**
+   * Whether to use user passed-in env as top level environment directly.If true, it may make side
+   * effects(such as assignment) to user passed-in env., otherwise aviator will wrap the user
+   * passed-in env and does not make any side effects into it.
+   *
+   * Default is false.
+   */
+  USE_USER_ENV_AS_TOP_ENV_DIRECTLY;
 
 
   /**
@@ -107,6 +116,7 @@ public enum Options {
       case TRACE:
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
+      case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
@@ -146,6 +156,8 @@ public enum Options {
         return true;
       case FUTURE_EXECUTOR:
         return DEFAULT_FUTURE_THREAD_POOL;
+      case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
+        return false;
     }
     return null;
   }

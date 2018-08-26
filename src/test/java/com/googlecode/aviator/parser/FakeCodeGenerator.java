@@ -139,6 +139,12 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
   @Override
+  public void onAssignment(Token<?> lookhead) {
+    this.appendToken("=");
+  }
+
+
+  @Override
   public void onGe(Token<?> lookhead) {
     this.appendToken(">=");
 

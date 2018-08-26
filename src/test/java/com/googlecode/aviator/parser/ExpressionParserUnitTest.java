@@ -47,6 +47,14 @@ public class ExpressionParserUnitTest {
   }
 
   @Test
+  public void testAssignment() {
+    this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "a=2"),
+        this.codeGenerator);
+    this.parser.parse();
+    assertEquals("a 2 =", this.codeGenerator.getPostFixExpression());
+  }
+
+  @Test
   public void testLambda1() {
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "lambda(x,y)-> x+y end"), this.codeGenerator);
@@ -148,13 +156,13 @@ public class ExpressionParserUnitTest {
     this.parser.parse();
   }
 
-
-  @Test(expected = ExpressionSyntaxErrorException.class)
-  public void testIllegalExpression1() {
-    this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "a=2"),
-        this.codeGenerator);
-    this.parser.parse();
-  }
+  //
+  // @Test(expected = ExpressionSyntaxErrorException.class)
+  // public void testIllegalExpression1() {
+  // this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "a=2"),
+  // this.codeGenerator);
+  // this.parser.parse();
+  // }
 
 
   @Test(expected = ExpressionSyntaxErrorException.class)

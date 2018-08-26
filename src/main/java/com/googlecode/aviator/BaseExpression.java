@@ -78,11 +78,25 @@ public abstract class BaseExpression implements Expression {
     return this.varNames;
   }
 
-
-  protected Env newEnv(Map<String, Object> map) {
-    Env env = new Env(map);
+  protected Env newEnv(Map<String, Object> map, boolean direct) {
+    Env env;
+    if (direct) {
+      env = new Env(map, map);
+    } else {
+      env = new Env(map);
+    }
     env.setInstance(this.instance);
     return env;
+  }
+
+  protected Env genTopEnv(Map<String, Object> map) {
+    Env env =
+        newEnv(map, (boolean) this.instance.getOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY));
+    return env;
+  }
+
+  protected Env newEnv(Map<String, Object> map) {
+    return newEnv(map, false);
   }
 
 }

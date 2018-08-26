@@ -28,6 +28,8 @@ import com.googlecode.aviator.parser.Parser;
  */
 public interface CodeGenerator {
 
+  public void onAssignment(Token<?> lookhead);
+
   public void setParser(Parser parser);
 
   public void onShiftRight(Token<?> lookhead);

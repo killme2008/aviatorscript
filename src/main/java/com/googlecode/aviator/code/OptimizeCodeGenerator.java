@@ -199,6 +199,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       AviatorObject result = OperationRuntime.eval(env, args, operatorType);
       // set result as token to tokenList for next executing
       this.tokenList.set(operatorIndex, this.getTokenFromOperand(result));
+      // FIXME should pass env to top env.
       return 1;
     }
     return 0;
@@ -497,6 +498,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             case SHIFT_RIGHT:
               this.codeGen.onShiftRight(token);
               break;
+            case ASSIGNMENT:
+              this.codeGen.onAssignment(token);
+              break;
             case U_SHIFT_RIGHT:
               this.codeGen.onUnsignedShiftRight(token);
               break;
@@ -600,6 +604,14 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
         DelegateTokenType.Index_Start));
 
+  }
+
+
+
+  @Override
+  public void onAssignment(Token<?> lookhead) {
+    this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(),
+        OperatorType.ASSIGNMENT));
   }
 
 

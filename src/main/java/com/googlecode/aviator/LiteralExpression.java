@@ -41,7 +41,7 @@ public class LiteralExpression extends BaseExpression {
 
   @Override
   public Object execute(Map<String, Object> map) {
-    Env env = newEnv(map);
+    Env env = genTopEnv(map);
     if (RuntimeUtils.isTracedEval(env)) {
       RuntimeUtils.printTrace(env, "Tracing: " + this.getExpression());
       RuntimeUtils.printTrace(env, "Result : " + this.getExpression());

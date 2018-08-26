@@ -66,7 +66,7 @@ public abstract class ClassExpression extends BaseExpression {
     if (map == null) {
       map = Collections.emptyMap();
     }
-    Env env = newEnv(map);
+    Env env = genTopEnv(map);
     try {
       Object result = this.execute0(env);
       if (RuntimeUtils.isTracedEval(env)) {

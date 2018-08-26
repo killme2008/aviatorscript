@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
@@ -1012,5 +1013,16 @@ public class GrammarUnitTest {
   @Test(expected = ExpressionSyntaxErrorException.class)
   public void test4J() {
     System.out.println(AviatorEvaluator.execute("4(ss*^^%%$$$$"));
+  }
+
+  @Test
+  public void testAssignment() {
+    AviatorEvaluator.setOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY, true);
+    AviatorEvaluator.setOption(Options.PUT_CAPTURING_GROUPS_INTO_ENV, true);
+    Map<String, Object> env = new HashMap<>();
+    env.put("b", 4);
+    Object v = AviatorEvaluator.execute("'hello@4'=~/(.*)@(.*)/ ? a=$2:'not match'", env);
+    System.out.println(v);
+    System.out.println(env);
   }
 }

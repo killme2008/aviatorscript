@@ -252,6 +252,12 @@ public class LambdaGenerator implements CodeGenerator {
 
 
   @Override
+  public void onAssignment(Token<?> lookhead) {
+    this.codeGenerator.onAssignment(lookhead);
+  }
+
+
+  @Override
   public void onBitOr(Token<?> lookhead) {
     codeGenerator.onBitOr(lookhead);
   }
