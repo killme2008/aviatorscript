@@ -3,17 +3,33 @@ package com.googlecode.aviator.runtime.function;
 import java.util.Map;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorType;
 
 
 /**
  * Abstract function to implement variadic arguments function.
- * 
+ *
  * @author dennis
  * @since 3.0.0
  * @Date 2016-12-09
- * 
+ *
  */
-public abstract class AbstractVariadicFunction implements AviatorFunction {
+public abstract class AbstractVariadicFunction extends AviatorObject implements AviatorFunction {
+
+  @Override
+  public AviatorType getAviatorType() {
+    return AviatorType.Lambda;
+  }
+
+  @Override
+  public Object getValue(Map<String, Object> env) {
+    return this;
+  }
+
+  @Override
+  public int compare(AviatorObject other, Map<String, Object> env) {
+    throw new UnsupportedOperationException("Lambda function can't be compared.");
+  }
 
   @Override
   public AviatorObject call(Map<String, Object> env) {
@@ -240,7 +256,7 @@ public abstract class AbstractVariadicFunction implements AviatorFunction {
 
   /**
    * Call with variadic arguments.The subclass must implement this method.
-   * 
+   *
    * @since 3.0.0
    * @param env
    * @param args
