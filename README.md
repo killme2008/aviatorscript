@@ -21,8 +21,8 @@ AviatorEvaluator.execute("reduce(a, lambda(x,y) -> x + y end, 0)", env);
 
 # Intro
 
-Aviator is a lighweith,high performance expression evaluator for java.
-Aviator compiles expresson to byte code and evaluate it on the fly.
+Aviator is a lightweight,high performance expression evaluator for java.
+Aviator compiles expression to byte code and evaluate it on the fly.
 
 Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地将表达式编译成字节码并运行。更详细的请阅读[开发指南](https://github.com/killme2008/aviator/wiki)。
 
