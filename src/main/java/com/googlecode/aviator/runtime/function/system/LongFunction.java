@@ -43,6 +43,7 @@ public class LongFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "long";
   }

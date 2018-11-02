@@ -15,6 +15,7 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  * 
  */
 public class StringSplitFunction extends AbstractFunction {
+  @Override
   public String getName() {
     return "string.split";
   }

@@ -16,6 +16,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class StringIndexOfFunction extends AbstractFunction {
 
+  @Override
   public String getName() {
     return "string.indexOf";
   }

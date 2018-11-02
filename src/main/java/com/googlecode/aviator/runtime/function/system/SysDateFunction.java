@@ -30,6 +30,7 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SysDateFunction extends AbstractFunction {
 
+  @Override
   public String getName() {
     return "sysdate";
   }

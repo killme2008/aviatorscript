@@ -38,6 +38,7 @@ public class MathLog10Function extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "math.log10";
   }

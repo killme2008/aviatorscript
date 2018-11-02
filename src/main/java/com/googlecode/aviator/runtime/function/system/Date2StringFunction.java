@@ -17,6 +17,7 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  */
 public class Date2StringFunction extends AbstractFunction {
 
+  @Override
   public String getName() {
     return "date_to_string";
   }

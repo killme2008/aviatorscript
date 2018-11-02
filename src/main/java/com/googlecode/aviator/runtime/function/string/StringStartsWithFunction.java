@@ -29,6 +29,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * 
  */
 public class StringStartsWithFunction extends AbstractFunction {
+  @Override
   public String getName() {
     return "string.startsWith";
   }

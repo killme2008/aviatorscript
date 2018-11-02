@@ -35,31 +35,37 @@ public class AviatorScriptEngineFactory implements ScriptEngineFactory {
   }
 
 
+  @Override
   public String getEngineName() {
     return parameterMap.get(ScriptEngine.ENGINE);
   }
 
 
+  @Override
   public String getEngineVersion() {
     return parameterMap.get(ScriptEngine.ENGINE_VERSION);
   }
 
 
+  @Override
   public List<String> getExtensions() {
     return extensions;
   }
 
 
+  @Override
   public String getLanguageName() {
     return parameterMap.get(ScriptEngine.LANGUAGE);
   }
 
 
+  @Override
   public String getLanguageVersion() {
     return parameterMap.get(ScriptEngine.LANGUAGE_VERSION);
   }
 
 
+  @Override
   public String getMethodCallSyntax(String obj, String m, String... args) {
     StringBuilder sb = new StringBuilder(m);
     sb.append("(").append(obj);
@@ -74,31 +80,37 @@ public class AviatorScriptEngineFactory implements ScriptEngineFactory {
   }
 
 
+  @Override
   public List<String> getMimeTypes() {
     return mimeTypes;
   }
 
 
+  @Override
   public List<String> getNames() {
     return names;
   }
 
 
+  @Override
   public String getOutputStatement(String toDisplay) {
     return "print(+" + toDisplay + ")";
   }
 
 
+  @Override
   public Object getParameter(String key) {
     return parameterMap.get(key);
   }
 
 
+  @Override
   public String getProgram(String... statements) {
     return null;
   }
 
 
+  @Override
   public ScriptEngine getScriptEngine() {
     return new AviatorScriptEngine(this);
   }

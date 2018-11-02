@@ -53,6 +53,7 @@ public class SeqEveryFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "seq.every";
   }

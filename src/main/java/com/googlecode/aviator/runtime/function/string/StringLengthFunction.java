@@ -37,6 +37,7 @@ public class StringLengthFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "string.length";
   }

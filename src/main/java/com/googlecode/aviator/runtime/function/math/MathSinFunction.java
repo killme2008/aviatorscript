@@ -38,6 +38,7 @@ public class MathSinFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "math.sin";
   }

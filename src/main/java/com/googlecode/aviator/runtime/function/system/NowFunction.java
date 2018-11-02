@@ -35,6 +35,7 @@ public class NowFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "now";
   }

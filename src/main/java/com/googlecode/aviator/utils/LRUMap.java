@@ -24,21 +24,25 @@ public class LRUMap<K, V> extends LinkedHashMap<K, V> {
   }
 
 
+  @Override
   public V remove(Object key) {
     return super.remove(key);
   }
 
 
+  @Override
   public int size() {
     return super.size();
   }
 
 
+  @Override
   public V put(K k, V v) {
     return super.put(k, v);
   }
 
 
+  @Override
   public V get(Object k) {
     return super.get(k);
   }

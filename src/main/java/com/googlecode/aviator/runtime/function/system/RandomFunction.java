@@ -56,6 +56,7 @@ public class RandomFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "rand";
   }

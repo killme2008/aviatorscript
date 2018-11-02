@@ -68,6 +68,7 @@ public class SeqReduceFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "reduce";
   }

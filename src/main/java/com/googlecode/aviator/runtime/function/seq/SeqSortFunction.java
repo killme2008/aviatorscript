@@ -61,6 +61,7 @@ public class SeqSortFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "sort";
   }

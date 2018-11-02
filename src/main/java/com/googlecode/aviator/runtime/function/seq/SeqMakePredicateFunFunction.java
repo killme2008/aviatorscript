@@ -63,6 +63,7 @@ public class SeqMakePredicateFunFunction extends AbstractFunction {
     return new AviatorRuntimeJavaType(new SeqPredicateFunction(this.name, this.opType, arg1, arg2));
   }
 
+  @Override
   public String getName() {
     return this.name;
   }

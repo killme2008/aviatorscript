@@ -29,6 +29,7 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  * 
  */
 public class StringSubStringFunction extends AbstractFunction {
+  @Override
   public String getName() {
     return "string.substring";
   }

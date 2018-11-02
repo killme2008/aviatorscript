@@ -8,11 +8,11 @@ import com.googlecode.aviator.runtime.type.AviatorString;
 
 /**
  * Cast value to string
- * 
+ *
  * @author dennis
  * @Date 2011-5-18
  * @since 1.1.1
- * 
+ *
  */
 public class StrFunction extends AbstractFunction {
 
@@ -22,7 +22,7 @@ public class StrFunction extends AbstractFunction {
     return new AviatorString(value == null ? "null" : value.toString());
   }
 
-
+  @Override
   public String getName() {
     return "str";
   }
