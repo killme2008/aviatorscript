@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
 
@@ -36,6 +37,15 @@ public class ExpressionParserUnitTest {
   public void setUp() {
     this.codeGenerator = new FakeCodeGenerator();
     this.instance = AviatorEvaluator.newInstance();
+  }
+
+  @Test
+  public void testIssue77() {
+    instance.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "'一二三'=~/.*三/"), this.codeGenerator);
+    this.parser.parse();
+    assertEquals("一二三 .*三 =~", this.codeGenerator.getPostFixExpression());
   }
 
 

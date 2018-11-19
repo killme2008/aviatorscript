@@ -242,8 +242,11 @@ public class ExpressionLexer {
       } else if (isBigInt) {
         value = new BigInteger(this.getBigNumberLexeme(sb));
       } else if (hasDot) {
-        if (this.parseFloatIntoDecimal) {
+        if (this.parseFloatIntoDecimal && sb.length() > 1) {
           value = new BigDecimal(sb.toString(), this.mathContext);
+        } else if (sb.length() == 1) {
+          // only have a dot character.
+          return new CharToken('.', startIndex);
         } else {
           value = dval;
         }

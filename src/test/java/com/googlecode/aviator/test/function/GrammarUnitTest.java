@@ -45,6 +45,13 @@ import junit.framework.Assert;
  */
 public class GrammarUnitTest {
 
+  @Test
+  public void testIssue77() {
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
+    assertTrue((boolean) AviatorEvaluator.execute("'一二三'=~/.*三/"));
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
+  }
+
   /**
    * 类型测试
    */

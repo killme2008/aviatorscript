@@ -41,7 +41,6 @@ public class ExpressionLexerUnitTest {
     this.instance = AviatorEvaluator.newInstance();
   }
 
-
   @Test
   public void testSimpleExpression() {
     this.lexer = new ExpressionLexer(this.instance, "1+2");
@@ -588,7 +587,7 @@ public class ExpressionLexerUnitTest {
     assertEquals("\\", token.getLexeme());
 
     token = this.lexer.scan();
-    assertEquals(TokenType.Number, token.getType());
+    assertEquals(TokenType.Char, token.getType());
     assertEquals(".", token.getLexeme());
 
     token = this.lexer.scan();
