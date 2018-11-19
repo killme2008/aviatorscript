@@ -8,11 +8,11 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 
 /**
  * Cast value to long
- * 
+ *
  * @author dennis
  * @Date 2011-5-18
  * @since 1.1.1
- * 
+ *
  */
 public class LongFunction extends AbstractFunction {
 
@@ -34,6 +34,8 @@ public class LongFunction extends AbstractFunction {
         }
       case String:
         return AviatorLong.valueOf(Long.valueOf((String) arg1.getValue(env)));
+      case BigInt:
+      case Decimal:
       case Long:
       case Double:
         return AviatorLong.valueOf(((Number) arg1.getValue(env)).longValue());
@@ -43,6 +45,7 @@ public class LongFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "long";
   }

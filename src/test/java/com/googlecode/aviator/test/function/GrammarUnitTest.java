@@ -52,6 +52,13 @@ public class GrammarUnitTest {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
   }
 
+  @Test
+  public void testIssue87() {
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
+    assertEquals(1, (long) AviatorEvaluator.execute("long(1.2)"));
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
+  }
+
   /**
    * 类型测试
    */
