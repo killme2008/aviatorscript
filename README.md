@@ -63,3 +63,4 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
  * documents: https://github.com/killme2008/aviator/wiki
  * javadoc: http://fnil.net/aviator/apidocs/
  * author:  dennis (killme2008@gmail.com)
+ * spring boot: https://github.com/mengxiangrui007/spring-boot-rule-jsr94
