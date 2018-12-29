@@ -59,6 +59,12 @@ public class GrammarUnitTest {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
   }
 
+  @Test
+  public void testIssue92() {
+    HashMap<String, Object> env = new HashMap<>();
+    assertEquals("\\", AviatorEvaluator.execute("'\\\\'", env));
+  }
+
   /**
    * 类型测试
    */

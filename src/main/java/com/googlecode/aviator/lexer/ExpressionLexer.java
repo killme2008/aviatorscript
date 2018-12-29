@@ -106,6 +106,7 @@ public class ExpressionLexer {
   }
 
 
+
   public Token<?> scan(boolean analyse) {
     // If buffer is not empty,return
     if (!this.tokenBuffer.isEmpty()) {
@@ -306,18 +307,51 @@ public class ExpressionLexer {
       char left = this.peek;
       int startIndex = this.iterator.getIndex();
       StringBuilder sb = new StringBuilder();
-      char prev = this.peek;
-      while ((this.peek = this.iterator.next()) != left || prev == '\\') {
-        if (this.peek == CharacterIterator.DONE) {
-          throw new CompileExpressionErrorException("Illegal String " + sb + " at " + startIndex);
-        } else {
-          if (this.peek == left && prev == '\\') {
-            sb.setCharAt(sb.length() - 1, this.peek);
-          } else {
+      // char prev = this.peek;
+      while ((this.peek = this.iterator.next()) != left) {
+        if (this.peek == '\\') // escape
+        {
+          this.nextChar();
+          if (this.peek == CharacterIterator.DONE) {
+            throw new CompileExpressionErrorException(
+                "EOF while reading string at index: " + this.iterator.getIndex());
+          }
+          if (this.peek == left) {
             sb.append(this.peek);
+            continue;
+          }
+          switch (this.peek) {
+            case 't':
+              this.peek = '\t';
+              break;
+            case 'r':
+              this.peek = '\r';
+              break;
+            case 'n':
+              this.peek = '\n';
+              break;
+            case '\\':
+              break;
+            case 'b':
+              this.peek = '\b';
+              break;
+            case 'f':
+              this.peek = '\f';
+              break;
+            default: {
+              throw new CompileExpressionErrorException(
+                  "Unsupported escape character: \\" + this.peek);
+            }
+
           }
         }
-        prev = this.peek;
+
+        if (this.peek == CharacterIterator.DONE) {
+          throw new CompileExpressionErrorException(
+              "EOF while reading string at index: " + this.iterator.getIndex());
+        }
+
+        sb.append(this.peek);
       }
       this.nextChar();
       return new StringToken(sb.toString(), startIndex);

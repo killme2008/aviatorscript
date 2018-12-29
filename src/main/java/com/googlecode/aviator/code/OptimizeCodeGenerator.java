@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.LiteralExpression;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
@@ -72,6 +73,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   // the expression parser
   private Parser parser;
 
+  private Env compileEnv;
+
   /**
    * Compiled lambda functions.
    */
@@ -84,6 +87,14 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     this.codeGen =
         new ASMCodeGenerator(instance, (AviatorClassLoader) classLoader, traceOutStream, trace);
     this.trace = trace;
+  }
+
+  private Env getCompileEnv() {
+    if (this.compileEnv == null) {
+      this.compileEnv = new Env();
+      this.compileEnv.setInstance(this.instance);
+    }
+    return this.compileEnv;
   }
 
 
@@ -193,13 +204,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         this.tokenList.set(j, null);
 
       }
-      // execute it now
-      Env env = new Env();
-      env.setInstance(this.instance);
-      AviatorObject result = OperationRuntime.eval(env, args, operatorType);
+      AviatorObject result = OperationRuntime.eval(getCompileEnv(), args, operatorType);
       // set result as token to tokenList for next executing
       this.tokenList.set(operatorIndex, this.getTokenFromOperand(result));
-      // FIXME should pass env to top env.
       return 1;
     }
     return 0;
@@ -391,21 +398,28 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     // call asm to generate byte codes
     this.callASM(variables, methods);
 
+    Expression exp = null;
+
     // Last token is a literal token,then return a LiteralExpression
     if (this.tokenList.size() <= 1) {
       if (this.tokenList.isEmpty()) {
-        return new LiteralExpression(instance, null, new ArrayList<String>(variables.keySet()));
-      }
-      final Token<?> lastToken = this.tokenList.get(0);
-      if (this.isLiteralToken(lastToken)) {
-        return new LiteralExpression(instance,
-            this.getAviatorObjectFromToken(lastToken).getValue(null),
-            new ArrayList<String>(variables.keySet()));
+        exp = new LiteralExpression(instance, null, new ArrayList<String>(variables.keySet()));
+      } else {
+        final Token<?> lastToken = this.tokenList.get(0);
+        if (this.isLiteralToken(lastToken)) {
+          exp = new LiteralExpression(instance,
+              this.getAviatorObjectFromToken(lastToken).getValue(null),
+              new ArrayList<String>(variables.keySet()));
+        }
       }
     }
 
     // get result from asm
-    return this.codeGen.getResult();
+    exp = this.codeGen.getResult();
+    if (exp instanceof BaseExpression) {
+      ((BaseExpression) exp).setCompileEnv(this.getCompileEnv());
+    }
+    return exp;
   }
 
 

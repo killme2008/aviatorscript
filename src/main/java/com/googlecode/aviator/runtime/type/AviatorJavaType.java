@@ -264,9 +264,28 @@ public class AviatorJavaType extends AviatorObject {
     return new AviatorRuntimeJavaType(v);
   }
 
+  @SuppressWarnings("unchecked")
   private Object getProperty(Map<String, Object> env) {
     try {
+      String[] names = this.name.split("\\.");
+      Map<String, Object> innerEnv = env;
+      for (int i = 0; i < names.length; i++) {
+        // Fast path for nested map.
+        Object val = innerEnv.get(names[i]);
+
+        if (i == names.length - 1) {
+          return val;
+        }
+
+        // fallback to property utils
+        if (!(val instanceof Map)) {
+          return PropertyUtils.getProperty(env, this.name);
+        }
+
+        innerEnv = (Map<String, Object>) val;
+      }
       return PropertyUtils.getProperty(env, this.name);
+
     } catch (Throwable t) {
       if (RuntimeUtils.getInstance(env).<Boolean>getOption(Options.TRACE_EVAL)) {
         t.printStackTrace();
