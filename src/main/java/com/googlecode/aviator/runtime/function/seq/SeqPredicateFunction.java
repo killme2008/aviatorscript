@@ -80,6 +80,7 @@ public class SeqPredicateFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return this.name;
   }

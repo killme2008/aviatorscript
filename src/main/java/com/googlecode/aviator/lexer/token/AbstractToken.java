@@ -36,11 +36,13 @@ public abstract class AbstractToken<T> implements Token<T> {
   }
 
 
+  @Override
   public String getLexeme() {
     return this.lexeme;
   }
 
 
+  @Override
   public int getStartIndex() {
     return this.startIndex;
   }

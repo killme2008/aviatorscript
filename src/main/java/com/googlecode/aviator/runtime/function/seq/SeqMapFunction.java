@@ -80,6 +80,7 @@ public class SeqMapFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "map";
   }

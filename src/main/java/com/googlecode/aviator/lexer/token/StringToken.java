@@ -31,11 +31,13 @@ public class StringToken extends AbstractToken<java.lang.String> {
   }
 
 
+  @Override
   public TokenType getType() {
     return TokenType.String;
   }
 
 
+  @Override
   public java.lang.String getValue(Map<String, Object> env) {
     return lexeme;
   }

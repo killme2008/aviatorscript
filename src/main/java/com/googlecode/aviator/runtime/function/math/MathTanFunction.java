@@ -38,6 +38,7 @@ public class MathTanFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "math.tan";
   }

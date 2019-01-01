@@ -17,6 +17,7 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  * 
  */
 public class StringJoinFunction extends AbstractFunction {
+  @Override
   public String getName() {
     return "string.join";
   }

@@ -40,11 +40,13 @@ public class OperatorToken extends AbstractToken<OperatorType> {
   }
 
 
+  @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
     return TokenType.Operator;
   }
 
 
+  @Override
   public OperatorType getValue(Map<String, Object> env) {
     return operatorType;
   }

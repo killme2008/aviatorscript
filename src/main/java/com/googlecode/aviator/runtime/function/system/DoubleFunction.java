@@ -43,6 +43,7 @@ public class DoubleFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "double";
   }

@@ -51,11 +51,13 @@ public class NumberToken extends AbstractToken<Number> {
   }
 
 
+  @Override
   public Number getValue(Map<String, Object> env) {
     return value;
   }
 
 
+  @Override
   public TokenType getType() {
     return TokenType.Number;
   }

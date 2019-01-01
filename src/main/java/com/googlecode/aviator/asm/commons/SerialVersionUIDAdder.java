@@ -465,6 +465,7 @@ public class SerialVersionUIDAdder extends ClassVisitor {
       this.desc = desc;
     }
 
+    @Override
     public int compareTo(final Item other) {
       int retVal = name.compareTo(other.name);
       if (retVal == 0) {

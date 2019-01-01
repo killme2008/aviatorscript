@@ -52,6 +52,7 @@ public class SeqCountFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "count";
   }

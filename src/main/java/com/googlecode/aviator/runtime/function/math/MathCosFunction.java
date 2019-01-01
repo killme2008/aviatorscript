@@ -38,6 +38,7 @@ public class MathCosFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "math.cos";
   }

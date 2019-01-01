@@ -32,6 +32,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class PrintFunction extends AbstractFunction {
 
+  @Override
   public String getName() {
     return "print";
   }

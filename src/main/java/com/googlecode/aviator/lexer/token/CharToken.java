@@ -40,11 +40,13 @@ public class CharToken extends AbstractToken<Character> {
   }
 
 
+  @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
     return TokenType.Char;
   }
 
 
+  @Override
   public Character getValue(Map<String, Object> env) {
     return ch;
   }

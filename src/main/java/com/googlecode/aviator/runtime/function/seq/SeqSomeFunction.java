@@ -58,6 +58,7 @@ public class SeqSomeFunction extends AbstractFunction {
   }
 
 
+  @Override
   public String getName() {
     return "seq.some";
   }

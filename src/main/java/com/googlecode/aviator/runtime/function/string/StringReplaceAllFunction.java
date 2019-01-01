@@ -15,6 +15,7 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  * 
  */
 public class StringReplaceAllFunction extends AbstractFunction {
+  @Override
   public String getName() {
     return "string.replace_all";
   }

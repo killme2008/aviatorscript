@@ -106,11 +106,10 @@ public class ExpressionParser implements Parser {
     return info;
   }
 
-  /*
+  /**
    * (non-Javadoc)
    *
-   * @see com.googlecode.aviator.parser.Parser#restoreScope(com.googlecode.aviator.parser.
-   * ExpressionParser.DepthInfo)
+   * @see com.googlecode.aviator.parser.Parser#restoreScope(com.googlecode.aviator.parser.ExpressionParser.DepthInfo)
    */
   @Override
   public void restoreScope(ScopeInfo info) {
