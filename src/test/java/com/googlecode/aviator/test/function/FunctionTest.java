@@ -14,6 +14,7 @@
  **/
 package com.googlecode.aviator.test.function;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -773,6 +774,18 @@ public class FunctionTest {
       assertEquals("李四", user.getName());
       assertTrue(user.getAge() > 25);
     }
+  }
+
+  @Test
+  public void testTuple() {
+    assertArrayEquals(new Object[] {1, "hello", 3.2},
+        (Object[]) AviatorEvaluator.execute("tuple(1,'hello',3.2)"));
+    assertArrayEquals(new Object[] {1, 2}, (Object[]) AviatorEvaluator.execute("tuple(1,2)"));
+    assertArrayEquals(new Object[] {}, (Object[]) AviatorEvaluator.execute("tuple()"));
+    assertEquals(3, AviatorEvaluator.execute("count(tuple(1,'hello',3.2))"));
+    assertEquals(3.2, AviatorEvaluator.execute("tuple(1,'hello',3.2)[2]"));
+    assertArrayEquals(new Object[] {2, 3, 4},
+        (Object[]) AviatorEvaluator.execute("map(tuple(1,2,3), lambda(x) -> x +1 end)"));
   }
 
   public static class User {

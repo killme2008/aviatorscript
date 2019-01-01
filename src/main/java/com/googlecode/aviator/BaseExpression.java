@@ -1,6 +1,7 @@
 package com.googlecode.aviator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,9 @@ public abstract class BaseExpression implements Expression {
   private List<String> varFullNames;
   private String expression;
   protected AviatorEvaluatorInstance instance;
+  private Env compileEnv;
+
+
 
   public BaseExpression(AviatorEvaluatorInstance instance, List<String> varNames) {
     super();
@@ -34,6 +38,19 @@ public abstract class BaseExpression implements Expression {
     }
     this.varNames = new ArrayList<String>(tmp);
   }
+
+
+
+  public Env getCompileEnv() {
+    return compileEnv;
+  }
+
+
+
+  public void setCompileEnv(Env compileEnv) {
+    this.compileEnv = compileEnv;
+  }
+
 
 
   /**
@@ -78,11 +95,28 @@ public abstract class BaseExpression implements Expression {
     return this.varNames;
   }
 
-
-  protected Env newEnv(Map<String, Object> map) {
-    Env env = new Env(map);
+  protected Env newEnv(Map<String, Object> map, boolean direct) {
+    Env env;
+    if (direct) {
+      env = new Env(map, map.isEmpty() ? new HashMap<String, Object>() : map);
+    } else {
+      env = new Env(map);
+    }
     env.setInstance(this.instance);
     return env;
+  }
+
+  protected Env genTopEnv(Map<String, Object> map) {
+    Env env =
+        newEnv(map, (boolean) this.instance.getOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY));
+    if (this.compileEnv != null) {
+      env.putAll(this.compileEnv);
+    }
+    return env;
+  }
+
+  protected Env newEnv(Map<String, Object> map) {
+    return newEnv(map, false);
   }
 
 }

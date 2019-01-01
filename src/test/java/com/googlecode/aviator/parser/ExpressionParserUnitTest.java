@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
 
@@ -38,12 +39,29 @@ public class ExpressionParserUnitTest {
     this.instance = AviatorEvaluator.newInstance();
   }
 
+  @Test
+  public void testIssue77() {
+    instance.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "'一二三'=~/.*三/"), this.codeGenerator);
+    this.parser.parse();
+    assertEquals("一二三 .*三 =~", this.codeGenerator.getPostFixExpression());
+  }
+
 
   @Test(expected = ExpressionSyntaxErrorException.class)
   public void testIllegalIdentifier1() {
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "null"),
         this.codeGenerator);
     this.parser.parse();
+  }
+
+  @Test
+  public void testAssignment() {
+    this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "a=2"),
+        this.codeGenerator);
+    this.parser.parse();
+    assertEquals("a 2 =", this.codeGenerator.getPostFixExpression());
   }
 
   @Test
@@ -148,13 +166,13 @@ public class ExpressionParserUnitTest {
     this.parser.parse();
   }
 
-
-  @Test(expected = ExpressionSyntaxErrorException.class)
-  public void testIllegalExpression1() {
-    this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "a=2"),
-        this.codeGenerator);
-    this.parser.parse();
-  }
+  //
+  // @Test(expected = ExpressionSyntaxErrorException.class)
+  // public void testIllegalExpression1() {
+  // this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "a=2"),
+  // this.codeGenerator);
+  // this.parser.parse();
+  // }
 
 
   @Test(expected = ExpressionSyntaxErrorException.class)

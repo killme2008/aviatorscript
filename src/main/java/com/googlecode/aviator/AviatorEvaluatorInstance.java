@@ -81,6 +81,7 @@ import com.googlecode.aviator.runtime.function.system.RandomFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
+import com.googlecode.aviator.runtime.function.system.TupleFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -284,6 +285,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new BinaryFunction(OperatorType.BIT_OR));
     addFunction(new BinaryFunction(OperatorType.BIT_XOR));
     addFunction(new BinaryFunction(OperatorType.BIT_NOT));
+    addFunction(new TupleFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());
@@ -454,18 +456,21 @@ public final class AviatorEvaluatorInstance {
    * @param name
    * @return
    */
-  public AviatorFunction getFunction(String name) {
+  public AviatorFunction getFunction(final String name) {
     AviatorFunction function = (AviatorFunction) funcMap.get(name);
     if (function == null && functionLoaders != null) {
       for (FunctionLoader loader : functionLoaders) {
-        function = loader.onFunctionNotFound(name);
+        if (loader != null) {
+          function = loader.onFunctionNotFound(name);
+        }
         if (function != null) {
           break;
         }
       }
     }
     if (function == null) {
-      throw new ExpressionRuntimeException("Could not find function named '" + name + "'");
+      // Returns a delegate function that will try to find the function from runtime env.
+      return new RuntimeFunctionDelegator(name);
     }
     return function;
   }
@@ -539,6 +544,28 @@ public final class AviatorEvaluatorInstance {
       return null;
     }
   }
+
+  /**
+   * Returns true when the expression is in cache.
+   *
+   * @param expression
+   * @return
+   * @since 4.0.0
+   */
+  public boolean isExpressionCached(String expression) {
+    return this.getCachedExpression(expression) != null;
+  }
+
+  /**
+   * Returns the number of cached expressions.
+   *
+   * @since 4.0.0
+   * @return
+   */
+  public int getExpressionCacheSize() {
+    return this.cacheExpressions.size();
+  }
+
 
 
   /**

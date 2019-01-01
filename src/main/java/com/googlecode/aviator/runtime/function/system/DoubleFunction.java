@@ -8,11 +8,11 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 
 /**
  * Cast value to double,double(a) eg.
- * 
+ *
  * @author dennis
  * @Date 2011-6-23
  * @since 1.1.1
- * 
+ *
  */
 public class DoubleFunction extends AbstractFunction {
 
@@ -34,6 +34,8 @@ public class DoubleFunction extends AbstractFunction {
         }
       case String:
         return new AviatorDouble(Double.parseDouble((String) arg1.getValue(env)));
+      case BigInt:
+      case Decimal:
       case Long:
       case Double:
         return new AviatorDouble(((Number) arg1.getValue(env)).doubleValue());

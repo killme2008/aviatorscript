@@ -36,6 +36,7 @@ public final class RuntimeUtils {
     return getInstance(env).getOption(Options.MATH_CONTEXT);
   }
 
+
   public static final void printTrace(Map<String, Object> env, String msg) {
     try {
       getInstance(env).getTraceOutputStream().write(("[Aviator TRACE] " + msg + "\n").getBytes());

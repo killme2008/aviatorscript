@@ -283,7 +283,11 @@ public class ExpressionParser implements Parser {
           this.rel();
           this.codeGenerator.onMatch(this.lookhead);
         } else {
-          this.reportSyntaxError("Aviator doesn't support assignment");
+          // this.back();
+          // assignment
+          this.ternary();
+          this.codeGenerator.onAssignment(this.lookhead);
+          // this.reportSyntaxError("Aviator doesn't support assignment");
         }
       } else if (this.expectChar('!')) {
         this.move(true);

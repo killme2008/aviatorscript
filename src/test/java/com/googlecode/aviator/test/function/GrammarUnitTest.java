@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
@@ -43,6 +44,26 @@ import junit.framework.Assert;
  *
  */
 public class GrammarUnitTest {
+
+  @Test
+  public void testIssue77() {
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
+    assertTrue((boolean) AviatorEvaluator.execute("'一二三'=~/.*三/"));
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
+  }
+
+  @Test
+  public void testIssue87() {
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
+    assertEquals(1, (long) AviatorEvaluator.execute("long(1.2)"));
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
+  }
+
+  @Test
+  public void testIssue92() {
+    HashMap<String, Object> env = new HashMap<>();
+    assertEquals("\\", AviatorEvaluator.execute("'\\\\'", env));
+  }
 
   /**
    * 类型测试
@@ -1012,5 +1033,28 @@ public class GrammarUnitTest {
   @Test(expected = ExpressionSyntaxErrorException.class)
   public void test4J() {
     System.out.println(AviatorEvaluator.execute("4(ss*^^%%$$$$"));
+  }
+
+  @Test
+  public void testAssignment1() {
+    assertEquals(3, AviatorEvaluator.execute("a=1; a+2"));
+    assertEquals(5, AviatorEvaluator.execute("a=3; b=2; a+b"));
+    assertEquals(20.0, AviatorEvaluator.execute("a=3; b=2; c=a+b; c*4.0"));
+    assertEquals(6, AviatorEvaluator.execute("square = lambda(x) -> x *2 end; square(3)"));
+    assertEquals(1, AviatorEvaluator.execute("a=5;b=4.2 ; c= a > b? 1: 0; c"));
+
+  }
+
+  @Test
+  public void testAssignment() {
+    AviatorEvaluator.setOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY, true);
+    AviatorEvaluator.setOption(Options.PUT_CAPTURING_GROUPS_INTO_ENV, true);
+    Map<String, Object> env = new HashMap<>();
+    env.put("b", 4);
+    Object v = AviatorEvaluator.execute("'hello@4'=~/(.*)@(.*)/ ? a=$2:'not match'", env);
+    assertEquals("4", v);
+    assertTrue(env.containsKey("$2"));
+    assertTrue(env.containsKey("a"));
+    assertEquals("4", env.get("a"));
   }
 }

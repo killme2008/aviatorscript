@@ -79,7 +79,9 @@ public enum OperatorType {
 
   NEG("-neg", 1),
 
-  TERNARY("?:", 3);
+  TERNARY("?:", 3),
+
+  ASSIGNMENT("=", 2);
 
   public final String token;
 
@@ -102,6 +104,10 @@ public enum OperatorType {
         return args[0].sub(args[1], env);
       case MOD:
         return args[0].mod(args[1], env);
+      case ASSIGNMENT:
+        // TODO check type?
+        env.put((String) args[0].getValue(env), args[1].getValue(env));
+        return args[1];
       case DIV:
         return args[0].div(args[1], env);
       case MULT:

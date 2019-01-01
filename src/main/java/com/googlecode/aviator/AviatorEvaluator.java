@@ -86,6 +86,12 @@ public final class AviatorEvaluator {
     private static AviatorEvaluatorInstance INSTANCE = new AviatorEvaluatorInstance();
   }
 
+  /**
+   * Get the default evaluator instance
+   *
+   * @since 4.0.0
+   * @return
+   */
   public static AviatorEvaluatorInstance getInstance() {
     return StaticHolder.INSTANCE;
   }

@@ -66,8 +66,16 @@ public enum Options {
    * When enable property access syntax sugar, returns nil if the property value is not found or
    * throws exception.Default value is false,disabled this behaviour.
    */
-  NIL_WHEN_PROPERTY_NOT_FOUND;
+  NIL_WHEN_PROPERTY_NOT_FOUND,
 
+  /**
+   * Whether to use user passed-in env as top level environment directly.If true, it may make side
+   * effects(such as assignment) to user passed-in env., otherwise aviator will wrap the user
+   * passed-in env and does not make any side effects into it.
+   *
+   * Default is false.
+   */
+  USE_USER_ENV_AS_TOP_ENV_DIRECTLY;
 
   private static final Boolean TRACE_DEFAULT_VAL =
       Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
@@ -84,6 +92,7 @@ public enum Options {
       case TRACE:
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
+      case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
@@ -118,6 +127,8 @@ public enum Options {
       case TRACE:
         return TRACE_DEFAULT_VAL;
       case PUT_CAPTURING_GROUPS_INTO_ENV:
+        return true;
+      case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
         return true;
     }
     return null;

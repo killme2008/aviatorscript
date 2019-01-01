@@ -28,6 +28,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 
@@ -54,7 +55,7 @@ public class AviatorEvaluatorInstanceUnitTest {
     try {
       AviatorEvaluator.newInstance().exec("add(3,4)");
       fail();
-    } catch (CompileExpressionErrorException e) {
+    } catch (ExpressionRuntimeException e) {
       assertTrue(true);
     }
     assertEquals(17, this.instance.execute("add(8,9)"));
@@ -62,7 +63,7 @@ public class AviatorEvaluatorInstanceUnitTest {
     try {
       AviatorEvaluator.newInstance().exec("add(1,y)", 3);
       fail();
-    } catch (CompileExpressionErrorException e) {
+    } catch (ExpressionRuntimeException e) {
       assertTrue(true);
     }
   }
@@ -158,8 +159,12 @@ public class AviatorEvaluatorInstanceUnitTest {
 
   @Test
   public void testCompileCache() {
+    assertEquals(0, this.instance.getExpressionCacheSize());
+    assertFalse(this.instance.isExpressionCached("1+3"));
     Expression exp1 = this.instance.compile("1+3", true);
     Expression exp2 = this.instance.compile("1+3", true);
+    assertEquals(1, this.instance.getExpressionCacheSize());
+    assertTrue(this.instance.isExpressionCached("1+3"));
     assertNotNull(exp1);
     assertNotNull(exp2);
     assertSame(exp1, exp2);
@@ -176,10 +181,16 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertNotNull(exp1);
     assertNotNull(exp2);
     assertSame(exp1, exp2);
+    assertEquals(1, this.instance.getExpressionCacheSize());
+    assertTrue(this.instance.isExpressionCached("1+3"));
 
     this.instance.invalidateCache("1+3");
+    assertFalse(this.instance.isExpressionCached("1+3"));
+    assertEquals(0, this.instance.getExpressionCacheSize());
     Expression exp3 = this.instance.compile("1+3", true);
     assertNotSame(exp1, exp3);
+    assertEquals(1, this.instance.getExpressionCacheSize());
+    assertTrue(this.instance.isExpressionCached("1+3"));
 
     assertEquals(4, exp1.execute(null));
     assertEquals(4, exp2.execute(null));

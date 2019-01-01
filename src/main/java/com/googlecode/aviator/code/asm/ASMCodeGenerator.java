@@ -356,6 +356,20 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
+  public void onAssignment(Token<?> lookhead) {
+    this.loadEnv();
+
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorJavaType",
+        "setValue",
+        "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    this.popOperand();
+    this.popOperand();
+    this.popOperand();
+    this.pushOperand();
+  }
+
+
   /*
    * (non-Javadoc)
    *
