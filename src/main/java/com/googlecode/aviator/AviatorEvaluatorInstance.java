@@ -454,18 +454,21 @@ public final class AviatorEvaluatorInstance {
    * @param name
    * @return
    */
-  public AviatorFunction getFunction(String name) {
+  public AviatorFunction getFunction(final String name) {
     AviatorFunction function = (AviatorFunction) funcMap.get(name);
     if (function == null && functionLoaders != null) {
       for (FunctionLoader loader : functionLoaders) {
-        function = loader.onFunctionNotFound(name);
+        if (loader != null) {
+          function = loader.onFunctionNotFound(name);
+        }
         if (function != null) {
           break;
         }
       }
     }
     if (function == null) {
-      throw new ExpressionRuntimeException("Could not find function named '" + name + "'");
+      // Returns a delegate function that will try to find the function from runtime env.
+      return new RuntimeFunctionDelegator(name);
     }
     return function;
   }

@@ -1,5 +1,6 @@
 package com.googlecode.aviator.spring;
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import com.googlecode.aviator.FunctionLoader;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -39,7 +40,11 @@ public class SringContextFunctionLoader implements FunctionLoader {
 
   @Override
   public AviatorFunction onFunctionNotFound(String name) {
-    return (AviatorFunction) this.applicationContext.getBean(name);
+    try {
+      return (AviatorFunction) this.applicationContext.getBean(name);
+    } catch (NoSuchBeanDefinitionException e) {
+      return null;
+    }
   }
 
 }

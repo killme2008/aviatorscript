@@ -284,7 +284,6 @@ public class ExpressionParser implements Parser {
           this.rel();
           this.codeGenerator.onMatch(this.lookhead);
         } else {
-          System.out.println(this.lookhead);
           // this.back();
           // assignment
           this.ternary();

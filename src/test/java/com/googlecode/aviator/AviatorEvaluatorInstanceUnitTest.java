@@ -28,6 +28,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 
@@ -54,7 +55,7 @@ public class AviatorEvaluatorInstanceUnitTest {
     try {
       AviatorEvaluator.newInstance().exec("add(3,4)");
       fail();
-    } catch (CompileExpressionErrorException e) {
+    } catch (ExpressionRuntimeException e) {
       assertTrue(true);
     }
     assertEquals(17, this.instance.execute("add(8,9)"));
@@ -62,7 +63,7 @@ public class AviatorEvaluatorInstanceUnitTest {
     try {
       AviatorEvaluator.newInstance().exec("add(1,y)", 3);
       fail();
-    } catch (CompileExpressionErrorException e) {
+    } catch (ExpressionRuntimeException e) {
       assertTrue(true);
     }
   }
