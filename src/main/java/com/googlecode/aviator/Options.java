@@ -129,7 +129,7 @@ public enum Options {
       case PUT_CAPTURING_GROUPS_INTO_ENV:
         return true;
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
-        return false;
+        return true;
     }
     return null;
   }

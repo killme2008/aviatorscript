@@ -4,6 +4,7 @@ import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorType;
 
 /**
  * Runtime function delegator
@@ -11,8 +12,24 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis
  *
  */
-final class RuntimeFunctionDelegator implements AviatorFunction {
+final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFunction {
 
+
+
+  @Override
+  public int compare(AviatorObject other, Map<String, Object> env) {
+    throw new UnsupportedOperationException("Lambda function can't be compared.");
+  }
+
+  @Override
+  public AviatorType getAviatorType() {
+    return AviatorType.Lambda;
+  }
+
+  @Override
+  public Object getValue(Map<String, Object> env) {
+    return this;
+  }
 
   @Override
   public AviatorObject call(Map<String, Object> env) {
