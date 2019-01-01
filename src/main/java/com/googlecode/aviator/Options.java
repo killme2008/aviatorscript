@@ -1,10 +1,6 @@
 package com.googlecode.aviator;
 
 import java.math.MathContext;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -81,22 +77,6 @@ public enum Options {
    */
   USE_USER_ENV_AS_TOP_ENV_DIRECTLY;
 
-
-  /**
-   * Default executor for future function.
-   */
-  private static final ExecutorService DEFAULT_FUTURE_THREAD_POOL =
-      Executors.newCachedThreadPool(new ThreadFactory() {
-        AtomicInteger counter = new AtomicInteger(0);
-
-        @Override
-        public Thread newThread(Runnable r) {
-          Thread t = new Thread(r);
-          t.setDaemon(true);
-          t.setName("AviatorFutureExecutor-" + counter.incrementAndGet());
-          return t;
-        }
-      });
   private static final Boolean TRACE_DEFAULT_VAL =
       Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
   private static final Boolean TRACE_EVAL_DEFAULT_VAL =
