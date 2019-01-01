@@ -3,7 +3,6 @@ package com.googlecode.aviator.runtime;
 import java.io.IOException;
 import java.math.MathContext;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -37,9 +36,6 @@ public final class RuntimeUtils {
     return getInstance(env).getOption(Options.MATH_CONTEXT);
   }
 
-  public static ExecutorService getFutureExecutor(Map<String, Object> env) {
-    return getInstance(env).getOption(Options.FUTURE_EXECUTOR);
-  }
 
   public static final void printTrace(Map<String, Object> env, String msg) {
     try {

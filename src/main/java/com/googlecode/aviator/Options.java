@@ -71,10 +71,6 @@ public enum Options {
    * throws exception.Default value is false,disabled this behaviour.
    */
   NIL_WHEN_PROPERTY_NOT_FOUND,
-  /**
-   * Future function executor,default is a {@link Executors#newCachedThreadPool()}.
-   */
-  FUTURE_EXECUTOR,
 
   /**
    * Whether to use user passed-in env as top level environment directly.If true, it may make side
@@ -123,8 +119,6 @@ public enum Options {
             || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
       case MATH_CONTEXT:
         return val instanceof MathContext;
-      case FUTURE_EXECUTOR:
-        return val instanceof ExecutorService;
     }
     return false;
   }
@@ -154,8 +148,6 @@ public enum Options {
         return TRACE_DEFAULT_VAL;
       case PUT_CAPTURING_GROUPS_INTO_ENV:
         return true;
-      case FUTURE_EXECUTOR:
-        return DEFAULT_FUTURE_THREAD_POOL;
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
         return false;
     }
