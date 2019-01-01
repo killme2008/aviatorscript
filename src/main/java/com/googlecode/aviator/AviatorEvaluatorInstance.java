@@ -81,6 +81,7 @@ import com.googlecode.aviator.runtime.function.system.RandomFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
+import com.googlecode.aviator.runtime.function.system.TupleFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -284,6 +285,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new BinaryFunction(OperatorType.BIT_OR));
     addFunction(new BinaryFunction(OperatorType.BIT_XOR));
     addFunction(new BinaryFunction(OperatorType.BIT_NOT));
+    addFunction(new TupleFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());
