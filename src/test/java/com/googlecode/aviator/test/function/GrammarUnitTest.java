@@ -1042,7 +1042,8 @@ public class GrammarUnitTest {
     assertEquals(20.0, AviatorEvaluator.execute("a=3; b=2; c=a+b; c*4.0"));
     assertEquals(6, AviatorEvaluator.execute("square = lambda(x) -> x *2 end; square(3)"));
     assertEquals(1, AviatorEvaluator.execute("a=5;b=4.2 ; c= a > b? 1: 0; c"));
-
+    assertEquals(6, AviatorEvaluator.execute("add_n = lambda(x) -> lambda(y) -> x + y end end ; "
+        + "add_1 = add_n(1) ; " + "add_2 = add_n(2) ;" + " add_1(add_2(3))"));
   }
 
   @Test
