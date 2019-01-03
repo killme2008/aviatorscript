@@ -67,6 +67,7 @@ public class Env implements Map<String, Object> {
   }
 
   private static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
+
   /**
    * Constructs an env instance with empty state.
    */
@@ -273,8 +274,8 @@ public class Env implements Map<String, Object> {
   public String toString() {
     StringBuffer buf = new StringBuffer(32 * size());
     buf.append(super.toString()).append("{"). //
-    append(Variable.INSTANCE_VAR).append("=").append(this.instance).append(", ").//
-    append(Variable.ENV_VAR).append("=").append("<this>");
+        append(Variable.INSTANCE_VAR).append("=").append(this.instance).append(", ").//
+        append(Variable.ENV_VAR).append("=").append("<this>");
 
     Iterator<String> it = keySet().iterator();
     boolean hasNext = it.hasNext();
