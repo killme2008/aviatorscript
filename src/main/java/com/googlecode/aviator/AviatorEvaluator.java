@@ -412,12 +412,15 @@ public final class AviatorEvaluator {
 
   /**
    * Execute a text expression with values that are variables order in the expression.It only runs
-   * in EVAL mode,and it will cache the compiled expression.
+   * in EVAL mode,and it will cache the compiled expression. It's deprecated, please use
+   * {@link #execute(String, Map)} instead.
    *
+   * @deprecated
    * @param expression
    * @param values
    * @return
    */
+  @Deprecated
   public static Object exec(String expression, Object... values) {
     return getInstance().exec(expression, values);
   }
