@@ -145,10 +145,12 @@ public final class AviatorEvaluator {
 
   /**
    * Returns the current evaluator option value, returns null if missing.
-   *
+   * 
+   * @deprecated
    * @param opt
    * @return
    */
+  @Deprecated
   public static <T> T getOption(Options opt) {
     return getInstance().getOption(opt);
   }
@@ -173,7 +175,7 @@ public final class AviatorEvaluator {
    */
   @Deprecated
   public static MathContext getMathContext() {
-    return getInstance().getOption(Options.MATH_CONTEXT);
+    return getInstance().getOptionValue(Options.MATH_CONTEXT).mathContext;
   }
 
 

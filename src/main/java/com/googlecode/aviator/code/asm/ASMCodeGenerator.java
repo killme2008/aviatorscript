@@ -1158,7 +1158,7 @@ public class ASMCodeGenerator implements CodeGenerator {
           "(Ljava/lang/Object;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
       this.popOperand();
     }
-    if (this.instance.getOption(Options.TRACE_EVAL)) {
+    if (this.instance.getOptionValue(Options.TRACE_EVAL).bool) {
       this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/function/TraceFunction",
           "wrapTrace",
           "(Lcom/googlecode/aviator/runtime/type/AviatorFunction;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");

@@ -108,8 +108,8 @@ public abstract class BaseExpression implements Expression {
   }
 
   protected Env genTopEnv(Map<String, Object> map) {
-    Env env = newEnv(map,
-        this.instance.getOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY) == Boolean.TRUE);
+    Env env =
+        newEnv(map, this.instance.getOptionValue(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY).bool);
     if (this.compileEnv != null && !this.compileEnv.isEmpty()) {
       env.putAll(this.compileEnv);
     }
