@@ -105,8 +105,7 @@ public final class AviatorEvaluatorInstance {
    */
   public int bytecodeVersion = Opcodes.V1_6;
 
-  private final ConcurrentHashMap<Options, Object> options =
-      new ConcurrentHashMap<Options, Object>();
+  private volatile Map<Options, Object> options = new IdentityHashMap<Options, Object>();
   /** function loader list */
   private List<FunctionLoader> functionLoaders;
 
@@ -153,7 +152,9 @@ public final class AviatorEvaluatorInstance {
     if (!opt.isValidValue(val)) {
       throw new IllegalArgumentException("Invalid value for option:" + opt.name());
     }
-    options.put(opt, val);
+    Map<Options, Object> newOpts = new IdentityHashMap<>(this.options);
+    newOpts.put(opt, val);
+    this.options = newOpts;
   }
 
 
@@ -199,7 +200,7 @@ public final class AviatorEvaluatorInstance {
    *
    * @return
    */
-  public ConcurrentHashMap<Options, Object> getOptions() {
+  public Map<Options, Object> getOptions() {
     return options;
   }
 
@@ -470,7 +471,7 @@ public final class AviatorEvaluatorInstance {
     }
     if (function == null) {
       // Returns a delegate function that will try to find the function from runtime env.
-      return new RuntimeFunctionDelegator(name);
+      function = new RuntimeFunctionDelegator(name);
     }
     return function;
   }

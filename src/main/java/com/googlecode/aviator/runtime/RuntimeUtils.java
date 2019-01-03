@@ -46,7 +46,7 @@ public final class RuntimeUtils {
   }
 
   public static final boolean isTracedEval(Map<String, Object> env) {
-    return (boolean) getInstance(env).getOption(Options.TRACE_EVAL);
+    return getInstance(env).getOption(Options.TRACE_EVAL) == Boolean.TRUE;
   }
 
 
