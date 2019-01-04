@@ -59,7 +59,7 @@ public class AviatorString extends AviatorObject {
       case Long:
       case Double:
         final AviatorNumber otherNumber = (AviatorNumber) other;
-        return new AviatorString(this.lexeme + otherNumber.number);
+        return new AviatorString(this.lexeme + otherNumber.getValue(env));
       case Nil:
       case JavaType:
         return new AviatorString(this.lexeme + other.getValue(env));

@@ -23,7 +23,7 @@ public class SimpleELPerformanceTest extends TestCase {
     Expression exp = AviatorEvaluator.compile("(a+b)*c");
     long startMillis = System.currentTimeMillis();
 
-    final int COUNT = 1000 * 1000;
+    final int COUNT = 100000 * 1000;
     for (int i = 0; i < COUNT; ++i) {
       exp.execute(ctx);
     }

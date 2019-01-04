@@ -27,6 +27,25 @@ public class AviatorBigInt extends AviatorLong {
   }
 
 
+
+  @Override
+  public Object getValue(Map<String, Object> env) {
+    return this.number;
+  }
+
+
+  @Override
+  public long longValue() {
+    return this.number.longValue();
+  }
+
+
+  @Override
+  public double doubleValue() {
+    return this.number.doubleValue();
+  }
+
+
   public AviatorBigInt(Number number) {
     super(number);
   }

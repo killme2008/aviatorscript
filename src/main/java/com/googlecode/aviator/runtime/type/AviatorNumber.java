@@ -30,7 +30,25 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public abstract class AviatorNumber extends AviatorObject {
+  // Value union
   protected Number number;
+  // Only valid for AviatorLong
+  protected long longValue;
+  // Only valid for AviatorDouble
+  protected double doubleValue;
+
+
+  public AviatorNumber(long longValue) {
+    super();
+    this.longValue = longValue;
+  }
+
+
+  public AviatorNumber(double doubleValue) {
+    super();
+    this.doubleValue = doubleValue;
+  }
+
 
 
   public AviatorNumber(Number number) {
@@ -70,7 +88,8 @@ public abstract class AviatorNumber extends AviatorObject {
   public AviatorObject add(AviatorObject other, Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
-        return new AviatorString(this.number.toString() + ((AviatorString) other).getLexeme());
+        return new AviatorString(
+            this.getValue(env).toString() + ((AviatorString) other).getLexeme());
       case BigInt:
       case Decimal:
       case Long:
@@ -82,7 +101,7 @@ public abstract class AviatorNumber extends AviatorObject {
         if (otherValue instanceof Number) {
           return this.innerAdd(env, AviatorNumber.valueOf(otherValue));
         } else if (otherValue instanceof String) {
-          return new AviatorString(this.number.toString() + otherValue);
+          return new AviatorString(this.getValue(env).toString() + otherValue);
         } else {
           return super.add(other, env);
         }
@@ -242,7 +261,7 @@ public abstract class AviatorNumber extends AviatorObject {
     if (TypeUtils.isBigInt(this.number)) {
       return (BigInteger) this.number;
     } else {
-      return new BigInteger(String.valueOf(this.number.longValue()));
+      return new BigInteger(String.valueOf(this.longValue()));
     }
   }
 
@@ -253,7 +272,7 @@ public abstract class AviatorNumber extends AviatorObject {
     } else if (TypeUtils.isBigInt(this.number)) {
       return new BigDecimal(this.toBigInt());
     } else {
-      return new BigDecimal(this.number.doubleValue(), RuntimeUtils.getMathContext(env));
+      return new BigDecimal(this.doubleValue(), RuntimeUtils.getMathContext(env));
     }
   }
 }
