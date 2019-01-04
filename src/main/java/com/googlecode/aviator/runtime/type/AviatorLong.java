@@ -41,7 +41,7 @@ public class AviatorLong extends AviatorNumber {
     }
   }
 
-  public AviatorLong(long i) {
+  AviatorLong(long i) {
     super(i);
   }
 

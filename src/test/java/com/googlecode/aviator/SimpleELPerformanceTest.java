@@ -9,7 +9,7 @@ public class SimpleELPerformanceTest extends TestCase {
   public void test_perf() throws Exception {
 
     Map<String, Object> ctx = new HashMap<String, Object>();
-    ctx.put("a", 3);
+    ctx.put("a", 1001);
     ctx.put("b", 4);
     ctx.put("c", 5);
 
@@ -23,7 +23,7 @@ public class SimpleELPerformanceTest extends TestCase {
     Expression exp = AviatorEvaluator.compile("(a+b)*c");
     long startMillis = System.currentTimeMillis();
 
-    final int COUNT = 100000 * 1000;
+    final int COUNT = 10000 * 1000;
     for (int i = 0; i < COUNT; ++i) {
       exp.execute(ctx);
     }
