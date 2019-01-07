@@ -46,7 +46,7 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
 
 # News
 
-* [4.1.1](https://github.com/killme2008/aviator/releases/tag/aviator-4.1.0)，性能优化等。
+* [4.1.1](https://github.com/killme2008/aviator/releases/tag/aviator-4.1.1)，性能优化等。
 * [4.1.0](https://github.com/killme2008/aviator/releases/tag/aviator-4.1.0)，支持赋值语句、修复 bug 等。
 * [4.0.0-RC 发布](https://github.com/killme2008/aviator/releases/tag/aviator-4.0.0-RC)。支持 lambda 函数和闭包、多求值器实例创建和多行表达式等。
 * [3.3.0 发布](https://github.com/killme2008/aviator/releases/tag/aviator-3.3.0)。支持运算符重载和跟踪执行过程等。
