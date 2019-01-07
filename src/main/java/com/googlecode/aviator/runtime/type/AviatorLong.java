@@ -41,8 +41,12 @@ public class AviatorLong extends AviatorNumber {
     }
   }
 
+  AviatorLong(long i) {
+    super(i);
+  }
 
-  public AviatorLong(Number number) {
+
+  AviatorLong(Number number) {
     super(number);
 
   }
@@ -64,7 +68,7 @@ public class AviatorLong extends AviatorNumber {
 
   @Override
   public AviatorObject neg(Map<String, Object> env) {
-    return AviatorLong.valueOf(-this.number.longValue());
+    return AviatorLong.valueOf(-this.longValue);
   }
 
 
@@ -78,7 +82,7 @@ public class AviatorLong extends AviatorNumber {
       case Long:
         return TypeUtils.comapreLong(this.longValue(), other.longValue());
       case Double:
-        return Double.compare(this.number.doubleValue(), other.doubleValue());
+        return Double.compare(this.doubleValue(), other.doubleValue());
       default:
         throw new ExpressionRuntimeException("Could not compare " + this + " with " + other);
     }
@@ -94,9 +98,9 @@ public class AviatorLong extends AviatorNumber {
         return AviatorDecimal.valueOf(
             this.toDecimal(env).divide(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
-        return AviatorLong.valueOf(this.number.longValue() / other.longValue());
+        return AviatorLong.valueOf(this.longValue / other.longValue());
       default:
-        return new AviatorDouble(this.number.longValue() / other.doubleValue());
+        return AviatorDouble.valueOf(this.longValue / other.doubleValue());
     }
   }
 
@@ -110,9 +114,9 @@ public class AviatorLong extends AviatorNumber {
         return AviatorDecimal.valueOf(
             this.toDecimal(env).add(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
-        return AviatorLong.valueOf(this.number.longValue() + other.longValue());
+        return AviatorLong.valueOf(this.longValue + other.longValue());
       default:
-        return new AviatorDouble(this.number.longValue() + other.doubleValue());
+        return new AviatorDouble(this.longValue + other.doubleValue());
     }
   }
 
@@ -126,9 +130,9 @@ public class AviatorLong extends AviatorNumber {
         return AviatorDecimal.valueOf(
             this.toDecimal(env).remainder(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
-        return AviatorLong.valueOf(this.number.longValue() % other.longValue());
+        return AviatorLong.valueOf(this.longValue % other.longValue());
       default:
-        return new AviatorDouble(this.number.longValue() % other.doubleValue());
+        return new AviatorDouble(this.longValue % other.doubleValue());
     }
   }
 
@@ -142,9 +146,9 @@ public class AviatorLong extends AviatorNumber {
         return AviatorDecimal.valueOf(
             this.toDecimal(env).multiply(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
-        return AviatorLong.valueOf(this.number.longValue() * other.longValue());
+        return AviatorLong.valueOf(this.longValue * other.longValue());
       default:
-        return new AviatorDouble(this.number.longValue() * other.doubleValue());
+        return new AviatorDouble(this.longValue * other.doubleValue());
     }
   }
 
@@ -182,48 +186,67 @@ public class AviatorLong extends AviatorNumber {
   protected AviatorObject innerBitAnd(AviatorObject other) {
     this.ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
-    return AviatorLong.valueOf(this.number.longValue() & otherLong.longValue());
+    return AviatorLong.valueOf(this.longValue & otherLong.longValue());
   }
 
 
   protected AviatorObject innerBitOr(AviatorObject other) {
     this.ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
-    return AviatorLong.valueOf(this.number.longValue() | otherLong.longValue());
+    return AviatorLong.valueOf(this.longValue | otherLong.longValue());
   }
 
 
   protected AviatorObject innerBitXor(AviatorObject other) {
     this.ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
-    return AviatorLong.valueOf(this.number.longValue() ^ otherLong.longValue());
+    return AviatorLong.valueOf(this.longValue ^ otherLong.longValue());
   }
 
 
   protected AviatorObject innerShiftLeft(AviatorObject other) {
     this.ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
-    return AviatorLong.valueOf(this.number.longValue() << otherLong.longValue());
+    return AviatorLong.valueOf(this.longValue << otherLong.longValue());
   }
 
 
   protected AviatorObject innerShiftRight(AviatorObject other) {
     this.ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
-    return AviatorLong.valueOf(this.number.longValue() >> otherLong.longValue());
+    return AviatorLong.valueOf(this.longValue >> otherLong.longValue());
   }
 
 
   protected AviatorObject innerUnsignedShiftRight(AviatorObject other) {
     this.ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
-    return AviatorLong.valueOf(this.number.longValue() >>> otherLong.longValue());
+    return AviatorLong.valueOf(this.longValue >>> otherLong.longValue());
   }
 
 
   @Override
   public AviatorObject bitNot(Map<String, Object> env) {
-    return AviatorLong.valueOf(~this.number.longValue());
+    return AviatorLong.valueOf(~this.longValue);
+  }
+
+
+
+  @Override
+  public Object getValue(Map<String, Object> env) {
+    return this.longValue;
+  }
+
+
+  @Override
+  public long longValue() {
+    return this.longValue;
+  }
+
+
+  @Override
+  public double doubleValue() {
+    return this.longValue;
   }
 
 
@@ -346,9 +369,9 @@ public class AviatorLong extends AviatorNumber {
         return AviatorDecimal.valueOf(
             this.toDecimal(env).subtract(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
-        return AviatorLong.valueOf(this.number.longValue() - other.longValue());
+        return AviatorLong.valueOf(this.longValue - other.longValue());
       default:
-        return new AviatorDouble(this.number.longValue() - other.doubleValue());
+        return new AviatorDouble(this.longValue - other.doubleValue());
     }
   }
 

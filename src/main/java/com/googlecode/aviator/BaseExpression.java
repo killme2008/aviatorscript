@@ -1,6 +1,7 @@
 package com.googlecode.aviator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -98,7 +99,7 @@ public abstract class BaseExpression implements Expression {
   protected Env newEnv(Map<String, Object> map, boolean direct) {
     Env env;
     if (direct) {
-      env = new Env(map, map.isEmpty() ? new HashMap<String, Object>() : map);
+      env = new Env(map, map == Collections.EMPTY_MAP ? new HashMap<String, Object>() : map);
     } else {
       env = new Env(map);
     }
@@ -108,8 +109,8 @@ public abstract class BaseExpression implements Expression {
 
   protected Env genTopEnv(Map<String, Object> map) {
     Env env =
-        newEnv(map, (boolean) this.instance.getOption(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY));
-    if (this.compileEnv != null) {
+        newEnv(map, this.instance.getOptionValue(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY).bool);
+    if (this.compileEnv != null && !this.compileEnv.isEmpty()) {
       env.putAll(this.compileEnv);
     }
     return env;

@@ -66,8 +66,7 @@ public class Env implements Map<String, Object> {
     this.instance = instance;
   }
 
-  private static final Map<String, Object> EMPTY_ENV =
-      Collections.unmodifiableMap(new HashMap<String, Object>());
+  public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
 
   /**
    * Constructs an env instance with empty state.

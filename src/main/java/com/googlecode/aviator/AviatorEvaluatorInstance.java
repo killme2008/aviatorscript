@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
+import com.googlecode.aviator.Options.Value;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
@@ -105,8 +106,12 @@ public final class AviatorEvaluatorInstance {
    */
   public int bytecodeVersion = Opcodes.V1_6;
 
-  private final ConcurrentHashMap<Options, Object> options =
-      new ConcurrentHashMap<Options, Object>();
+  /**
+   * Options
+   */
+  private volatile Map<Options, Value> options = new IdentityHashMap<Options, Value>();
+
+
   /** function loader list */
   private List<FunctionLoader> functionLoaders;
 
@@ -153,7 +158,9 @@ public final class AviatorEvaluatorInstance {
     if (!opt.isValidValue(val)) {
       throw new IllegalArgumentException("Invalid value for option:" + opt.name());
     }
-    options.put(opt, val);
+    Map<Options, Value> newOpts = new IdentityHashMap<>(this.options);
+    newOpts.put(opt, opt.intoValue(val));
+    this.options = newOpts;
   }
 
 
@@ -163,13 +170,27 @@ public final class AviatorEvaluatorInstance {
    * @param opt
    * @return
    */
+  @Deprecated
   @SuppressWarnings("unchecked")
   public <T> T getOption(Options opt) {
-    Object val = options.get(opt);
+    Value val = options.get(opt);
     if (val == null) {
-      val = opt.getDefaultValue();
+      val = opt.getDefaultValueObject();
     }
-    return (T) val;
+
+    return (T) opt.intoObject(val);
+  }
+
+  /**
+   * Returns the current evaluator option value union, returns null if missing.
+   *
+   * @param opt
+   * @return
+   */
+  public Value getOptionValue(Options opt) {
+    Value val = options.get(opt);
+    assert (val != null);
+    return val;
   }
 
 
@@ -199,8 +220,12 @@ public final class AviatorEvaluatorInstance {
    *
    * @return
    */
-  public ConcurrentHashMap<Options, Object> getOptions() {
-    return options;
+  public Map<Options, Object> getOptions() {
+    Map<Options, Object> ret = new HashMap<>();
+    for (Map.Entry<Options, Value> entry : this.options.entrySet()) {
+      ret.put(entry.getKey(), entry.getKey().intoObject(entry.getValue()));
+    }
+    return ret;
   }
 
 
@@ -353,6 +378,9 @@ public final class AviatorEvaluatorInstance {
   AviatorEvaluatorInstance() {
     this.loadLib();
     this.addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
+    for (Options opt : Options.values()) {
+      options.put(opt, opt.getDefaultValueObject());
+    }
   }
 
   /**
@@ -470,7 +498,7 @@ public final class AviatorEvaluatorInstance {
     }
     if (function == null) {
       // Returns a delegate function that will try to find the function from runtime env.
-      return new RuntimeFunctionDelegator(name);
+      function = new RuntimeFunctionDelegator(name);
     }
     return function;
   }
@@ -621,14 +649,14 @@ public final class AviatorEvaluatorInstance {
     CodeGenerator codeGenerator = newCodeGenerator(cached);
     ExpressionParser parser = new ExpressionParser(this, lexer, codeGenerator);
     Expression exp = parser.parse();
-    if ((boolean) getOption(Options.TRACE_EVAL)) {
+    if (getOptionValue(Options.TRACE_EVAL).bool) {
       ((BaseExpression) exp).setExpression(expression);
     }
     return exp;
   }
 
   private int getOptimizeLevel() {
-    return getOption(Options.OPTIMIZE_LEVEL);
+    return getOptionValue(Options.OPTIMIZE_LEVEL).level;
   }
 
 
@@ -642,12 +670,12 @@ public final class AviatorEvaluatorInstance {
     switch (getOptimizeLevel()) {
       case AviatorEvaluator.COMPILE:
         ASMCodeGenerator asmCodeGenerator = new ASMCodeGenerator(this, classLoader,
-            traceOutputStream, (Boolean) getOption(Options.TRACE));
+            traceOutputStream, getOptionValue(Options.TRACE).bool);
         asmCodeGenerator.start();
         return asmCodeGenerator;
       case AviatorEvaluator.EVAL:
         return new OptimizeCodeGenerator(this, classLoader, traceOutputStream,
-            (Boolean) getOption(Options.TRACE));
+            getOptionValue(Options.TRACE).bool);
       default:
         throw new IllegalArgumentException("Unknow option " + getOptimizeLevel());
     }

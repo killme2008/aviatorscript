@@ -58,9 +58,9 @@ public class ExpressionLexer {
     this.symbolTable = new SymbolTable();
     this.peek = this.iterator.current();
     this.instance = instance;
-    this.mathContext = this.instance.getOption(Options.MATH_CONTEXT);
+    this.mathContext = this.instance.getOptionValue(Options.MATH_CONTEXT).mathContext;
     this.parseFloatIntoDecimal =
-        this.instance.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL);
+        this.instance.getOptionValue(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL).bool;
   }
 
   /**

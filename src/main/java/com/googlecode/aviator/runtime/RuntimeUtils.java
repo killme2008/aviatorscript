@@ -33,7 +33,7 @@ public final class RuntimeUtils {
   }
 
   public static final MathContext getMathContext(Map<String, Object> env) {
-    return getInstance(env).getOption(Options.MATH_CONTEXT);
+    return getInstance(env).getOptionValue(Options.MATH_CONTEXT).mathContext;
   }
 
 
@@ -46,7 +46,7 @@ public final class RuntimeUtils {
   }
 
   public static final boolean isTracedEval(Map<String, Object> env) {
-    return (boolean) getInstance(env).getOption(Options.TRACE_EVAL);
+    return getInstance(env).getOptionValue(Options.TRACE_EVAL).bool;
   }
 
 

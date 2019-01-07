@@ -247,7 +247,7 @@ public class AviatorJavaType extends AviatorObject {
 
     if (env != null) {
       if (this.name.contains(".") && RuntimeUtils.getInstance(env)
-          .<Boolean>getOption(Options.ENABLE_PROPERTY_SYNTAX_SUGAR)) {
+          .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
         return getProperty(env);
       }
       return env.get(this.name);
@@ -287,10 +287,10 @@ public class AviatorJavaType extends AviatorObject {
       return PropertyUtils.getProperty(env, this.name);
 
     } catch (Throwable t) {
-      if (RuntimeUtils.getInstance(env).<Boolean>getOption(Options.TRACE_EVAL)) {
+      if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
         t.printStackTrace();
       }
-      if (RuntimeUtils.getInstance(env).<Boolean>getOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND)) {
+      if (RuntimeUtils.getInstance(env).getOptionValue(Options.NIL_WHEN_PROPERTY_NOT_FOUND).bool) {
         return null;
       } else {
         throw new ExpressionRuntimeException("Could not find variable " + this.name, t);
