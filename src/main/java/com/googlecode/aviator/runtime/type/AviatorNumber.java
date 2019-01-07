@@ -30,7 +30,10 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public abstract class AviatorNumber extends AviatorObject {
-  // Value union
+  /**
+   * Number union
+   */
+  // Only for bigint/decimal
   protected Number number;
   // Only valid for AviatorLong
   protected long longValue;

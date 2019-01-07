@@ -189,9 +189,7 @@ public final class AviatorEvaluatorInstance {
    */
   public Value getOptionValue(Options opt) {
     Value val = options.get(opt);
-    if (val == null) {
-      val = opt.getDefaultValueObject();
-    }
+    assert (val != null);
     return val;
   }
 
