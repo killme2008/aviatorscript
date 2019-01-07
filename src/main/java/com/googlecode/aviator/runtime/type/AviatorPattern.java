@@ -76,7 +76,7 @@ public class AviatorPattern extends AviatorObject {
         if (m.matches()) {
           boolean captureGroups = RuntimeUtils.getInstance(env)
               .getOptionValue(Options.PUT_CAPTURING_GROUPS_INTO_ENV).bool;
-          if (captureGroups && env != null && env != Collections.EMPTY_MAP) {
+          if (captureGroups && env != Collections.EMPTY_MAP) {
             int groupCount = m.groupCount();
             for (int i = 0; i <= groupCount; i++) {
               env.put("$" + i, m.group(i));
