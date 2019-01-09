@@ -26,7 +26,7 @@ public abstract class LambdaFunction extends AbstractFunction {
   public LambdaFunction(List<String> arguments, Expression expression, Env context) {
     super();
     this.arguments = arguments;
-    this.context = context;
+    this.context = context.clone();
     this.expression = expression;
   }
 
