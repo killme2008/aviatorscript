@@ -75,6 +75,12 @@ public class Env implements Map<String, Object> {
     this(EMPTY_ENV);
   }
 
+  @Override
+  public Env clone() {
+    return new Env(this.mDefaults == EMPTY_ENV ? EMPTY_ENV : new HashMap<>(this.mDefaults),
+        new HashMap<>(this.mOverrides));
+  }
+
   /**
    * Constructor.
    *
