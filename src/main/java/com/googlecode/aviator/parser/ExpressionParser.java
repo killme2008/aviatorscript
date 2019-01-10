@@ -757,8 +757,9 @@ public class ExpressionParser implements Parser {
 
 
   private void reportSyntaxError(String message) {
-    int index = this.lookhead != null && this.lookhead.getStartIndex() > 0
-        ? this.lookhead.getStartIndex() : this.lexer.getCurrentIndex();
+    int index =
+        this.lookhead != null && this.lookhead.getStartIndex() > 0 ? this.lookhead.getStartIndex()
+            : this.lexer.getCurrentIndex();
     throw new ExpressionSyntaxErrorException(
         "Syntax error:" + message + " at " + index + ", current token: " + this.lookhead
             + ". Parsing expression: `" + this.lexer.getScanString() + "^^`");

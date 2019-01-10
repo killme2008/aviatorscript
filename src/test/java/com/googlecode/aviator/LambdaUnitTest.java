@@ -60,7 +60,7 @@ public class LambdaUnitTest {
   @Test(expected = ExpressionRuntimeException.class)
   public void testIssue101() {
     String exp = "a=1; b = lambda(x) -> a+ x end ; a=4 ; b(5)";
-    AviatorEvaluator.execute(exp); // output 6
+    AviatorEvaluator.execute(exp); // throw exception
   }
 
   @Test
