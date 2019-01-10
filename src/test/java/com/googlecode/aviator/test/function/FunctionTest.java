@@ -145,10 +145,9 @@ public class FunctionTest {
     assertEquals((i + pi + d + b) / 4 % 2 > 0, AviatorEvaluator.execute("(i+pi+d+b)/4%2>0", env));
     assertEquals(true, AviatorEvaluator.execute("(i+100)%3!=1", env));
     assertEquals(true, AviatorEvaluator.execute("i%4<=0", env));
-    assertEquals(true,
-        AviatorEvaluator.execute(
-            "i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99 ==i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99",
-            env));
+    assertEquals(true, AviatorEvaluator.execute(
+        "i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99 ==i * pi + (d * b - 199) / (1 - d * pi) - (2 + 100 - i / pi) % 99",
+        env));
   }
 
 

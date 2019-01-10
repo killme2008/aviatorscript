@@ -364,10 +364,10 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                     * Compiled
-                                                                                     * expression
-                                                                                     * task
-                                                                                     */> cacheExpressions =
+                                                                                      * Compiled
+                                                                                      * expression
+                                                                                      * task
+                                                                                      */> cacheExpressions =
       new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 

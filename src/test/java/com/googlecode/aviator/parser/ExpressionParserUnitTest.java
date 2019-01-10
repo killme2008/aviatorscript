@@ -689,9 +689,8 @@ public class ExpressionParserUnitTest {
 
   @Test
   public void testParseFunctionNested() {
-    this.parser = new ExpressionParser(this.instance,
-        new ExpressionLexer(this.instance,
-            "string.contains(string.substring(\"hello\",3,4),string.substring(\"hello\",1)) && 3>2"),
+    this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance,
+        "string.contains(string.substring(\"hello\",3,4),string.substring(\"hello\",1)) && 3>2"),
         this.codeGenerator);
     this.parser.parse();
 
