@@ -45,7 +45,7 @@ public class OperationRuntime {
     AviatorFunction func = RuntimeUtils.getInstance(env).getOpFunction(opType);
     AviatorObject ret = eval0(env, args, opType, func);
     if (RuntimeUtils.isTracedEval(env)) {
-      trace(null, opType, ret, args);
+      trace(env, opType, ret, args);
     }
     return ret;
   }
@@ -166,7 +166,7 @@ public class OperationRuntime {
       case 3:
         RuntimeUtils.printTrace(env,
             TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + "?" + WHITE_SPACE + args[0].desc(env)
-                + WHITE_SPACE + ":" + WHITE_SPACE + args[1].desc(env) + " => " + result.desc(env));
+            + WHITE_SPACE + ":" + WHITE_SPACE + args[1].desc(env) + " => " + result.desc(env));
         break;
     }
   }
