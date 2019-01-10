@@ -57,6 +57,18 @@ public class LambdaUnitTest {
     assertEquals(19, AviatorEvaluator.execute("test(4)(5)(6) + a", env));
   }
 
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testIssue101() {
+    String exp = "a=1; b = lambda(x) -> a+ x end ; a=4 ; b(5)";
+    AviatorEvaluator.execute(exp); // output 6
+  }
+
+  @Test
+  public void testIssue101_assignment() {
+    String exp = "a=1; c=a; b = lambda(x) -> a+ x end ; c=4 ; b(5)";
+    assertEquals(6, AviatorEvaluator.execute(exp));
+  }
+
   public static class Foo {
     private int a;
 

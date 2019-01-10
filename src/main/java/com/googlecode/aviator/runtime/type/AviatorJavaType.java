@@ -259,6 +259,7 @@ public class AviatorJavaType extends AviatorObject {
     if (this.name.contains(".")) {
       throw new IllegalArgumentException("Can't assignment value to `" + this.name + "`");
     }
+
     Object v = value.getValue(env);
     env.put(this.name, v);
     return new AviatorRuntimeJavaType(v);

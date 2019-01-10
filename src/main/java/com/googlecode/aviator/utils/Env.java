@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.Variable;
 
 /**
@@ -68,19 +69,20 @@ public class Env implements Map<String, Object> {
 
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
 
+  private Map<String, String> capturedVars;
+
+  public void capture(String var, String expression) {
+    if (capturedVars == null) {
+      capturedVars = new HashMap<>();
+    }
+    capturedVars.put(var, expression);
+  }
+
   /**
    * Constructs an env instance with empty state.
    */
   public Env() {
     this(EMPTY_ENV);
-  }
-
-  @Override
-  public Env clone() {
-    Env ret = new Env(this.mDefaults == EMPTY_ENV ? EMPTY_ENV : new HashMap<>(this.mDefaults),
-        new HashMap<>(this.mOverrides));
-    ret.instance = this.instance;
-    return ret;
   }
 
   /**
@@ -210,6 +212,12 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Object put(String key, Object value) {
+    String capturedExp = null;
+    if (this.capturedVars != null && this.capturedVars.containsKey(key)) {
+      throw new ExpressionRuntimeException("Can't assignment value to captured variable.The `" + key
+          + "` is already captured by lambda.");
+    }
+
     Object prior;
     Map<String, Object> overrides = getmOverrides(false);
     if (overrides.containsKey(key)) {
@@ -282,8 +290,8 @@ public class Env implements Map<String, Object> {
   public String toString() {
     StringBuffer buf = new StringBuffer(32 * size());
     buf.append(super.toString()).append("{"). //
-    append(Variable.INSTANCE_VAR).append("=").append(this.instance).append(", ").//
-    append(Variable.ENV_VAR).append("=").append("<this>");
+        append(Variable.INSTANCE_VAR).append("=").append(this.instance).append(", ").//
+        append(Variable.ENV_VAR).append("=").append("<this>");
 
     Iterator<String> it = keySet().iterator();
     boolean hasNext = it.hasNext();
