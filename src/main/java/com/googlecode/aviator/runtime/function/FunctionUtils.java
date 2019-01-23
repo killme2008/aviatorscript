@@ -64,7 +64,7 @@ public class FunctionUtils {
     if (arg.getAviatorType() != AviatorType.JavaType) {
       throw new ExpressionRuntimeException(arg.desc(env) + " is not a javaType");
     }
-    return env.get(((AviatorJavaType) arg).getName());
+    return ((AviatorJavaType) arg).getValue(env);
   }
 
 
