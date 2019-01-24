@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
@@ -785,6 +786,17 @@ public class FunctionTest {
     assertEquals(3.2, AviatorEvaluator.execute("tuple(1,'hello',3.2)[2]"));
     assertArrayEquals(new Object[] {2, 3, 4},
         (Object[]) AviatorEvaluator.execute("map(tuple(1,2,3), lambda(x) -> x +1 end)"));
+
+    assertEquals(1, AviatorEvaluator.execute("seq.get(tuple(1,'hello',3.2), 0)"));
+    assertEquals("hello", AviatorEvaluator.execute("seq.get(tuple(1,'hello',3.2), 1)"));
+    assertEquals(3.2, AviatorEvaluator.execute("seq.get(tuple(1,'hello',3.2), 2)"));
+
+    try {
+      assertEquals(1, AviatorEvaluator.execute("seq.get(tuple(1,'hello',3.2), 3)"));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+
+    }
   }
 
 
@@ -871,6 +883,108 @@ public class FunctionTest {
     } catch (ExpressionRuntimeException e) {
       assertEquals("<JavaType, 3, Integer> is not a seq", e.getCause().getMessage());
     }
+  }
+
+
+  private List newList(Object... args) {
+    List list = new ArrayList<>();
+    for (Object obj : args) {
+      list.add(obj);
+    }
+    return list;
+  }
+
+  private Set newSet(Object... args) {
+    Set list = new HashSet<>();
+    for (Object obj : args) {
+      list.add(obj);
+    }
+    return list;
+  }
+
+  @Test
+  public void testSeqNewList() {
+    assertEquals(newList(), AviatorEvaluator.execute("seq.list()"));
+    assertEquals(newList(1L), AviatorEvaluator.execute("seq.list(1)"));
+    assertEquals(newList(1L, 1L, 2L, 3L), AviatorEvaluator.execute("seq.list(1,1,2,3)"));
+    assertEquals(newList(1L, 2L, 3L, 4L), AviatorEvaluator.execute("seq.list(1,2,3,4)"));
+    assertEquals(newList(1L, 2.2, "hello"), AviatorEvaluator.execute("seq.list(1,2.2, 'hello')"));
+
+    assertEquals(newList(1L), AviatorEvaluator.execute("seq.add(seq.list(), 1)"));
+    assertEquals(newList(1L, "hello"),
+        AviatorEvaluator.execute("seq.add(seq.add(seq.list(), 1), 'hello')"));
+
+    assertEquals(newList("hello"),
+        AviatorEvaluator.execute("seq.remove(seq.add(seq.add(seq.list(), 1), 'hello'), 1)"));
+    assertEquals(newList(), AviatorEvaluator.execute("seq.remove(seq.list(), nil)"));
+
+    assertEquals(1, AviatorEvaluator.execute("seq.get(seq.list(1,1,2,3),0)"));
+    assertEquals(1, AviatorEvaluator.execute("seq.get(seq.list(1,1,2,3),1)"));
+    assertEquals(2, AviatorEvaluator.execute("seq.get(seq.list(1,1,2,3),2)"));
+    assertEquals(3, AviatorEvaluator.execute("seq.get(seq.list(1,1,2,3),3)"));
+
+    try {
+      assertEquals(1, AviatorEvaluator.execute("seq.get(seq.list(1,1,2,3),4)"));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Index: 4, Size: 4", e.getCause().getMessage());
+    }
+  }
+
+
+
+  @Test
+  public void testSeqNewMap() {
+    Map<Object, Object> map = new HashMap<>();
+
+    assertEquals(map, AviatorEvaluator.execute("seq.map()"));
+
+    map.put(1L, 2L);
+    map.put(3L, 4L);
+    assertEquals(map, AviatorEvaluator.execute("seq.map(1,2,3,4)"));
+
+    map.put("a", "b");
+    assertEquals(map, AviatorEvaluator.execute("seq.map(1,2,3,4,'a','b')"));
+
+    map.clear();
+    map.put(1L, 2L);
+    map.put(3L, 4L);
+    assertEquals(map, AviatorEvaluator.execute("seq.add(seq.map(1,2),3,4)"));
+    map.put("a", "b");
+    assertEquals(map, AviatorEvaluator.execute("seq.add(seq.map(1,2,3,4), 'a','b')"));
+
+    map.remove(3L);
+    assertEquals(map,
+        AviatorEvaluator.execute("seq.remove(seq.add(seq.map(1,2,3,4), 'a','b'), 3)"));
+
+    map.remove("a");
+    assertEquals(map, AviatorEvaluator
+        .execute("seq.remove(seq.remove(seq.add(seq.map(1,2,3,4), 'a','b'), 3), 'a')"));
+
+    assertEquals(2, AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 1)"));
+    assertEquals(null, AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 2)"));
+    assertEquals(4, AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 3)"));
+    assertEquals(null, AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 4)"));
+    assertEquals("b", AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 'a')"));
+  }
+
+  @Test
+  public void testSeqNewSet() {
+    assertEquals(newSet(), AviatorEvaluator.execute("seq.set()"));
+    assertEquals(newSet(1L), AviatorEvaluator.execute("seq.set(1)"));
+    assertEquals(newSet(1L, 2L, 3L, 4L), AviatorEvaluator.execute("seq.set(1,2,3,4)"));
+    assertEquals(newSet(1L, 2.2, "hello"), AviatorEvaluator.execute("seq.set(1,2.2, 'hello')"));
+
+    assertEquals(newSet(1L), AviatorEvaluator.execute("seq.add(seq.set(), 1)"));
+    assertEquals(newSet(1L, "hello"),
+        AviatorEvaluator.execute("seq.add(seq.add(seq.set(), 1), 'hello')"));
+
+    assertEquals(newSet("hello"),
+        AviatorEvaluator.execute("seq.remove(seq.add(seq.add(seq.set(), 1), 'hello'), 1)"));
+    assertEquals(newSet(), AviatorEvaluator.execute("seq.remove(seq.set(), nil)"));
+    assertEquals(newSet(1L, 2L, 3L), AviatorEvaluator.execute("seq.set(1,1,2,3)"));
+
+    assertEquals(3, AviatorEvaluator.execute("count(seq.set(1,1,2,3))"));
   }
 
   @Test

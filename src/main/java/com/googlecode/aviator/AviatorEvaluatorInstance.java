@@ -48,18 +48,24 @@ import com.googlecode.aviator.runtime.function.math.MathRoundFunction;
 import com.googlecode.aviator.runtime.function.math.MathSinFunction;
 import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
 import com.googlecode.aviator.runtime.function.seq.SeqCountFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqEveryFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqGetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMaxFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMinFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqNewListFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqNewMapFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqNewSetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqRemoveFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
 import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
@@ -342,6 +348,12 @@ public final class AviatorEvaluatorInstance {
     addFunction(new MathTanFunction());
 
     // seq lib
+    addFunction(new SeqNewListFunction());
+    addFunction(new SeqNewMapFunction());
+    addFunction(new SeqNewSetFunction());
+    addFunction(new SeqAddFunction());
+    addFunction(new SeqRemoveFunction());
+    addFunction(new SeqGetFunction());
     addFunction(new SeqMinFunction());
     addFunction(new SeqMaxFunction());
     addFunction(new SeqMapFunction());

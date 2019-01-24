@@ -49,7 +49,7 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
         }
       }
 
-      return normalizeResult(result);
+      return AviatorRuntimeJavaType.valueOf(result);
     } else if (clazz.isArray()) {
       int length = Array.getLength(first);
 
@@ -69,22 +69,13 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
           break;
         }
       }
-      return normalizeResult(result);
+      return AviatorRuntimeJavaType.valueOf(result);
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
     }
   }
 
   protected abstract Op getOp();
-
-  private AviatorObject normalizeResult(Object result) {
-    if (result == null) {
-      return AviatorNil.NIL;
-    } else {
-      return new AviatorRuntimeJavaType(result);
-    }
-  }
-
 
   private Object compareObjects(Object result, Object obj, boolean wasFirst) {
     if (obj == null) {
