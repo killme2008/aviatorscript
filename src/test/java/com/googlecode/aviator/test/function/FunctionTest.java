@@ -787,6 +787,147 @@ public class FunctionTest {
         (Object[]) AviatorEvaluator.execute("map(tuple(1,2,3), lambda(x) -> x +1 end)"));
   }
 
+
+  @Test
+  public void testSeqMinMaxFunction() {
+    assertEquals(-1, AviatorEvaluator.execute("seq.min(tuple(4,2,3,-1,5))"));
+    assertEquals(5, AviatorEvaluator.execute("seq.max(tuple(4,2,3,1,5))"));
+
+
+    assertEquals(null, AviatorEvaluator.execute("seq.min(tuple())"));
+    assertEquals(null, AviatorEvaluator.execute("seq.max(tuple())"));
+
+    assertEquals(99, AviatorEvaluator.execute("seq.min(tuple(99))"));
+    assertEquals(99, AviatorEvaluator.execute("seq.max(tuple(99))"));
+
+    assertEquals(null, AviatorEvaluator.execute("seq.min(tuple(nil))"));
+    assertEquals(null, AviatorEvaluator.execute("seq.max(tuple(nil))"));
+
+    assertEquals(null, AviatorEvaluator.execute("seq.min(tuple(4,nil,3,-1,5))"));
+    assertEquals(5, AviatorEvaluator.execute("seq.max(tuple(4,2,nil,-1,5))"));
+
+    try {
+      assertEquals(5, AviatorEvaluator.execute("seq.max(tuple(4,'hello',3,1,5))"));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Could not compare `hello` with `4`", e.getMessage());
+    }
+
+    try {
+      assertEquals(5, AviatorEvaluator.execute("seq.min(tuple(4,'hello',3,1,5))"));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Could not compare `hello` with `4`", e.getMessage());
+    }
+
+    Map<String, Object> env = new HashMap<>();
+    env.put("a", Arrays.asList(4, 3, 5, -6, 9));
+    assertEquals(-6, AviatorEvaluator.execute("seq.min(a)", env));
+    assertEquals(9, AviatorEvaluator.execute("seq.max(a)", env));
+
+    env.put("a", Arrays.asList(4, 3, 5, null, -6, 9));
+    assertEquals(null, AviatorEvaluator.execute("seq.min(a)", env));
+    assertEquals(9, AviatorEvaluator.execute("seq.max(a)", env));
+
+    try {
+      env.put("a", Arrays.asList(4, 3, 5, "hello", -6, 9));
+      assertEquals(5, AviatorEvaluator.execute("seq.min(a)", env));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Could not compare `hello` with `3`", e.getMessage());
+    }
+
+    try {
+      env.put("a", Arrays.asList(4, 3, 5, "hello", -6, 9));
+      assertEquals(5, AviatorEvaluator.execute("seq.max(a)", env));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Could not compare `hello` with `5`", e.getMessage());
+    }
+    env.put("a", null);
+    assertEquals(null, AviatorEvaluator.execute("seq.min(a)", env));
+    assertEquals(null, AviatorEvaluator.execute("seq.max(a)", env));
+
+    env.put("a", Arrays.asList());
+    assertEquals(null, AviatorEvaluator.execute("seq.min(a)", env));
+    assertEquals(null, AviatorEvaluator.execute("seq.max(a)", env));
+
+    env.put("a", Arrays.asList(4));
+    assertEquals(4, AviatorEvaluator.execute("seq.min(a)", env));
+    assertEquals(4, AviatorEvaluator.execute("seq.max(a)", env));
+
+    try {
+      env.put("a", 3);
+      assertEquals(5, AviatorEvaluator.execute("seq.max(a)", env));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("<JavaType, 3, Integer> is not a seq", e.getCause().getMessage());
+    }
+
+    try {
+      env.put("a", 3);
+      assertEquals(5, AviatorEvaluator.execute("seq.min(a)", env));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("<JavaType, 3, Integer> is not a seq", e.getCause().getMessage());
+    }
+  }
+
+  @Test
+  public void testSystemMinMaxFunction() {
+    assertEquals(-1, AviatorEvaluator.execute("min(4,2,3,-1,5)"));
+    assertEquals(5, AviatorEvaluator.execute("max(4,2,3,1,5)"));
+
+    assertEquals(null, AviatorEvaluator.execute("min()"));
+    assertEquals(null, AviatorEvaluator.execute("max()"));
+
+    assertEquals(99, AviatorEvaluator.execute("min(99)"));
+    assertEquals(99, AviatorEvaluator.execute("max(99)"));
+
+    assertEquals(null, AviatorEvaluator.execute("min(nil)"));
+    assertEquals(null, AviatorEvaluator.execute("max(nil)"));
+
+    assertEquals(null, AviatorEvaluator.execute("min(4,nil,3,-1,5)"));
+    assertEquals(5, AviatorEvaluator.execute("max(4,2,nil,-1,5)"));
+
+    try {
+      assertEquals(5, AviatorEvaluator.execute("max(4,'hello',3,1,5)"));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Could not compare <String, hello> with <Long, 4>", e.getMessage());
+    }
+
+
+    try {
+      assertEquals(5, AviatorEvaluator.execute("min(4,'hello',3,1,5)"));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Could not compare <String, hello> with <Long, 4>", e.getMessage());
+    }
+
+    Map<String, Object> env = new HashMap<>();
+    env.put("a", 1);
+    env.put("b", -99.3);
+    env.put("c", "hello");
+    env.put("d", false);
+
+    assertEquals(-99.3, AviatorEvaluator.execute("min(4,a,3,b,1,5)", env));
+    assertEquals(5, AviatorEvaluator.execute("max(4,a,3,b,1,5)", env));
+
+    assertEquals(null, AviatorEvaluator.execute("min(4,nil, a,3,b,1,5)", env));
+    assertEquals(5, AviatorEvaluator.execute("max(4,nil, a,3,b,1,5)", env));
+
+    assertEquals(1, AviatorEvaluator.execute("min(a)", env));
+    assertEquals(1, AviatorEvaluator.execute("max(a)", env));
+
+    try {
+      assertEquals(5, AviatorEvaluator.execute("max(a,b,c,5)", env));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Could not compare <String, hello> with <JavaType, 1, Integer>", e.getMessage());
+    }
+  }
+
   public static class User {
     private Long id;
     private Integer age;

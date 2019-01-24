@@ -56,6 +56,8 @@ import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqMaxFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqMinFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
@@ -75,6 +77,8 @@ import com.googlecode.aviator.runtime.function.system.BooleanFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
+import com.googlecode.aviator.runtime.function.system.MaxFunction;
+import com.googlecode.aviator.runtime.function.system.MinFunction;
 import com.googlecode.aviator.runtime.function.system.NowFunction;
 import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
@@ -311,6 +315,8 @@ public final class AviatorEvaluatorInstance {
     addFunction(new BinaryFunction(OperatorType.BIT_XOR));
     addFunction(new BinaryFunction(OperatorType.BIT_NOT));
     addFunction(new TupleFunction());
+    addFunction(new MinFunction());
+    addFunction(new MaxFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());
@@ -336,6 +342,8 @@ public final class AviatorEvaluatorInstance {
     addFunction(new MathTanFunction());
 
     // seq lib
+    addFunction(new SeqMinFunction());
+    addFunction(new SeqMaxFunction());
     addFunction(new SeqMapFunction());
     addFunction(new SeqReduceFunction());
     addFunction(new SeqFilterFunction());

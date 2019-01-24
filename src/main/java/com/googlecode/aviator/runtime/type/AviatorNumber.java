@@ -226,12 +226,14 @@ public abstract class AviatorNumber extends AviatorObject {
         if (otherValue instanceof Number) {
           return this.innerCompare(env, AviatorNumber.valueOf(otherValue));
         } else {
-          throw new ExpressionRuntimeException("Could not compare " + this + " with " + other);
+          throw new ExpressionRuntimeException(
+              "Could not compare " + this.desc(env) + " with " + other.desc(env));
         }
       case Nil:
         return 1;
       default:
-        throw new ExpressionRuntimeException("Could not compare " + this + " with " + other);
+        throw new ExpressionRuntimeException(
+            "Could not compare " + this.desc(env) + " with " + other.desc(env));
 
     }
   }
