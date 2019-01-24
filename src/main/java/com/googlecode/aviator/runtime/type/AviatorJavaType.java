@@ -257,7 +257,11 @@ public class AviatorJavaType extends AviatorObject {
 
   public AviatorObject setValue(AviatorObject value, Map<String, Object> env) {
     if (this.name.contains(".")) {
-      throw new IllegalArgumentException("Can't assignment value to `" + this.name + "`");
+      throw new ExpressionRuntimeException("Can't assignment value to `" + this.name + "`");
+    }
+
+    if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
+      throw new ExpressionRuntimeException("Disabled variable assignment.");
     }
 
     Object v = value.getValue(env);

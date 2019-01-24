@@ -75,7 +75,15 @@ public enum Options {
    *
    * Default is false.
    */
-  USE_USER_ENV_AS_TOP_ENV_DIRECTLY;
+  USE_USER_ENV_AS_TOP_ENV_DIRECTLY,
+
+  /**
+   * Disable variable assignment when true, default is false. You may want to disable variable
+   * assignment for security reason.
+   *
+   * @since 4.1.2
+   */
+  DISABLE_ASSIGNMENT;
 
   private static final boolean TRACE_DEFAULT_VAL =
       Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
@@ -132,6 +140,7 @@ public enum Options {
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
+      case DISABLE_ASSIGNMENT:
         return val.bool;
       case OPTIMIZE_LEVEL: {
         return val.level;
@@ -158,6 +167,7 @@ public enum Options {
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
+      case DISABLE_ASSIGNMENT:
         return ((boolean) val) ? TRUE_VALUE : FALSE_VALUE;
       case OPTIMIZE_LEVEL: {
         int level = (int) val;
@@ -183,6 +193,7 @@ public enum Options {
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
+      case DISABLE_ASSIGNMENT:
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
@@ -240,6 +251,8 @@ public enum Options {
         return TRUE_VALUE;
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
         return TRUE_VALUE;
+      case DISABLE_ASSIGNMENT:
+        return FALSE_VALUE;
     }
     return null;
   }
