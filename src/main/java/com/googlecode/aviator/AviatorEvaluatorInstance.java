@@ -34,7 +34,7 @@ import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
@@ -743,7 +743,7 @@ public final class AviatorEvaluatorInstance {
         return compiledExpression.execute();
       }
     } else {
-      throw new ExpressionRuntimeException("Null compiled expression for " + expression);
+      throw new ExpressionNotFoundException("Null compiled expression for " + expression);
     }
   }
 
@@ -760,7 +760,7 @@ public final class AviatorEvaluatorInstance {
     if (compiledExpression != null) {
       return compiledExpression.execute(env);
     } else {
-      throw new ExpressionRuntimeException("Null compiled expression for " + expression);
+      throw new ExpressionNotFoundException("Null compiled expression for " + expression);
     }
   }
 

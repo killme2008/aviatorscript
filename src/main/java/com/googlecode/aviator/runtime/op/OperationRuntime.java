@@ -1,7 +1,7 @@
 package com.googlecode.aviator.runtime.op;
 
 import java.util.Map;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.IllegalArityException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -63,7 +63,7 @@ public class OperationRuntime {
         case 3:
           return func.call(env, args[0], args[1], args[2]);
       }
-      throw new ExpressionRuntimeException("Too many arguments.");
+      throw new IllegalArityException("Too many arguments.");
     }
   }
 

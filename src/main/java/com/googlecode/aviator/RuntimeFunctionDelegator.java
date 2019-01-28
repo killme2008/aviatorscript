@@ -1,7 +1,7 @@
 package com.googlecode.aviator;
 
 import java.util.Map;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
@@ -223,6 +223,6 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
     if (val instanceof AviatorFunction) {
       return (AviatorFunction) val;
     }
-    throw new ExpressionRuntimeException("Function not found: " + this.name);
+    throw new FunctionNotFoundException("Function not found: " + this.name);
   }
 }

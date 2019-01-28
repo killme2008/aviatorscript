@@ -18,7 +18,7 @@ package com.googlecode.aviator.runtime.function.seq;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -29,9 +29,9 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 /**
  * reduce(col,fun,init) function to reduce seq with function and a initial value value
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class SeqReduceFunction extends AbstractFunction {
 
@@ -41,7 +41,7 @@ public class SeqReduceFunction extends AbstractFunction {
     Object first = arg1.getValue(env);
     AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 2);
     if (fun == null) {
-      throw new ExpressionRuntimeException(
+      throw new FunctionNotFoundException(
           "There is no function named " + ((AviatorJavaType) arg2).getName());
     }
     if (first == null) {

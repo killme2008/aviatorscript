@@ -218,6 +218,16 @@ public class AviatorEvaluatorInstanceUnitTest {
   }
 
 
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testDisableAssignment() {
+    this.instance.setOption(Options.DISABLE_ASSIGNMENT, true);
+    try {
+      this.instance.execute("a=3");
+    } finally {
+      this.instance.setOption(Options.DISABLE_ASSIGNMENT, false);
+    }
+  }
+
   @Test(expected = CompileExpressionErrorException.class)
   public void compileBlankExpression1() {
     this.instance.compile("");

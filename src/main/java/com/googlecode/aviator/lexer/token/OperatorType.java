@@ -16,7 +16,7 @@
 package com.googlecode.aviator.lexer.token;
 
 import java.util.Map;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.IllegalArityException;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -95,7 +95,8 @@ public enum OperatorType {
 
   public AviatorObject eval(AviatorObject[] args, Map<String, Object> env) {
     if (args.length < this.operandCount) {
-      throw new ExpressionRuntimeException("There are not enough operands for " + this);
+      throw new IllegalArityException("Expect " + this.operandCount + " parameters for "
+          + this.name() + ", but have " + args.length + " arguments.");
     }
     switch (this) {
       case ADD:
