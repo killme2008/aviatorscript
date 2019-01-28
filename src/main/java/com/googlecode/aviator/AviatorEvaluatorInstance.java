@@ -82,6 +82,7 @@ import com.googlecode.aviator.runtime.function.system.BinaryFunction;
 import com.googlecode.aviator.runtime.function.system.BooleanFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
+import com.googlecode.aviator.runtime.function.system.IdentityFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
 import com.googlecode.aviator.runtime.function.system.MaxFunction;
 import com.googlecode.aviator.runtime.function.system.MinFunction;
@@ -323,6 +324,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new TupleFunction());
     addFunction(new MinFunction());
     addFunction(new MaxFunction());
+    addFunction(new IdentityFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());

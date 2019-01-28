@@ -276,8 +276,23 @@ public class FunctionTest {
 
     assertEquals(2, AviatorEvaluator.execute("count(map(list,string.length))", env));
     assertTrue((Boolean) AviatorEvaluator.execute("include(map(list,string.length),5)", env));
+
+    assertTrue((Boolean) AviatorEvaluator.execute("seq.every(tuple(true,true,true), identity)"));
+    assertFalse((Boolean) AviatorEvaluator.execute("seq.every(tuple(true,false,true), identity)"));
+    assertTrue((Boolean) AviatorEvaluator.execute("seq.some(tuple(false,true,false), identity)"));
+    assertFalse((Boolean) AviatorEvaluator.execute("seq.every(tuple(true,false,true), identity)"));
+    assertTrue(
+        (Boolean) AviatorEvaluator.execute("seq.not_any(tuple(false,false,false), identity)"));
+    assertFalse(
+        (Boolean) AviatorEvaluator.execute("seq.not_any(tuple(true,false,true), identity)"));
   }
 
+  @Test
+  public void testIdentityFunction() {
+    assertNull(AviatorEvaluator.execute("identity(nil)"));
+    assertEquals(1L, AviatorEvaluator.execute("identity(1)"));
+    assertEquals("hello", AviatorEvaluator.execute("identity('hello')"));
+  }
 
   @Test
   public void testIssue2() {
