@@ -34,7 +34,7 @@ import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
@@ -48,16 +48,24 @@ import com.googlecode.aviator.runtime.function.math.MathRoundFunction;
 import com.googlecode.aviator.runtime.function.math.MathSinFunction;
 import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
 import com.googlecode.aviator.runtime.function.seq.SeqCountFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqEveryFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqGetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqMaxFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqMinFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqNewListFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqNewMapFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqNewSetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqRemoveFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
 import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
@@ -74,7 +82,10 @@ import com.googlecode.aviator.runtime.function.system.BinaryFunction;
 import com.googlecode.aviator.runtime.function.system.BooleanFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
+import com.googlecode.aviator.runtime.function.system.IdentityFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
+import com.googlecode.aviator.runtime.function.system.MaxFunction;
+import com.googlecode.aviator.runtime.function.system.MinFunction;
 import com.googlecode.aviator.runtime.function.system.NowFunction;
 import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
@@ -311,6 +322,9 @@ public final class AviatorEvaluatorInstance {
     addFunction(new BinaryFunction(OperatorType.BIT_XOR));
     addFunction(new BinaryFunction(OperatorType.BIT_NOT));
     addFunction(new TupleFunction());
+    addFunction(new MinFunction());
+    addFunction(new MaxFunction());
+    addFunction(new IdentityFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());
@@ -336,6 +350,14 @@ public final class AviatorEvaluatorInstance {
     addFunction(new MathTanFunction());
 
     // seq lib
+    addFunction(new SeqNewListFunction());
+    addFunction(new SeqNewMapFunction());
+    addFunction(new SeqNewSetFunction());
+    addFunction(new SeqAddFunction());
+    addFunction(new SeqRemoveFunction());
+    addFunction(new SeqGetFunction());
+    addFunction(new SeqMinFunction());
+    addFunction(new SeqMaxFunction());
     addFunction(new SeqMapFunction());
     addFunction(new SeqReduceFunction());
     addFunction(new SeqFilterFunction());
@@ -364,10 +386,10 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                     * Compiled
-                                                                                     * expression
-                                                                                     * task
-                                                                                     */> cacheExpressions =
+                                                                                      * Compiled
+                                                                                      * expression
+                                                                                      * task
+                                                                                      */> cacheExpressions =
       new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
@@ -723,7 +745,7 @@ public final class AviatorEvaluatorInstance {
         return compiledExpression.execute();
       }
     } else {
-      throw new ExpressionRuntimeException("Null compiled expression for " + expression);
+      throw new ExpressionNotFoundException("Null compiled expression for " + expression);
     }
   }
 
@@ -740,7 +762,7 @@ public final class AviatorEvaluatorInstance {
     if (compiledExpression != null) {
       return compiledExpression.execute(env);
     } else {
-      throw new ExpressionRuntimeException("Null compiled expression for " + expression);
+      throw new ExpressionNotFoundException("Null compiled expression for " + expression);
     }
   }
 

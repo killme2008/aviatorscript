@@ -84,7 +84,8 @@ public class AviatorLong extends AviatorNumber {
       case Double:
         return Double.compare(this.doubleValue(), other.doubleValue());
       default:
-        throw new ExpressionRuntimeException("Could not compare " + this + " with " + other);
+        throw new ExpressionRuntimeException(
+            "Could not compare " + this.desc(env) + " with " + other.desc(env));
     }
   }
 

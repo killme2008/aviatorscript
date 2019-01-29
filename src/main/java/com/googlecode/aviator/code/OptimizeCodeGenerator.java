@@ -395,8 +395,6 @@ public class OptimizeCodeGenerator implements CodeGenerator {
           break;
       }
     }
-    // call asm to generate byte codes
-    this.callASM(variables, methods);
 
     Expression exp = null;
 
@@ -414,8 +412,14 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       }
     }
 
-    // get result from asm
-    exp = this.codeGen.getResult();
+    if (exp == null) {
+      // call asm to generate byte codes
+      this.callASM(variables, methods);
+      // get result from asm
+      exp = this.codeGen.getResult();
+    }
+
+
     if (exp instanceof BaseExpression) {
       ((BaseExpression) exp).setCompileEnv(this.getCompileEnv());
     }

@@ -28,6 +28,9 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
   private final Object object;
 
   public static AviatorObject valueOf(Object object) {
+    if (object == null) {
+      return AviatorNil.NIL;
+    }
     if (object instanceof AviatorObject) {
       return (AviatorObject) object;
     }

@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.Variable;
 
 /**
@@ -67,6 +68,15 @@ public class Env implements Map<String, Object> {
   }
 
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
+
+  private Map<String, String> capturedVars;
+
+  public void capture(String var, String expression) {
+    if (capturedVars == null) {
+      capturedVars = new HashMap<>();
+    }
+    capturedVars.put(var, expression);
+  }
 
   /**
    * Constructs an env instance with empty state.
@@ -202,6 +212,12 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Object put(String key, Object value) {
+    String capturedExp = null;
+    if (this.capturedVars != null && this.capturedVars.containsKey(key)) {
+      throw new ExpressionRuntimeException("Can't assignment value to captured variable.The `" + key
+          + "` is already captured by lambda.");
+    }
+
     Object prior;
     Map<String, Object> overrides = getmOverrides(false);
     if (overrides.containsKey(key)) {

@@ -3,7 +3,7 @@ package com.googlecode.aviator.runtime.function.seq;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -15,7 +15,7 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 /**
  * Returns the first logical true value of fun.call(x) for any x in sequence, else returns nil.
- * 
+ *
  * @author dennis
  *
  */
@@ -26,7 +26,7 @@ public class SeqSomeFunction extends AbstractFunction {
     Object first = arg1.getValue(env);
     AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 1);
     if (fun == null) {
-      throw new ExpressionRuntimeException(
+      throw new FunctionNotFoundException(
           "There is no function named " + ((AviatorJavaType) arg2).getName());
     }
     if (first == null) {

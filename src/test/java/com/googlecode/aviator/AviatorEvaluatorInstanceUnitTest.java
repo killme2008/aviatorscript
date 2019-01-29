@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.io.ByteArrayOutputStream;
 import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
@@ -217,6 +218,36 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertEquals("hello world", this.instance.execute("a+b", env, true));
   }
 
+
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testDisableAssignment() {
+    this.instance.setOption(Options.DISABLE_ASSIGNMENT, true);
+    try {
+      this.instance.execute("a=3");
+    } finally {
+      this.instance.setOption(Options.DISABLE_ASSIGNMENT, false);
+    }
+  }
+
+  @Test
+  public void testTraceEval() throws Exception {
+    this.instance.setOption(Options.TRACE_EVAL, true);
+    ByteArrayOutputStream bs = new ByteArrayOutputStream();
+    this.instance.setTraceOutputStream(bs);
+    try {
+      this.instance.execute("string.replace_all('hello','l','c') + ' world'");
+      String output = new String(bs.toByteArray());
+      assertEquals(
+          "[Aviator TRACE] Func   : string.replace_all(<String, hello>,<String, l>,<String, c>)\n"
+              + "[Aviator TRACE]          <String, hecco> + <String,  world> => <String, hecco world>\n"
+              + "[Aviator TRACE] Result : hecco world\n",
+          output);
+    } finally {
+      this.instance.setOption(Options.TRACE_EVAL, false);
+      this.instance.setTraceOutputStream(System.out);
+    }
+
+  }
 
   @Test(expected = CompileExpressionErrorException.class)
   public void compileBlankExpression1() {

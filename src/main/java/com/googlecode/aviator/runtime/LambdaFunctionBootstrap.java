@@ -47,8 +47,10 @@ public class LambdaFunctionBootstrap {
   public LambdaFunction newInstance(Env env) {
     try {
       return (LambdaFunction) constructor.invoke(arguments, expression, env);
+    } catch (ExpressionRuntimeException e) {
+      throw e;
     } catch (Throwable t) {
-      throw new ExpressionRuntimeException(t);
+      throw new ExpressionRuntimeException("Fail to create lambda instance.", t);
     }
   }
 }

@@ -115,14 +115,12 @@ public class AviatorPattern extends AviatorObject {
         if (other.getValue(env) == null) {
           return 1;
         } else {
-          throw new ExpressionRuntimeException(
-              "Could not compare Pattern with " + other.getAviatorType());
+          throw new ExpressionRuntimeException("Could not compare Pattern with " + other.desc(env));
         }
       case Nil:
         return 1;
       default:
-        throw new ExpressionRuntimeException(
-            "Could not compare Pattern with " + other.getAviatorType());
+        throw new ExpressionRuntimeException("Could not compare Pattern with " + other.desc(env));
     }
   }
 
