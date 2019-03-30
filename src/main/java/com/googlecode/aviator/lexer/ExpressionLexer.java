@@ -51,6 +51,7 @@ public class ExpressionLexer {
   private String expression;
   private MathContext mathContext;
   private boolean parseFloatIntoDecimal;
+  private boolean parseLongIntoDecimal;
 
   public ExpressionLexer(AviatorEvaluatorInstance instance, String expression) {
     this.iterator = new StringCharacterIterator(expression);
@@ -61,6 +62,9 @@ public class ExpressionLexer {
     this.mathContext = this.instance.getOptionValue(Options.MATH_CONTEXT).mathContext;
     this.parseFloatIntoDecimal =
         this.instance.getOptionValue(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL).bool;
+    this.parseLongIntoDecimal =
+        this.instance.getOptionValue(Options.ALWAYS_PARSE_LONG_NUMBER_INTO_DECIMAL).bool;
+
   }
 
   /**
@@ -254,10 +258,14 @@ public class ExpressionLexer {
       } else {
         // if the long value is out of range,then it must be negative,so
         // we make it as a big integer.
-        if (lval < 0) {
-          value = new BigInteger(sb.toString());
+        if (this.parseLongIntoDecimal) {
+          value = new BigDecimal(sb.toString(), this.mathContext);
         } else {
-          value = lval;
+          if (lval < 0) {
+            value = new BigInteger(sb.toString());
+          } else {
+            value = lval;
+          }
         }
       }
       String lexeme = sb.toString();
