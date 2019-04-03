@@ -267,6 +267,7 @@ public class ExpressionLexerUnitTest {
       assertEquals(new BigDecimal("3"), token.getValue(null));
       assertEquals(0, token.getStartIndex());
     } finally {
+
       this.instance.setOption(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL, false);
     }
   }
