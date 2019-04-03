@@ -48,7 +48,7 @@ public enum Options {
   /**
    * Always parsing long number into BigDecial, default is false.It replaces
    */
-  ALWAYS_PARSE_LONG_NUMBER_INTO_DECIMAL,
+  ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL,
   /**
    * Whether to trace expression evaluating procedure, default is false.
    */
@@ -138,7 +138,7 @@ public enum Options {
     switch (this) {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
-      case ALWAYS_PARSE_LONG_NUMBER_INTO_DECIMAL:
+      case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
       case TRACE:
@@ -166,7 +166,7 @@ public enum Options {
     switch (this) {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
-      case ALWAYS_PARSE_LONG_NUMBER_INTO_DECIMAL:
+      case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
       case TRACE:
@@ -193,7 +193,7 @@ public enum Options {
     switch (this) {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
-      case ALWAYS_PARSE_LONG_NUMBER_INTO_DECIMAL:
+      case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
       case TRACE:
@@ -240,7 +240,7 @@ public enum Options {
   public Value getDefaultValueObject() {
     switch (this) {
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
-      case ALWAYS_PARSE_LONG_NUMBER_INTO_DECIMAL:
+      case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
         return FALSE_VALUE;
       case ENABLE_PROPERTY_SYNTAX_SUGAR:

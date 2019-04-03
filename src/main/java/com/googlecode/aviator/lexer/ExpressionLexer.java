@@ -63,7 +63,7 @@ public class ExpressionLexer {
     this.parseFloatIntoDecimal =
         this.instance.getOptionValue(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL).bool;
     this.parseLongIntoDecimal =
-        this.instance.getOptionValue(Options.ALWAYS_PARSE_LONG_NUMBER_INTO_DECIMAL).bool;
+        this.instance.getOptionValue(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL).bool;
 
   }
 
@@ -256,9 +256,9 @@ public class ExpressionLexer {
           value = dval;
         }
       } else {
-        // if the long value is out of range,then it must be negative,so
-        // we make it as a big integer.
         if (this.parseLongIntoDecimal) {
+          // if the long value is out of range,then it must be negative,so
+          // we make it as a big integer.
           value = new BigDecimal(sb.toString(), this.mathContext);
         } else {
           if (lval < 0) {

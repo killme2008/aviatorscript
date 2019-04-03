@@ -256,6 +256,21 @@ public class ExpressionLexerUnitTest {
     }
   }
 
+  @Test
+  public void testParseIntegralAsDecimal() {
+    try {
+      this.instance.setOption(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL, true);
+      this.lexer = new ExpressionLexer(this.instance, "3");
+      Token<?> token = this.lexer.scan();
+      assertEquals(TokenType.Number, token.getType());
+      assertTrue(token.getValue(null) instanceof BigDecimal);
+      assertEquals(new BigDecimal("3"), token.getValue(null));
+      assertEquals(0, token.getStartIndex());
+    } finally {
+      this.instance.setOption(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL, false);
+    }
+  }
+
 
   @Test
   public void testParseLikeHexNumber() {

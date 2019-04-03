@@ -63,12 +63,13 @@ public class GrammarUnitTest {
     HashMap<String, Object> env = new HashMap<>();
     assertEquals("\\", AviatorEvaluator.execute("'\\\\'", env));
   }
-  //增加测试用例
+
+  // 增加测试用例
   @Test
-  public void testLongIntoDecimal() {
-    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_LONG_NUMBER_INTO_DECIMAL, true);
+  public void testIntegralIntoDecimal() {
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL, true);
     assertEquals(1.5D, ((BigDecimal) AviatorEvaluator.execute("3/2")).doubleValue());
-    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_LONG_NUMBER_INTO_DECIMAL, false);
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL, false);
   }
 
   /**
