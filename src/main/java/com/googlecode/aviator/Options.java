@@ -41,12 +41,12 @@ public enum Options {
    */
   TRACE,
   /**
-   * Always parsing floating-point number into BigDecial, default is false.It replaces
+   * When true, always parsing floating-point number into BigDecial, default is false.It replaces
    * {@link #ALWAYS_USE_DOUBLE_AS_DECIMAL} option.
    */
   ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL,
   /**
-   * Always parsing long number into BigDecial, default is false.It replaces
+   * When true, always parsing long number into BigDecial, default is false.
    */
   ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL,
   /**

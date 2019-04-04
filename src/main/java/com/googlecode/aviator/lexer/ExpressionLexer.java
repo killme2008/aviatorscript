@@ -260,6 +260,8 @@ public class ExpressionLexer {
           // we make integral number as a BigDecimal.
           value = new BigDecimal(sb.toString(), this.mathContext);
         } else {
+          // if the long value is out of range,then it must be negative, so
+          // we make it as a big integer.
           if (lval < 0) {
             value = new BigInteger(sb.toString());
           } else {
