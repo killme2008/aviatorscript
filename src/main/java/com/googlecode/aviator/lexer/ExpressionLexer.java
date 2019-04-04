@@ -51,7 +51,7 @@ public class ExpressionLexer {
   private String expression;
   private MathContext mathContext;
   private boolean parseFloatIntoDecimal;
-  private boolean parseLongIntoDecimal;
+  private boolean parseIntegralNumberIntoDecimal;
 
   public ExpressionLexer(AviatorEvaluatorInstance instance, String expression) {
     this.iterator = new StringCharacterIterator(expression);
@@ -62,7 +62,7 @@ public class ExpressionLexer {
     this.mathContext = this.instance.getOptionValue(Options.MATH_CONTEXT).mathContext;
     this.parseFloatIntoDecimal =
         this.instance.getOptionValue(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL).bool;
-    this.parseLongIntoDecimal =
+    this.parseIntegralNumberIntoDecimal =
         this.instance.getOptionValue(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL).bool;
 
   }
@@ -256,7 +256,7 @@ public class ExpressionLexer {
           value = dval;
         }
       } else {
-        if (this.parseLongIntoDecimal) {
+        if (this.parseIntegralNumberIntoDecimal) {
           // we make integral number as a BigDecimal.
           value = new BigDecimal(sb.toString(), this.mathContext);
         } else {

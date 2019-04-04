@@ -46,7 +46,9 @@ public enum Options {
    */
   ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL,
   /**
-   * When true, always parsing long number into BigDecial, default is false.
+   * When true, always parsing integral number into BigDecial, default is false.
+   * 
+   * @since 4.2.0
    */
   ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL,
   /**
