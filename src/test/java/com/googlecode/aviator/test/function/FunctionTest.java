@@ -901,7 +901,7 @@ public class FunctionTest {
   }
 
 
-  private List newList(Object... args) {
+  private List newList(final Object... args) {
     List list = new ArrayList<>();
     for (Object obj : args) {
       list.add(obj);
@@ -909,7 +909,7 @@ public class FunctionTest {
     return list;
   }
 
-  private Set newSet(Object... args) {
+  private Set newSet(final Object... args) {
     Set list = new HashSet<>();
     for (Object obj : args) {
       list.add(obj);
@@ -981,6 +981,17 @@ public class FunctionTest {
     assertEquals(4, AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 3)"));
     assertEquals(null, AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 4)"));
     assertEquals("b", AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 'a')"));
+  }
+
+  @Test
+  public void testIssue134() {
+    Map<String, Object> env = new HashMap<>(2);
+    env.put("v", 3);
+    assertEquals(3, AviatorEvaluator
+        .execute("func=lambda(v)->v+2 end;func2=lambda(v)->func(v) end;func(1) ; func2(1)", env));
+    assertEquals(6, AviatorEvaluator.execute(
+        "func=lambda(v)->v+2 end;func2=lambda(v)->func(v) end; func3 = lambda(v) -> func(v) + func2(v) end; func(1); func2(1);func3(1)",
+        env));
   }
 
   @Test
@@ -1062,39 +1073,39 @@ public class FunctionTest {
     private Integer age;
     private String name;
 
-    public User(Long id, Integer age, String name) {
+    public User(final Long id, final Integer age, final String name) {
       this.id = id;
       this.age = age;
       this.name = name;
     }
 
     public Long getId() {
-      return id;
+      return this.id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
       this.id = id;
     }
 
     public Integer getAge() {
-      return age;
+      return this.age;
     }
 
-    public void setAge(Integer age) {
+    public void setAge(final Integer age) {
       this.age = age;
     }
 
     public String getName() {
-      return name;
+      return this.name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
       this.name = name;
     }
 
     @Override
     public String toString() {
-      return "User{" + "id=" + id + ", age=" + age + ", name='" + name + '\'' + '}';
+      return "User{" + "id=" + this.id + ", age=" + this.age + ", name='" + this.name + '\'' + '}';
     }
   }
 }

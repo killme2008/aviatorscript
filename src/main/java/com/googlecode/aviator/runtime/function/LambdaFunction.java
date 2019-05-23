@@ -26,7 +26,8 @@ public abstract class LambdaFunction extends AbstractFunction {
   // closure context
   protected Env context;
 
-  public LambdaFunction(List<String> arguments, Expression expression, Env context) {
+  public LambdaFunction(final List<String> arguments, final Expression expression,
+      final Env context) {
     super();
     this.arguments = arguments;
     this.context = context;
@@ -40,13 +41,14 @@ public abstract class LambdaFunction extends AbstractFunction {
     this.expression = expression;
   }
 
-  protected Map<String, Object> newEnv(Map<String, Object> parentEnv, AviatorObject... args) {
-    Env env = new Env(new Env(parentEnv, context));
-    env.setInstance(context.getInstance());
+  protected Map<String, Object> newEnv(final Map<String, Object> parentEnv,
+      final AviatorObject... args) {
+    Env env = new Env(new Env(parentEnv, this.context));
+    env.setInstance(this.context.getInstance());
 
     int i = 0;
-    for (String name : arguments) {
-      env.put(name, args[i++].getValue(env));
+    for (String name : this.arguments) {
+      env.put(name, args[i++].getValue(parentEnv));
     }
     return env;
   }
