@@ -37,7 +37,7 @@ public class FunctionArgument {
 
   @Override
   public String toString() {
-    return "FunctionParameter [index=" + this.index + ", expression=" + this.expression + "]";
+    return "FunctionArgument [index=" + this.index + ", expression=" + this.expression + "]";
   }
 
   public static FunctionArgument from(final int index, final String name) {

@@ -128,7 +128,7 @@ public class ExpressionParserUnitTest {
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "println(3+2);4"), this.codeGenerator);
     this.parser.parse();
-    assertEquals("3 2 + method_invoke<[FunctionParameter [index=0, expression=3+2]]> ; 4",
+    assertEquals("3 2 + method_invoke<[FunctionArgument [index=0, expression=3+2]]> ; 4",
         this.codeGenerator.getPostFixExpression());
 
     {
@@ -137,7 +137,7 @@ public class ExpressionParserUnitTest {
           new ExpressionLexer(this.instance, "println(a,be,cdf,2+3)"), this.codeGenerator);
       this.parser.parse();
       assertEquals(
-          "a be cdf 2 3 + method_invoke<[FunctionParameter [index=0, expression=a], FunctionParameter [index=1, expression=be], FunctionParameter [index=2, expression=cdf], FunctionParameter [index=3, expression=2+3]]>",
+          "a be cdf 2 3 + method_invoke<[FunctionArgument [index=0, expression=a], FunctionArgument [index=1, expression=be], FunctionArgument [index=2, expression=cdf], FunctionArgument [index=3, expression=2+3]]>",
           this.codeGenerator.getPostFixExpression());
     }
 
@@ -147,7 +147,7 @@ public class ExpressionParserUnitTest {
           new ExpressionLexer(this.instance, "println(a,b,println(c,1+2))"), this.codeGenerator);
       this.parser.parse();
       assertEquals(
-          "a b c 1 2 + method_invoke<[FunctionParameter [index=0, expression=c], FunctionParameter [index=1, expression=1+2]]> method_invoke<[FunctionParameter [index=0, expression=a], FunctionParameter [index=1, expression=b], FunctionParameter [index=2, expression=println(c,1+2)]]>",
+          "a b c 1 2 + method_invoke<[FunctionArgument [index=0, expression=c], FunctionArgument [index=1, expression=1+2]]> method_invoke<[FunctionArgument [index=0, expression=a], FunctionArgument [index=1, expression=b], FunctionArgument [index=2, expression=println(c,1+2)]]>",
           this.codeGenerator.getPostFixExpression());
     }
 
@@ -158,7 +158,7 @@ public class ExpressionParserUnitTest {
           new ExpressionLexer(this.instance, "test(a, ab, c)(d, e)(foo)"), this.codeGenerator);
       this.parser.parse();
       assertEquals(
-          "a ab c method_invoke<[FunctionParameter [index=0, expression=a], FunctionParameter [index=1, expression=ab], FunctionParameter [index=2, expression=c]]> d e method_invoke<[FunctionParameter [index=0, expression=d], FunctionParameter [index=1, expression=e]]> foo method_invoke<[FunctionParameter [index=0, expression=foo]]>",
+          "a ab c method_invoke<[FunctionArgument [index=0, expression=a], FunctionArgument [index=1, expression=ab], FunctionArgument [index=2, expression=c]]> d e method_invoke<[FunctionArgument [index=0, expression=d], FunctionArgument [index=1, expression=e]]> foo method_invoke<[FunctionArgument [index=0, expression=foo]]>",
           this.codeGenerator.getPostFixExpression());
     }
   }
