@@ -45,7 +45,7 @@ public abstract class BaseExpression implements Expression {
 
   public void setFuncsArgs(final Map<Integer, List<FunctionArgument>> funcsArgs) {
     if (funcsArgs != null) {
-      this.funcsArgs = funcsArgs;
+      this.funcsArgs = Collections.unmodifiableMap(funcsArgs);
     }
   }
 

@@ -961,7 +961,7 @@ public class ASMCodeGenerator implements CodeGenerator {
     if (this.instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool) {
       if (params != null && !params.isEmpty()) {
         int funcId = getNextFuncInvocationId();
-        getFuncsArgs().put(funcId, params);
+        getFuncsArgs().put(funcId, Collections.unmodifiableList(params));
         loadEnv();
         this.mv.visitLdcInsn(FUNC_ARGS_INNER_VAR);
         this.mv.visitLdcInsn(funcId);
