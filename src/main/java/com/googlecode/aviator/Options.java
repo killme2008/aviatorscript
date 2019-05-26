@@ -46,7 +46,9 @@ public enum Options {
    */
   ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL,
   /**
-   * When true, always parsing long number into BigDecial, default is false.
+   * When true, always parsing integral number into BigDecial, default is false.
+   *
+   * @since 4.2.0
    */
   ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL,
   /**
@@ -59,6 +61,14 @@ public enum Options {
    * regular-expression pattern matching.
    */
   PUT_CAPTURING_GROUPS_INTO_ENV,
+
+  /**
+   * Whether to capture the function arguments(at invocation) into env, the argument list will be
+   * stored in __args__ variable in env valid for function body. Default is false(disabled).
+   *
+   * @since 4.2.0
+   */
+  CAPTURE_FUNCTION_ARGS,
 
   /**
    * Enable property access syntax sugar, use common-beantuils to access property such as "a.b.c"
@@ -105,24 +115,25 @@ public enum Options {
     public MathContext mathContext;
     public int level;
 
-    public Value(boolean bool) {
+    public Value(final boolean bool) {
       super();
       this.bool = bool;
     }
 
-    public Value(MathContext mathContext) {
+    public Value(final MathContext mathContext) {
       super();
       this.mathContext = mathContext;
     }
 
-    public Value(int level) {
+    public Value(final int level) {
       super();
       this.level = level;
     }
 
     @Override
     public String toString() {
-      return "Value [bool=" + bool + ", mathContext=" + mathContext + ", level=" + level + "]";
+      return "Value [bool=" + this.bool + ", mathContext=" + this.mathContext + ", level="
+          + this.level + "]";
     }
 
 
@@ -134,7 +145,7 @@ public enum Options {
    * @param val
    * @return
    */
-  public Object intoObject(Value val) {
+  public Object intoObject(final Value val) {
     switch (this) {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
@@ -146,6 +157,7 @@ public enum Options {
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
       case DISABLE_ASSIGNMENT:
+      case CAPTURE_FUNCTION_ARGS:
         return val.bool;
       case OPTIMIZE_LEVEL: {
         return val.level;
@@ -162,7 +174,7 @@ public enum Options {
    * @param val
    * @return
    */
-  public Value intoValue(Object val) {
+  public Value intoValue(final Object val) {
     switch (this) {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
@@ -173,6 +185,7 @@ public enum Options {
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
+      case CAPTURE_FUNCTION_ARGS:
       case DISABLE_ASSIGNMENT:
         return ((boolean) val) ? TRUE_VALUE : FALSE_VALUE;
       case OPTIMIZE_LEVEL: {
@@ -189,7 +202,7 @@ public enum Options {
     throw new IllegalArgumentException("Fail to cast value " + val + " for option " + this);
   }
 
-  public boolean isValidValue(Object val) {
+  public boolean isValidValue(final Object val) {
     switch (this) {
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
@@ -201,6 +214,7 @@ public enum Options {
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
       case DISABLE_ASSIGNMENT:
+      case CAPTURE_FUNCTION_ARGS:
         return val instanceof Boolean;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
@@ -228,7 +242,7 @@ public enum Options {
    * @return
    */
   public Object getDefaultValue() {
-    return this.intoObject(this.getDefaultValueObject());
+    return intoObject(getDefaultValueObject());
   }
 
 
@@ -259,6 +273,8 @@ public enum Options {
         return TRUE_VALUE;
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
         return TRUE_VALUE;
+      case CAPTURE_FUNCTION_ARGS:
+        return FALSE_VALUE;
       case DISABLE_ASSIGNMENT:
         return FALSE_VALUE;
     }

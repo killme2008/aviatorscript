@@ -15,26 +15,41 @@
  **/
 package com.googlecode.aviator.lexer.token;
 
+import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.runtime.FunctionArgument;
 
 
 /**
  * Operator token
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class OperatorToken extends AbstractToken<OperatorType> {
 
   private final OperatorType operatorType;
 
+  private List<FunctionArgument> params;
 
-  public OperatorType getOperatorType() {
-    return operatorType;
+
+
+  public List<FunctionArgument> getParams() {
+    return this.params;
   }
 
 
-  public OperatorToken(int startIndex, OperatorType operatorType) {
+  public void setParams(final List<FunctionArgument> params) {
+    this.params = params;
+  }
+
+
+  public OperatorType getOperatorType() {
+    return this.operatorType;
+  }
+
+
+  public OperatorToken(final int startIndex, final OperatorType operatorType) {
     super(startIndex, operatorType.getToken());
     this.operatorType = operatorType;
   }
@@ -47,8 +62,8 @@ public class OperatorToken extends AbstractToken<OperatorType> {
 
 
   @Override
-  public OperatorType getValue(Map<String, Object> env) {
-    return operatorType;
+  public OperatorType getValue(final Map<String, Object> env) {
+    return this.operatorType;
   }
 
 }

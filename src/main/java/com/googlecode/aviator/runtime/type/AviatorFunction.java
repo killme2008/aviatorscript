@@ -20,22 +20,21 @@ import java.util.Map;
 
 /**
  * A aviator function,all functions must implement this interface
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public interface AviatorFunction {
   /**
    * Get the function name
-   * 
+   *
    * @return
    */
   public String getName();
 
-
   /**
    * call function
-   * 
+   *
    * @param env Variable environment
    * @return
    */

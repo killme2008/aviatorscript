@@ -41,7 +41,7 @@ public class ExpressionParserUnitTest {
 
   @Test
   public void testIssue77() {
-    instance.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
+    this.instance.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "'一二三'=~/.*三/"), this.codeGenerator);
     this.parser.parse();
@@ -121,12 +121,54 @@ public class ExpressionParserUnitTest {
     assertEquals("x y + ; x y -", this.codeGenerator.getPostFixExpression());
   }
 
+
+  @Test
+  public void testParseFunctionParams() {
+    this.instance.setOption(Options.CAPTURE_FUNCTION_ARGS, true);
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "println(3+2);4"), this.codeGenerator);
+    this.parser.parse();
+    assertEquals("3 2 + method_invoke<[FunctionParameter [index=0, expression=3+2]]> ; 4",
+        this.codeGenerator.getPostFixExpression());
+
+    {
+      this.codeGenerator = new FakeCodeGenerator();
+      this.parser = new ExpressionParser(this.instance,
+          new ExpressionLexer(this.instance, "println(a,be,cdf,2+3)"), this.codeGenerator);
+      this.parser.parse();
+      assertEquals(
+          "a be cdf 2 3 + method_invoke<[FunctionParameter [index=0, expression=a], FunctionParameter [index=1, expression=be], FunctionParameter [index=2, expression=cdf], FunctionParameter [index=3, expression=2+3]]>",
+          this.codeGenerator.getPostFixExpression());
+    }
+
+    {
+      this.codeGenerator = new FakeCodeGenerator();
+      this.parser = new ExpressionParser(this.instance,
+          new ExpressionLexer(this.instance, "println(a,b,println(c,1+2))"), this.codeGenerator);
+      this.parser.parse();
+      assertEquals(
+          "a b c 1 2 + method_invoke<[FunctionParameter [index=0, expression=c], FunctionParameter [index=1, expression=1+2]]> method_invoke<[FunctionParameter [index=0, expression=a], FunctionParameter [index=1, expression=b], FunctionParameter [index=2, expression=println(c,1+2)]]>",
+          this.codeGenerator.getPostFixExpression());
+    }
+
+    {
+      // function chains
+      this.codeGenerator = new FakeCodeGenerator();
+      this.parser = new ExpressionParser(this.instance,
+          new ExpressionLexer(this.instance, "test(a, ab, c)(d, e)(foo)"), this.codeGenerator);
+      this.parser.parse();
+      assertEquals(
+          "a ab c method_invoke<[FunctionParameter [index=0, expression=a], FunctionParameter [index=1, expression=ab], FunctionParameter [index=2, expression=c]]> d e method_invoke<[FunctionParameter [index=0, expression=d], FunctionParameter [index=1, expression=e]]> foo method_invoke<[FunctionParameter [index=0, expression=foo]]>",
+          this.codeGenerator.getPostFixExpression());
+    }
+  }
+
   @Test
   public void testStatement2() {
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "println(3+2);4"), this.codeGenerator);
     this.parser.parse();
-    assertEquals("3 2 + method<invoked> ; 4", this.codeGenerator.getPostFixExpression());
+    assertEquals("3 2 + method_invoke<> ; 4", this.codeGenerator.getPostFixExpression());
   }
 
   @Test(expected = ExpressionSyntaxErrorException.class)
@@ -241,91 +283,91 @@ public class ExpressionParserUnitTest {
     this.parser.parse();
     assertEquals("1 3 +", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "1+3-2"),
         this.codeGenerator);
     this.parser.parse();
     assertEquals("1 3 + 2 -", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "1+3-2/5"),
         this.codeGenerator);
     this.parser.parse();
     assertEquals("1 3 + 2 5 / -", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "6==3"),
         this.codeGenerator);
     this.parser.parse();
     assertEquals("6 3 ==", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "6>=3 && c==d.a"), this.codeGenerator);
     this.parser.parse();
     assertEquals("6 3 >= c d.a == &&", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "6>=3 && c==d.a || 0.3<4"), this.codeGenerator);
     this.parser.parse();
     assertEquals("6 3 >= c d.a == && 0.3 4 < ||", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "!true"),
         this.codeGenerator);
     this.parser.parse();
     assertEquals("true !", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "!a && 3==1"), this.codeGenerator);
     this.parser.parse();
     assertEquals("a ! 3 1 == &&", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "-a+2010"),
         this.codeGenerator);
     this.parser.parse();
     assertEquals("a - 2010 +", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "3&2^1|4 == 5"), this.codeGenerator);
     this.parser.parse();
     assertEquals("3 2 & 1 ^ 4 5 == |", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "3^2&3|4&~1"), this.codeGenerator);
     this.parser.parse();
     assertEquals("3 2 3 & ^ 4 1 ~ & |", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "true || 2&1==0 ? 1 :0"), this.codeGenerator);
     this.parser.parse();
     assertEquals("true 2 1 0 == & || 1 0 ?:", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "3+4>>1"),
         this.codeGenerator);
     this.parser.parse();
     assertEquals("3 4 + 1 >>", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "3-4>>1"),
         this.codeGenerator);
     this.parser.parse();
     assertEquals("3 4 - 1 >>", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "3-4<<1==0"), this.codeGenerator);
     this.parser.parse();
     assertEquals("3 4 - 1 << 0 ==", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "3-4<<1&3"), this.codeGenerator);
     this.parser.parse();
@@ -346,7 +388,7 @@ public class ExpressionParserUnitTest {
     this.parser.parse();
     assertEquals("3 5 2 + -", this.codeGenerator.getPostFixExpression());
 
-    this.resetCodeGenerator();
+    resetCodeGenerator();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "6>=3 && (c==d.a || 0.3<4)"), this.codeGenerator);
     this.parser.parse();
@@ -477,33 +519,33 @@ public class ExpressionParserUnitTest {
 
   @Test
   public void testCommonPattern() {
-    this.matchPattern("^\\d+$");
-    this.matchPattern("^[0-9]*[1-9][0-9]*$");
+    matchPattern("^\\d+$");
+    matchPattern("^[0-9]*[1-9][0-9]*$");
 
-    this.matchPattern("^((-\\d+) ?(0+))$");
-    this.matchPattern("^-[0-9]*[1-9][0-9]*$");
-    this.matchPattern("^-?\\d+$");
-    this.matchPattern("^\\d+(\\.\\d+)?$");
-    this.matchPattern(
+    matchPattern("^((-\\d+) ?(0+))$");
+    matchPattern("^-[0-9]*[1-9][0-9]*$");
+    matchPattern("^-?\\d+$");
+    matchPattern("^\\d+(\\.\\d+)?$");
+    matchPattern(
         "^(([0-9]+\\.[0-9]*[1-9][0-9]*) ?([0-9]*[1-9][0-9]*\\.[0-9]+) ?([0-9]*[1-9][0-9]*))$");
-    this.matchPattern("^((-\\d+(\\.\\d+)?) ?(0+(\\.0+)?))$");
-    this.matchPattern(
+    matchPattern("^((-\\d+(\\.\\d+)?) ?(0+(\\.0+)?))$");
+    matchPattern(
         "^(-(([0-9]+\\.[0-9]*[1-9][0-9]*) ?([0-9]*[1-9][0-9]*\\.[0-9]+) ?([0-9]*[1-9][0-9]*)))$");
-    this.matchPattern("^(-?\\d+)(\\.\\d+)?$");
-    this.matchPattern("^[A-Za-z]+$");
-    this.matchPattern("^[A-Z]+$");
-    this.matchPattern("^[a-z]+$");
-    this.matchPattern("^[A-Za-z0-9]+$");
-    this.matchPattern("^\\w+$");
-    this.matchPattern("^[\\w-]+(\\.[\\w-]+)*@[\\w-]+(\\.[\\w-]+)+$");
-    this.matchPattern("^[a-zA-z]+:\\/\\/(\\w+(-\\w+)*)(\\.(\\w+(-\\w+)*))*(\\?\\S*)?$");
-    this.matchPattern("[\u4e00-\u9fa5]");
-    this.matchPattern("[^\\x00-\\xff]");
-    this.matchPattern("^\\x00-\\xff]");
-    this.matchPattern("\\n[\\s ? ]*\\r");
-    this.matchPattern("<(.*)>.*<\\/\\1>?<(.*)\\/>");
-    this.matchPattern("(^\\s*)?(\\s*$)");
-    this.matchPattern("[A-Z][a-z][a-z] [0-9][0-9]*, [0-9]\\{4\\}");
+    matchPattern("^(-?\\d+)(\\.\\d+)?$");
+    matchPattern("^[A-Za-z]+$");
+    matchPattern("^[A-Z]+$");
+    matchPattern("^[a-z]+$");
+    matchPattern("^[A-Za-z0-9]+$");
+    matchPattern("^\\w+$");
+    matchPattern("^[\\w-]+(\\.[\\w-]+)*@[\\w-]+(\\.[\\w-]+)+$");
+    matchPattern("^[a-zA-z]+:\\/\\/(\\w+(-\\w+)*)(\\.(\\w+(-\\w+)*))*(\\?\\S*)?$");
+    matchPattern("[\u4e00-\u9fa5]");
+    matchPattern("[^\\x00-\\xff]");
+    matchPattern("^\\x00-\\xff]");
+    matchPattern("\\n[\\s ? ]*\\r");
+    matchPattern("<(.*)>.*<\\/\\1>?<(.*)\\/>");
+    matchPattern("(^\\s*)?(\\s*$)");
+    matchPattern("[A-Z][a-z][a-z] [0-9][0-9]*, [0-9]\\{4\\}");
   }
 
 
@@ -516,7 +558,7 @@ public class ExpressionParserUnitTest {
   }
 
 
-  private void matchPattern(String pattern) {
+  private void matchPattern(final String pattern) {
     this.codeGenerator.reset();
     this.parser = new ExpressionParser(this.instance,
         new ExpressionLexer(this.instance, "/" + pattern + "/"), this.codeGenerator);
@@ -660,7 +702,7 @@ public class ExpressionParserUnitTest {
         this.codeGenerator);
     this.parser.parse();
 
-    assertEquals("hello fuck method<invoked>", this.codeGenerator.getPostFixExpression());
+    assertEquals("hello fuck method_invoke<>", this.codeGenerator.getPostFixExpression());
 
   }
 
@@ -671,7 +713,7 @@ public class ExpressionParserUnitTest {
         new ExpressionLexer(this.instance, "map(list,println)"), this.codeGenerator);
     this.parser.parse();
 
-    assertEquals("list println method<invoked>", this.codeGenerator.getPostFixExpression());
+    assertEquals("list println method_invoke<>", this.codeGenerator.getPostFixExpression());
 
   }
 
@@ -682,7 +724,7 @@ public class ExpressionParserUnitTest {
         new ExpressionLexer(this.instance, "reduce(list,-,0)"), this.codeGenerator);
     this.parser.parse();
 
-    assertEquals("list - 0 method<invoked>", this.codeGenerator.getPostFixExpression());
+    assertEquals("list - 0 method_invoke<>", this.codeGenerator.getPostFixExpression());
 
   }
 
@@ -694,7 +736,7 @@ public class ExpressionParserUnitTest {
         this.codeGenerator);
     this.parser.parse();
 
-    assertEquals("hello 3 4 method<invoked> hello 1 method<invoked> method<invoked> 3 2 > &&",
+    assertEquals("hello 3 4 method_invoke<> hello 1 method_invoke<> method_invoke<> 3 2 > &&",
         this.codeGenerator.getPostFixExpression());
 
   }

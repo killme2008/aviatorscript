@@ -65,4 +65,10 @@ public final class RuntimeUtils {
     return getInstance(env).getFunction(name);
   }
 
+  public static void printStackTrace(final Map<String, Object> env, final Exception e) {
+    if (isTracedEval(env)) {
+      e.printStackTrace();
+    }
+  }
+
 }

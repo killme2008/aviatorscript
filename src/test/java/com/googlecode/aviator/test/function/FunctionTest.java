@@ -37,7 +37,12 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.type.AviatorNil;
+import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
 
 
@@ -69,6 +74,77 @@ public class FunctionTest {
     assertEquals(0, AviatorEvaluator.execute("1-100%3"));
     assertEquals(100 % 3 * 4.2 + (37 + 95) / (6 * 3 - 18.0),
         (Double) AviatorEvaluator.execute("100%3*4.2+(37+95)/(6*3-18.0)"), 0.0001);
+  }
+
+  @Test
+  public void testCaptureFunctionParams1() {
+    try {
+      AviatorEvaluator.setOption(Options.CAPTURE_FUNCTION_ARGS, true);
+
+      List<FunctionArgument> params = (List<FunctionArgument>) AviatorEvaluator
+          .execute("f = lambda(a,bc, d) -> __args__ end; f(1,2,100+2)");
+
+      assertEquals(3, params.size());
+
+      System.out.println(params);
+
+      assertEquals(0, params.get(0).getIndex());
+      assertEquals("1", params.get(0).getExpression());
+      assertEquals(1, params.get(1).getIndex());
+      assertEquals("2", params.get(1).getExpression());
+      assertEquals(2, params.get(2).getIndex());
+      assertEquals("100+2", params.get(2).getExpression());
+    } finally {
+      AviatorEvaluator.setOption(Options.CAPTURE_FUNCTION_ARGS, false);
+    }
+  }
+
+  private static class CustomFunction extends AbstractFunction {
+
+    List<FunctionArgument> args;
+
+    @Override
+    public String getName() {
+      return "myadd";
+    }
+
+    @Override
+    public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+        final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4) {
+      this.args = FunctionUtils.getFunctionArguments(env);
+      return AviatorNil.NIL;
+    }
+
+  }
+
+  @Test
+  public void testCaptureFunctionParams2() {
+    CustomFunction function = new CustomFunction();
+    try {
+      AviatorEvaluator.setOption(Options.CAPTURE_FUNCTION_ARGS, true);
+
+      AviatorEvaluator.addFunction(function);
+
+      AviatorEvaluator.execute("myadd(sum,a,'hello', 4+100)");
+
+      List<FunctionArgument> args = function.args;
+      assertNotNull(args);
+      assertEquals(4, args.size());
+
+      System.out.println(args);
+
+      assertEquals(0, args.get(0).getIndex());
+      assertEquals("sum", args.get(0).getExpression());
+      assertEquals(1, args.get(1).getIndex());
+      assertEquals("a", args.get(1).getExpression());
+      assertEquals(2, args.get(2).getIndex());
+      assertEquals("'hello'", args.get(2).getExpression());
+      assertEquals(3, args.get(3).getIndex());
+      assertEquals("4+100", args.get(3).getExpression());
+    } finally {
+      AviatorEvaluator.setOption(Options.CAPTURE_FUNCTION_ARGS, false);
+      AviatorEvaluator.removeFunction(function);
+    }
   }
 
 
@@ -901,7 +977,7 @@ public class FunctionTest {
   }
 
 
-  private List newList(Object... args) {
+  private List newList(final Object... args) {
     List list = new ArrayList<>();
     for (Object obj : args) {
       list.add(obj);
@@ -909,7 +985,7 @@ public class FunctionTest {
     return list;
   }
 
-  private Set newSet(Object... args) {
+  private Set newSet(final Object... args) {
     Set list = new HashSet<>();
     for (Object obj : args) {
       list.add(obj);
@@ -946,7 +1022,32 @@ public class FunctionTest {
     }
   }
 
+  @Test
+  public void testSeqContainsKey() {
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(seq.map(1,2,3,4), 1)"));
+    assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(seq.map(1,2,3,4), 2)"));
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(seq.map(1,2,3,4), 3)"));
+    assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(seq.map(1,2,3,4), 10)"));
 
+    Map<Object, Object> map = new HashMap<>();
+    map.put("hello", 2L);
+    map.put(3L, 4L);
+    map.put("world", null);
+
+    Map<String, Object> env = new HashMap<>();
+    env.put("m", map);
+
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(m, 'hello')", env));
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(m, 'world')", env));
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(m, 3)", env));
+    assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(m, 'test')", env));
+    assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(m, -1)", env));
+  }
+
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testSeqContainsKeyWrongType() {
+    AviatorEvaluator.execute("seq.contains_key(seq.list(), 'hello')");
+  }
 
   @Test
   public void testSeqNewMap() {
@@ -981,6 +1082,17 @@ public class FunctionTest {
     assertEquals(4, AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 3)"));
     assertEquals(null, AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 4)"));
     assertEquals("b", AviatorEvaluator.execute("seq.get(seq.map(1,2,3,4,'a','b'), 'a')"));
+  }
+
+  @Test
+  public void testIssue134() {
+    Map<String, Object> env = new HashMap<>(2);
+    env.put("v", 3);
+    assertEquals(3, AviatorEvaluator
+        .execute("func=lambda(v)->v+2 end;func2=lambda(v)->func(v) end;func(1) ; func2(1)", env));
+    assertEquals(6, AviatorEvaluator.execute(
+        "func=lambda(v)->v+2 end;func2=lambda(v)->func(v) end; func3 = lambda(v) -> func(v) + func2(v) end; func(1); func2(1);func3(1)",
+        env));
   }
 
   @Test
@@ -1062,39 +1174,39 @@ public class FunctionTest {
     private Integer age;
     private String name;
 
-    public User(Long id, Integer age, String name) {
+    public User(final Long id, final Integer age, final String name) {
       this.id = id;
       this.age = age;
       this.name = name;
     }
 
     public Long getId() {
-      return id;
+      return this.id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
       this.id = id;
     }
 
     public Integer getAge() {
-      return age;
+      return this.age;
     }
 
-    public void setAge(Integer age) {
+    public void setAge(final Integer age) {
       this.age = age;
     }
 
     public String getName() {
-      return name;
+      return this.name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
       this.name = name;
     }
 
     @Override
     public String toString() {
-      return "User{" + "id=" + id + ", age=" + age + ", name='" + name + '\'' + '}';
+      return "User{" + "id=" + this.id + ", age=" + this.age + ", name='" + this.name + '\'' + '}';
     }
   }
 }
