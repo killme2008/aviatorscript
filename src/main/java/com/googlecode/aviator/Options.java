@@ -63,8 +63,8 @@ public enum Options {
   PUT_CAPTURING_GROUPS_INTO_ENV,
 
   /**
-   * Whether to capture the function arguments(invocation) into env, the parameter list will be
-   * stored in __args__ variable in function body. Default is false(disabled).
+   * Whether to capture the function arguments(at invocation) into env, the argument list will be
+   * stored in __args__ variable in env valid for function body. Default is false(disabled).
    *
    * @since 4.2.0
    */

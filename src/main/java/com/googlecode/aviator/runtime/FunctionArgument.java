@@ -1,8 +1,9 @@
 package com.googlecode.aviator.runtime;
 
 /**
- * A function parameter
+ * A function argument.
  *
+ * @since 4.2.0
  * @author dennis(killme2008@gmail.com)
  *
  */
