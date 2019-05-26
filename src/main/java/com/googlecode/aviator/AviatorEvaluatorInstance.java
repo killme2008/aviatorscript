@@ -51,6 +51,7 @@ import com.googlecode.aviator.runtime.function.math.MathTanFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
+import com.googlecode.aviator.runtime.function.seq.SeqContainsKeyFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCountFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqEveryFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
@@ -134,11 +135,11 @@ public final class AviatorEvaluatorInstance {
    * @since 4.0.0
    * @param loader
    */
-  public void addFunctionLoader(FunctionLoader loader) {
+  public void addFunctionLoader(final FunctionLoader loader) {
     if (this.functionLoaders == null) {
-      functionLoaders = new ArrayList<FunctionLoader>();
+      this.functionLoaders = new ArrayList<FunctionLoader>();
     }
-    functionLoaders.add(loader);
+    this.functionLoaders.add(loader);
   }
 
   /**
@@ -147,7 +148,7 @@ public final class AviatorEvaluatorInstance {
    * @since 4.0.0
    * @param loader
    */
-  public void removeFunctionLoader(FunctionLoader loader) {
+  public void removeFunctionLoader(final FunctionLoader loader) {
     if (this.functionLoaders == null) {
       return;
     }
@@ -162,7 +163,7 @@ public final class AviatorEvaluatorInstance {
    * @param opt
    * @param val
    */
-  public void setOption(Options opt, Object val) {
+  public void setOption(final Options opt, final Object val) {
     if (opt == null || val == null) {
       throw new IllegalArgumentException("Option and value should not be null.");
     }
@@ -183,8 +184,8 @@ public final class AviatorEvaluatorInstance {
    */
   @Deprecated
   @SuppressWarnings("unchecked")
-  public <T> T getOption(Options opt) {
-    Value val = options.get(opt);
+  public <T> T getOption(final Options opt) {
+    Value val = this.options.get(opt);
     if (val == null) {
       val = opt.getDefaultValueObject();
     }
@@ -198,8 +199,8 @@ public final class AviatorEvaluatorInstance {
    * @param opt
    * @return
    */
-  public Value getOptionValue(Options opt) {
-    Value val = options.get(opt);
+  public Value getOptionValue(final Options opt) {
+    Value val = this.options.get(opt);
     assert (val != null);
     return val;
   }
@@ -211,7 +212,7 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public int getBytecodeVersion() {
-    return bytecodeVersion;
+    return this.bytecodeVersion;
   }
 
 
@@ -221,7 +222,7 @@ public final class AviatorEvaluatorInstance {
    * @see Opcodes#V1_6
    * @param bytecodeVersion
    */
-  public void setBytecodeVersion(int bytecodeVersion) {
+  public void setBytecodeVersion(final int bytecodeVersion) {
     this.bytecodeVersion = bytecodeVersion;
   }
 
@@ -246,7 +247,7 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Map<String, Object> getFuncMap() {
-    return funcMap;
+    return this.funcMap;
   }
 
 
@@ -256,7 +257,7 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Map<OperatorType, AviatorFunction> getOpsMap() {
-    return opsMap;
+    return this.opsMap;
   }
 
 
@@ -266,7 +267,7 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public OutputStream getTraceOutputStream() {
-    return traceOutputStream;
+    return this.traceOutputStream;
   }
 
 
@@ -275,19 +276,20 @@ public final class AviatorEvaluatorInstance {
    *
    * @param traceOutputStream
    */
-  public void setTraceOutputStream(OutputStream traceOutputStream) {
+  public void setTraceOutputStream(final OutputStream traceOutputStream) {
     this.traceOutputStream = traceOutputStream;
   }
 
   {
-    aviatorClassLoader = AccessController.doPrivileged(new PrivilegedAction<AviatorClassLoader>() {
+    this.aviatorClassLoader =
+        AccessController.doPrivileged(new PrivilegedAction<AviatorClassLoader>() {
 
-      @Override
-      public AviatorClassLoader run() {
-        return new AviatorClassLoader(AviatorEvaluatorInstance.class.getClassLoader());
-      }
+          @Override
+          public AviatorClassLoader run() {
+            return new AviatorClassLoader(AviatorEvaluatorInstance.class.getClassLoader());
+          }
 
-    });
+        });
   }
 
   private final Map<String, Object> funcMap = new HashMap<String, Object>();
@@ -363,6 +365,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new SeqFilterFunction());
     addFunction(new SeqSortFunction());
     addFunction(new SeqIncludeFunction());
+    addFunction(new SeqContainsKeyFunction());
     addFunction(new SeqCountFunction());
     addFunction(new SeqEveryFunction());
     addFunction(new SeqNotAnyFunction());
@@ -398,10 +401,10 @@ public final class AviatorEvaluatorInstance {
    * Create a aviator evaluator instance.
    */
   AviatorEvaluatorInstance() {
-    this.loadLib();
-    this.addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
+    loadLib();
+    addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
     for (Options opt : Options.values()) {
-      options.put(opt, opt.getDefaultValueObject());
+      this.options.put(opt, opt.getDefaultValueObject());
     }
   }
 
@@ -409,7 +412,7 @@ public final class AviatorEvaluatorInstance {
    * Clear all cached compiled expression
    */
   public void clearExpressionCache() {
-    cacheExpressions.clear();
+    this.cacheExpressions.clear();
   }
 
 
@@ -428,9 +431,9 @@ public final class AviatorEvaluatorInstance {
    *
    * @return
    */
-  public AviatorClassLoader getAviatorClassLoader(boolean cached) {
+  public AviatorClassLoader getAviatorClassLoader(final boolean cached) {
     if (cached) {
-      return aviatorClassLoader;
+      return this.aviatorClassLoader;
     } else {
       return new AviatorClassLoader(Thread.currentThread().getContextClassLoader());
     }
@@ -442,7 +445,7 @@ public final class AviatorEvaluatorInstance {
    *
    * @param function
    */
-  public void addFunction(AviatorFunction function) {
+  public void addFunction(final AviatorFunction function) {
     final String name = function.getName();
     addFunction(name, function);
   }
@@ -453,15 +456,15 @@ public final class AviatorEvaluatorInstance {
    * @param name
    * @param function
    */
-  public void addFunction(final String name, AviatorFunction function) {
+  public void addFunction(final String name, final AviatorFunction function) {
     if ("lambda".equals(name)) {
       throw new IllegalArgumentException("Invalid function name, lambda is a keyword.");
     }
-    if (funcMap.containsKey(name)) {
+    if (this.funcMap.containsKey(name)) {
       System.out.println("[Aviator WARN] The function '" + name
           + "' is already exists, but is replaced with new one.");
     }
-    funcMap.put(name, function);
+    this.funcMap.put(name, function);
   }
 
   /**
@@ -471,7 +474,7 @@ public final class AviatorEvaluatorInstance {
    * @param expression the expression to be executed and it's result must be a function.
    * @since 4.0.0
    */
-  public void defineFunction(String name, String expression) {
+  public void defineFunction(final String name, final String expression) {
     this.defineFunction(name, expression, null);
   }
 
@@ -483,7 +486,8 @@ public final class AviatorEvaluatorInstance {
    * @param env the expression execution env
    * @since 4.0.0
    */
-  public void defineFunction(String name, String expression, Map<String, Object> env) {
+  public void defineFunction(final String name, final String expression,
+      final Map<String, Object> env) {
     AviatorFunction function = (AviatorFunction) this.execute(expression, env);
     this.addFunction(name, function);
   }
@@ -495,8 +499,8 @@ public final class AviatorEvaluatorInstance {
    * @param name
    * @return
    */
-  public AviatorFunction removeFunction(String name) {
-    return (AviatorFunction) funcMap.remove(name);
+  public AviatorFunction removeFunction(final String name) {
+    return (AviatorFunction) this.funcMap.remove(name);
   }
 
 
@@ -507,9 +511,9 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public AviatorFunction getFunction(final String name) {
-    AviatorFunction function = (AviatorFunction) funcMap.get(name);
-    if (function == null && functionLoaders != null) {
-      for (FunctionLoader loader : functionLoaders) {
+    AviatorFunction function = (AviatorFunction) this.funcMap.get(name);
+    if (function == null && this.functionLoaders != null) {
+      for (FunctionLoader loader : this.functionLoaders) {
         if (loader != null) {
           function = loader.onFunctionNotFound(name);
         }
@@ -530,8 +534,8 @@ public final class AviatorEvaluatorInstance {
    *
    * @param function
    */
-  public void addOpFunction(OperatorType opType, AviatorFunction function) {
-    opsMap.put(opType, function);
+  public void addOpFunction(final OperatorType opType, final AviatorFunction function) {
+    this.opsMap.put(opType, function);
   }
 
 
@@ -543,8 +547,8 @@ public final class AviatorEvaluatorInstance {
    * @param opType
    * @return
    */
-  public AviatorFunction getOpFunction(OperatorType opType) {
-    return opsMap.get(opType);
+  public AviatorFunction getOpFunction(final OperatorType opType) {
+    return this.opsMap.get(opType);
   }
 
   /**
@@ -554,8 +558,8 @@ public final class AviatorEvaluatorInstance {
    * @param opType
    * @return
    */
-  public AviatorFunction removeOpFunction(OperatorType opType) {
-    return opsMap.remove(opType);
+  public AviatorFunction removeOpFunction(final OperatorType opType) {
+    return this.opsMap.remove(opType);
   }
 
 
@@ -565,8 +569,8 @@ public final class AviatorEvaluatorInstance {
    * @param name
    * @return
    */
-  public boolean containsFunction(String name) {
-    return funcMap.containsKey(name);
+  public boolean containsFunction(final String name) {
+    return this.funcMap.containsKey(name);
   }
 
   /**
@@ -575,7 +579,7 @@ public final class AviatorEvaluatorInstance {
    * @param function
    * @return
    */
-  public AviatorFunction removeFunction(AviatorFunction function) {
+  public AviatorFunction removeFunction(final AviatorFunction function) {
     return removeFunction(function.getName());
   }
 
@@ -586,8 +590,8 @@ public final class AviatorEvaluatorInstance {
    * @param expression
    * @return
    */
-  public Expression getCachedExpression(String expression) {
-    FutureTask<Expression> task = cacheExpressions.get(expression);
+  public Expression getCachedExpression(final String expression) {
+    FutureTask<Expression> task = this.cacheExpressions.get(expression);
     if (task != null) {
       return getCompiledExpression(expression, task);
     } else {
@@ -602,8 +606,8 @@ public final class AviatorEvaluatorInstance {
    * @return
    * @since 4.0.0
    */
-  public boolean isExpressionCached(String expression) {
-    return this.getCachedExpression(expression) != null;
+  public boolean isExpressionCached(final String expression) {
+    return getCachedExpression(expression) != null;
   }
 
   /**
@@ -631,7 +635,7 @@ public final class AviatorEvaluatorInstance {
     }
 
     if (cached) {
-      FutureTask<Expression> task = cacheExpressions.get(expression);
+      FutureTask<Expression> task = this.cacheExpressions.get(expression);
       if (task != null) {
         return getCompiledExpression(expression, task);
       }
@@ -642,7 +646,7 @@ public final class AviatorEvaluatorInstance {
         }
 
       });
-      FutureTask<Expression> existedTask = cacheExpressions.putIfAbsent(expression, task);
+      FutureTask<Expression> existedTask = this.cacheExpressions.putIfAbsent(expression, task);
       if (existedTask == null) {
         existedTask = task;
         existedTask.run();
@@ -656,17 +660,18 @@ public final class AviatorEvaluatorInstance {
   }
 
 
-  private Expression getCompiledExpression(final String expression, FutureTask<Expression> task) {
+  private Expression getCompiledExpression(final String expression,
+      final FutureTask<Expression> task) {
     try {
       return task.get();
     } catch (Exception e) {
-      cacheExpressions.remove(expression);
+      this.cacheExpressions.remove(expression);
       throw new CompileExpressionErrorException("Compile expression failure:" + expression, e);
     }
   }
 
 
-  private Expression innerCompile(final String expression, boolean cached) {
+  private Expression innerCompile(final String expression, final boolean cached) {
     ExpressionLexer lexer = new ExpressionLexer(this, expression);
     CodeGenerator codeGenerator = newCodeGenerator(cached);
     ExpressionParser parser = new ExpressionParser(this, lexer, codeGenerator);
@@ -682,21 +687,21 @@ public final class AviatorEvaluatorInstance {
   }
 
 
-  public CodeGenerator newCodeGenerator(boolean cached) {
+  public CodeGenerator newCodeGenerator(final boolean cached) {
     AviatorClassLoader classLoader = getAviatorClassLoader(cached);
     return newCodeGenerator(classLoader);
 
   }
 
-  public CodeGenerator newCodeGenerator(AviatorClassLoader classLoader) {
+  public CodeGenerator newCodeGenerator(final AviatorClassLoader classLoader) {
     switch (getOptimizeLevel()) {
       case AviatorEvaluator.COMPILE:
         ASMCodeGenerator asmCodeGenerator = new ASMCodeGenerator(this, classLoader,
-            traceOutputStream, getOptionValue(Options.TRACE).bool);
+            this.traceOutputStream, getOptionValue(Options.TRACE).bool);
         asmCodeGenerator.start();
         return asmCodeGenerator;
       case AviatorEvaluator.EVAL:
-        return new OptimizeCodeGenerator(this, classLoader, traceOutputStream,
+        return new OptimizeCodeGenerator(this, classLoader, this.traceOutputStream,
             getOptionValue(Options.TRACE).bool);
       default:
         throw new IllegalArgumentException("Unknow option " + getOptimizeLevel());
@@ -710,7 +715,7 @@ public final class AviatorEvaluatorInstance {
    * @param expression
    * @return
    */
-  public Expression compile(String expression) {
+  public Expression compile(final String expression) {
     return compile(expression, false);
   }
 
@@ -723,7 +728,7 @@ public final class AviatorEvaluatorInstance {
    * @param values
    * @return
    */
-  public Object exec(String expression, Object... values) {
+  public Object exec(final String expression, final Object... values) {
     if (getOptimizeLevel() != AviatorEvaluator.EVAL) {
       throw new IllegalStateException("Aviator evaluator is not in EVAL mode.");
     }
@@ -757,7 +762,8 @@ public final class AviatorEvaluatorInstance {
    * @param env Binding variable environment
    * @param cached Whether to cache the compiled result,make true to cache it.
    */
-  public Object execute(String expression, Map<String, Object> env, boolean cached) {
+  public Object execute(final String expression, final Map<String, Object> env,
+      final boolean cached) {
     Expression compiledExpression = compile(expression, cached);
     if (compiledExpression != null) {
       return compiledExpression.execute(env);
@@ -774,7 +780,7 @@ public final class AviatorEvaluatorInstance {
    * @param env
    * @return
    */
-  public Object execute(String expression, Map<String, Object> env) {
+  public Object execute(final String expression, final Map<String, Object> env) {
     return execute(expression, env, false);
   }
 
@@ -784,8 +790,8 @@ public final class AviatorEvaluatorInstance {
    *
    * @param expression
    */
-  public void invalidateCache(String expression) {
-    cacheExpressions.remove(expression);
+  public void invalidateCache(final String expression) {
+    this.cacheExpressions.remove(expression);
   }
 
 
@@ -795,7 +801,7 @@ public final class AviatorEvaluatorInstance {
    * @param expression
    * @return
    */
-  public Object execute(String expression) {
+  public Object execute(final String expression) {
     return execute(expression, (Map<String, Object>) null);
   }
 }

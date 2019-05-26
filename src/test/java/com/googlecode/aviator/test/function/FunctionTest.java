@@ -1022,7 +1022,32 @@ public class FunctionTest {
     }
   }
 
+  @Test
+  public void testSeqContainsKey() {
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(seq.map(1,2,3,4), 1)"));
+    assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(seq.map(1,2,3,4), 2)"));
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(seq.map(1,2,3,4), 3)"));
+    assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(seq.map(1,2,3,4), 10)"));
 
+    Map<Object, Object> map = new HashMap<>();
+    map.put("hello", 2L);
+    map.put(3L, 4L);
+    map.put("world", null);
+
+    Map<String, Object> env = new HashMap<>();
+    env.put("m", map);
+
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(m, 'hello')", env));
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(m, 'world')", env));
+    assertEquals(Boolean.TRUE, AviatorEvaluator.execute("seq.contains_key(m, 3)", env));
+    assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(m, 'test')", env));
+    assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(m, -1)", env));
+  }
+
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testSeqContainsKeyWrongType() {
+    AviatorEvaluator.execute("seq.contains_key(seq.list(), 'hello')");
+  }
 
   @Test
   public void testSeqNewMap() {

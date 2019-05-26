@@ -15,24 +15,22 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
 import java.util.Map;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 
 /**
- * include(seq,obj) function to check if seq contains object
+ * seq.contains_key(map,key) function to check if seq(should be map) contains the key.
  *
  * @author dennis
  *
  */
-public class SeqIncludeFunction extends AbstractFunction {
+public class SeqContainsKeyFunction extends AbstractFunction {
 
+  @SuppressWarnings("rawtypes")
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {
@@ -41,46 +39,23 @@ public class SeqIncludeFunction extends AbstractFunction {
       throw new NullPointerException("null seq");
     }
     Class<?> clazz = first.getClass();
-    boolean contains = false;
-    if (Collection.class.isAssignableFrom(clazz)) {
-      Collection<?> seq = (Collection<?>) first;
+    if (Map.class.isAssignableFrom(clazz)) {
+      Map seq = (Map) first;
       try {
-        for (Object obj : seq) {
-          if (new AviatorRuntimeJavaType(obj).compare(arg2, env) == 0) {
-            contains = true;
-            break;
-          }
-        }
-      } catch (Exception e) {
-        RuntimeUtils.printStackTrace(env, e);
-        return AviatorBoolean.FALSE;
-      }
-    } else if (clazz.isArray()) {
-      // Object[] seq = (Object[]) first;
-      try {
-        int length = Array.getLength(first);
-        for (int i = 0; i < length; i++) {
-          Object obj = Array.get(first, i);
-          if (new AviatorRuntimeJavaType(obj).compare(arg2, env) == 0) {
-            contains = true;
-            break;
-          }
-        }
+        return AviatorBoolean.valueOf(seq.containsKey(arg2.getValue(env)));
       } catch (Exception e) {
         RuntimeUtils.printStackTrace(env, e);
         return AviatorBoolean.FALSE;
       }
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
+      throw new IllegalArgumentException(arg1.desc(env) + " is not a map.");
     }
-
-    return AviatorBoolean.valueOf(contains);
   }
 
 
   @Override
   public String getName() {
-    return "include";
+    return "seq.contains_key";
   }
 
 }

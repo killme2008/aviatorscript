@@ -118,20 +118,14 @@ public class Env implements Map<String, Object> {
 
   /**
    * Check if a key has a defined value. This will return <code>true</code> if the key is present in
-   * the overrides map with a non-null value, or if the key is not present in the overrides map but
-   * is present in the defaults map.
+   * the overrides map or the defaults map.
    *
    * @param key
    * @return <code>true</code> if key defined, <code>false</code> if not
    */
   @Override
   public boolean containsKey(final Object key) {
-    Map<String, Object> overrides = getmOverrides(true);
-    if (overrides.containsKey(key)) {
-      return overrides.get(key) != null;
-    } else {
-      return this.mDefaults.containsKey(key);
-    }
+    return getmOverrides(true).containsKey(key) || this.mDefaults.containsKey(key);
   }
 
   /**
