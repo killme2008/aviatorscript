@@ -33,6 +33,7 @@ import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.Variable;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
 
 /**
  * Expression execute environment.Modifed from ChainedMap in jibx.
@@ -56,14 +57,14 @@ public class Env implements Map<String, Object> {
   private Map<String, Object> mOverrides;
 
   public Map<String, Object> getDefaults() {
-    return mDefaults;
+    return this.mDefaults;
   }
 
   public AviatorEvaluatorInstance getInstance() {
-    return instance;
+    return this.instance;
   }
 
-  public void setInstance(AviatorEvaluatorInstance instance) {
+  public void setInstance(final AviatorEvaluatorInstance instance) {
     this.instance = instance;
   }
 
@@ -71,11 +72,14 @@ public class Env implements Map<String, Object> {
 
   private Map<String, String> capturedVars;
 
-  public void capture(String var, String expression) {
-    if (capturedVars == null) {
-      capturedVars = new HashMap<>();
+  public void capture(final String var, final String expression) {
+    if (var.equals(Variable.FUNC_ARGS_VAR)) {
+      return;
     }
-    capturedVars.put(var, expression);
+    if (this.capturedVars == null) {
+      this.capturedVars = new HashMap<>();
+    }
+    this.capturedVars.put(var, expression);
   }
 
   /**
@@ -90,13 +94,13 @@ public class Env implements Map<String, Object> {
    *
    * @param defaults map providing defaults for keys not set directly
    */
-  public Env(Map<String, Object> defaults) {
-    mDefaults = defaults;
+  public Env(final Map<String, Object> defaults) {
+    this.mDefaults = defaults;
   }
 
-  public Env(Map<String, Object> defaults, Map<String, Object> overrides) {
-    mDefaults = defaults;
-    mOverrides = overrides;
+  public Env(final Map<String, Object> defaults, final Map<String, Object> overrides) {
+    this.mDefaults = defaults;
+    this.mOverrides = overrides;
   }
 
   /**
@@ -104,11 +108,11 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public void clear() {
-    if (mDefaults != EMPTY_ENV) {
-      mDefaults.clear();
+    if (this.mDefaults != EMPTY_ENV) {
+      this.mDefaults.clear();
     }
-    if (mOverrides != null && mOverrides != EMPTY_ENV) {
-      mOverrides.clear();
+    if (this.mOverrides != null && this.mOverrides != EMPTY_ENV) {
+      this.mOverrides.clear();
     }
   }
 
@@ -121,12 +125,12 @@ public class Env implements Map<String, Object> {
    * @return <code>true</code> if key defined, <code>false</code> if not
    */
   @Override
-  public boolean containsKey(Object key) {
+  public boolean containsKey(final Object key) {
     Map<String, Object> overrides = getmOverrides(true);
     if (overrides.containsKey(key)) {
       return overrides.get(key) != null;
     } else {
-      return mDefaults.containsKey(key);
+      return this.mDefaults.containsKey(key);
     }
   }
 
@@ -137,8 +141,8 @@ public class Env implements Map<String, Object> {
    * @return <code>true</code> if value present as an override, <code>false</code> if not
    */
   @Override
-  public boolean containsValue(Object value) {
-    return getmOverrides(true).containsValue(value) || mDefaults.containsValue(value);
+  public boolean containsValue(final Object value) {
+    return getmOverrides(true).containsValue(value) || this.mDefaults.containsValue(value);
   }
 
   /**
@@ -148,8 +152,8 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Set<Entry<String, Object>> entrySet() {
-    Set<Entry<String, Object>> ret = new HashSet<Entry<String, Object>>(mDefaults.entrySet());
-    ret.addAll(this.getmOverrides(true).entrySet());
+    Set<Entry<String, Object>> ret = new HashSet<Entry<String, Object>>(this.mDefaults.entrySet());
+    ret.addAll(getmOverrides(true).entrySet());
     return ret;
   }
 
@@ -161,17 +165,21 @@ public class Env implements Map<String, Object> {
    * @return value (<code>null</code> if key not present)
    */
   @Override
-  public Object get(Object key) {
+  public Object get(final Object key) {
     // Should check ENV_VAR at first
+    // TODO: performance tweak
     if (Variable.ENV_VAR.equals(key)) {
       return this;
+    }
+    if (Variable.FUNC_ARGS_VAR.equals(key)) {
+      return FunctionUtils.getFunctionArguments(this);
     }
     Map<String, Object> overrides = getmOverrides(true);
     Object ret = null;
     if (overrides.containsKey(key)) {
       ret = overrides.get(key);
     } else {
-      ret = mDefaults.get(key);
+      ret = this.mDefaults.get(key);
     }
     if (ret == null) {
       if (Variable.INSTANCE_VAR.equals(key)) {
@@ -198,8 +206,8 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Set<String> keySet() {
-    Set<String> ret = new HashSet<String>(mDefaults.keySet());
-    ret.addAll(this.getmOverrides(true).keySet());
+    Set<String> ret = new HashSet<String>(this.mDefaults.keySet());
+    ret.addAll(getmOverrides(true).keySet());
     return ret;
   }
 
@@ -211,8 +219,7 @@ public class Env implements Map<String, Object> {
    * @return previous value for key (from default map, if not present in overrides)
    */
   @Override
-  public Object put(String key, Object value) {
-    String capturedExp = null;
+  public Object put(final String key, final Object value) {
     if (this.capturedVars != null && this.capturedVars.containsKey(key)) {
       throw new ExpressionRuntimeException("Can't assignment value to captured variable.The `" + key
           + "` is already captured by lambda.");
@@ -224,7 +231,7 @@ public class Env implements Map<String, Object> {
       prior = overrides.put(key, value);
     } else {
       overrides.put(key, value);
-      prior = mDefaults.get(key);
+      prior = this.mDefaults.get(key);
     }
     return prior;
   }
@@ -235,7 +242,7 @@ public class Env implements Map<String, Object> {
    * @param map
    */
   @Override
-  public void putAll(Map map) {
+  public void putAll(final Map map) {
     getmOverrides(false).putAll(map);
   }
 
@@ -248,11 +255,11 @@ public class Env implements Map<String, Object> {
    * @return previous value for key
    */
   @Override
-  public Object remove(Object key) {
+  public Object remove(final Object key) {
     if (getmOverrides(false).containsKey(key)) {
       return getmOverrides(false).remove(key);
     } else {
-      return mDefaults.remove(key);
+      return this.mDefaults.remove(key);
     }
   }
 
@@ -274,7 +281,7 @@ public class Env implements Map<String, Object> {
   @Override
   public Collection<Object> values() {
     Collection<Object> vals = new ArrayList<Object>();
-    for (String key : this.keySet()) {
+    for (String key : keySet()) {
       vals.add(get(key));
     }
     return vals;
@@ -313,13 +320,13 @@ public class Env implements Map<String, Object> {
     return buf.toString();
   }
 
-  private Map<String, Object> getmOverrides(boolean readOnly) {
-    if (mOverrides == null) {
+  private Map<String, Object> getmOverrides(final boolean readOnly) {
+    if (this.mOverrides == null) {
       if (readOnly) {
         return EMPTY_ENV;
       }
-      mOverrides = new HashMap<String, Object>();
+      this.mOverrides = new HashMap<String, Object>();
     }
-    return mOverrides;
+    return this.mOverrides;
   }
 }

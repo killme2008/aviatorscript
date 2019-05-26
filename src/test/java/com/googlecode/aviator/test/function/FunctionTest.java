@@ -37,7 +37,12 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.type.AviatorNil;
+import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
 
 
@@ -69,6 +74,77 @@ public class FunctionTest {
     assertEquals(0, AviatorEvaluator.execute("1-100%3"));
     assertEquals(100 % 3 * 4.2 + (37 + 95) / (6 * 3 - 18.0),
         (Double) AviatorEvaluator.execute("100%3*4.2+(37+95)/(6*3-18.0)"), 0.0001);
+  }
+
+  @Test
+  public void testCaptureFunctionParams1() {
+    try {
+      AviatorEvaluator.setOption(Options.CAPTURE_FUNCTION_ARGS, true);
+
+      List<FunctionArgument> params = (List<FunctionArgument>) AviatorEvaluator
+          .execute("f = lambda(a,bc, d) -> __args__ end; f(1,2,100+2)");
+
+      assertEquals(3, params.size());
+
+      System.out.println(params);
+
+      assertEquals(0, params.get(0).getIndex());
+      assertEquals("1", params.get(0).getExpression());
+      assertEquals(1, params.get(1).getIndex());
+      assertEquals("2", params.get(1).getExpression());
+      assertEquals(2, params.get(2).getIndex());
+      assertEquals("100+2", params.get(2).getExpression());
+    } finally {
+      AviatorEvaluator.setOption(Options.CAPTURE_FUNCTION_ARGS, false);
+    }
+  }
+
+  private static class CustomFunction extends AbstractFunction {
+
+    List<FunctionArgument> args;
+
+    @Override
+    public String getName() {
+      return "myadd";
+    }
+
+    @Override
+    public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+        final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4) {
+      this.args = FunctionUtils.getFunctionArguments(env);
+      return AviatorNil.NIL;
+    }
+
+  }
+
+  @Test
+  public void testCaptureFunctionParams2() {
+    CustomFunction function = new CustomFunction();
+    try {
+      AviatorEvaluator.setOption(Options.CAPTURE_FUNCTION_ARGS, true);
+
+      AviatorEvaluator.addFunction(function);
+
+      AviatorEvaluator.execute("myadd(sum,a,'hello', 4+100)");
+
+      List<FunctionArgument> args = function.args;
+      assertNotNull(args);
+      assertEquals(4, args.size());
+
+      System.out.println(args);
+
+      assertEquals(0, args.get(0).getIndex());
+      assertEquals("sum", args.get(0).getExpression());
+      assertEquals(1, args.get(1).getIndex());
+      assertEquals("a", args.get(1).getExpression());
+      assertEquals(2, args.get(2).getIndex());
+      assertEquals("'hello'", args.get(2).getExpression());
+      assertEquals(3, args.get(3).getIndex());
+      assertEquals("4+100", args.get(3).getExpression());
+    } finally {
+      AviatorEvaluator.setOption(Options.CAPTURE_FUNCTION_ARGS, false);
+      AviatorEvaluator.removeFunction(function);
+    }
   }
 
 

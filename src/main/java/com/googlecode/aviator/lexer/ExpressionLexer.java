@@ -47,13 +47,13 @@ public class ExpressionLexer {
   private final SymbolTable symbolTable;
   // Tokens buffer
   private final Stack<Token<?>> tokenBuffer = new Stack<Token<?>>();
-  private AviatorEvaluatorInstance instance;
-  private String expression;
-  private MathContext mathContext;
-  private boolean parseFloatIntoDecimal;
-  private boolean parseIntegralNumberIntoDecimal;
+  private final AviatorEvaluatorInstance instance;
+  private final String expression;
+  private final MathContext mathContext;
+  private final boolean parseFloatIntoDecimal;
+  private final boolean parseIntegralNumberIntoDecimal;
 
-  public ExpressionLexer(AviatorEvaluatorInstance instance, String expression) {
+  public ExpressionLexer(final AviatorEvaluatorInstance instance, final String expression) {
     this.iterator = new StringCharacterIterator(expression);
     this.expression = expression;
     this.symbolTable = new SymbolTable();
@@ -72,7 +72,7 @@ public class ExpressionLexer {
    *
    * @param token
    */
-  public void pushback(Token<?> token) {
+  public void pushback(final Token<?> token) {
     this.tokenBuffer.push(token);
   }
 
@@ -95,7 +95,7 @@ public class ExpressionLexer {
       'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f'};
 
 
-  public boolean isValidHexChar(char ch) {
+  public boolean isValidHexChar(final char ch) {
     for (char c : VALID_HEX_CHAR) {
       if (c == ch) {
         return true;
@@ -111,13 +111,13 @@ public class ExpressionLexer {
 
 
 
-  public Token<?> scan(boolean analyse) {
+  public Token<?> scan(final boolean analyse) {
     // If buffer is not empty,return
     if (!this.tokenBuffer.isEmpty()) {
       return this.tokenBuffer.pop();
     }
     // Skip white space or line
-    for (;; this.nextChar()) {
+    for (;; nextChar()) {
       if (this.peek == CharacterIterator.DONE) {
         return null;
       }
@@ -135,27 +135,27 @@ public class ExpressionLexer {
       } else {
         char ch = this.peek;
         int index = this.iterator.getIndex();
-        this.nextChar();
+        nextChar();
         return new CharToken(ch, index);
       }
     }
 
     // if it is a hex digit
     if (Character.isDigit(this.peek) && this.peek == '0') {
-      this.nextChar();
+      nextChar();
       if (this.peek == 'x' || this.peek == 'X') {
-        this.nextChar();
+        nextChar();
         StringBuffer sb = new StringBuffer();
         int startIndex = this.iterator.getIndex() - 2;
         long value = 0L;
         do {
           sb.append(this.peek);
           value = 16 * value + Character.digit(this.peek, 16);
-          this.nextChar();
-        } while (this.isValidHexChar(this.peek));
+          nextChar();
+        } while (isValidHexChar(this.peek));
         return new NumberToken(value, sb.toString(), startIndex);
       } else {
-        this.prevChar();
+        prevChar();
       }
     }
 
@@ -183,7 +183,7 @@ public class ExpressionLexer {
                 "Illegal Number " + sb + " at " + this.iterator.getIndex());
           } else {
             hasDot = true;
-            this.nextChar();
+            nextChar();
           }
 
         } else if (this.peek == 'N') {
@@ -193,11 +193,11 @@ public class ExpressionLexer {
                 "Illegal number " + sb + " at " + this.iterator.getIndex());
           }
           isBigInt = true;
-          this.nextChar();
+          nextChar();
           break;
         } else if (this.peek == 'M') {
           isBigDecimal = true;
-          this.nextChar();
+          nextChar();
           break;
         } else if (this.peek == 'e' || this.peek == 'E') {
           if (scientificNotation) {
@@ -205,20 +205,20 @@ public class ExpressionLexer {
                 "Illegal number " + sb + " at " + this.iterator.getIndex());
           }
           scientificNotation = true;
-          this.nextChar();
+          nextChar();
           if (this.peek == '-') {
             negExp = true;
             sb.append(this.peek);
-            this.nextChar();
+            nextChar();
           }
         } else {
           int digit = Character.digit(this.peek, 10);
           if (scientificNotation) {
             int n = digit;
-            this.nextChar();
+            nextChar();
             while (Character.isDigit(this.peek)) {
               n = 10 * n + Character.digit(this.peek, 10);
-              this.nextChar();
+              nextChar();
             }
             while (n-- > 0) {
               if (negExp) {
@@ -231,11 +231,11 @@ public class ExpressionLexer {
           } else if (hasDot) {
             dval = dval + digit / d;
             d = d * 10;
-            this.nextChar();
+            nextChar();
           } else {
             lval = 10 * lval + digit;
             dval = 10 * dval + digit;
-            this.nextChar();
+            nextChar();
           }
 
         }
@@ -243,9 +243,9 @@ public class ExpressionLexer {
           || this.peek == 'e' || this.peek == 'M' || this.peek == 'N');
       Number value;
       if (isBigDecimal) {
-        value = new BigDecimal(this.getBigNumberLexeme(sb), this.mathContext);
+        value = new BigDecimal(getBigNumberLexeme(sb), this.mathContext);
       } else if (isBigInt) {
-        value = new BigInteger(this.getBigNumberLexeme(sb));
+        value = new BigInteger(getBigNumberLexeme(sb));
       } else if (hasDot) {
         if (this.parseFloatIntoDecimal && sb.length() > 1) {
           value = new BigDecimal(sb.toString(), this.mathContext);
@@ -279,12 +279,12 @@ public class ExpressionLexer {
     // It is a variable
     if (this.peek == '#') {
       int startIndex = this.iterator.getIndex();
-      this.nextChar(); // skip $
+      nextChar(); // skip $
       StringBuilder sb = new StringBuilder();
       while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '['
           || this.peek == ']') {
         sb.append(this.peek);
-        this.nextChar();
+        nextChar();
       }
       String lexeme = sb.toString();
       if (lexeme.isEmpty()) {
@@ -292,23 +292,23 @@ public class ExpressionLexer {
       }
       Variable variable = new Variable(lexeme, startIndex);
       variable.setQuote(true);
-      return this.reserverVar(lexeme, variable);
+      return reserverVar(lexeme, variable);
     }
     if (Character.isJavaIdentifierStart(this.peek)) {
       int startIndex = this.iterator.getIndex();
       StringBuilder sb = new StringBuilder();
       do {
         sb.append(this.peek);
-        this.nextChar();
+        nextChar();
       } while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.');
       String lexeme = sb.toString();
       Variable variable = new Variable(lexeme, startIndex);
-      return this.reserverVar(lexeme, variable);
+      return reserverVar(lexeme, variable);
     }
 
     if (isBinaryOP(this.peek)) {
       CharToken opToken = new CharToken(this.peek, this.iterator.getIndex());
-      this.nextChar();
+      nextChar();
       return opToken;
     }
     // String
@@ -320,7 +320,7 @@ public class ExpressionLexer {
       while ((this.peek = this.iterator.next()) != left) {
         if (this.peek == '\\') // escape
         {
-          this.nextChar();
+          nextChar();
           if (this.peek == CharacterIterator.DONE) {
             throw new CompileExpressionErrorException(
                 "EOF while reading string at index: " + this.iterator.getIndex());
@@ -362,12 +362,12 @@ public class ExpressionLexer {
 
         sb.append(this.peek);
       }
-      this.nextChar();
+      nextChar();
       return new StringToken(sb.toString(), startIndex);
     }
 
     Token<Character> token = new CharToken(this.peek, this.iterator.getIndex());
-    this.nextChar();
+    nextChar();
     return token;
   }
 
@@ -375,7 +375,7 @@ public class ExpressionLexer {
     return this.expression.substring(0, this.iterator.getIndex());
   }
 
-  private Token<?> reserverVar(String lexeme, Variable variable) {
+  private Token<?> reserverVar(final String lexeme, final Variable variable) {
     // If it is a reserved word(true/false/nil/lambda)
     if (this.symbolTable.contains(lexeme)) {
       return this.symbolTable.getVariable(lexeme);
@@ -386,7 +386,7 @@ public class ExpressionLexer {
   }
 
 
-  private String getBigNumberLexeme(StringBuffer sb) {
+  private String getBigNumberLexeme(final StringBuffer sb) {
     String lexeme = sb.toString();
     lexeme = lexeme.substring(0, lexeme.length() - 1);
     return lexeme;
@@ -395,7 +395,7 @@ public class ExpressionLexer {
   static final char[] OPS = {'=', '>', '<', '+', '-', '*', '/', '%', '!', '&', '|'};
 
 
-  public static boolean isBinaryOP(char ch) {
+  public static boolean isBinaryOP(final char ch) {
     for (char tmp : OPS) {
       if (tmp == ch) {
         return true;

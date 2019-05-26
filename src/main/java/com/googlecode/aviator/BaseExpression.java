@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.utils.Env;
 
 
@@ -17,15 +18,16 @@ import com.googlecode.aviator.utils.Env;
  */
 public abstract class BaseExpression implements Expression {
 
-  private List<String> varNames;
-  private List<String> varFullNames;
+  public static final String FUNC_PARAMS_VAR = "__funcs_args__";
+  private final List<String> varNames;
+  private final List<String> varFullNames;
   private String expression;
   protected AviatorEvaluatorInstance instance;
   private Env compileEnv;
+  private Map<Integer, List<FunctionArgument>> funcsArgs = Collections.emptyMap();
 
 
-
-  public BaseExpression(AviatorEvaluatorInstance instance, List<String> varNames) {
+  public BaseExpression(final AviatorEvaluatorInstance instance, final List<String> varNames) {
     super();
     this.varFullNames = varNames;
     this.instance = instance;
@@ -41,17 +43,21 @@ public abstract class BaseExpression implements Expression {
   }
 
 
+  public void setFuncsArgs(final Map<Integer, List<FunctionArgument>> funcsArgs) {
+    if (funcsArgs != null) {
+      this.funcsArgs = funcsArgs;
+    }
+  }
+
 
   public Env getCompileEnv() {
-    return compileEnv;
+    return this.compileEnv;
   }
 
 
-
-  public void setCompileEnv(Env compileEnv) {
+  public void setCompileEnv(final Env compileEnv) {
     this.compileEnv = compileEnv;
   }
-
 
 
   /**
@@ -64,7 +70,7 @@ public abstract class BaseExpression implements Expression {
     return this.expression;
   }
 
-  public void setExpression(String expression) {
+  public void setExpression(final String expression) {
     this.expression = expression;
   }
 
@@ -96,7 +102,7 @@ public abstract class BaseExpression implements Expression {
     return this.varNames;
   }
 
-  protected Env newEnv(Map<String, Object> map, boolean direct) {
+  protected Env newEnv(final Map<String, Object> map, final boolean direct) {
     Env env;
     if (direct) {
       env = new Env(map, map == Collections.EMPTY_MAP ? new HashMap<String, Object>() : map);
@@ -107,16 +113,19 @@ public abstract class BaseExpression implements Expression {
     return env;
   }
 
-  protected Env genTopEnv(Map<String, Object> map) {
+  protected Env genTopEnv(final Map<String, Object> map) {
     Env env =
         newEnv(map, this.instance.getOptionValue(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY).bool);
     if (this.compileEnv != null && !this.compileEnv.isEmpty()) {
       env.putAll(this.compileEnv);
     }
+    if (!this.funcsArgs.isEmpty()) {
+      env.put(FUNC_PARAMS_VAR, this.funcsArgs);
+    }
     return env;
   }
 
-  protected Env newEnv(Map<String, Object> map) {
+  protected Env newEnv(final Map<String, Object> map) {
     return newEnv(map, false);
   }
 

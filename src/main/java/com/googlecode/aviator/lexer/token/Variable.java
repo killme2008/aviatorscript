@@ -28,13 +28,14 @@ public class Variable extends AbstractToken<Object> {
 
   public static final String INSTANCE_VAR = "__instance__";
   public static final String ENV_VAR = "__env__";
+  public static final String FUNC_ARGS_VAR = "__args__";
 
   public boolean isQuote() {
-    return quote;
+    return this.quote;
   }
 
 
-  public void setQuote(boolean special) {
+  public void setQuote(final boolean special) {
     this.quote = special;
   }
 
@@ -46,7 +47,7 @@ public class Variable extends AbstractToken<Object> {
   public static final Variable TRUE = new Variable("true", -1) {
 
     @Override
-    public Object getValue(Map<String, Object> env) {
+    public Object getValue(final Map<String, Object> env) {
       return true;
     }
 
@@ -58,7 +59,7 @@ public class Variable extends AbstractToken<Object> {
   public static final Variable FALSE = new Variable("false", -1) {
 
     @Override
-    public Object getValue(Map<String, Object> env) {
+    public Object getValue(final Map<String, Object> env) {
       return false;
     }
 
@@ -70,7 +71,7 @@ public class Variable extends AbstractToken<Object> {
   public static final Variable NIL = new Variable("nil", -1) {
 
     @Override
-    public Object getValue(Map<String, Object> env) {
+    public Object getValue(final Map<String, Object> env) {
       return null;
     }
 
@@ -83,7 +84,7 @@ public class Variable extends AbstractToken<Object> {
   public static final Variable LAMBDA = new Variable("lambda", -1) {
 
     @Override
-    public Object getValue(Map<String, Object> env) {
+    public Object getValue(final Map<String, Object> env) {
       return false;
     }
 
@@ -97,7 +98,7 @@ public class Variable extends AbstractToken<Object> {
 
 
   @Override
-  public Object getValue(Map<String, Object> env) {
+  public Object getValue(final Map<String, Object> env) {
     if (env != null) {
       return env.get(this.lexeme);
     } else {
@@ -106,7 +107,7 @@ public class Variable extends AbstractToken<Object> {
   }
 
 
-  public Variable(String name, int startIndex) {
+  public Variable(final String name, final int startIndex) {
     super(startIndex, name);
   }
 

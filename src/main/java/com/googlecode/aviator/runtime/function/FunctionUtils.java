@@ -15,8 +15,12 @@
  **/
 package com.googlecode.aviator.runtime.function;
 
+import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.BaseExpression;
+import com.googlecode.aviator.code.asm.ASMCodeGenerator;
+import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -34,13 +38,35 @@ import com.googlecode.aviator.runtime.type.AviatorType;
 public class FunctionUtils {
 
   /**
+   * Retrieve the invocation arguments info from env, returns null when absent.
+   *
+   * @param env
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static List<FunctionArgument> getFunctionArguments(final Map<String, Object> env) {
+    Map<Integer, List<FunctionArgument>> funcParams =
+        (Map<Integer, List<FunctionArgument>>) env.get(BaseExpression.FUNC_PARAMS_VAR);
+    if (funcParams == null) {
+      return null;
+    }
+    Integer refId = (Integer) env.get(ASMCodeGenerator.FUNC_ARGS_INNER_VAR);
+    if (refId == null) {
+      return null;
+    }
+    return funcParams.get(refId);
+  }
+
+
+  /**
    * Get string value from env.
    *
    * @param arg the var name
    * @param env
    * @return
    */
-  public static final String getStringValue(AviatorObject arg, Map<String, Object> env) {
+  public static final String getStringValue(final AviatorObject arg,
+      final Map<String, Object> env) {
     String result = null;
 
     final Object value = arg.getValue(env);
@@ -59,7 +85,7 @@ public class FunctionUtils {
    * @param env
    * @return
    */
-  public static Object getJavaObject(AviatorObject arg, Map<String, Object> env) {
+  public static Object getJavaObject(final AviatorObject arg, final Map<String, Object> env) {
     if (arg.getAviatorType() != AviatorType.JavaType) {
       throw new ClassCastException(arg.desc(env) + " is not a javaType");
     }
@@ -80,7 +106,8 @@ public class FunctionUtils {
    * @param arity
    * @return
    */
-  public static AviatorFunction getFunction(AviatorObject arg, Map<String, Object> env, int arity) {
+  public static AviatorFunction getFunction(final AviatorObject arg, final Map<String, Object> env,
+      final int arity) {
     if (arg.getAviatorType() != AviatorType.JavaType
         && arg.getAviatorType() != AviatorType.Lambda) {
       throw new ClassCastException(arg.desc(env) + " is not a function");
@@ -121,7 +148,8 @@ public class FunctionUtils {
    * @param env
    * @return
    */
-  public static final Number getNumberValue(AviatorObject arg1, Map<String, Object> env) {
+  public static final Number getNumberValue(final AviatorObject arg1,
+      final Map<String, Object> env) {
     return (Number) arg1.getValue(env);
   }
 
