@@ -381,9 +381,7 @@ public class ASMCodeGenerator implements CodeGenerator {
     this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/runtime/type/AviatorJavaType",
         "setValue",
         "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
-    this.popOperand();
-    this.popOperand();
-    this.popOperand();
+    this.popOperand(3);
     this.pushOperand();
   }
 
@@ -437,8 +435,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onAndRight(final Token<?> lookhead) {
     visitRightBranch(IFEQ, OperatorType.AND);
-    this.popOperand(); // boolean object
-    this.popOperand(); // environment
+    this.popOperand(2); // boolean object and environment
     this.pushOperand();
   }
 
@@ -492,7 +489,7 @@ public class ASMCodeGenerator implements CodeGenerator {
     this.mv.visitJumpInsn(IFEQ, l0);
     this.popOperand();
     this.popOperand();
-    this.pushOperand(1); // add two booleans
+    this.pushOperand(2); // add two booleans
 
     this.popOperand(); // pop the last result
   }
@@ -541,8 +538,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onJoinRight(final Token<?> lookhead) {
     visitRightBranch(IFNE, OperatorType.OR);
-    this.popOperand();
-    this.popOperand();
+    this.popOperand(2);
     this.pushOperand();
 
   }
@@ -663,14 +659,8 @@ public class ASMCodeGenerator implements CodeGenerator {
     doCompareAndJump(IFGE, OperatorType.LT);
   }
 
-
-  /**
-   *
-   * @param extras 额外的栈空间大小
-   */
-  public void pushOperand(final int extras) {
-    this.operandsCount++;
-    this.operandsCount += extras;
+  public void pushOperand(final int delta) {
+    this.operandsCount += delta;
     setMaxStacks(this.operandsCount);
   }
 
@@ -830,9 +820,8 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitLdcInsn(lookhead.getValue(null));
         this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/runtime/type/AviatorString",
             "<init>", "(Ljava/lang/String;)V");
-        this.pushOperand(2);
-        this.popOperand();
-        this.popOperand();
+        this.pushOperand(3);
+        this.popOperand(2);
         break;
       case Pattern:
         // load pattern
@@ -841,9 +830,8 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitLdcInsn(lookhead.getValue(null));
         this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/runtime/type/AviatorPattern",
             "<init>", "(Ljava/lang/String;)V");
-        this.pushOperand(2);
-        this.popOperand();
-        this.popOperand();
+        this.pushOperand(3);
+        this.popOperand(2);
         break;
       case Variable:
         // load variable
@@ -886,11 +874,10 @@ public class ASMCodeGenerator implements CodeGenerator {
                   this.labelNameIndexMap.put(this.currentLabel, name2Index);
                 }
                 name2Index.put(innerVarName, localIndex);
-                this.pushOperand(2);
-                this.popOperand();
-                this.popOperand();
+                this.pushOperand(3);
+                this.popOperand(2);
               } else {
-                this.pushOperand(1);
+                this.pushOperand(2);
                 this.popOperand();
               }
             }
@@ -902,9 +889,8 @@ public class ASMCodeGenerator implements CodeGenerator {
             this.mv.visitMethodInsn(INVOKESPECIAL,
                 "com/googlecode/aviator/runtime/type/AviatorJavaType", "<init>",
                 "(Ljava/lang/String;)V");
-            this.pushOperand(2);
-            this.popOperand();
-            this.popOperand();
+            this.pushOperand(3);
+            this.popOperand(2);
           }
 
         }
@@ -984,13 +970,10 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "put",
             "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
         this.mv.visitInsn(POP);
-        this.pushOperand();
-        this.pushOperand();
-        this.popOperand();
-        this.popOperand();
-        this.popOperand();
-        this.pushOperand();
-        this.popOperand();
+        this.pushOperand(2); // __args__ and ref id
+        this.popOperand(3); // env, __args and ref id
+        this.pushOperand(); // the put result
+        this.popOperand(); // pop the put result.
       }
     }
 
@@ -1016,8 +999,7 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitTypeInsn(CHECKCAST, "[Lcom/googlecode/aviator/runtime/type/AviatorObject;");
 
         this.popOperand(); // pop list to get size
-        this.pushOperand(); // new array, store and load it
-        this.pushOperand(); // load list
+        this.pushOperand(2); // new array, store and load it, then load the list
         this.popOperand(); // list.toArray
       }
     }
@@ -1047,8 +1029,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       this.mv.visitMethodInsn(INVOKEINTERFACE, "java/util/List", "add", "(Ljava/lang/Object;)Z");
       this.mv.visitInsn(Opcodes.POP);
       this.mv.visitVarInsn(ALOAD, currentMethodMetaData.variadicListIndex);
-      this.popOperand(); // pop list
-      this.popOperand(); // pop param
+      this.popOperand(2); // pop list and parameter
       this.pushOperand(); // list.add result
       this.popOperand(); // pop last result
       this.pushOperand(); // load list
@@ -1078,7 +1059,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 
   private void pushOperand() {
-    this.pushOperand(0);
+    this.pushOperand(1);
   }
 
   private static class MethodMetaData {
@@ -1120,9 +1101,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       this.popOperand();
     }
 
-    this.popOperand();
-    this.popOperand();
-    this.popOperand();
+    this.popOperand(3);
     this.pushOperand();
   }
 
@@ -1177,10 +1156,8 @@ public class ASMCodeGenerator implements CodeGenerator {
     this.mv.visitLdcInsn(bootstrap.getName());
     this.mv.visitMethodInsn(INVOKEVIRTUAL, this.className, "newLambda",
         "(Lcom/googlecode/aviator/utils/Env;Ljava/lang/String;)Lcom/googlecode/aviator/runtime/function/LambdaFunction;");
-    this.pushOperand();
-    this.pushOperand();
-    this.popOperand();
-    this.popOperand();
+    this.pushOperand(2);
+    this.popOperand(2);
   }
 
   @Override
@@ -1232,7 +1209,7 @@ public class ASMCodeGenerator implements CodeGenerator {
           this.labelNameIndexMap.put(this.currentLabel, name2Index);
         }
         name2Index.put(innerMethodName, localIndex);
-        this.pushOperand(1);
+        this.pushOperand(2);
         this.popOperand();
       } else {
         this.pushOperand();
@@ -1271,8 +1248,7 @@ public class ASMCodeGenerator implements CodeGenerator {
     this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/RuntimeUtils",
         "getFunction",
         "(Ljava/util/Map;Ljava/lang/String;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
-    this.popOperand();
-    this.popOperand();
+    this.popOperand(2);
     this.pushOperand();
   }
 
