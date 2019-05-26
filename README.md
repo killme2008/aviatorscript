@@ -46,6 +46,7 @@ Aviator是一个轻量级、高性能的Java表达式执行引擎，它动态地
 
 # News
 
+* [4.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.0)， New features such as capturing function invocation arguments etc.
 * [4.1.2](https://github.com/killme2008/aviator/releases/tag/aviator-4.1.2)， Bug fixes and more sequence functions.
 
 
