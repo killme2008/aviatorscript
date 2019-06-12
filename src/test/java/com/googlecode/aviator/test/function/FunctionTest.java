@@ -1018,7 +1018,16 @@ public class FunctionTest {
       assertEquals(1, AviatorEvaluator.execute("seq.get(seq.list(1,1,2,3),4)"));
       fail();
     } catch (ExpressionRuntimeException e) {
-      assertEquals("Index: 4, Size: 4", e.getCause().getMessage());
+      // Jdk changed the message of IndexOutOfBoundsException:
+      //   - for jdk 8-, cause exception is
+      //     java.lang.IndexOutOfBoundsException: Index: 4, Size: 4
+      //   - for jdk 9/10, exception is
+      //     java.lang.IndexOutOfBoundsException: Index 4 out-of-bounds for length 4
+      //   - for jdk 11, exception is
+      //     java.lang.IndexOutOfBoundsException: Index 4 out of bounds for length 4
+      assertTrue(e.getCause().getMessage().equals("Index: 4, Size: 4")
+          || e.getCause().getMessage().equals("Index 4 out-of-bounds for length 4")
+          || e.getCause().getMessage().equals("Index 4 out of bounds for length 4"));
     }
   }
 
