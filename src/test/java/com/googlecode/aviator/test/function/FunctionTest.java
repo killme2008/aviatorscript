@@ -1019,12 +1019,12 @@ public class FunctionTest {
       fail();
     } catch (ExpressionRuntimeException e) {
       // Jdk changed the message of IndexOutOfBoundsException:
-      //   - for jdk 8-, cause exception is
-      //     java.lang.IndexOutOfBoundsException: Index: 4, Size: 4
-      //   - for jdk 9/10, exception is
-      //     java.lang.IndexOutOfBoundsException: Index 4 out-of-bounds for length 4
-      //   - for jdk 11, exception is
-      //     java.lang.IndexOutOfBoundsException: Index 4 out of bounds for length 4
+      // - for jdk 8-, cause exception is
+      // java.lang.IndexOutOfBoundsException: Index: 4, Size: 4
+      // - for jdk 9/10, exception is
+      // java.lang.IndexOutOfBoundsException: Index 4 out-of-bounds for length 4
+      // - for jdk 11, exception is
+      // java.lang.IndexOutOfBoundsException: Index 4 out of bounds for length 4
       assertTrue(e.getCause().getMessage().equals("Index: 4, Size: 4")
           || e.getCause().getMessage().equals("Index 4 out-of-bounds for length 4")
           || e.getCause().getMessage().equals("Index 4 out of bounds for length 4"));
