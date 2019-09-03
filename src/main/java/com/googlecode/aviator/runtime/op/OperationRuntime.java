@@ -3,6 +3,7 @@ package com.googlecode.aviator.runtime.op;
 import java.util.Map;
 import com.googlecode.aviator.exception.IllegalArityException;
 import com.googlecode.aviator.lexer.token.OperatorType;
+import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -40,8 +41,8 @@ public class OperationRuntime {
    * @param opType
    * @return
    */
-  public static AviatorObject eval(Map<String, Object> env, AviatorObject[] args,
-      OperatorType opType) {
+  public static AviatorObject eval(final Map<String, Object> env, final AviatorObject[] args,
+      final OperatorType opType) {
     AviatorFunction func = RuntimeUtils.getInstance(env).getOpFunction(opType);
     AviatorObject ret = eval0(env, args, opType, func);
     if (RuntimeUtils.isTracedEval(env)) {
@@ -50,8 +51,8 @@ public class OperationRuntime {
     return ret;
   }
 
-  private static AviatorObject eval0(Map<String, Object> env, AviatorObject[] args,
-      OperatorType opType, AviatorFunction func) {
+  private static AviatorObject eval0(final Map<String, Object> env, final AviatorObject[] args,
+      final OperatorType opType, final AviatorFunction func) {
     if (func == null) {
       return opType.eval(args, env);
     } else {
@@ -75,8 +76,8 @@ public class OperationRuntime {
    * @param opType
    * @return
    */
-  public static AviatorObject eval(AviatorObject arg, Map<String, Object> env,
-      OperatorType opType) {
+  public static AviatorObject eval(final AviatorObject arg, final Map<String, Object> env,
+      final OperatorType opType) {
     AviatorFunction func = RuntimeUtils.getInstance(env).getOpFunction(opType);
     AviatorObject ret = eval0(arg, env, opType, func);
     if (RuntimeUtils.isTracedEval(env)) {
@@ -85,8 +86,8 @@ public class OperationRuntime {
     return ret;
   }
 
-  private static AviatorObject eval0(AviatorObject arg, Map<String, Object> env,
-      OperatorType opType, AviatorFunction func) {
+  private static AviatorObject eval0(final AviatorObject arg, final Map<String, Object> env,
+      final OperatorType opType, final AviatorFunction func) {
     if (func == null) {
       AviatorObject[] args = ONE_ARG.get();
       args[0] = arg;
@@ -106,8 +107,8 @@ public class OperationRuntime {
    * @param opType
    * @return
    */
-  public static AviatorObject eval(AviatorObject left, Map<String, Object> env, AviatorObject right,
-      OperatorType opType) {
+  public static AviatorObject eval(final AviatorObject left, final Map<String, Object> env,
+      final AviatorObject right, final OperatorType opType) {
     return eval(left, right, env, opType);
   }
 
@@ -120,8 +121,8 @@ public class OperationRuntime {
    * @param opType
    * @return
    */
-  public static AviatorObject eval(AviatorObject left, AviatorObject right, Map<String, Object> env,
-      OperatorType opType) {
+  public static AviatorObject eval(final AviatorObject left, final AviatorObject right,
+      final Map<String, Object> env, final OperatorType opType) {
 
     AviatorFunction func = RuntimeUtils.getInstance(env).getOpFunction(opType);
     AviatorObject ret = eval0(left, right, env, opType, func);
@@ -131,8 +132,8 @@ public class OperationRuntime {
     return ret;
   }
 
-  private static AviatorObject eval0(AviatorObject left, AviatorObject right,
-      Map<String, Object> env, OperatorType opType, AviatorFunction func) {
+  private static AviatorObject eval0(final AviatorObject left, final AviatorObject right,
+      final Map<String, Object> env, final OperatorType opType, final AviatorFunction func) {
     if (func == null) {
       AviatorObject[] args = TWO_ARRGS.get();
       args[0] = left;
@@ -143,7 +144,8 @@ public class OperationRuntime {
     }
   }
 
-  public static final boolean hasRuntimeContext(Map<String, Object> env, OperatorType opType) {
+  public static final boolean hasRuntimeContext(final Map<String, Object> env,
+      final OperatorType opType) {
     return RuntimeUtils.getInstance(env).getOpsMap().containsKey(opType)
         || RuntimeUtils.isTracedEval(env);
   }
@@ -151,23 +153,34 @@ public class OperationRuntime {
   private static final String WHITE_SPACE = " ";
   private static final String TRACE_PREFIX = "         ";
 
-  private static void trace(Map<String, Object> env, OperatorType opType, AviatorObject result,
-      AviatorObject... args) {
+  private static String desc(final AviatorObject arg, final Map<String, Object> env) {
+    if (arg != null) {
+      return arg.desc(env);
+    } else {
+      return Variable.NIL.getLexeme();
+    }
+  }
+
+  private static void trace(final Map<String, Object> env, final OperatorType opType,
+      final AviatorObject result, final AviatorObject... args) {
 
     switch (args.length) {
       case 1:
         RuntimeUtils.printTrace(env,
-            TRACE_PREFIX + opType.token + args[0].desc(env) + " => " + result.desc(env));
+            TRACE_PREFIX + opType.token + desc(args[0], env) + " => " + desc(result, env));
         break;
       case 2:
-        RuntimeUtils.printTrace(env, TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + opType.token
-            + WHITE_SPACE + args[1].desc(env) + " => " + result.desc(env));
+        RuntimeUtils.printTrace(env, TRACE_PREFIX + desc(args[0], env) + WHITE_SPACE + opType.token
+            + WHITE_SPACE + desc(args[1], env) + " => " + desc(result, env));
         break;
       case 3:
         RuntimeUtils.printTrace(env,
-            TRACE_PREFIX + args[0].desc(env) + WHITE_SPACE + "?" + WHITE_SPACE + args[0].desc(env)
-                + WHITE_SPACE + ":" + WHITE_SPACE + args[1].desc(env) + " => " + result.desc(env));
+            TRACE_PREFIX + desc(args[0], env) + WHITE_SPACE + "?" + WHITE_SPACE + desc(args[0], env)
+                + WHITE_SPACE + ":" + WHITE_SPACE + desc(args[1], env) + " => "
+                + desc(result, env));
         break;
+      default:
+        throw new UnsupportedOperationException("Impossible");
     }
   }
 }

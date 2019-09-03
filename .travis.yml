@@ -1,11 +1,10 @@
 language: java
+dist: trusty
 script:
-  - mvn test
+  - mvn clean test
 jdk:
-  - openjdk7
   - oraclejdk8
-  - openjdk8
   - oraclejdk9
-  - openjdk10
   - oraclejdk11
-  - openjdk11
+  - openjdk7
+  - openjdk8
