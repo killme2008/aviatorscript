@@ -56,8 +56,8 @@ AviatorEvaluator.execute("reduce(a, lambda(x,y) -> x + y end, 0)", env);
 
 # News
 
+* [4.2.1](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.1),  minor fixes.
 * [4.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.0), New features such as capturing function invocation arguments etc.
-* [4.1.2](https://github.com/killme2008/aviator/releases/tag/aviator-4.1.2), Bug fixes and more sequence functions.
 
 
 # Dependency
