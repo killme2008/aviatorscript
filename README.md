@@ -56,6 +56,7 @@ AviatorEvaluator.execute("reduce(a, lambda(x,y) -> x + y end, 0)", env);
 
 # News
 
+* [4.2.2](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.2),  [import java class's public static methods as custom functions](https://github.com/killme2008/aviator/wiki#%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95%E4%BD%9C%E4%B8%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0).
 * [4.2.1](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.1),  minor fixes.
 * [4.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.0), New features such as capturing function invocation arguments etc.
 
