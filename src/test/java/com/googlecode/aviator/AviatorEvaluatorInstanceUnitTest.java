@@ -83,6 +83,13 @@ public class AviatorEvaluatorInstanceUnitTest {
     } catch (Exception e) {
       assertEquals("Function not found: test.sub", e.getMessage());
     }
+
+    try {
+      this.instance.execute("test.assertNotNull(lambda() -> 3 end)");
+      fail();
+    } catch (Exception e) {
+      assertEquals("No matching method assertNotNull found taking 1 args", e.getMessage());
+    }
   }
 
   @Test

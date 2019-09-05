@@ -35,14 +35,14 @@ public class ClassStaticFunction extends AbstractVariadicFunction {
     this.methodName = methodName;
 
     if (methods.size() == 1) {
-      // fast path for on e-arity function.
+      // fast path by method handle.
       this.handle = MethodHandles.lookup().unreflect(methods.get(0));
       this.pTypes = methods.get(0).getParameterTypes();
       if (this.handle == null) {
         throw new NoSuchMethodException("Method handle for " + methodName + " not found");
       }
     } else {
-      // Slow path by reflections.
+      // Slow path by reflection
       this.methods = methods;
     }
   }

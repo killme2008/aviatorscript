@@ -91,7 +91,7 @@ public class GrammarUnitTest {
     assertTrue((Boolean) AviatorEvaluator.execute("true"));
     assertFalse((Boolean) AviatorEvaluator.execute("false"));
 
-    assertEquals("/\\w+\\d?\\..*/", AviatorEvaluator.execute("/\\w+\\d?\\..*/"));
+    assertEquals("\\w+\\d?\\..*", AviatorEvaluator.execute("/\\w+\\d?\\..*/").toString());
     Map<String, Object> env = new HashMap<String, Object>();
     env.put("_a", 3);
     assertEquals(3, AviatorEvaluator.execute("_a", env));
@@ -108,7 +108,7 @@ public class GrammarUnitTest {
 
     }
 
-    public Foo(int a) {
+    public Foo(final int a) {
       super();
       this.a = a;
     }
@@ -117,7 +117,7 @@ public class GrammarUnitTest {
       return this.a;
     }
 
-    public void setA(int a) {
+    public void setA(final int a) {
       this.a = a;
     }
 
@@ -130,7 +130,7 @@ public class GrammarUnitTest {
 
     }
 
-    public Bar(int a, int b) {
+    public Bar(final int a, final int b) {
       super(a);
       this.b = b;
     }
@@ -139,7 +139,7 @@ public class GrammarUnitTest {
       return this.b;
     }
 
-    public void setB(int b) {
+    public void setB(final int b) {
       this.b = b;
     }
 
@@ -246,7 +246,7 @@ public class GrammarUnitTest {
 
   @Test
   public void testAddOperandsLimit() {
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
 
     assertEquals(6, AviatorEvaluator.execute("1+2+3"));
     assertEquals(2.7, (Double) AviatorEvaluator.execute("6+d", env), 0.001);
@@ -287,49 +287,49 @@ public class GrammarUnitTest {
 
   @Test
   public void testSubOperandsLimit() {
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
     assertEquals(3, AviatorEvaluator.execute("6-1-2", env));
     assertEquals(2.86, (Double) AviatorEvaluator.execute("6-3.14"), 0.001);
     assertEquals(4.3, (Double) AviatorEvaluator.execute("1-d", env), 0.001);
     assertEquals(0.0, (Double) AviatorEvaluator.execute("d-d", env), 0.001);
     assertEquals(1003.3, (Double) AviatorEvaluator.execute("a-d", env), 0.001);
-    this.doArithOpIllegalOperands("-");
+    doArithOpIllegalOperands("-");
   }
 
   @Test
   public void testMultOperandsLimit() {
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
     assertEquals(300, AviatorEvaluator.execute("100*3", env));
     assertEquals(18.84, (Double) AviatorEvaluator.execute("6*3.14"), 0.001);
     assertEquals(-9.9, (Double) AviatorEvaluator.execute("d*3", env), 0.001);
     assertEquals(10.89, (Double) AviatorEvaluator.execute("d*d", env), 0.001);
     assertEquals(-3300, (Double) AviatorEvaluator.execute("a*d", env), 0.001);
-    this.doArithOpIllegalOperands("*");
+    doArithOpIllegalOperands("*");
   }
 
   @Test
   public void testDivOperandsLimit() {
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
     assertEquals(33, AviatorEvaluator.execute("100/3", env));
     assertEquals(1.9108, (Double) AviatorEvaluator.execute("6/3.14"), 0.001);
     assertEquals(-1.1, (Double) AviatorEvaluator.execute("d/3", env), 0.001);
     assertEquals(1.0, (Double) AviatorEvaluator.execute("d/d", env), 0.001);
     assertEquals(-303.030, (Double) AviatorEvaluator.execute("a/d", env), 0.001);
-    this.doArithOpIllegalOperands("/");
+    doArithOpIllegalOperands("/");
   }
 
   @Test
   public void testModOperandsLimit() {
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
     assertEquals(1, AviatorEvaluator.execute("100%3", env));
     assertEquals(2.86, (Double) AviatorEvaluator.execute("6%3.14"), 0.001);
     assertEquals(-0.29999, (Double) AviatorEvaluator.execute("d%3", env), 0.001);
     assertEquals(0.0, (Double) AviatorEvaluator.execute("d%d", env), 0.001);
     assertEquals(1000 % -3.3, (Double) AviatorEvaluator.execute("a%d", env), 0.001);
-    this.doArithOpIllegalOperands("%");
+    doArithOpIllegalOperands("%");
   }
 
-  private void doArithOpIllegalOperands(String op) {
+  private void doArithOpIllegalOperands(final String op) {
     try {
       AviatorEvaluator.execute("1" + op + "/\\d+/");
       Assert.fail();
@@ -442,7 +442,7 @@ public class GrammarUnitTest {
 
   @Test
   public void testComparePattern() {
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
 
     assertTrue((Boolean) AviatorEvaluator.execute("p1==p1", env));
     assertTrue((Boolean) AviatorEvaluator.execute("p1>=p1", env));
@@ -482,7 +482,7 @@ public class GrammarUnitTest {
 
   @Test
   public void testCompareString() {
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
     assertTrue((Boolean) AviatorEvaluator.execute("'b'>'a'"));
     assertTrue((Boolean) AviatorEvaluator.execute("'b'>='a'"));
     assertTrue((Boolean) AviatorEvaluator.execute("'b'!='a'"));
@@ -540,7 +540,7 @@ public class GrammarUnitTest {
 
   @Test
   public void testCompareNumber() {
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
     assertTrue((Boolean) AviatorEvaluator.execute("3>1"));
     assertTrue((Boolean) AviatorEvaluator.execute("3>=1"));
     assertTrue((Boolean) AviatorEvaluator.execute("3!=1"));
@@ -828,7 +828,7 @@ public class GrammarUnitTest {
     assertFalse((Boolean) AviatorEvaluator.execute("/\\d+/==nil"));
     assertTrue((Boolean) AviatorEvaluator.execute("/\\d+/!=nil"));
 
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
     assertFalse((Boolean) AviatorEvaluator.execute("p1==nil", env));
     assertTrue((Boolean) AviatorEvaluator.execute("p1>nil", env));
 
@@ -897,7 +897,7 @@ public class GrammarUnitTest {
     try {
       AviatorEvaluator.exec("string.split('a,b,c,d',',')[4]");
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (ArrayIndexOutOfBoundsException e) {
 
     }
 
@@ -916,7 +916,7 @@ public class GrammarUnitTest {
     try {
       AviatorEvaluator.exec("(string.split('a,b,c,d',','))[4]");
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (ArrayIndexOutOfBoundsException e) {
 
     }
     assertEquals("a", AviatorEvaluator.exec("(string.split(s,','))[0]", "a,b,c,d"));
@@ -937,7 +937,7 @@ public class GrammarUnitTest {
 
   @Test
   public void testFunctionCall() {
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
     assertEquals(10, AviatorEvaluator.execute(" string.length('hello') + string.length('hello') "));
     assertEquals(3.0, (Double) AviatorEvaluator
         .execute(" string.length('hello')>5? math.abs(d):math.log10(a) ", env), 0.001);
@@ -974,7 +974,8 @@ public class GrammarUnitTest {
   public class StringGetFromJsonMapFunction extends AbstractFunction {
 
     @Override
-    public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+    public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+        final AviatorObject arg2) {
       return new AviatorString(null);
     }
 
@@ -1011,7 +1012,7 @@ public class GrammarUnitTest {
     assertEquals(4, AviatorEvaluator.exec("5;1+2;a", 4));
     assertEquals(4, AviatorEvaluator.exec("(3+a)*4;1+2;println(b);a", 4, 5));
 
-    Map<String, Object> env = this.createEnv();
+    Map<String, Object> env = createEnv();
     assertEquals(3.0, (Double) AviatorEvaluator
         .execute("d+10*a ; string.length('hello')>5? math.abs(d):math.log10(a) ", env), 0.001);
   }
