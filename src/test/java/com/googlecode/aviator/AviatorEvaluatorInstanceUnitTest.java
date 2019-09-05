@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayOutputStream;
 import java.math.MathContext;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +66,10 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertFalse((boolean) this.instance.execute("str.hasText(c)", env));
 
 
-    assertTrue(this.instance.addStaticFunctions("test", TestUtils.class).size() > 0);
+    List<String> added = this.instance.addStaticFunctions("test", TestUtils.class);
+    assertEquals(2, added.size());
+    assertTrue(added.contains("test.add"));
+    assertTrue(added.contains("test.assertNotNull"));
 
     assertEquals("str", this.instance.execute("test.assertNotNull('abc')"));
     assertEquals("num", this.instance.execute("test.assertNotNull(3)"));
