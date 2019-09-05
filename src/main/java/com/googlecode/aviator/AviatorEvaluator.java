@@ -17,6 +17,7 @@ package com.googlecode.aviator;
 
 import java.io.OutputStream;
 import java.math.MathContext;
+import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
@@ -103,7 +104,7 @@ public final class AviatorEvaluator {
    * @since 4.0.0
    * @param loader
    */
-  public static void addFunctionLoader(FunctionLoader loader) {
+  public static void addFunctionLoader(final FunctionLoader loader) {
     getInstance().addFunctionLoader(loader);
   }
 
@@ -114,7 +115,7 @@ public final class AviatorEvaluator {
    * @since 4.0.0
    * @param loader
    */
-  public static void removeFunctionLoader(FunctionLoader loader) {
+  public static void removeFunctionLoader(final FunctionLoader loader) {
     getInstance().removeFunctionLoader(loader);
   }
 
@@ -125,7 +126,7 @@ public final class AviatorEvaluator {
    * @param t true is to trace,default is false.
    */
   @Deprecated
-  public static void setTrace(boolean t) {
+  public static void setTrace(final boolean t) {
     getInstance().setOption(Options.TRACE, t);
   }
 
@@ -138,20 +139,20 @@ public final class AviatorEvaluator {
    * @param opt
    * @param val
    */
-  public static void setOption(Options opt, Object val) {
+  public static void setOption(final Options opt, final Object val) {
     getInstance().setOption(opt, val);
   }
 
 
   /**
    * Returns the current evaluator option value, returns null if missing.
-   * 
+   *
    * @deprecated
    * @param opt
    * @return
    */
   @Deprecated
-  public static <T> T getOption(Options opt) {
+  public static <T> T getOption(final Options opt) {
     return getInstance().getOption(opt);
   }
 
@@ -187,7 +188,7 @@ public final class AviatorEvaluator {
    * @since 2.3.0
    */
   @Deprecated
-  public static void setMathContext(MathContext mathContext) {
+  public static void setMathContext(final MathContext mathContext) {
     getInstance().setOption(Options.MATH_CONTEXT, mathContext);
   }
 
@@ -197,7 +198,7 @@ public final class AviatorEvaluator {
    *
    * @param traceOutputStream
    */
-  public static void setTraceOutputStream(OutputStream traceOutputStream) {
+  public static void setTraceOutputStream(final OutputStream traceOutputStream) {
     getInstance().setTraceOutputStream(traceOutputStream);
   }
 
@@ -213,12 +214,12 @@ public final class AviatorEvaluator {
    * @param value
    */
   @Deprecated
-  public static void setOptimize(int value) {
+  public static void setOptimize(final int value) {
     getInstance().setOption(Options.OPTIMIZE_LEVEL, value);
   }
 
 
-  public static void setBYTECODE_VER(int nversion) {
+  public static void setBYTECODE_VER(final int nversion) {
     getInstance().setBytecodeVersion(nversion);
   }
 
@@ -251,8 +252,22 @@ public final class AviatorEvaluator {
    *
    * @return
    */
-  public static AviatorClassLoader getAviatorClassLoader(boolean cached) {
+  public static AviatorClassLoader getAviatorClassLoader(final boolean cached) {
     return getInstance().getAviatorClassLoader(cached);
+  }
+
+  /**
+   * Adds all public static methods in the class as custom functions into evaluator, all these
+   * functions will keep the same name as method name, but prefixed with namespace.
+   *
+   * @since 4.2.2
+   * @param namespace the functions namespace
+   * @param clazz the class
+   * @return the added function list.
+   */
+  public List<String> addStaticFunctions(final String namespace, final Class<?> clazz)
+      throws IllegalAccessException, NoSuchMethodException {
+    return getInstance().addStaticFunctions(namespace, clazz);
   }
 
 
@@ -261,7 +276,7 @@ public final class AviatorEvaluator {
    *
    * @param function
    */
-  public static void addFunction(AviatorFunction function) {
+  public static void addFunction(final AviatorFunction function) {
     getInstance().addFunction(function);
   }
 
@@ -272,7 +287,7 @@ public final class AviatorEvaluator {
    * @param expression the expression to be executed and it's result must be a function.
    * @since 4.0.0
    */
-  public static void defineFunction(String name, String expression) {
+  public static void defineFunction(final String name, final String expression) {
     getInstance().defineFunction(name, expression);
   }
 
@@ -285,7 +300,8 @@ public final class AviatorEvaluator {
    * @param env the expression execution env
    * @since 4.0.0
    */
-  public static void defineFunction(String name, String expression, Map<String, Object> env) {
+  public static void defineFunction(final String name, final String expression,
+      final Map<String, Object> env) {
     getInstance().defineFunction(name, expression, env);
   }
 
@@ -296,7 +312,7 @@ public final class AviatorEvaluator {
    * @param name
    * @return
    */
-  public static AviatorFunction removeFunction(String name) {
+  public static AviatorFunction removeFunction(final String name) {
     return getInstance().removeFunction(name);
   }
 
@@ -307,7 +323,7 @@ public final class AviatorEvaluator {
    * @param name
    * @return
    */
-  public static AviatorFunction getFunction(String name) {
+  public static AviatorFunction getFunction(final String name) {
     return getInstance().getFunction(name);
   }
 
@@ -316,7 +332,7 @@ public final class AviatorEvaluator {
    *
    * @param function
    */
-  public static void addOpFunction(OperatorType opType, AviatorFunction function) {
+  public static void addOpFunction(final OperatorType opType, final AviatorFunction function) {
     getInstance().addOpFunction(opType, function);
   }
 
@@ -329,7 +345,7 @@ public final class AviatorEvaluator {
    * @param opType
    * @return
    */
-  public static AviatorFunction getOpFunction(OperatorType opType) {
+  public static AviatorFunction getOpFunction(final OperatorType opType) {
     return getInstance().getOpFunction(opType);
   }
 
@@ -340,7 +356,7 @@ public final class AviatorEvaluator {
    * @param opType
    * @return
    */
-  public static AviatorFunction removeOpFunction(OperatorType opType) {
+  public static AviatorFunction removeOpFunction(final OperatorType opType) {
     return getInstance().removeOpFunction(opType);
   }
 
@@ -351,7 +367,7 @@ public final class AviatorEvaluator {
    * @param name
    * @return
    */
-  public static boolean containsFunction(String name) {
+  public static boolean containsFunction(final String name) {
     return getInstance().containsFunction(name);
   }
 
@@ -361,7 +377,7 @@ public final class AviatorEvaluator {
    * @param function
    * @return
    */
-  public static AviatorFunction removeFunction(AviatorFunction function) {
+  public static AviatorFunction removeFunction(final AviatorFunction function) {
     return getInstance().removeFunction(function);
   }
 
@@ -373,7 +389,7 @@ public final class AviatorEvaluator {
    * @param aviatorClassLoader
    */
   @Deprecated
-  public static void setAviatorClassLoader(AviatorClassLoader aviatorClassLoader) {
+  public static void setAviatorClassLoader(final AviatorClassLoader aviatorClassLoader) {
     // AviatorEvaluator.aviatorClassLoader = aviatorClassLoader;
   }
 
@@ -384,7 +400,7 @@ public final class AviatorEvaluator {
    * @param expression
    * @return
    */
-  public static Expression getCachedExpression(String expression) {
+  public static Expression getCachedExpression(final String expression) {
     return getInstance().getCachedExpression(expression);
   }
 
@@ -407,7 +423,7 @@ public final class AviatorEvaluator {
    * @param expression
    * @return
    */
-  public static Expression compile(String expression) {
+  public static Expression compile(final String expression) {
     return compile(expression, false);
   }
 
@@ -423,7 +439,7 @@ public final class AviatorEvaluator {
    * @return
    */
   @Deprecated
-  public static Object exec(String expression, Object... values) {
+  public static Object exec(final String expression, final Object... values) {
     return getInstance().exec(expression, values);
   }
 
@@ -435,7 +451,8 @@ public final class AviatorEvaluator {
    * @param env Binding variable environment
    * @param cached Whether to cache the compiled result,make true to cache it.
    */
-  public static Object execute(String expression, Map<String, Object> env, boolean cached) {
+  public static Object execute(final String expression, final Map<String, Object> env,
+      final boolean cached) {
     return getInstance().execute(expression, env, cached);
   }
 
@@ -447,7 +464,7 @@ public final class AviatorEvaluator {
    * @param env
    * @return
    */
-  public static Object execute(String expression, Map<String, Object> env) {
+  public static Object execute(final String expression, final Map<String, Object> env) {
     return execute(expression, env, false);
   }
 
@@ -457,7 +474,7 @@ public final class AviatorEvaluator {
    *
    * @param expression
    */
-  public static void invalidateCache(String expression) {
+  public static void invalidateCache(final String expression) {
     getInstance().invalidateCache(expression);
   }
 
@@ -468,7 +485,7 @@ public final class AviatorEvaluator {
    * @param expression
    * @return
    */
-  public static Object execute(String expression) {
+  public static Object execute(final String expression) {
     return execute(expression, (Map<String, Object>) null);
   }
 }
