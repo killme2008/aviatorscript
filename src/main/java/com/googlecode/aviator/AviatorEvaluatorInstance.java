@@ -18,6 +18,8 @@ package com.googlecode.aviator;
 
 
 import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
+import com.googlecode.aviator.runtime.function.ClassStaticFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -140,6 +143,44 @@ public final class AviatorEvaluatorInstance {
       this.functionLoaders = new ArrayList<FunctionLoader>();
     }
     this.functionLoaders.add(loader);
+  }
+
+  /**
+   * Adds all public static methods in the class as custom functions into evaluator, all these
+   * functions will keep the same name as method name, but prefixed with namespace.
+   *
+   * @since 4.2.2
+   * @param namespace the functions namespace
+   * @param clazz the class
+   * @return the added function list.
+   */
+  public List<String> addStaticFunctions(final String namespace, final Class<?> clazz)
+      throws IllegalAccessException, NoSuchMethodException {
+
+    Map<String, List<Method>> methodMap = new HashMap<>();
+
+    for (Method method : clazz.getMethods()) {
+      int modifiers = method.getModifiers();
+      if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
+        String methodName = method.getName();
+        List<Method> methods = methodMap.get(methodName);
+        if (methods == null) {
+          methods = new ArrayList<>(3);
+          methodMap.put(methodName, methods);
+        }
+        methods.add(method);
+      }
+    }
+
+    List<String> added = new ArrayList<>();
+
+    for (Map.Entry<String, List<Method>> entry : methodMap.entrySet()) {
+      String methodName = entry.getKey();
+      String name = namespace + "." + methodName;
+      this.addFunction(new ClassStaticFunction(clazz, name, methodName, entry.getValue()));
+      added.add(name);
+    }
+    return added;
   }
 
   /**

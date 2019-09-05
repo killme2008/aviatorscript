@@ -297,7 +297,7 @@ public class FunctionTest {
     try {
       assertEquals(0, AviatorEvaluator.execute("reduce(a,/,0)", env));
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (ArithmeticException e) {
       // ignore
     }
     assertEquals(-45, AviatorEvaluator.execute("reduce(a,-,0)", env));
@@ -339,7 +339,7 @@ public class FunctionTest {
     try {
       AviatorEvaluator.execute("sort(set)", env);
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (IllegalArgumentException e) {
       // ignore
     }
 
@@ -885,7 +885,7 @@ public class FunctionTest {
     try {
       assertEquals(1, AviatorEvaluator.execute("seq.get(tuple(1,'hello',3.2), 3)"));
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (ArrayIndexOutOfBoundsException e) {
 
     }
   }
@@ -963,16 +963,16 @@ public class FunctionTest {
       env.put("a", 3);
       assertEquals(5, AviatorEvaluator.execute("seq.max(a)", env));
       fail();
-    } catch (ExpressionRuntimeException e) {
-      assertEquals("<JavaType, 3, Integer> is not a seq", e.getCause().getMessage());
+    } catch (IllegalArgumentException e) {
+      assertEquals("<JavaType, 3, Integer> is not a seq", e.getMessage());
     }
 
     try {
       env.put("a", 3);
       assertEquals(5, AviatorEvaluator.execute("seq.min(a)", env));
       fail();
-    } catch (ExpressionRuntimeException e) {
-      assertEquals("<JavaType, 3, Integer> is not a seq", e.getCause().getMessage());
+    } catch (IllegalArgumentException e) {
+      assertEquals("<JavaType, 3, Integer> is not a seq", e.getMessage());
     }
   }
 
@@ -1017,7 +1017,7 @@ public class FunctionTest {
     try {
       assertEquals(1, AviatorEvaluator.execute("seq.get(seq.list(1,1,2,3),4)"));
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (IndexOutOfBoundsException e) {
       // Jdk changed the message of IndexOutOfBoundsException:
       // - for jdk 8-, cause exception is
       // java.lang.IndexOutOfBoundsException: Index: 4, Size: 4
@@ -1025,9 +1025,9 @@ public class FunctionTest {
       // java.lang.IndexOutOfBoundsException: Index 4 out-of-bounds for length 4
       // - for jdk 11, exception is
       // java.lang.IndexOutOfBoundsException: Index 4 out of bounds for length 4
-      assertTrue(e.getCause().getMessage().equals("Index: 4, Size: 4")
-          || e.getCause().getMessage().equals("Index 4 out-of-bounds for length 4")
-          || e.getCause().getMessage().equals("Index 4 out of bounds for length 4"));
+      assertTrue(e.getMessage().equals("Index: 4, Size: 4")
+          || e.getMessage().equals("Index 4 out-of-bounds for length 4")
+          || e.getMessage().equals("Index 4 out of bounds for length 4"));
     }
   }
 
@@ -1053,7 +1053,7 @@ public class FunctionTest {
     assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(m, -1)", env));
   }
 
-  @Test(expected = ExpressionRuntimeException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testSeqContainsKeyWrongType() {
     AviatorEvaluator.execute("seq.contains_key(seq.list(), 'hello')");
   }

@@ -24,6 +24,7 @@ import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Env;
+import com.googlecode.aviator.utils.Reflector;
 
 
 /**
@@ -38,18 +39,18 @@ public abstract class ClassExpression extends BaseExpression {
 
 
   public Map<String, LambdaFunctionBootstrap> getLambdaBootstraps() {
-    return lambdaBootstraps;
+    return this.lambdaBootstraps;
   }
 
-  public void setLambdaBootstraps(Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
+  public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
     this.lambdaBootstraps = lambdaBootstraps;
   }
 
-  public ClassExpression(AviatorEvaluatorInstance instance, List<String> varNames) {
+  public ClassExpression(final AviatorEvaluatorInstance instance, final List<String> varNames) {
     super(instance, varNames);
   }
 
-  public LambdaFunction newLambda(Env env, String name) {
+  public LambdaFunction newLambda(final Env env, final String name) {
     LambdaFunctionBootstrap bootstrap = this.lambdaBootstraps.get(name);
     if (bootstrap == null) {
       throw new ExpressionNotFoundException("Lambda " + name + " not found");
@@ -69,15 +70,15 @@ public abstract class ClassExpression extends BaseExpression {
     }
     Env env = genTopEnv(map);
     try {
-      Object result = this.execute0(env);
+      Object result = execute0(env);
       if (RuntimeUtils.isTracedEval(env)) {
         RuntimeUtils.printTrace(env, "Result : " + result);
       }
       return result;
     } catch (ExpressionRuntimeException e) {
       throw e;
-    } catch (Throwable e) {
-      throw new ExpressionRuntimeException("Execute expression error", e);
+    } catch (Throwable t) {
+      throw Reflector.sneakyThrow(t);
     }
   }
 

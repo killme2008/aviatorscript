@@ -36,7 +36,7 @@ public class AviatorPattern extends AviatorObject {
   final Pattern pattern;
 
 
-  public AviatorPattern(String expression) {
+  public AviatorPattern(final String expression) {
     super();
     this.pattern = Pattern.compile(expression);
   }
@@ -48,7 +48,7 @@ public class AviatorPattern extends AviatorObject {
 
 
   @Override
-  public AviatorObject add(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
         return new AviatorString(this.pattern.pattern() + ((AviatorString) other).lexeme);
@@ -68,7 +68,7 @@ public class AviatorPattern extends AviatorObject {
 
 
   @Override
-  public AviatorObject match(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject match(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
         AviatorString aviatorString = (AviatorString) other;
@@ -90,21 +90,19 @@ public class AviatorPattern extends AviatorObject {
         AviatorJavaType javaType = (AviatorJavaType) other;
         final Object javaValue = javaType.getValue(env);
         if (TypeUtils.isString(javaValue)) {
-          return this.match(new AviatorString(String.valueOf(javaValue)), env);
+          return match(new AviatorString(String.valueOf(javaValue)), env);
         } else {
-          throw new ExpressionRuntimeException(
-              this.desc(env) + " could not match " + other.desc(env));
+          throw new ExpressionRuntimeException(desc(env) + " could not match " + other.desc(env));
         }
       default:
-        throw new ExpressionRuntimeException(
-            this.desc(env) + " could not match " + other.desc(env));
+        throw new ExpressionRuntimeException(desc(env) + " could not match " + other.desc(env));
     }
 
   }
 
 
   @Override
-  public int compare(AviatorObject other, Map<String, Object> env) {
+  public int compare(final AviatorObject other, final Map<String, Object> env) {
     if (this == other) {
       return 0;
     }
@@ -132,8 +130,8 @@ public class AviatorPattern extends AviatorObject {
 
 
   @Override
-  public Object getValue(Map<String, Object> env) {
-    return "/" + this.pattern.pattern() + "/";
+  public Object getValue(final Map<String, Object> env) {
+    return this.pattern;
   }
 
 }

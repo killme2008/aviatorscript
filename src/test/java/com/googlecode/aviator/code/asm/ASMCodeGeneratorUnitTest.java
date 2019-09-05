@@ -25,6 +25,7 @@ import java.security.PrivilegedAction;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
@@ -122,7 +123,8 @@ public class ASMCodeGeneratorUnitTest {
     this.codeGenerator.onConstant(new PatternToken("[a-z_A-Z]+", 0));
     Expression exp = this.codeGenerator.getResult();
     Object result = exp.execute();
-    assertEquals("/[a-z_A-Z]+/", result);
+    assertTrue(result instanceof Pattern);
+    assertEquals("[a-z_A-Z]+", result.toString());
   }
 
 
