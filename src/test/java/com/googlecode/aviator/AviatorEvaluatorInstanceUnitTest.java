@@ -28,10 +28,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.util.StringUtils;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.utils.TestUtils;
 
 
 public class AviatorEvaluatorInstanceUnitTest {
@@ -47,6 +49,36 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Test
   public void testNewInstance() {
     assertNotSame(this.instance, AviatorEvaluator.newInstance());
+  }
+
+  @Test
+  public void testAddStaticFunctions() throws Exception {
+    assertTrue(this.instance.addStaticFunctions("str", StringUtils.class).size() > 0);
+    assertTrue((boolean) this.instance.execute("str.hasText('3')"));
+
+    Map<String, Object> env = new HashMap<>();
+    env.put("a", new StringBuffer("test"));
+    env.put("b", new StringBuilder("test"));
+    env.put("c", "");
+    assertTrue((boolean) this.instance.execute("str.hasText(a)", env));
+    assertTrue((boolean) this.instance.execute("str.hasText(b)", env));
+    assertFalse((boolean) this.instance.execute("str.hasText(c)", env));
+
+
+    assertTrue(this.instance.addStaticFunctions("test", TestUtils.class).size() > 0);
+
+    assertEquals("str", this.instance.execute("test.assertNotNull('abc')"));
+    assertEquals("num", this.instance.execute("test.assertNotNull(3)"));
+    assertEquals("num", this.instance.execute("test.assertNotNull(3.14)"));
+    assertEquals(3L, this.instance.execute("test.add(1,2)"));
+    assertEquals(6L, this.instance.execute("test.add(4N,2)"));
+
+    try {
+      this.instance.execute("test.sub(3,2)");
+      fail();
+    } catch (Exception e) {
+      assertEquals("Function not found: test.sub", e.getMessage());
+    }
   }
 
   @Test
