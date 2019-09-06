@@ -62,6 +62,9 @@ public class AviatorEvaluatorInstanceUnitTest {
         this.instance.execute("ss.compareToIgnoreCase('hello', 'heLLo')"));
     assertFalse((boolean) this.instance.execute("ss.startsWith('hello','l')"));
     assertTrue((boolean) this.instance.execute("ss.endsWith('hello','o')"));
+
+    byte[] bs = (byte[]) this.instance.execute("ss.getBytes(\"hello world\")");
+    assertEquals("hello world", new String(bs));
   }
 
   @Test
