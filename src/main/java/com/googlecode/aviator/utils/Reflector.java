@@ -132,6 +132,11 @@ public class Reflector {
     return invokeMatchingMethod(methodName, methods, null, args);
   }
 
+  public static Object invokeInstanceMethod(final Class c, final String methodName,
+      final Object target, final List<Method> methods, final Object[] args) {
+    return invokeMatchingMethod(methodName, methods, target, args);
+  }
+
 
   static Object boxArg(final Class paramType, final Object arg) {
     if (!paramType.isPrimitive()) {

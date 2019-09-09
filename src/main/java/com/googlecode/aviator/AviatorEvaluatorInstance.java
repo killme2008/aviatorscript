@@ -41,7 +41,7 @@ import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
-import com.googlecode.aviator.runtime.function.ClassStaticFunction;
+import com.googlecode.aviator.runtime.function.ClassMethodFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -146,6 +146,22 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
+   * Adds all public instance methods in the class as custom functions into evaluator, all these
+   * functions will keep the same name as method name, but prefixed with namespace. And the function
+   * will have more than one argument than the method, the function's first argument is always the
+   * instance object(this pointer).
+   *
+   * @since 4.2.3
+   * @param namespace the functions namespace
+   * @param clazz the class
+   * @return the added function list.
+   */
+  public List<String> addInstanceFunctions(final String namespace, final Class<?> clazz)
+      throws IllegalAccessException, NoSuchMethodException {
+    return addMethodFunctions(namespace, false, clazz);
+  }
+
+  /**
    * Adds all public static methods in the class as custom functions into evaluator, all these
    * functions will keep the same name as method name, but prefixed with namespace.
    *
@@ -157,11 +173,25 @@ public final class AviatorEvaluatorInstance {
   public List<String> addStaticFunctions(final String namespace, final Class<?> clazz)
       throws IllegalAccessException, NoSuchMethodException {
 
+    return addMethodFunctions(namespace, true, clazz);
+  }
+
+  private List<String> addMethodFunctions(final String namespace, final boolean isStatic,
+      final Class<?> clazz) throws IllegalAccessException, NoSuchMethodException {
     Map<String, List<Method>> methodMap = new HashMap<>();
 
     for (Method method : clazz.getMethods()) {
       int modifiers = method.getModifiers();
-      if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
+      if (Modifier.isPublic(modifiers)) {
+        if (isStatic) {
+          if (!Modifier.isStatic(modifiers)) {
+            continue;
+          }
+        } else {
+          if (Modifier.isStatic(modifiers)) {
+            continue;
+          }
+        }
         String methodName = method.getName();
         List<Method> methods = methodMap.get(methodName);
         if (methods == null) {
@@ -177,7 +207,8 @@ public final class AviatorEvaluatorInstance {
     for (Map.Entry<String, List<Method>> entry : methodMap.entrySet()) {
       String methodName = entry.getKey();
       String name = namespace + "." + methodName;
-      this.addFunction(new ClassStaticFunction(clazz, name, methodName, entry.getValue()));
+      this.addFunction(
+          new ClassMethodFunction(clazz, isStatic, name, methodName, entry.getValue()));
       added.add(name);
     }
     return added;

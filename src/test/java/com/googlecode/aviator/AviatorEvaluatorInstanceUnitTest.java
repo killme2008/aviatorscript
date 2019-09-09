@@ -52,6 +52,21 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertNotSame(this.instance, AviatorEvaluator.newInstance());
   }
 
+
+  @Test
+  public void testAddInstanceMethods() throws Exception {
+    assertTrue(this.instance.addInstanceFunctions("ss", String.class).size() > 0);
+    assertEquals(2, this.instance.execute("ss.indexOf('hello','l')"));
+    assertEquals(3, this.instance.execute("ss.lastIndexOf('hello','l')"));
+    assertEquals("hello".compareToIgnoreCase("heLLo"),
+        this.instance.execute("ss.compareToIgnoreCase('hello', 'heLLo')"));
+    assertFalse((boolean) this.instance.execute("ss.startsWith('hello','l')"));
+    assertTrue((boolean) this.instance.execute("ss.endsWith('hello','o')"));
+
+    byte[] bs = (byte[]) this.instance.execute("ss.getBytes(\"hello world\")");
+    assertEquals("hello world", new String(bs));
+  }
+
   @Test
   public void testAddStaticFunctions() throws Exception {
     assertTrue(this.instance.addStaticFunctions("str", StringUtils.class).size() > 0);
