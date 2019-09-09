@@ -33,6 +33,15 @@ AviatorEvaluator.execute("seq.every(a, seq.and(seq.ge(0), seq.lt(10)))", env);
 
 // Lambda 求和
 AviatorEvaluator.execute("reduce(a, lambda(x,y) -> x + y end, 0)", env);
+
+// 导入 String 类实例方法作为自定义函数
+AviatorEvaluator.addInstanceFunctions("s", String.class);
+AviatorEvaluator.execute("s.indexOf('hello', 'l')");
+AviatorEvaluator.execute("s.replaceAll('hello', 'l', 'x')");
+
+// 导入静态方法作为自定义函数
+AviatorEvaluator.addStaticFunctions("sutil", StringUtils.class);
+AviatorEvaluator.execute("sutils.isBlank('hello')");
 ```
 
 更详细的请阅读[用户指南](https://github.com/killme2008/aviator/wiki)。
@@ -46,7 +55,7 @@ AviatorEvaluator.execute("reduce(a, lambda(x,y) -> x + y end, 0)", env);
 5. 支持丰富类型，例如`nil`、整数和浮点数、字符串、正则表达式、日期、变量等，支持自动类型转换和提升。
 6. [支持`lambda`匿名函数和闭包](https://github.com/killme2008/aviator/wiki/4.0-%E5%8A%9F%E8%83%BD%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90#lambda-%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0)。
 7. 内置一套强大的常用[函数库](https://github.com/killme2008/aviator/wiki/%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0)。
-8. 可[自定义函数](https://github.com/killme2008/aviator/wiki#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0)，易于扩展，支持函数调用点[参数列表捕获](https://github.com/killme2008/aviator/wiki/%E5%AE%8C%E6%95%B4%E9%80%89%E9%A1%B9%E5%88%97%E8%A1%A8%E8%AF%B4%E6%98%8E#capture_function_args)。
+8. 可[自定义函数](https://github.com/killme2008/aviator/wiki#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0)，易于扩展，支持函数调用点[参数列表捕获](https://github.com/killme2008/aviator/wiki/%E5%AE%8C%E6%95%B4%E9%80%89%E9%A1%B9%E5%88%97%E8%A1%A8%E8%AF%B4%E6%98%8E#capture_function_args)和 [Java 方法批量导入](https://github.com/killme2008/aviator/wiki#%E4%BD%BF%E7%94%A8Java%E7%B1%BB%E6%96%B9%E6%B3%95%E4%BD%9C%E4%B8%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0)。
 9. 可[重载运算符](https://github.com/killme2008/aviator/wiki#%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E7%AC%A6)。
 10. 支持[大数运算（`BigInteger`）和高精度运算（`BigDecimal`）](https://github.com/killme2008/aviator/wiki#%E5%A4%A7%E6%95%B0%E8%AE%A1%E7%AE%97%E5%92%8C%E7%B2%BE%E5%BA%A6)。
 11. 支持[多行表达式以及定制化求值器实例](https://github.com/killme2008/aviator/wiki/4.0-%E5%8A%9F%E8%83%BD%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90)。
@@ -56,9 +65,7 @@ AviatorEvaluator.execute("reduce(a, lambda(x,y) -> x + y end, 0)", env);
 
 # News
 
-* [4.2.2](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.2),  [import java class's public static methods as custom functions](https://github.com/killme2008/aviator/wiki#%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95%E4%BD%9C%E4%B8%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0).
-* [4.2.1](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.1),  minor fixes.
-* [4.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.0), New features such as capturing function invocation arguments etc.
+* [4.2.3](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.3),  [import java class's public methods as custom functions](https://github.com/killme2008/aviator/wiki#%E4%BD%BF%E7%94%A8Java%E7%B1%BB%E6%96%B9%E6%B3%95%E4%BD%9C%E4%B8%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0).
 
 
 # Dependency
