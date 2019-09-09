@@ -41,7 +41,7 @@ AviatorEvaluator.execute("s.replaceAll('hello', 'l', 'x')");
 
 // 导入静态方法作为自定义函数
 AviatorEvaluator.addStaticFunctions("sutil", StringUtils.class);
-AviatorEvaluator.execute("sutils.isBlank('hello')");
+AviatorEvaluator.execute("sutil.isBlank('hello')");
 ```
 
 更详细的请阅读[用户指南](https://github.com/killme2008/aviator/wiki)。

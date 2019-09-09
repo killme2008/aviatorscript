@@ -41,7 +41,7 @@ AviatorEvaluator.execute("s.replaceAll('hello', 'l', 'x')");
 
 // import static methods
 AviatorEvaluator.addStaticFunctions("sutil", StringUtils.class);
-AviatorEvaluator.execute("sutils.isBlank('hello')");
+AviatorEvaluator.execute("sutil.isBlank('hello')");
 ```
 
 See [user guide](https://github.com/killme2008/aviator/wiki) for details.
