@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.math.MathContext;
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.Options.Value;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -145,7 +146,8 @@ public final class AviatorEvaluator {
 
 
   /**
-   * Returns the current evaluator option value, returns null if missing.
+   * Returns the current evaluator option value, returns null if missing. use
+   * {@link #getOptionValue(Options)} instead.
    *
    * @deprecated
    * @param opt
@@ -156,6 +158,15 @@ public final class AviatorEvaluator {
     return getInstance().getOption(opt);
   }
 
+  /**
+   * Returns the current evaluator option value union, returns null if missing.
+   *
+   * @param opt
+   * @return the option value, null if missing.
+   */
+  public static Value getOptionValue(final Options opt) {
+    return getInstance().getOptionValue(opt);
+  }
 
   /**
    * Get current trace output stream,default is System.out

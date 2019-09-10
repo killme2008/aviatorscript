@@ -117,9 +117,9 @@ public final class AviatorEvaluatorInstance {
   private OutputStream traceOutputStream = System.out;
 
   /**
-   * Generated java class version,default 1.6
+   * Generated java class version,default 1.7
    */
-  public int bytecodeVersion = Opcodes.V1_6;
+  private int bytecodeVersion = Opcodes.V1_7;
 
   /**
    * Options
@@ -269,7 +269,7 @@ public final class AviatorEvaluatorInstance {
    * Returns the current evaluator option value union, returns null if missing.
    *
    * @param opt
-   * @return
+   * @return the option value, null if missing.
    */
   public Value getOptionValue(final Options opt) {
     Value val = this.options.get(opt);
@@ -281,7 +281,7 @@ public final class AviatorEvaluatorInstance {
   /**
    * Returns the generated java classes byte code version, 1.6 by defualt.
    *
-   * @return
+   * @return the bytecode version.
    */
   public int getBytecodeVersion() {
     return this.bytecodeVersion;
