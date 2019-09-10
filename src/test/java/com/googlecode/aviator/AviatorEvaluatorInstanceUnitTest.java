@@ -68,6 +68,28 @@ public class AviatorEvaluatorInstanceUnitTest {
   }
 
   @Test
+  public void testAnnotations() throws Exception {
+    List<String> added = this.instance.addInstanceFunctions("test", TestUtils.class);
+    System.out.println(added);
+    assertTrue(added.size() > 1);
+    assertTrue(added.contains("test.is_empty"));
+
+    TestUtils t = new TestUtils();
+    Map<String, Object> env = new HashMap<>();
+    env.put("t", t);
+    assertTrue((boolean) this.instance.execute("test.is_empty(t, '')", env));
+    assertFalse((boolean) this.instance.execute("test.is_empty(t, t)", env));
+    try {
+      this.instance.execute("test.is_empty(t, 0)", env);
+      fail();
+    } catch (Exception e) {
+      assertEquals(
+          "No matching method is_empty found taking 1 args for class com.googlecode.aviator.utils.TestUtils",
+          e.getMessage());
+    }
+  }
+
+  @Test
   public void testAddStaticFunctions() throws Exception {
     assertTrue(this.instance.addStaticFunctions("str", StringUtils.class).size() > 0);
     assertTrue((boolean) this.instance.execute("str.hasText('3')"));
@@ -82,15 +104,27 @@ public class AviatorEvaluatorInstanceUnitTest {
 
 
     List<String> added = this.instance.addStaticFunctions("test", TestUtils.class);
-    assertEquals(2, added.size());
+    assertEquals(3, added.size());
     assertTrue(added.contains("test.add"));
     assertTrue(added.contains("test.assertNotNull"));
+    assertTrue(added.contains("test.fib"));
 
     assertEquals("str", this.instance.execute("test.assertNotNull('abc')"));
     assertEquals("num", this.instance.execute("test.assertNotNull(3)"));
     assertEquals("num", this.instance.execute("test.assertNotNull(3.14)"));
     assertEquals(3L, this.instance.execute("test.add(1,2)"));
     assertEquals(6L, this.instance.execute("test.add(4N,2)"));
+
+    assertEquals(1L, this.instance.execute("test.fib(1)"));
+    assertEquals(0L, this.instance.execute("test.fib(0)"));
+    assertEquals(55L, this.instance.execute("test.fib(10)"));
+
+    try {
+      this.instance.execute("test.dadd(3.2,2.0)");
+      fail();
+    } catch (Exception e) {
+      assertEquals("Function not found: test.dadd", e.getMessage());
+    }
 
     try {
       this.instance.execute("test.sub(3,2)");

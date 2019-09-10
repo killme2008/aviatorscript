@@ -31,6 +31,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 import com.googlecode.aviator.Options.Value;
+import com.googlecode.aviator.annotation.Function;
+import com.googlecode.aviator.annotation.Ignore;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
@@ -192,7 +194,24 @@ public final class AviatorEvaluatorInstance {
             continue;
           }
         }
+
+        if (method.getAnnotation(Ignore.class) != null) {
+          continue;
+        }
+
+        Function func = method.getAnnotation(Function.class);
         String methodName = method.getName();
+        if (func != null) {
+          String rename = func.rename();
+          if (!rename.isEmpty()) {
+            if (!ExpressionParser.isJavaIdentifier(rename)) {
+              throw new IllegalArgumentException("Invalid rename `" + rename + "` for method "
+                  + method.getName() + " in class " + clazz);
+            }
+            methodName = func.rename();
+          }
+        }
+
         List<Method> methods = methodMap.get(methodName);
         if (methods == null) {
           methods = new ArrayList<>(3);
