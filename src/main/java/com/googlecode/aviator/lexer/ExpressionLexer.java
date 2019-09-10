@@ -171,6 +171,7 @@ public class ExpressionLexer {
       boolean isBigDecimal = false;
       boolean scientificNotation = false;
       boolean negExp = false;
+      boolean isOverflow = false;
       do {
         sb.append(this.peek);
         if (this.peek == '.') {
@@ -239,6 +240,11 @@ public class ExpressionLexer {
           }
 
         }
+
+        if (lval < 0) {
+          isOverflow = true;
+        }
+
       } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'E'
           || this.peek == 'e' || this.peek == 'M' || this.peek == 'N');
       Number value;
@@ -262,7 +268,7 @@ public class ExpressionLexer {
         } else {
           // if the long value is out of range,then it must be negative, so
           // we make it as a big integer.
-          if (lval < 0) {
+          if (lval < 0 || isOverflow) {
             value = new BigInteger(sb.toString());
           } else {
             value = lval;
