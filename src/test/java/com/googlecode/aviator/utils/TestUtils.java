@@ -2,7 +2,10 @@ package com.googlecode.aviator.utils;
 
 import com.googlecode.aviator.annotation.Function;
 import com.googlecode.aviator.annotation.Ignore;
+import com.googlecode.aviator.annotation.Import;
+import com.googlecode.aviator.annotation.ImportScope;
 
+@Import(ns = "test", scopes = {ImportScope.Static})
 public class TestUtils {
 
   public static String assertNotNull(final String s) {

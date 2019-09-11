@@ -68,6 +68,27 @@ public class AviatorEvaluatorInstanceUnitTest {
   }
 
   @Test
+  public void testImportFunctions() throws Exception {
+    List<String> added = this.instance.importFunctions(String.class);
+    assertTrue(added.size() > 0);
+    assertEquals(2, this.instance.execute("String.indexOf('hello','l')"));
+    assertEquals(3, this.instance.execute("String.lastIndexOf('hello','l')"));
+    assertEquals("hello".compareToIgnoreCase("heLLo"),
+        this.instance.execute("String.compareToIgnoreCase('hello', 'heLLo')"));
+    assertFalse((boolean) this.instance.execute("String.startsWith('hello','l')"));
+    assertTrue((boolean) this.instance.execute("String.endsWith('hello','o')"));
+
+    byte[] bs = (byte[]) this.instance.execute("String.getBytes(\"hello world\")");
+    assertEquals("hello world", new String(bs));
+  }
+
+  @Test
+  public void testImportAnnotation() throws Exception {
+    List<String> added = this.instance.importFunctions(TestUtils.class);
+    assertTestUtilsStaticMethods(added);
+  }
+
+  @Test
   public void testAnnotations() throws Exception {
     List<String> added = this.instance.addInstanceFunctions("test", TestUtils.class);
     System.out.println(added);
@@ -104,6 +125,11 @@ public class AviatorEvaluatorInstanceUnitTest {
 
 
     List<String> added = this.instance.addStaticFunctions("test", TestUtils.class);
+    assertTestUtilsStaticMethods(added);
+  }
+
+
+  private void assertTestUtilsStaticMethods(final List<String> added) {
     assertEquals(3, added.size());
     assertTrue(added.contains("test.add"));
     assertTrue(added.contains("test.assertNotNull"));

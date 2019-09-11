@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Function annotation for importing java class public methods.
+ * Function annotation for method to import java class public method.
  *
  * @author dennis(killme2008@gmail.com)
  * @since 4.2.4

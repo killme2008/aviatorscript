@@ -33,6 +33,8 @@ import java.util.concurrent.FutureTask;
 import com.googlecode.aviator.Options.Value;
 import com.googlecode.aviator.annotation.Function;
 import com.googlecode.aviator.annotation.Ignore;
+import com.googlecode.aviator.annotation.Import;
+import com.googlecode.aviator.annotation.ImportScope;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
@@ -148,12 +150,15 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
-   * Adds all public instance methods in the class as custom functions into evaluator, all these
-   * functions will keep the same name as method name, but prefixed with namespace. And the function
-   * will have more than one argument than the method, the function's first argument is always the
-   * instance object(this pointer).
+   * Adds all public instance methods in the class as custom functions into evaluator except those
+   * have {@link Ignore} annotation, all these functions will keep the same name as method name, but
+   * prefixed with namespace, the function name can be renamed by {@link Function} annotation. And
+   * the function will have more than one argument than the method, the function's first argument is
+   * always the instance object(this pointer).
    *
    * @since 4.2.3
+   * @see Ignore
+   * @see Function
    * @param namespace the functions namespace
    * @param clazz the class
    * @return the added function list.
@@ -164,10 +169,13 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
-   * Adds all public static methods in the class as custom functions into evaluator, all these
-   * functions will keep the same name as method name, but prefixed with namespace.
+   * Adds all public static methods in the class as custom functions into evaluator except those
+   * have {@link Ignore} annotation, all these functions will keep the same name as method name, but
+   * prefixed with namespace, the function name can be renamed by {@link Function} annotation.
    *
    * @since 4.2.2
+   * @see Ignore
+   * @see Function
    * @param namespace the functions namespace
    * @param clazz the class
    * @return the added function list.
@@ -176,6 +184,54 @@ public final class AviatorEvaluatorInstance {
       throws IllegalAccessException, NoSuchMethodException {
 
     return addMethodFunctions(namespace, true, clazz);
+  }
+
+  /**
+   * Import the class public methods into aviator evaluator as custom functions. The function's
+   * namespace is the class name by default, and the scopes are both static and instance methods.
+   * The namespace and scope can be set by {@link Import} annotation.
+   *
+   * @since 4.2.2
+   * @see Import
+   * @param clazz the class
+   * @return the added function list.
+   * @throws NoSuchMethodException
+   * @throws IllegalAccessException
+   */
+  public List<String> importFunctions(final Class<?> clazz)
+      throws IllegalAccessException, NoSuchMethodException {
+
+    String namespace = clazz.getSimpleName();
+    ImportScope[] scopes = {ImportScope.Static, ImportScope.Instance};
+
+    Import importAnt = clazz.getAnnotation(Import.class);
+
+    if (importAnt != null) {
+      namespace = importAnt.ns();
+      if (namespace == null || namespace.isEmpty()
+          || !ExpressionParser.isJavaIdentifier(namespace)) {
+        throw new IllegalArgumentException("Invalid namespace in Import annotation: " + namespace);
+      }
+      scopes = importAnt.scopes();
+      if (scopes == null || scopes.length == 0) {
+        throw new IllegalArgumentException("Empty scopes in Import annotation");
+      }
+    }
+
+    List<String> result = new ArrayList<>();
+    for (ImportScope scope : scopes) {
+      switch (scope) {
+        case Static:
+          result.addAll(addStaticFunctions(namespace, clazz));
+          break;
+        case Instance:
+          result.addAll(addInstanceFunctions(namespace, clazz));
+          break;
+        default:
+          throw new IllegalStateException("Invalid import scope: " + scope);
+      }
+    }
+    return result;
   }
 
   private List<String> addMethodFunctions(final String namespace, final boolean isStatic,
@@ -199,8 +255,9 @@ public final class AviatorEvaluatorInstance {
           continue;
         }
 
-        Function func = method.getAnnotation(Function.class);
+
         String methodName = method.getName();
+        Function func = method.getAnnotation(Function.class);
         if (func != null) {
           String rename = func.rename();
           if (!rename.isEmpty()) {

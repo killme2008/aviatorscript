@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Ignore annotation to ignore importing the java class methods.
+ * Ignore annotation for method to ignore importing the java class methods.
  *
  * @author dennis(killme2008@gmail.com)
  * @since 4.2.4

@@ -268,15 +268,8 @@ public final class AviatorEvaluator {
   }
 
   /**
-   * Adds all public instance methods in the class as custom functions into evaluator, all these
-   * functions will keep the same name as method name, but prefixed with namespace. And the function
-   * will have more than one argument than the method, the function's first argument is always the
-   * instance object(this pointer).
    *
-   * @since 4.2.3
-   * @param namespace the functions namespace
-   * @param clazz the class
-   * @return the added function list.
+   * @see AviatorEvaluatorInstance#addInstanceFunctions(String, Class)
    */
   public static List<String> addInstanceFunctions(final String namespace, final Class<?> clazz)
       throws IllegalAccessException, NoSuchMethodException {
@@ -285,19 +278,22 @@ public final class AviatorEvaluator {
 
 
   /**
-   * Adds all public static methods in the class as custom functions into evaluator, all these
-   * functions will keep the same name as method name, but prefixed with namespace.
    *
-   * @since 4.2.2
-   * @param namespace the functions namespace
-   * @param clazz the class
-   * @return the added function list.
+   * @see AviatorEvaluatorInstance#addStaticFunctions(String, Class)
    */
   public static List<String> addStaticFunctions(final String namespace, final Class<?> clazz)
       throws IllegalAccessException, NoSuchMethodException {
     return getInstance().addStaticFunctions(namespace, clazz);
   }
 
+  /**
+   *
+   * @see AviatorEvaluatorInstance#importFunctions(Class)
+   */
+  public static List<String> importFunctions(final Class<?> clazz)
+      throws IllegalAccessException, NoSuchMethodException {
+    return getInstance().importFunctions(clazz);
+  }
 
   /**
    * Add an aviator function,it's not thread-safe.
