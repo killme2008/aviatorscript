@@ -1,8 +1,11 @@
 package com.googlecode.aviator.runtime.function.seq;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.TestUtils;
@@ -56,4 +59,19 @@ public class SeqMapFunctionUnitTest {
         fun.call(env, new AviatorRuntimeJavaType("hello"), new AviatorJavaType("string.length"));
   }
 
+  @Test
+  public void testMap_Map() {
+    final Map<String, String> m = new HashMap<String, String>();
+    m.put("a", "1");
+    m.put("b", "2");
+    SeqMapFunction fun = new SeqMapFunction();
+    AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, new AviatorRuntimeJavaType(m),
+        (AviatorObject) AviatorEvaluator.execute("lambda(x) -> x.value end"));
+
+    List<Object> results = (List<Object>) result.getValue(null);
+
+    assertEquals(2, results.size());
+    assertTrue(results.contains("1"));
+    assertTrue(results.contains("2"));
+  }
 }
