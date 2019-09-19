@@ -38,7 +38,8 @@ public class SeqMapFunction extends AbstractFunction {
 
   @Override
   @SuppressWarnings("unchecked")
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
 
     Object first = arg1.getValue(env);
     AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 1);
@@ -63,8 +64,13 @@ public class SeqMapFunction extends AbstractFunction {
         result.add(fun.call(env, new AviatorRuntimeJavaType(obj)).getValue(env));
       }
       return new AviatorRuntimeJavaType(result);
+    } else if (Map.class.isAssignableFrom(clazz)) {
+      Collection<Object> result = new ArrayList<Object>();
+      for (Object obj : ((Map<?, ?>) first).entrySet()) {
+        result.add(fun.call(env, new AviatorRuntimeJavaType(obj)).getValue(env));
+      }
+      return new AviatorRuntimeJavaType(result);
     } else if (clazz.isArray()) {
-      // Object[] seq = (Object[]) first;
       int length = Array.getLength(first);
       Object result = Array.newInstance(Object.class, length);
       int index = 0;

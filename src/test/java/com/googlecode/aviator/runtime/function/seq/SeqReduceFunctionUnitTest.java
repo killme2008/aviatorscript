@@ -2,7 +2,9 @@ package com.googlecode.aviator.runtime.function.seq;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
@@ -25,14 +27,28 @@ public class SeqReduceFunctionUnitTest {
 
   @Test
   public void testReduce_Array() {
+    final Map<String, String> m = new HashMap<String, String>();
+    m.put("a", "1");
+    m.put("b", "2");
+
+    SeqReduceFunction fun = new SeqReduceFunction();
+    AviatorObject result = fun.call(this.env, new AviatorRuntimeJavaType(m),
+        (AviatorObject) AviatorEvaluator.execute("lambda(x, y) -> x + long(y.value) end"),
+        new AviatorRuntimeJavaType(5));
+    assertNotNull(result);
+    assertEquals(8, result.getValue(null));
+  }
+
+  @Test
+  public void testReduce_Map() {
     Integer[] a = new Integer[10];
     for (int i = 0; i < a.length; i++) {
       a[i] = i;
     }
 
     SeqReduceFunction fun = new SeqReduceFunction();
-    AviatorObject result = fun.call(env, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"),
-        new AviatorRuntimeJavaType(0));
+    AviatorObject result = fun.call(this.env, new AviatorRuntimeJavaType(a),
+        new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
     assertNotNull(result);
     assertEquals(45, result.getValue(null));
 
@@ -49,8 +65,8 @@ public class SeqReduceFunctionUnitTest {
     }
 
     SeqReduceFunction fun = new SeqReduceFunction();
-    AviatorObject result = fun.call(env, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"),
-        new AviatorRuntimeJavaType(0));
+    AviatorObject result = fun.call(this.env, new AviatorRuntimeJavaType(a),
+        new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
 
   }
 
@@ -63,8 +79,8 @@ public class SeqReduceFunctionUnitTest {
     }
 
     SeqReduceFunction fun = new SeqReduceFunction();
-    AviatorObject result = fun.call(env, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"),
-        new AviatorRuntimeJavaType(0));
+    AviatorObject result = fun.call(this.env, new AviatorRuntimeJavaType(a),
+        new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
     assertNotNull(result);
     assertEquals(45, result.getValue(null));
 
@@ -79,7 +95,8 @@ public class SeqReduceFunctionUnitTest {
     }
 
     SeqReduceFunction fun = new SeqReduceFunction();
-    AviatorObject result = fun.call(env, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"));
+    AviatorObject result =
+        fun.call(this.env, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"));
   }
 
 

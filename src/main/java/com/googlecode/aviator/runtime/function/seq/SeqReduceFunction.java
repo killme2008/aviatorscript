@@ -36,8 +36,8 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 public class SeqReduceFunction extends AbstractFunction {
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3) {
     Object first = arg1.getValue(env);
     AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 2);
     if (fun == null) {
@@ -52,6 +52,10 @@ public class SeqReduceFunction extends AbstractFunction {
 
     if (Collection.class.isAssignableFrom(clazz)) {
       for (Object obj : (Collection<?>) first) {
+        result = fun.call(env, result, new AviatorRuntimeJavaType(obj));
+      }
+    } else if (Map.class.isAssignableFrom(clazz)) {
+      for (Object obj : ((Map<?, ?>) first).entrySet()) {
         result = fun.call(env, result, new AviatorRuntimeJavaType(obj));
       }
     } else if (clazz.isArray()) {

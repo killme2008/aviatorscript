@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,6 +50,18 @@ public class GrammarUnitTest {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
     assertTrue((boolean) AviatorEvaluator.execute("'一二三'=~/.*三/"));
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
+  }
+
+
+  @Test
+  public void testIssue162() {
+    Object val = AviatorEvaluator.execute("2017122615550747128008704");
+    assertTrue(val instanceof BigInteger);
+    assertEquals(new BigInteger("2017122615550747128008704"), val);
+
+    val = AviatorEvaluator.execute("-2017122615550747128008704");
+    assertTrue(val instanceof BigInteger);
+    assertEquals(new BigInteger("-2017122615550747128008704"), val);
   }
 
   @Test

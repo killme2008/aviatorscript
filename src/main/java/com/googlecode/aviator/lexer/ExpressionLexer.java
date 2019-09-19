@@ -20,7 +20,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
-import java.util.Stack;
+import java.util.LinkedList;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
@@ -46,7 +46,7 @@ public class ExpressionLexer {
   // symbol table
   private final SymbolTable symbolTable;
   // Tokens buffer
-  private final Stack<Token<?>> tokenBuffer = new Stack<Token<?>>();
+  private LinkedList<Token<?>> tokenBuffer;
   private final AviatorEvaluatorInstance instance;
   private final String expression;
   private final MathContext mathContext;
@@ -73,6 +73,9 @@ public class ExpressionLexer {
    * @param token
    */
   public void pushback(final Token<?> token) {
+    if (this.tokenBuffer == null) {
+      this.tokenBuffer = new LinkedList<>();
+    }
     this.tokenBuffer.push(token);
   }
 
@@ -113,7 +116,7 @@ public class ExpressionLexer {
 
   public Token<?> scan(final boolean analyse) {
     // If buffer is not empty,return
-    if (!this.tokenBuffer.isEmpty()) {
+    if (this.tokenBuffer != null && !this.tokenBuffer.isEmpty()) {
       return this.tokenBuffer.pop();
     }
     // Skip white space or line
@@ -171,6 +174,7 @@ public class ExpressionLexer {
       boolean isBigDecimal = false;
       boolean scientificNotation = false;
       boolean negExp = false;
+      boolean isOverflow = false;
       do {
         sb.append(this.peek);
         if (this.peek == '.') {
@@ -239,6 +243,11 @@ public class ExpressionLexer {
           }
 
         }
+
+        if (lval < 0) {
+          isOverflow = true;
+        }
+
       } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'E'
           || this.peek == 'e' || this.peek == 'M' || this.peek == 'N');
       Number value;
@@ -260,9 +269,8 @@ public class ExpressionLexer {
           // we make integral number as a BigDecimal.
           value = new BigDecimal(sb.toString(), this.mathContext);
         } else {
-          // if the long value is out of range,then it must be negative, so
-          // we make it as a big integer.
-          if (lval < 0) {
+          // The long value is overflow, we should prompt it to be a BigInteger.
+          if (isOverflow) {
             value = new BigInteger(sb.toString());
           } else {
             value = lval;

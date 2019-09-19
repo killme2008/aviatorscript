@@ -18,10 +18,12 @@ package com.googlecode.aviator.code;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.BaseExpression;
@@ -243,8 +245,20 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       case Pattern:
       case String:
         return true;
+      default:
+        return false;
     }
-    return false;
+  }
+
+  private boolean isConstant(final Token<?> token) {
+    switch (token.getType()) {
+      case Number:
+      case Pattern:
+      case String:
+        return true;
+      default:
+        return false;
+    }
   }
 
 
@@ -355,7 +369,13 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
     Map<String, Integer/* counter */> variables = new LinkedHashMap<String, Integer>();
     Map<String, Integer/* counter */> methods = new HashMap<String, Integer>();
+    Set<Token<?>> constants = new HashSet<>();
     for (Token<?> token : this.tokenList) {
+
+      if (isConstant(token)) {
+        constants.add(token);
+      }
+
       switch (token.getType()) {
         case Variable:
           String varName = token.getLexeme();
@@ -414,7 +434,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
     if (exp == null) {
       // call asm to generate byte codes
-      callASM(variables, methods);
+      callASM(variables, methods, constants);
       // get result from asm
       exp = this.codeGen.getResult();
     }
@@ -428,7 +448,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   private void callASM(final Map<String, Integer/* counter */> variables,
-      final Map<String, Integer/* counter */> methods) {
+      final Map<String, Integer/* counter */> methods, final Set<Token<?>> constants) {
+    this.codeGen.initConstants(constants);
     this.codeGen.initVariables(variables);
     this.codeGen.initMethods(methods);
     this.codeGen.setLambdaBootstraps(this.lambdaBootstraps);

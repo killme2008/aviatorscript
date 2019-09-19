@@ -19,8 +19,8 @@ public class SimpleELPerformanceTest extends TestCase {
     }
   }
 
-  private void perf(Map<String, Object> ctx) {
-    Expression exp = AviatorEvaluator.compile("(a+b)*c");
+  private void perf(final Map<String, Object> ctx) {
+    Expression exp = AviatorEvaluator.compile("(a+b+100)*c*100");
     long startMillis = System.currentTimeMillis();
 
     final int COUNT = 10000 * 1000;

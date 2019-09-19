@@ -15,7 +15,9 @@
  **/
 package com.googlecode.aviator.parser;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,7 +68,7 @@ public class ExpressionParser implements Parser {
 
   private int lambdaDepth = 0;
 
-  private LinkedList<DepthState> depthState = new LinkedList<DepthState>();
+  private Deque<DepthState> depthState = new ArrayDeque<DepthState>();
 
 
   private boolean inPattern = false;

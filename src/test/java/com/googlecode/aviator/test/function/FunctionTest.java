@@ -361,6 +361,17 @@ public class FunctionTest {
         (Boolean) AviatorEvaluator.execute("seq.not_any(tuple(false,false,false), identity)"));
     assertFalse(
         (Boolean) AviatorEvaluator.execute("seq.not_any(tuple(true,false,true), identity)"));
+
+    // map and reduce with hash-map
+    List<Object> results = (List<Object>) AviatorEvaluator
+        .execute("a=seq.map('k1', 'v1', 'k2', 'v2');" + "map(a,lambda(x) -> x.value end)");
+    assertEquals(2, results.size());
+    assertTrue(results.contains("v1"));
+    assertTrue(results.contains("v2"));
+
+    String result = (String) AviatorEvaluator.execute("a=seq.map('k1', 'v1', 'k2', 'v2');"
+        + "reduce(a,lambda(r, x) -> r+',' + x.key+ '=' + x.value end, '')");
+    assertEquals(result, ",k1=v1,k2=v2");
   }
 
   @Test

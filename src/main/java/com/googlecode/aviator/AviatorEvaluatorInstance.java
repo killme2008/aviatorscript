@@ -31,6 +31,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 import com.googlecode.aviator.Options.Value;
+import com.googlecode.aviator.annotation.Function;
+import com.googlecode.aviator.annotation.Ignore;
+import com.googlecode.aviator.annotation.Import;
+import com.googlecode.aviator.annotation.ImportScope;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
@@ -64,6 +68,7 @@ import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMaxFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMinFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqNewArrayFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewListFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewSetFunction;
@@ -117,9 +122,9 @@ public final class AviatorEvaluatorInstance {
   private OutputStream traceOutputStream = System.out;
 
   /**
-   * Generated java class version,default 1.6
+   * Generated java class version,default 1.7
    */
-  public int bytecodeVersion = Opcodes.V1_6;
+  private int bytecodeVersion = Opcodes.V1_7;
 
   /**
    * Options
@@ -146,12 +151,15 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
-   * Adds all public instance methods in the class as custom functions into evaluator, all these
-   * functions will keep the same name as method name, but prefixed with namespace. And the function
-   * will have more than one argument than the method, the function's first argument is always the
-   * instance object(this pointer).
+   * Adds all public instance methods in the class as custom functions into evaluator except those
+   * have {@link Ignore} annotation, all these functions will keep the same name as method name, but
+   * prefixed with namespace, the function name can be renamed by {@link Function} annotation. And
+   * the function will have more than one argument than the method, the function's first argument is
+   * always the instance object(this pointer).
    *
    * @since 4.2.3
+   * @see Ignore
+   * @see Function
    * @param namespace the functions namespace
    * @param clazz the class
    * @return the added function list.
@@ -162,10 +170,13 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
-   * Adds all public static methods in the class as custom functions into evaluator, all these
-   * functions will keep the same name as method name, but prefixed with namespace.
+   * Adds all public static methods in the class as custom functions into evaluator except those
+   * have {@link Ignore} annotation, all these functions will keep the same name as method name, but
+   * prefixed with namespace, the function name can be renamed by {@link Function} annotation.
    *
    * @since 4.2.2
+   * @see Ignore
+   * @see Function
    * @param namespace the functions namespace
    * @param clazz the class
    * @return the added function list.
@@ -174,6 +185,54 @@ public final class AviatorEvaluatorInstance {
       throws IllegalAccessException, NoSuchMethodException {
 
     return addMethodFunctions(namespace, true, clazz);
+  }
+
+  /**
+   * Import the class public methods into aviator evaluator as custom functions. The function's
+   * namespace is the class name by default, and the scopes are both static and instance methods.
+   * The namespace and scope can be set by {@link Import} annotation.
+   *
+   * @since 4.2.2
+   * @see Import
+   * @param clazz the class
+   * @return the added function list.
+   * @throws NoSuchMethodException
+   * @throws IllegalAccessException
+   */
+  public List<String> importFunctions(final Class<?> clazz)
+      throws IllegalAccessException, NoSuchMethodException {
+
+    String namespace = clazz.getSimpleName();
+    ImportScope[] scopes = {ImportScope.Static, ImportScope.Instance};
+
+    Import importAnt = clazz.getAnnotation(Import.class);
+
+    if (importAnt != null) {
+      namespace = importAnt.ns();
+      if (namespace == null || namespace.isEmpty()
+          || !ExpressionParser.isJavaIdentifier(namespace)) {
+        throw new IllegalArgumentException("Invalid namespace in Import annotation: " + namespace);
+      }
+      scopes = importAnt.scopes();
+      if (scopes == null || scopes.length == 0) {
+        throw new IllegalArgumentException("Empty scopes in Import annotation");
+      }
+    }
+
+    List<String> result = new ArrayList<>();
+    for (ImportScope scope : scopes) {
+      switch (scope) {
+        case Static:
+          result.addAll(addStaticFunctions(namespace, clazz));
+          break;
+        case Instance:
+          result.addAll(addInstanceFunctions(namespace, clazz));
+          break;
+        default:
+          throw new IllegalStateException("Invalid import scope: " + scope);
+      }
+    }
+    return result;
   }
 
   private List<String> addMethodFunctions(final String namespace, final boolean isStatic,
@@ -192,7 +251,25 @@ public final class AviatorEvaluatorInstance {
             continue;
           }
         }
+
+        if (method.getAnnotation(Ignore.class) != null) {
+          continue;
+        }
+
+
         String methodName = method.getName();
+        Function func = method.getAnnotation(Function.class);
+        if (func != null) {
+          String rename = func.rename();
+          if (!rename.isEmpty()) {
+            if (!ExpressionParser.isJavaIdentifier(rename)) {
+              throw new IllegalArgumentException("Invalid rename `" + rename + "` for method "
+                  + method.getName() + " in class " + clazz);
+            }
+            methodName = func.rename();
+          }
+        }
+
         List<Method> methods = methodMap.get(methodName);
         if (methods == null) {
           methods = new ArrayList<>(3);
@@ -269,7 +346,7 @@ public final class AviatorEvaluatorInstance {
    * Returns the current evaluator option value union, returns null if missing.
    *
    * @param opt
-   * @return
+   * @return the option value, null if missing.
    */
   public Value getOptionValue(final Options opt) {
     Value val = this.options.get(opt);
@@ -281,7 +358,7 @@ public final class AviatorEvaluatorInstance {
   /**
    * Returns the generated java classes byte code version, 1.6 by defualt.
    *
-   * @return
+   * @return the bytecode version.
    */
   public int getBytecodeVersion() {
     return this.bytecodeVersion;
@@ -424,6 +501,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new MathTanFunction());
 
     // seq lib
+    addFunction(new SeqNewArrayFunction());
     addFunction(new SeqNewListFunction());
     addFunction(new SeqNewMapFunction());
     addFunction(new SeqNewSetFunction());
