@@ -130,10 +130,12 @@ public class AviatorEvaluatorInstanceUnitTest {
 
 
   private void assertTestUtilsStaticMethods(final List<String> added) {
-    assertEquals(3, added.size());
+    assertEquals(5, added.size());
     assertTrue(added.contains("test.add"));
     assertTrue(added.contains("test.assertNotNull"));
     assertTrue(added.contains("test.fib"));
+    assertTrue(added.contains("test.join"));
+    assertTrue(added.contains("test.join2"));
 
     assertEquals("str", this.instance.execute("test.assertNotNull('abc')"));
     assertEquals("num", this.instance.execute("test.assertNotNull(3)"));
@@ -144,6 +146,14 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertEquals(1L, this.instance.execute("test.fib(1)"));
     assertEquals(0L, this.instance.execute("test.fib(0)"));
     assertEquals(55L, this.instance.execute("test.fib(10)"));
+
+    assertEquals("hello,dennis",
+        this.instance.execute("test.join(seq.array(java.lang.String, 'hello','dennis'))"));
+    assertEquals("hello,dennis",
+        this.instance.execute("test.join2(seq.array(java.lang.String, 'hello','dennis'))"));
+
+    assertEquals("hello,dennis",
+        this.instance.execute("test.join('hello',seq.array(java.lang.String, 'dennis'))"));
 
     try {
       this.instance.execute("test.dadd(3.2,2.0)");

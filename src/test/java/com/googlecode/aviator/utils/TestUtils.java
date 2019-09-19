@@ -47,4 +47,29 @@ public class TestUtils {
   public boolean isEmpty(final Number n) {
     return n.longValue() == 0;
   }
+
+  public static String join(final String s, final String... args) {
+    return s + "," + join(args);
+  }
+
+  public static String join(final String... args) {
+    if (args == null || args.length == 0) {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder();
+    boolean wasFirst = true;
+    for (int i = 0; i < args.length; i++) {
+      if (wasFirst) {
+        sb.append(args[i]);
+        wasFirst = false;
+      } else {
+        sb.append(",").append(args[i]);
+      }
+    }
+    return sb.toString();
+  }
+
+  public static String join2(final String... args) {
+    return join(args);
+  }
 }

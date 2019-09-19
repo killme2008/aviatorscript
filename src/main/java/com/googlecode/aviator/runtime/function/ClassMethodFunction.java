@@ -39,7 +39,7 @@ public class ClassMethodFunction extends AbstractVariadicFunction {
 
     if (methods.size() == 1) {
       // fast path by method handle.
-      this.handle = MethodHandles.lookup().unreflect(methods.get(0));
+      this.handle = MethodHandles.lookup().unreflect(methods.get(0)).asFixedArity();
       this.pTypes = methods.get(0).getParameterTypes();
       if (!isStatic) {
         Class<?>[] newTypes = new Class<?>[this.pTypes.length + 1];
