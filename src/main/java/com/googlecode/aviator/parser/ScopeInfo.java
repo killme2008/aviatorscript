@@ -1,6 +1,6 @@
 package com.googlecode.aviator.parser;
 
-import java.util.LinkedList;
+import java.util.Deque;
 
 public class ScopeInfo {
   int parenDepth;
@@ -9,10 +9,10 @@ public class ScopeInfo {
 
   int lambdaDepth;
 
-  LinkedList<DepthState> depthState;
+  Deque<DepthState> depthState;
 
-  public ScopeInfo(int parenDepth, int bracketDepth, int lambdaDepth,
-      LinkedList<DepthState> depthState) {
+  public ScopeInfo(final int parenDepth, final int bracketDepth, final int lambdaDepth,
+      final Deque<DepthState> depthState) {
     super();
     this.parenDepth = parenDepth;
     this.bracketDepth = bracketDepth;
