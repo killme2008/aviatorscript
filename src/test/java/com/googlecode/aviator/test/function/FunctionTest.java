@@ -1005,6 +1005,21 @@ public class FunctionTest {
   }
 
   @Test
+  public void testSeqNewArray() {
+    assertArrayEquals(new String[] {},
+        (String[]) AviatorEvaluator.execute("seq.array(java.lang.String)"));
+
+    assertArrayEquals(new long[] {1, 2, 3},
+        (long[]) AviatorEvaluator.execute("seq.array(long, 1,2,3)"));
+
+    assertArrayEquals(new short[] {-2, 3, 100},
+        (short[]) AviatorEvaluator.execute("seq.array(short, -2, 3, 100)"));
+
+    assertEquals(101,
+        (long) AviatorEvaluator.execute("reduce(seq.array(short, -2, 3, 100), +, 0)"));
+  }
+
+  @Test
   public void testSeqNewList() {
     assertEquals(newList(), AviatorEvaluator.execute("seq.list()"));
     assertEquals(newList(1L), AviatorEvaluator.execute("seq.list(1)"));

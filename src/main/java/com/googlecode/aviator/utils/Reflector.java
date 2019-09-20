@@ -138,7 +138,7 @@ public class Reflector {
   }
 
 
-  static Object boxArg(final Class paramType, final Object arg) {
+  public static Object boxArg(final Class paramType, final Object arg) {
     if (!paramType.isPrimitive()) {
       return paramType.cast(arg);
     } else if (paramType == boolean.class) {
