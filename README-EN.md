@@ -65,7 +65,7 @@ See [home page](http://fnil.net/aviator) for details.
 
 # News
 
-* [4.2.3](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.3),  [import java class's public methods as custom functions](https://github.com/killme2008/aviator/wiki#%E4%BD%BF%E7%94%A8Java%E7%B1%BB%E6%96%B9%E6%B3%95%E4%BD%9C%E4%B8%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0).
+* [4.2.4](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.4),  adds annotations for importing java class methods and some new features.
 
 # Dependency
 
