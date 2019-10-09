@@ -36,6 +36,49 @@ public class JavaMethodReflectionFunctionMissingTest {
     assertEquals(true, this.instance.execute("isEmpty(test, '')", env));
   }
 
+  @Test
+  public void benchmark() {
+    // test String#indexOf by different impl.
+
+    int n = 500000;
+
+    // by custom function
+    benchmarkFunction(n);
+    benchmarkFunctionMissing(n);
+
+    long start = System.nanoTime();
+    System.out.println("custom function:" + benchmarkFunction(n) + ", cost: "
+        + (System.nanoTime() - start) / 1000_000 + " ms.");
+    start = System.nanoTime();
+    System.out.println("function missing:" + benchmarkFunctionMissing(n) + ", cost: "
+        + (System.nanoTime() - start) / 1000_000 + " ms.");
+
+  }
+
+  private long benchmarkFunctionMissing(final int n) {
+    Map<String, Object> env = new HashMap<>();
+    long result = 0;
+    for (int i = 0; i < n; i++) {
+      String s = "hello" + i + "world";
+      env.put("s", s);
+      // by function missing reflection
+      result += (long) this.instance.execute("indexOf(s, 'w')", env, true);
+    }
+    return result;
+  }
+
+  private long benchmarkFunction(final int n) {
+    Map<String, Object> env = new HashMap<>();
+    long result = 0;
+    for (int i = 0; i < n; i++) {
+      String s = "hello" + i + "world";
+      env.put("s", s);
+      // by system lib.
+      result += (long) this.instance.execute("string.indexOf(s, 'w')", env, true);
+    }
+    return result;
+  }
+
   @Test(expected = FunctionNotFoundException.class)
   public void testFunctionNotFound1() {
     assertEquals(1, this.instance.execute("test()"));
