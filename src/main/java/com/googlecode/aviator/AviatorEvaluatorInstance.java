@@ -121,6 +121,8 @@ public final class AviatorEvaluatorInstance {
 
   private OutputStream traceOutputStream = System.out;
 
+  private FunctionMissing functionMissing;
+
   /**
    * Generated java class version,default 1.7
    */
@@ -149,6 +151,33 @@ public final class AviatorEvaluatorInstance {
     }
     this.functionLoaders.add(loader);
   }
+
+
+  /**
+   * Returns the function missing handler, null if not set.
+   *
+   * @since 4.2.5
+   * @return
+   */
+  public FunctionMissing getFunctionMissing() {
+    return this.functionMissing;
+  }
+
+
+  /**
+   * Configure a function missing handler.
+   *
+   * @since 4.2.5
+   * @param functionMissing
+   */
+  public void setFunctionMissing(final FunctionMissing functionMissing) {
+    if (this.functionMissing != null) {
+      throw new IllegalArgumentException("functionMissing already set.");
+    }
+    this.functionMissing = functionMissing;
+  }
+
+
 
   /**
    * Adds all public instance methods in the class as custom functions into evaluator except those
@@ -674,7 +703,7 @@ public final class AviatorEvaluatorInstance {
     }
     if (function == null) {
       // Returns a delegate function that will try to find the function from runtime env.
-      function = new RuntimeFunctionDelegator(name);
+      function = new RuntimeFunctionDelegator(name, this.functionMissing);
     }
     return function;
   }
