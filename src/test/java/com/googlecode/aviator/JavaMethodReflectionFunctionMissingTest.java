@@ -37,7 +37,12 @@ public class JavaMethodReflectionFunctionMissingTest {
   }
 
   @Test(expected = FunctionNotFoundException.class)
-  public void testFunctionNotFound() {
+  public void testFunctionNotFound1() {
     assertEquals(1, this.instance.execute("test()"));
+  }
+
+  @Test(expected = FunctionNotFoundException.class)
+  public void testFunctionNotFound2() {
+    assertEquals(1, this.instance.execute("test(nil)"));
   }
 }

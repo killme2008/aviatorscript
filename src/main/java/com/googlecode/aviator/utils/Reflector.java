@@ -157,6 +157,11 @@ public class Reflector {
   }
 
 
+  /**
+   *
+   * Class's instance method cache key
+   *
+   */
   static class MethodKey {
     Class<?> clazz;
     String name;

@@ -42,6 +42,12 @@ public class JavaMethodReflectionFunctionMissing implements FunctionMissing {
     }
 
     Object firstArg = args[0].getValue(env);
+
+    if (firstArg == null) {
+      throw new FunctionNotFoundException(
+          "Function not found: " + name + ", the first argument is null");
+    }
+
     Class<?> clazz = firstArg.getClass();
 
 
