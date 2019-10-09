@@ -37,22 +37,35 @@ public class JavaMethodReflectionFunctionMissingTest {
   }
 
   @Test
-  public void benchmark() {
-    // test String#indexOf by different impl.
+  public void benchmark() throws Exception {
+    this.instance.addInstanceFunctions("str", String.class);
 
     int n = 500000;
-
-    // by custom function
     benchmarkFunction(n);
     benchmarkFunctionMissing(n);
-
+    benchmarkImportFunction(n);
     long start = System.nanoTime();
     System.out.println("custom function:" + benchmarkFunction(n) + ", cost: "
         + (System.nanoTime() - start) / 1000_000 + " ms.");
     start = System.nanoTime();
     System.out.println("function missing:" + benchmarkFunctionMissing(n) + ", cost: "
         + (System.nanoTime() - start) / 1000_000 + " ms.");
+    start = System.nanoTime();
+    System.out.println("imported function:" + benchmarkImportFunction(n) + ", cost: "
+        + (System.nanoTime() - start) / 1000_000 + " ms.");
 
+  }
+
+  private long benchmarkImportFunction(final int n) {
+    Map<String, Object> env = new HashMap<>();
+    long result = 0;
+    for (int i = 0; i < n; i++) {
+      String s = "hello" + i + "world";
+      env.put("s", s);
+      // by function missing reflection
+      result += (long) this.instance.execute("str.indexOf(s, 'w')", env, true);
+    }
+    return result;
   }
 
   private long benchmarkFunctionMissing(final int n) {
