@@ -901,12 +901,14 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Execute a text expression with values that are variables order in the expression.It only runs
-   * in EVAL mode,and it will cache the compiled expression.
+   * in EVAL mode,and it will cache the compiled expression.It's deprecated, please use
+   * {@link #execute(String, Map)} instead.
    *
    * @param expression
    * @param values
    * @return
    */
+  @Deprecated
   public Object exec(final String expression, final Object... values) {
     if (getOptimizeLevel() != AviatorEvaluator.EVAL) {
       throw new IllegalStateException("Aviator evaluator is not in EVAL mode.");
