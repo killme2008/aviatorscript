@@ -22,12 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import com.googlecode.aviator.runtime.type.AviatorBoolean;
-import com.googlecode.aviator.runtime.type.AviatorNil;
-import com.googlecode.aviator.runtime.type.AviatorNumber;
-import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
-import com.googlecode.aviator.runtime.type.AviatorString;
 
 /**
  * Some code is copied from
@@ -350,21 +344,5 @@ public class Reflector {
       }
     }
     return ret;
-  }
-
-  public static AviatorObject wrapRet(final Object ret) {
-    if (ret == null) {
-      return AviatorNil.NIL;
-    } else if (ret instanceof Number) {
-      return AviatorNumber.valueOf(ret);
-    } else if (ret instanceof CharSequence) {
-      return new AviatorString(ret.toString());
-    } else if (ret instanceof Boolean) {
-      return AviatorBoolean.valueOf((boolean) ret);
-    } else if (ret instanceof AviatorObject) {
-      return (AviatorObject) ret;
-    } else {
-      return new AviatorRuntimeJavaType(ret);
-    }
   }
 }

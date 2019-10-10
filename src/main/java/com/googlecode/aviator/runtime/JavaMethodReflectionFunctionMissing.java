@@ -3,6 +3,7 @@ package com.googlecode.aviator.runtime;
 import java.util.Map;
 import com.googlecode.aviator.FunctionMissing;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Reflector;
 
@@ -38,7 +39,8 @@ public class JavaMethodReflectionFunctionMissing implements FunctionMissing {
       final AviatorObject... args) {
 
     if (args == null || args.length < 1) {
-      throw new FunctionNotFoundException("Function not found: " + name);
+      throw new FunctionNotFoundException(
+          "Function not found: " + name + ", could not resolve with no arguments");
     }
 
     Object firstArg = args[0].getValue(env);
@@ -56,7 +58,7 @@ public class JavaMethodReflectionFunctionMissing implements FunctionMissing {
       jArgs[i - 1] = args[i].getValue(env);
     }
 
-    return Reflector.wrapRet(Reflector.invokeInstanceMethod(clazz, name, firstArg,
+    return FunctionUtils.wrapReturn(Reflector.invokeInstanceMethod(clazz, name, firstArg,
         Reflector.getInstanceMethods(clazz, name), jArgs));
   }
 

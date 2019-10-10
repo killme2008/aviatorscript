@@ -172,7 +172,7 @@ public final class AviatorEvaluatorInstance {
    */
   public void setFunctionMissing(final FunctionMissing functionMissing) {
     if (this.functionMissing != null) {
-      throw new IllegalArgumentException("functionMissing already set.");
+      throw new IllegalArgumentException("functionMissing already set:" + this.functionMissing);
     }
     this.functionMissing = functionMissing;
   }

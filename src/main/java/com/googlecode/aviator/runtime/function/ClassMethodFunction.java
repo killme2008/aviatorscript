@@ -82,13 +82,13 @@ public class ClassMethodFunction extends AbstractVariadicFunction {
 
     if (this.handle != null) {
       try {
-        return Reflector
-            .wrapRet(this.handle.invokeWithArguments(Reflector.boxArgs(this.pTypes, jArgs)));
+        return FunctionUtils
+            .wrapReturn(this.handle.invokeWithArguments(Reflector.boxArgs(this.pTypes, jArgs)));
       } catch (Throwable t) {
         throw Reflector.sneakyThrow(t);
       }
     } else {
-      return Reflector.wrapRet(this.isStatic
+      return FunctionUtils.wrapReturn(this.isStatic
           ? Reflector.invokeStaticMethod(this.clazz, this.methodName, this.methods, jArgs)
           : Reflector.invokeInstanceMethod(this.clazz, this.methodName, target, this.methods,
               jArgs));
