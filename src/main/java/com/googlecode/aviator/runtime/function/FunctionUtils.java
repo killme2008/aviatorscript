@@ -22,10 +22,14 @@ import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
+import com.googlecode.aviator.runtime.type.AviatorNil;
+import com.googlecode.aviator.runtime.type.AviatorNumber;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.runtime.type.AviatorString;
 import com.googlecode.aviator.runtime.type.AviatorType;
 
 
@@ -151,6 +155,30 @@ public class FunctionUtils {
   public static final Number getNumberValue(final AviatorObject arg1,
       final Map<String, Object> env) {
     return (Number) arg1.getValue(env);
+  }
+
+
+  /**
+   * Wraps the object as aviator object.
+   *
+   * @since 4.2.5
+   * @param ret the java object
+   * @return wrapped aviator object
+   */
+  public static AviatorObject wrapReturn(final Object ret) {
+    if (ret == null) {
+      return AviatorNil.NIL;
+    } else if (ret instanceof Number) {
+      return AviatorNumber.valueOf(ret);
+    } else if (ret instanceof CharSequence) {
+      return new AviatorString(ret.toString());
+    } else if (ret instanceof Boolean) {
+      return AviatorBoolean.valueOf((boolean) ret);
+    } else if (ret instanceof AviatorObject) {
+      return (AviatorObject) ret;
+    } else {
+      return new AviatorRuntimeJavaType(ret);
+    }
   }
 
 }

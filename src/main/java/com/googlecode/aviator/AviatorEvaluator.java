@@ -131,6 +131,22 @@ public final class AviatorEvaluator {
     getInstance().setOption(Options.TRACE, t);
   }
 
+  /**
+   * @see AviatorEvaluatorInstance#setFunctionMissing(FunctionMissing)
+   * @param functionMissing
+   */
+  public static void setFunctionMissing(final FunctionMissing functionMissing) {
+    getInstance().setFunctionMissing(functionMissing);
+  }
+
+
+  /**
+   * @see AviatorEvaluatorInstance#getFunctionMissing(FunctionMissing)
+   * @param functionMissing
+   */
+  public static FunctionMissing getFunctionMissing() {
+    return getInstance().getFunctionMissing();
+  }
 
   /**
    * Adds a evaluator option

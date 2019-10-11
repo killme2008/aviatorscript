@@ -34,6 +34,8 @@ import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorString;
 import com.googlecode.aviator.utils.TestUtils;
 
 
@@ -50,6 +52,22 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Test
   public void testNewInstance() {
     assertNotSame(this.instance, AviatorEvaluator.newInstance());
+  }
+
+  @Test
+  public void testFunctionMissing() {
+    this.instance.setFunctionMissing(new FunctionMissing() {
+
+      @Override
+      public AviatorObject onFunctionMissing(final String name, final Map<String, Object> env,
+          final AviatorObject... args) {
+        // Returns the missing function name.
+        return new AviatorString(name);
+      }
+    });
+
+    assertEquals("test", this.instance.execute("test()"));
+    assertEquals("abc", this.instance.execute("abc(1,2)"));
   }
 
 

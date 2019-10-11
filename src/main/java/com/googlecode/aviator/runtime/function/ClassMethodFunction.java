@@ -5,12 +5,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import com.googlecode.aviator.runtime.type.AviatorBoolean;
-import com.googlecode.aviator.runtime.type.AviatorNil;
-import com.googlecode.aviator.runtime.type.AviatorNumber;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
-import com.googlecode.aviator.runtime.type.AviatorString;
 import com.googlecode.aviator.utils.Reflector;
 
 /**
@@ -62,23 +57,6 @@ public class ClassMethodFunction extends AbstractVariadicFunction {
     return this.name;
   }
 
-  private static AviatorObject wrapRet(final Object ret) {
-    if (ret == null) {
-      return AviatorNil.NIL;
-    } else if (ret instanceof Number) {
-      return AviatorNumber.valueOf(ret);
-    } else if (ret instanceof CharSequence) {
-      return new AviatorString(ret.toString());
-    } else if (ret instanceof Boolean) {
-      return AviatorBoolean.valueOf((boolean) ret);
-    } else if (ret instanceof AviatorObject) {
-      return (AviatorObject) ret;
-    } else {
-      return new AviatorRuntimeJavaType(ret);
-    }
-  }
-
-
   @Override
   public AviatorObject variadicCall(final Map<String, Object> env, final AviatorObject... args) {
     Object[] jArgs = null;
@@ -104,12 +82,13 @@ public class ClassMethodFunction extends AbstractVariadicFunction {
 
     if (this.handle != null) {
       try {
-        return wrapRet(this.handle.invokeWithArguments(Reflector.boxArgs(this.pTypes, jArgs)));
+        return FunctionUtils
+            .wrapReturn(this.handle.invokeWithArguments(Reflector.boxArgs(this.pTypes, jArgs)));
       } catch (Throwable t) {
         throw Reflector.sneakyThrow(t);
       }
     } else {
-      return wrapRet(this.isStatic
+      return FunctionUtils.wrapReturn(this.isStatic
           ? Reflector.invokeStaticMethod(this.clazz, this.methodName, this.methods, jArgs)
           : Reflector.invokeInstanceMethod(this.clazz, this.methodName, target, this.methods,
               jArgs));
