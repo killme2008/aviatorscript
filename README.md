@@ -25,7 +25,7 @@
 10. 支持[大数运算（`BigInteger`）和高精度运算（`BigDecimal`）](https://github.com/killme2008/aviator/wiki#%E5%A4%A7%E6%95%B0%E8%AE%A1%E7%AE%97%E5%92%8C%E7%B2%BE%E5%BA%A6)。
 11. 支持[多行表达式以及定制化求值器实例](https://github.com/killme2008/aviator/wiki/4.0-%E5%8A%9F%E8%83%BD%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90)。
 12. 小巧并性能优秀，提供大量的定制[选项](https://github.com/killme2008/aviator/wiki/%E5%AE%8C%E6%95%B4%E9%80%89%E9%A1%B9%E5%88%97%E8%A1%A8%E8%AF%B4%E6%98%8E)。
-13. [Function missing 机制](https://github.com/killme2008/aviator/pull/171)，类似 Ruby 的 method missing。
+13. [Function missing 机制](https://github.com/killme2008/aviator/wiki/%E8%B0%83%E7%94%A8-Java-%E6%96%B9%E6%B3%95%E5%92%8C-Function-Missing)，类似 Ruby 的 method missing。
 
 更多详情，请访问[主页](http://fnil.net/aviator)。
 
