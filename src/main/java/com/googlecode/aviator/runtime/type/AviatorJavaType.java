@@ -45,14 +45,14 @@ public class AviatorJavaType extends AviatorObject {
     return this.name;
   }
 
-  public AviatorJavaType(String name) {
+  public AviatorJavaType(final String name) {
     super();
     this.name = name;
   }
 
   @Override
-  public AviatorObject div(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject div(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -77,8 +77,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject bitAnd(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject bitAnd(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -103,8 +103,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject bitNot(Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject bitNot(final Map<String, Object> env) {
+    final Object value = getValue(env);
     if (value instanceof Number) {
       return AviatorNumber.valueOf(value).bitNot(env);
     } else {
@@ -113,8 +113,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject bitOr(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject bitOr(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -139,8 +139,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject bitXor(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject bitXor(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -165,8 +165,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject shiftLeft(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject shiftLeft(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -191,8 +191,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject shiftRight(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject shiftRight(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -217,8 +217,9 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject unsignedShiftRight(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject unsignedShiftRight(final AviatorObject other,
+      final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -243,7 +244,7 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public Object getValue(Map<String, Object> env) {
+  public Object getValue(final Map<String, Object> env) {
 
     if (env != null) {
       if (this.name.contains(".") && RuntimeUtils.getInstance(env)
@@ -255,7 +256,7 @@ public class AviatorJavaType extends AviatorObject {
     return null;
   }
 
-  public AviatorObject setValue(AviatorObject value, Map<String, Object> env) {
+  public AviatorObject setValue(final AviatorObject value, final Map<String, Object> env) {
     if (this.name.contains(".")) {
       throw new ExpressionRuntimeException("Can't assignment value to `" + this.name + "`");
     }
@@ -270,7 +271,7 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @SuppressWarnings("unchecked")
-  private Object getProperty(Map<String, Object> env) {
+  private Object getProperty(final Map<String, Object> env) {
     try {
       String[] names = this.name.split("\\.");
       Map<String, Object> innerEnv = env;
@@ -304,8 +305,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject mod(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject mod(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -330,8 +331,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject sub(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject sub(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -357,7 +358,7 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   @SuppressWarnings("unchecked")
-  public int compare(AviatorObject other, Map<String, Object> env) {
+  public int compare(final AviatorObject other, final Map<String, Object> env) {
     if (this == other) {
       return 0;
     }
@@ -377,7 +378,7 @@ public class AviatorJavaType extends AviatorObject {
       case JavaType:
 
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
-        final Object thisValue = this.getValue(env);
+        final Object thisValue = getValue(env);
         final Object otherValue = otherJavaType.getValue(env);
         if (thisValue == null) {
           return AviatorNil.NIL.compare(other, env);
@@ -396,19 +397,21 @@ public class AviatorJavaType extends AviatorObject {
             return thisAviatorBoolean.compare(other, env);
           } else if (thisValue instanceof Date && otherValue instanceof String) {
             // This is date,other is string
-            return this.tryCompareDate(thisValue, otherValue);
+            return tryCompareDate(thisValue, otherValue);
+          } else if (otherValue == null) {
+            return 1;
           } else {
             try {
               return ((Comparable<Object>) thisValue).compareTo(otherValue);
             } catch (Throwable t) {
-              throw new ExpressionRuntimeException("Compare " + this + " with " + other + " error",
-                  t);
+              throw new ExpressionRuntimeException(
+                  "Compare " + desc(env) + " with " + other.desc(env) + " error", t);
             }
           }
         }
       case Nil:
         // Any object is greater than nil except nil
-        if (this.getValue(env) == null) {
+        if (getValue(env) == null) {
           return 0;
         } else {
           return 1;
@@ -429,8 +432,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject mult(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject mult(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
@@ -455,8 +458,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject neg(Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject neg(final Map<String, Object> env) {
+    final Object value = getValue(env);
     if (value instanceof Number) {
       return AviatorNumber.valueOf(value).neg(env);
     } else {
@@ -465,8 +468,8 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public AviatorObject not(Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject not(final Map<String, Object> env) {
+    final Object value = getValue(env);
     if (value instanceof Boolean) {
       return AviatorBoolean.valueOf((Boolean) value).not(env);
     } else {
@@ -482,14 +485,14 @@ public class AviatorJavaType extends AviatorObject {
    * @return
    */
   @Override
-  public AviatorObject getElement(Map<String, Object> env, AviatorObject indexObject) {
-    Object thisValue = this.getValue(env);
+  public AviatorObject getElement(final Map<String, Object> env, final AviatorObject indexObject) {
+    Object thisValue = getValue(env);
     if (!thisValue.getClass().isArray() && !(thisValue instanceof List)) {
       throw new ExpressionRuntimeException(
-          this.desc(env) + " is not a array or list,could not use [] to get element");
+          desc(env) + " is not a array or list,could not use [] to get element");
     }
     Object indexValue = indexObject.getValue(env);
-    if (!this.isInteger(indexValue)) {
+    if (!isInteger(indexValue)) {
       throw new IllegalArgumentException("Illegal index " + indexObject.desc(env));
     }
     int index = ((Number) indexValue).intValue();
@@ -500,14 +503,14 @@ public class AviatorJavaType extends AviatorObject {
     }
   }
 
-  private boolean isInteger(Object value) {
+  private boolean isInteger(final Object value) {
     return value instanceof Long && ((Long) value).longValue() < Integer.MAX_VALUE
         || value instanceof Integer || value instanceof Short || value instanceof Byte;
   }
 
   @Override
-  public AviatorObject add(AviatorObject other, Map<String, Object> env) {
-    final Object value = this.getValue(env);
+  public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
+    final Object value = getValue(env);
     if (value instanceof Number) {
       AviatorNumber aviatorNumber = AviatorNumber.valueOf(value);
       return aviatorNumber.add(other, env);
@@ -522,10 +525,10 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
-  public String desc(Map<String, Object> env) {
-    Object value = this.getValue(env);
-    return "<" + this.getAviatorType() + ", " + value + ", "
-        + (value == null ? "null" : value.getClass().getSimpleName()) + ">";
+  public String desc(final Map<String, Object> env) {
+    Object value = getValue(env);
+    return "<" + getAviatorType() + ", " + this.name + ", " + value + ", "
+        + (value == null ? "null" : value.getClass().getName()) + ">";
   }
 
 }

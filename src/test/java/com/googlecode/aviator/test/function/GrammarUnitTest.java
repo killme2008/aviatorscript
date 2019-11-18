@@ -65,6 +65,14 @@ public class GrammarUnitTest {
   }
 
   @Test
+  public void testIssue175() {
+    Map<String, Object> env = new HashMap<>();
+    env.put("date1", new Date());
+    env.put("date2", null);
+    assertTrue((boolean) AviatorEvaluator.execute("date1>date2", env));
+  }
+
+  @Test
   public void testIssue87() {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
     assertEquals(1, (long) AviatorEvaluator.execute("long(1.2)"));

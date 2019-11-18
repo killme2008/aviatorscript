@@ -975,7 +975,7 @@ public class FunctionTest {
       assertEquals(5, AviatorEvaluator.execute("seq.max(a)", env));
       fail();
     } catch (IllegalArgumentException e) {
-      assertEquals("<JavaType, 3, Integer> is not a seq", e.getMessage());
+      assertEquals("<JavaType, a, 3, java.lang.Integer> is not a seq", e.getMessage());
     }
 
     try {
@@ -983,7 +983,7 @@ public class FunctionTest {
       assertEquals(5, AviatorEvaluator.execute("seq.min(a)", env));
       fail();
     } catch (IllegalArgumentException e) {
-      assertEquals("<JavaType, 3, Integer> is not a seq", e.getMessage());
+      assertEquals("<JavaType, a, 3, java.lang.Integer> is not a seq", e.getMessage());
     }
   }
 
@@ -1200,7 +1200,8 @@ public class FunctionTest {
       assertEquals(5, AviatorEvaluator.execute("max(a,b,c,5)", env));
       fail();
     } catch (ExpressionRuntimeException e) {
-      assertEquals("Could not compare <String, hello> with <JavaType, 1, Integer>", e.getMessage());
+      assertEquals("Could not compare <String, hello> with <JavaType, a, 1, java.lang.Integer>",
+          e.getMessage());
     }
   }
 
