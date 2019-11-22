@@ -64,6 +64,11 @@ public class GrammarUnitTest {
     assertEquals(new BigInteger("-2017122615550747128008704"), val);
   }
 
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testIssue177() {
+    AviatorEvaluator.compile("$age >30 ($age < 20)");
+  }
+
   @Test
   public void testIssue175() {
     Map<String, Object> env = new HashMap<>();

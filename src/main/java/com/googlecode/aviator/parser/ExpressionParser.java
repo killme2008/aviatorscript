@@ -457,8 +457,12 @@ public class ExpressionParser implements Parser {
       factor();
     }
 
-    // FIXME: it's a parser bug here
+
     while (expectChar('[') || expectChar('(')) {
+      if (isConstant(this.prevToken)) {
+        break;
+      }
+
       if (expectChar('[')) {
         // (...)[index]
         arrayAccess();
@@ -890,6 +894,31 @@ public class ExpressionParser implements Parser {
           }
           break;
       }
+    }
+  }
+
+  public static boolean isConstant(final Token<?> token) {
+    switch (token.getType()) {
+      case Number:
+      case Pattern:
+      case String:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  public static boolean isLiteralToken(final Token<?> token) {
+    switch (token.getType()) {
+      case Variable:
+        return token == Variable.TRUE || token == Variable.FALSE || token == Variable.NIL;
+      case Char:
+      case Number:
+      case Pattern:
+      case String:
+        return true;
+      default:
+        return false;
     }
   }
 
