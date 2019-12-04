@@ -42,6 +42,7 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
+import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
@@ -236,32 +237,6 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   }
 
 
-  private boolean isLiteralToken(final Token<?> token) {
-    switch (token.getType()) {
-      case Variable:
-        return token == Variable.TRUE || token == Variable.FALSE || token == Variable.NIL;
-      case Char:
-      case Number:
-      case Pattern:
-      case String:
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  private boolean isConstant(final Token<?> token) {
-    switch (token.getType()) {
-      case Number:
-      case Pattern:
-      case String:
-        return true;
-      default:
-        return false;
-    }
-  }
-
-
   /**
    * Get token from executing result
    *
@@ -372,7 +347,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     Set<Token<?>> constants = new HashSet<>();
     for (Token<?> token : this.tokenList) {
 
-      if (isConstant(token)) {
+      if (ExpressionParser.isConstant(token)) {
         constants.add(token);
       }
 
@@ -424,7 +399,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         exp = new LiteralExpression(this.instance, null, new ArrayList<String>(variables.keySet()));
       } else {
         final Token<?> lastToken = this.tokenList.get(0);
-        if (isLiteralToken(lastToken)) {
+        if (ExpressionParser.isLiteralToken(lastToken)) {
           exp = new LiteralExpression(this.instance,
               getAviatorObjectFromToken(lastToken).getValue(null),
               new ArrayList<String>(variables.keySet()));
