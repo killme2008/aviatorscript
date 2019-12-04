@@ -31,7 +31,7 @@ See [home page](http://fnil.net/aviator) for details.
 
 # News
 
-* [4.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.6),  Fixed parser bug #177
+* [4.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.7),  Fixed parser bug #177
 * [4.2.6](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.6),  Fixed NPE when comparing java objects, #175
 * [4.2.5](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.5),  an usefull feature: function missing.
 
