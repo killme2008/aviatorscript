@@ -398,7 +398,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   public void onAssignment(final Token<?> lookhead) {
     loadEnv();
 
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, JAVA_TYPE_OWNER, "setValue",
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "setValue",
         "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
     this.popOperand(3);
     this.pushOperand();
@@ -773,7 +773,9 @@ public class ASMCodeGenerator implements CodeGenerator {
       exp.setLambdaBootstraps(this.lambdaBootstraps);
       exp.setFuncsArgs(this.funcsArgs);
       return exp;
-    } catch (Exception e) {
+    } catch (ExpressionRuntimeException e) {
+      throw e;
+    } catch (Throwable e) {
       if (e.getCause() instanceof ExpressionRuntimeException) {
         throw (ExpressionRuntimeException) e.getCause();
       }

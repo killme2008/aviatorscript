@@ -52,6 +52,14 @@ public class GrammarUnitTest {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
   }
 
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testIssue181() {
+    Map<String, Object> env = new HashMap<>();
+    env.put("a1", 3);
+    env.put("a2", 4);
+    AviatorEvaluator.execute("(a1%2=0)&&(a2%2==0)", env);
+  }
+
 
   @Test
   public void testIssue162() {

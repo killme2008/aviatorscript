@@ -60,16 +60,18 @@ public abstract class AviatorObject {
     throw new ExpressionRuntimeException(desc(env) + " doesn't support negative operation '-'");
   }
 
+  public AviatorObject setValue(final AviatorObject value, final Map<String, Object> env) {
+    throw new ExpressionRuntimeException(
+        "Can't assign value " + value.desc(env) + " to " + desc(env));
+  }
 
   public AviatorObject not(final Map<String, Object> env) {
     throw new ExpressionRuntimeException(desc(env) + " doesn't support not operation '!'");
   }
 
-
   public String desc(final Map<String, Object> env) {
     return "<" + getAviatorType() + ", " + getValue(env) + ">";
   }
-
 
   public abstract Object getValue(Map<String, Object> env);
 
