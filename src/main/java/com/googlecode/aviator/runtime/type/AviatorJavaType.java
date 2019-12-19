@@ -256,6 +256,7 @@ public class AviatorJavaType extends AviatorObject {
     return null;
   }
 
+  @Override
   public AviatorObject setValue(final AviatorObject value, final Map<String, Object> env) {
     if (this.name.contains(".")) {
       throw new ExpressionRuntimeException("Can't assignment value to `" + this.name + "`");

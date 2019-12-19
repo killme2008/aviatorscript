@@ -89,6 +89,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class ASMCodeGenerator implements CodeGenerator {
 
+  private static final String RUNTIME_UTILS = "com/googlecode/aviator/runtime/RuntimeUtils";
   private static final String OBJECT_DESC = "Lcom/googlecode/aviator/runtime/type/AviatorObject;";
   private static final String JAVA_TYPE_OWNER =
       "com/googlecode/aviator/runtime/type/AviatorJavaType";
@@ -398,7 +399,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   public void onAssignment(final Token<?> lookhead) {
     loadEnv();
 
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, JAVA_TYPE_OWNER, "setValue",
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "setValue",
         "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
     this.popOperand(3);
     this.pushOperand();
@@ -773,7 +774,9 @@ public class ASMCodeGenerator implements CodeGenerator {
       exp.setLambdaBootstraps(this.lambdaBootstraps);
       exp.setFuncsArgs(this.funcsArgs);
       return exp;
-    } catch (Exception e) {
+    } catch (ExpressionRuntimeException e) {
+      throw e;
+    } catch (Throwable e) {
       if (e.getCause() instanceof ExpressionRuntimeException) {
         throw (ExpressionRuntimeException) e.getCause();
       }
@@ -1072,6 +1075,8 @@ public class ASMCodeGenerator implements CodeGenerator {
     }
     this.mv.visitMethodInsn(INVOKEINTERFACE, "com/googlecode/aviator/runtime/type/AviatorFunction",
         "call", getInvokeMethodDesc(parameterCount));
+    this.mv.visitMethodInsn(INVOKESTATIC, RUNTIME_UTILS, "assertNotNull",
+        "(Lcom/googlecode/aviator/runtime/type/AviatorObject;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
 
     this.popOperand(); // method object
     this.popOperand(); // env map
@@ -1239,8 +1244,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       }
     } else {
       loadEnv();
-      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/RuntimeUtils",
-          "getFunction",
+      this.mv.visitMethodInsn(INVOKESTATIC, RUNTIME_UTILS, "getFunction",
           "(Ljava/lang/Object;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
       this.popOperand();
     }
@@ -1294,8 +1298,7 @@ public class ASMCodeGenerator implements CodeGenerator {
     loadEnv();
     this.pushOperand();
     this.mv.visitLdcInsn(methodName);
-    this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/RuntimeUtils",
-        "getFunction",
+    this.mv.visitMethodInsn(INVOKESTATIC, RUNTIME_UTILS, "getFunction",
         "(Ljava/util/Map;Ljava/lang/String;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
     this.popOperand(2);
     this.pushOperand();

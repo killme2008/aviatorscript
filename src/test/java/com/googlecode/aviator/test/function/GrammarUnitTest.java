@@ -17,6 +17,7 @@ package com.googlecode.aviator.test.function;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.math.BigDecimal;
@@ -29,11 +30,14 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorString;
 import junit.framework.Assert;
@@ -52,6 +56,37 @@ public class GrammarUnitTest {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
   }
 
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testIssue181() {
+    Map<String, Object> env = new HashMap<>();
+    env.put("a1", 3);
+    env.put("a2", 4);
+    AviatorEvaluator.execute("(a1%2=0)&&(a2%2==0)", env);
+  }
+
+  @Test
+  public void testReturnNullCustomFunction() {
+    AviatorEvaluatorInstance evaluator = AviatorEvaluator.newInstance();
+    evaluator.addFunction(new AbstractFunction() {
+
+
+      @Override
+      public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
+        try {
+          return AviatorLong.valueOf(FunctionUtils.getJavaObject(arg1, env));
+        } catch (Exception e) {
+          return null;
+        }
+      }
+
+      @Override
+      public String getName() {
+        return "SafeCastLong";
+      }
+    });
+
+    assertNull(evaluator.execute("SafeCastLong('a')"));
+  }
 
   @Test
   public void testIssue162() {
