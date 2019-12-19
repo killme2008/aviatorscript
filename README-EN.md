@@ -31,7 +31,7 @@ See [home page](http://fnil.net/aviator) for details.
 
 # News
 
-* [4.2.8](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.8),  Fixed #181  and wraps function returned value to ensure it's not null (replaced by AviatorNil).x
+* [4.2.8](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.8),  Fixed #181  and wraps function returned value to ensure it's not null (replaced by AviatorNil).
 * [4.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.7),  Fixed parser bug #177
 * [4.2.6](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.6),  Fixed NPE when comparing java objects, #175
 
