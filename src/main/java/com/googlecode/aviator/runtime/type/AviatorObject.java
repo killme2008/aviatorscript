@@ -70,7 +70,12 @@ public abstract class AviatorObject {
   }
 
   public String desc(final Map<String, Object> env) {
-    return "<" + getAviatorType() + ", " + getValue(env) + ">";
+    Object val = getValue(env);
+    if (val != this) {
+      return "<" + getAviatorType() + ", " + val + ">";
+    } else {
+      return "<" + getAviatorType() + ", this>";
+    }
   }
 
   public abstract Object getValue(Map<String, Object> env);

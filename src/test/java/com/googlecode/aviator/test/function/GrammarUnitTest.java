@@ -56,6 +56,15 @@ public class GrammarUnitTest {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
   }
 
+  @Test
+  public void testFunctionToString() {
+    AviatorEvaluatorInstance instance = AviatorEvaluator.newInstance();
+    String expression = "(lambda (x) -> lambda(y) -> lambda(z) -> x + y + z end end end)(appName)";
+    HashMap<String, Object> env = new HashMap<>();
+    String s = instance.execute(expression, env, true).toString();
+    assertTrue(s.startsWith("<Lambda,"));
+  }
+
   @Test(expected = ExpressionRuntimeException.class)
   public void testIssue181() {
     Map<String, Object> env = new HashMap<>();
