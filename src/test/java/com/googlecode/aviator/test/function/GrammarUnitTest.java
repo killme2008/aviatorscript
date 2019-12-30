@@ -31,6 +31,7 @@ import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -48,6 +49,22 @@ import junit.framework.Assert;
  * @author dennis
  */
 public class GrammarUnitTest {
+
+
+  @Test
+  public void testIssue186() {
+    Expression exp = AviatorEvaluator.compile("1==1");
+    assertTrue(exp.getVariableFullNames().isEmpty());
+    assertTrue(exp.getVariableNames().isEmpty());
+
+    exp = AviatorEvaluator.compile("a!=nil");
+    List<String> vars = exp.getVariableFullNames();
+    assertEquals(1, vars.size());
+    assertTrue(vars.contains("a"));
+    vars = exp.getVariableNames();
+    assertEquals(1, vars.size());
+    assertTrue(vars.contains("a"));
+  }
 
   @Test
   public void testIssue77() {
