@@ -24,6 +24,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -268,7 +269,7 @@ public class AviatorJavaType extends AviatorObject {
 
     Object v = value.getValue(env);
     env.put(this.name, v);
-    return new AviatorRuntimeJavaType(v);
+    return value;
   }
 
   @SuppressWarnings("unchecked")
@@ -498,9 +499,11 @@ public class AviatorJavaType extends AviatorObject {
     }
     int index = ((Number) indexValue).intValue();
     if (thisValue.getClass().isArray()) {
-      return new AviatorRuntimeJavaType(Array.get(thisValue, index));
+      return new AviatorRuntimeJavaElementType(ContainerType.Array, thisValue, index,
+          Array.get(thisValue, index));
     } else {
-      return new AviatorRuntimeJavaType(((List<?>) thisValue).get(index));
+      return new AviatorRuntimeJavaElementType(ContainerType.List, thisValue, index,
+          ((List<?>) thisValue).get(index));
     }
   }
 

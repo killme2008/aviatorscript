@@ -1153,4 +1153,15 @@ public class GrammarUnitTest {
     assertTrue(env.containsKey("a"));
     assertEquals("4", env.get("a"));
   }
+
+  @Test
+  public void testIndexAssignment() {
+    assertEquals(5L, AviatorEvaluator.execute("s=seq.list(1,2); s[0]=3; s[0]+s[1]"));
+    int[] a = new int[] {-1, 99, 4};
+    Map<String, Object> env = AviatorEvaluator.newEnv("a", a);
+    assertEquals(4, AviatorEvaluator.execute("a[0]=-100; a[2] = 5; reduce(a, +, 0)", env));
+    assertEquals(-100, a[0]);
+    assertEquals(99, a[1]);
+    assertEquals(5, a[2]);
+  }
 }
