@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +41,31 @@ public class AviatorEvaluatorUnitTest {
     assertEquals(4, exp2.execute(null));
   }
 
+
+  @Test
+  public void testNewEnv() {
+    Map<String, Object> env = AviatorEvaluator.newEnv();
+    assertTrue(env.isEmpty());
+    env = AviatorEvaluator.newEnv("a", 1, "b", "hello", "c", 9.9d);
+    assertEquals(3, env.size());
+    assertEquals(1, env.get("a"));
+    assertEquals("hello", env.get("b"));
+    assertEquals(9.9d, (double) env.get("c"), 0.001);
+
+    try {
+      AviatorEvaluator.newEnv("a", 1, "b", "hello", 3, 9.9d);
+      fail();
+    } catch (ClassCastException e) {
+
+    }
+
+    try {
+      AviatorEvaluator.newEnv("a", 1, "b", "hello", "c");
+      fail();
+    } catch (IllegalArgumentException e) {
+
+    }
+  }
 
   @Test
   public void testDefaultOptionValues() {

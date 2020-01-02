@@ -17,6 +17,7 @@ package com.googlecode.aviator;
 
 import java.io.OutputStream;
 import java.math.MathContext;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.Options.Value;
@@ -96,6 +97,28 @@ public final class AviatorEvaluator {
    */
   public static AviatorEvaluatorInstance getInstance() {
     return StaticHolder.INSTANCE;
+  }
+
+  /**
+   * A helper method to generate a env object. The arguments should be a sequence of pair <String,
+   * Object>.
+   *
+   * @since 4.2.9
+   * @param args
+   * @return A new env instance contains arguments.
+   */
+  public static Map<String, Object> newEnv(final Object... args) {
+    if (args != null && args.length % 2 != 0) {
+      throw new IllegalArgumentException("Expect arguments number is even.");
+    }
+    Map<String, Object> env = new HashMap<String, Object>(args != null ? args.length : 10);
+    if (args != null) {
+      for (int i = 0; i < args.length; i += 2) {
+        String key = (String) args[i];
+        env.put(key, args[i + 1]);
+      }
+    }
+    return env;
   }
 
   /**

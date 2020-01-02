@@ -30,12 +30,17 @@ public class SymbolTable {
 
   private final Map<String, Variable> table = new HashMap<String, Variable>();
 
+  private static final Map<String, Variable> RESERVED = new HashMap<>();
 
-  public SymbolTable() {
-    reserve("true", Variable.TRUE);
-    reserve("false", Variable.FALSE);
-    reserve("nil", Variable.NIL);
-    reserve("lambda", Variable.LAMBDA);
+  static {
+    RESERVED.put("true", Variable.TRUE);
+    RESERVED.put("false", Variable.FALSE);
+    RESERVED.put("nil", Variable.NIL);
+    RESERVED.put("lambda", Variable.LAMBDA);
+  }
+
+  public static boolean isReserved(final Variable v) {
+    return RESERVED.containsKey(v.getLexeme());
   }
 
 
@@ -45,8 +50,8 @@ public class SymbolTable {
    * @param name
    * @param value
    */
-  public void reserve(String name, Variable value) {
-    table.put(name, value);
+  public void reserve(final String name, final Variable value) {
+    this.table.put(name, value);
   }
 
 
@@ -56,18 +61,8 @@ public class SymbolTable {
    * @param name
    * @return
    */
-  public boolean contains(String name) {
-    return table.containsKey(name);
-  }
-
-
-  /**
-   * Get symbold table
-   *
-   * @return
-   */
-  public Map<String, Variable> getTable() {
-    return table;
+  public boolean contains(final String name) {
+    return RESERVED.containsKey(name) || this.table.containsKey(name);
   }
 
 
@@ -77,7 +72,8 @@ public class SymbolTable {
    * @param name
    * @return
    */
-  public Variable getVariable(String name) {
-    return table.get(name);
+  public Variable getVariable(final String name) {
+    Variable var = RESERVED.get(name);
+    return var != null ? var : this.table.get(name);
   }
 }

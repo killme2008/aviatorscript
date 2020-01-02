@@ -31,6 +31,7 @@ import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -49,11 +50,36 @@ import junit.framework.Assert;
  */
 public class GrammarUnitTest {
 
+
+  @Test
+  public void testIssue186() {
+    Expression exp = AviatorEvaluator.compile("1==1");
+    assertTrue(exp.getVariableFullNames().isEmpty());
+    assertTrue(exp.getVariableNames().isEmpty());
+
+    exp = AviatorEvaluator.compile("a!=nil");
+    List<String> vars = exp.getVariableFullNames();
+    assertEquals(1, vars.size());
+    assertTrue(vars.contains("a"));
+    vars = exp.getVariableNames();
+    assertEquals(1, vars.size());
+    assertTrue(vars.contains("a"));
+  }
+
   @Test
   public void testIssue77() {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
     assertTrue((boolean) AviatorEvaluator.execute("'一二三'=~/.*三/"));
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
+  }
+
+  @Test
+  public void testFunctionToString() {
+    AviatorEvaluatorInstance instance = AviatorEvaluator.newInstance();
+    String expression = "(lambda (x) -> lambda(y) -> lambda(z) -> x + y + z end end end)(appName)";
+    HashMap<String, Object> env = new HashMap<>();
+    String s = instance.execute(expression, env, true).toString();
+    assertTrue(s.startsWith("<Lambda,"));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
@@ -1126,5 +1152,16 @@ public class GrammarUnitTest {
     assertTrue(env.containsKey("$2"));
     assertTrue(env.containsKey("a"));
     assertEquals("4", env.get("a"));
+  }
+
+  @Test
+  public void testIndexAssignment() {
+    assertEquals(5L, AviatorEvaluator.execute("s=seq.list(1,2); s[0]=3; s[0]+s[1]"));
+    int[] a = new int[] {-1, 99, 4};
+    Map<String, Object> env = AviatorEvaluator.newEnv("a", a);
+    assertEquals(4, AviatorEvaluator.execute("a[0]=-100; a[2] = 5; reduce(a, +, 0)", env));
+    assertEquals(-100, a[0]);
+    assertEquals(99, a[1]);
+    assertEquals(5, a[2]);
   }
 }

@@ -31,6 +31,7 @@ import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.LiteralExpression;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.DelegateToken;
 import com.googlecode.aviator.lexer.token.DelegateToken.DelegateTokenType;
 import com.googlecode.aviator.lexer.token.NumberToken;
@@ -346,13 +347,15 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     Map<String, Integer/* counter */> methods = new HashMap<String, Integer>();
     Set<Token<?>> constants = new HashSet<>();
     for (Token<?> token : this.tokenList) {
-
       if (ExpressionParser.isConstant(token)) {
         constants.add(token);
       }
-
       switch (token.getType()) {
         case Variable:
+          if (SymbolTable.isReserved((Variable) token)) {
+            continue;
+          }
+
           String varName = token.getLexeme();
           if (!variables.containsKey(varName)) {
             variables.put(varName, 1);

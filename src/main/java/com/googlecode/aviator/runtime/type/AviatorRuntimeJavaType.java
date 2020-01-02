@@ -16,6 +16,7 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.util.Map;
+import com.googlecode.aviator.utils.VarNameGenerator;
 
 
 /**
@@ -25,9 +26,20 @@ import java.util.Map;
  *
  */
 public class AviatorRuntimeJavaType extends AviatorJavaType {
-  private final Object object;
 
-  public static AviatorObject valueOf(Object object) {
+  public static final ThreadLocal<VarNameGenerator> TEMP_VAR_GEN =
+      new ThreadLocal<VarNameGenerator>() {
+
+        @Override
+        protected VarNameGenerator initialValue() {
+          return new VarNameGenerator();
+        }
+
+      };
+
+  protected final Object object;
+
+  public static AviatorObject valueOf(final Object object) {
     if (object == null) {
       return AviatorNil.NIL;
     }
@@ -37,14 +49,14 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
     return new AviatorRuntimeJavaType(object);
   }
 
-  public AviatorRuntimeJavaType(Object object) {
-    super("unknown");
+  public AviatorRuntimeJavaType(final Object object) {
+    super(TEMP_VAR_GEN.get().gen());
     this.object = object;
   }
 
 
   @Override
-  public Object getValue(Map<String, Object> env) {
+  public Object getValue(final Map<String, Object> env) {
     return this.object;
   }
 
