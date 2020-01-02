@@ -16,7 +16,7 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.util.Map;
-import com.googlecode.aviator.utils.LongWrapper;
+import com.googlecode.aviator.utils.VarNameGenerator;
 
 
 /**
@@ -26,23 +26,16 @@ import com.googlecode.aviator.utils.LongWrapper;
  *
  */
 public class AviatorRuntimeJavaType extends AviatorJavaType {
-  private static final String TEMP_VAR = "G_";
 
-  private static final int TEMP_LEN = TEMP_VAR.length() + String.valueOf(Long.MIN_VALUE).length();
+  public static final ThreadLocal<VarNameGenerator> TEMP_VAR_GEN =
+      new ThreadLocal<VarNameGenerator>() {
 
-  public static final ThreadLocal<LongWrapper> TEMP_NUM = new ThreadLocal<LongWrapper>() {
+        @Override
+        protected VarNameGenerator initialValue() {
+          return new VarNameGenerator();
+        }
 
-    @Override
-    protected LongWrapper initialValue() {
-      return new LongWrapper(0L);
-    }
-
-  };
-
-  public static String genTempVar() {
-    StringBuilder sb = new StringBuilder(TEMP_LEN);
-    return sb.append(TEMP_VAR).append(TEMP_NUM.get().getAndAdd()).toString();
-  }
+      };
 
   protected final Object object;
 
@@ -57,7 +50,7 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
   }
 
   public AviatorRuntimeJavaType(final Object object) {
-    super(genTempVar());
+    super(TEMP_VAR_GEN.get().gen());
     this.object = object;
   }
 

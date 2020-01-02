@@ -35,7 +35,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class AviatorJavaType extends AviatorObject {
 
-  final private String name;
+  private final String name;
 
   @Override
   public AviatorType getAviatorType() {
