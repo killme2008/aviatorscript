@@ -3,7 +3,9 @@ package com.googlecode.aviator.runtime.type;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.Reflector;
 
 public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
@@ -28,6 +30,9 @@ public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
   @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public AviatorObject setValue(final AviatorObject value, final Map<String, Object> env) {
+    if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
+      throw new ExpressionRuntimeException("Disabled variable assignment.");
+    }
     Object val = value.getValue(env);
     switch (this.containerType) {
       case Array:
@@ -40,6 +45,6 @@ public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
       default:
         throw new ExpressionRuntimeException("Unknown container type: " + this.containerType);
     }
-    return value;
+    return new AviatorRuntimeJavaType(val);
   }
 }

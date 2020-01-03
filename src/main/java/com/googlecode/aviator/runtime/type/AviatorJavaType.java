@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.apache.commons.beanutils.PropertyUtils;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -259,23 +260,34 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public AviatorObject setValue(final AviatorObject value, final Map<String, Object> env) {
-    if (this.name.contains(".")) {
-      throw new ExpressionRuntimeException("Can't assignment value to `" + this.name + "`");
-    }
-
     if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
       throw new ExpressionRuntimeException("Disabled variable assignment.");
     }
 
+    if (this.name.contains(".")) {
+      Object v = value.getValue(env);
+      try {
+        PropertyUtils.setProperty(env, this.name, value.getValue(env));
+      } catch (Throwable t) {
+        if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
+          t.printStackTrace();
+        }
+        throw new ExpressionRuntimeException("Can't assign value to " + this.name, t);
+      }
+      return new AviatorRuntimeJavaType(v);
+    }
+
     Object v = value.getValue(env);
     env.put(this.name, v);
-    return value;
+    return new AviatorRuntimeJavaType(v);
   }
+
+  public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
 
   @SuppressWarnings("unchecked")
   private Object getProperty(final Map<String, Object> env) {
     try {
-      String[] names = this.name.split("\\.");
+      String[] names = SPLIT_PAT.split(this.name);
       Map<String, Object> innerEnv = env;
       for (int i = 0; i < names.length; i++) {
         // Fast path for nested map.

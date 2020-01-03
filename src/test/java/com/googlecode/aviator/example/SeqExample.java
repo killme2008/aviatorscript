@@ -1,20 +1,18 @@
 package com.googlecode.aviator.example;
 
-import java.util.HashMap;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
 
 
 public class SeqExample {
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     int[] a = new int[10];
     for (int i = 0; i < 10; i++) {
       a[i] = i;
     }
 
-    Map<String, Object> env = new HashMap<String, Object>();
-    env.put("a", a);
+    Map<String, Object> env = AviatorEvaluator.newEnv("a", a);
 
     System.out.println(AviatorEvaluator.execute("a[1] + 100", env));
     System.out.println(AviatorEvaluator.execute("'a[1]=' + a[1]", env));
@@ -28,5 +26,6 @@ public class SeqExample {
     System.out
         .println(AviatorEvaluator.execute("seq.not_any(a,seq.and(seq.lt(0), seq.ge(10)))", env));
     System.out.println(AviatorEvaluator.execute("seq.some(a,seq.eq(3))", env));
+    System.out.println(AviatorEvaluator.execute("seq.some(a, lambda(x) -> x > 10 end)", env));
   }
 }
