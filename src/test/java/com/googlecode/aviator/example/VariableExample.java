@@ -100,5 +100,11 @@ public class VariableExample {
     System.out.println("Execute expression: " + exp);
     System.out.println("Result: " + result);
     System.out.println(foo.bars[0].getName());
+
+    exp = "foo.bars[0] = nil ; foo.bars[0]";
+    result = (String) AviatorEvaluator.execute(exp, env);
+    System.out.println("Execute expression: " + exp);
+    System.out.println("Result: " + result);
+    System.out.println(foo.bars[0]);
   }
 }

@@ -263,8 +263,17 @@ public class AviatorJavaType extends AviatorObject {
     if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
       throw new ExpressionRuntimeException("Disabled variable assignment.");
     }
-
     if (this.name.contains(".")) {
+      return setProperty(value, env);
+    }
+
+    Object v = value.getValue(env);
+    env.put(this.name, v);
+    return new AviatorRuntimeJavaType(v);
+  }
+
+  private AviatorObject setProperty(final AviatorObject value, final Map<String, Object> env) {
+    if (RuntimeUtils.getInstance(env).getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
       Object v = value.getValue(env);
       try {
         PropertyUtils.setProperty(env, this.name, value.getValue(env));
@@ -275,11 +284,10 @@ public class AviatorJavaType extends AviatorObject {
         throw new ExpressionRuntimeException("Can't assign value to " + this.name, t);
       }
       return new AviatorRuntimeJavaType(v);
+    } else {
+      throw new ExpressionRuntimeException("Can't assign value to " + this.name
+          + ", Options.ENABLE_PROPERTY_SYNTAX_SUGAR is disabled.");
     }
-
-    Object v = value.getValue(env);
-    env.put(this.name, v);
-    return new AviatorRuntimeJavaType(v);
   }
 
   public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
