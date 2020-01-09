@@ -4,6 +4,7 @@ import java.util.Map;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.function.system.ConstantFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
 
@@ -289,7 +290,7 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
   }
 
   private AviatorFunction getFunc(final Map<String, Object> env, final AviatorObject... args) {
-    Object val = env.get(this.name);
+    Object val = AviatorJavaType.getValueFromEnv(this.name, env, false);
     if (val instanceof AviatorFunction) {
       return (AviatorFunction) val;
     }

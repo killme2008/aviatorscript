@@ -247,13 +247,17 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public Object getValue(final Map<String, Object> env) {
+    return getValueFromEnv(this.name, env, true);
+  }
 
+  public static Object getValueFromEnv(final String name, final Map<String, Object> env,
+      final boolean throwExceptionNotFound) {
     if (env != null) {
-      if (this.name.contains(".") && RuntimeUtils.getInstance(env)
+      if (name.contains(".") && RuntimeUtils.getInstance(env)
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
-        return getProperty(env);
+        return getProperty(name, env, throwExceptionNotFound);
       }
-      return env.get(this.name);
+      return env.get(name);
     }
     return null;
   }
@@ -293,9 +297,10 @@ public class AviatorJavaType extends AviatorObject {
   public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
 
   @SuppressWarnings("unchecked")
-  private Object getProperty(final Map<String, Object> env) {
+  private static Object getProperty(final String name, final Map<String, Object> env,
+      final boolean throwExceptionNotFound) {
     try {
-      String[] names = SPLIT_PAT.split(this.name);
+      String[] names = SPLIT_PAT.split(name);
       Map<String, Object> innerEnv = env;
       for (int i = 0; i < names.length; i++) {
         // Fast path for nested map.
@@ -307,12 +312,12 @@ public class AviatorJavaType extends AviatorObject {
 
         // fallback to property utils
         if (!(val instanceof Map)) {
-          return PropertyUtils.getProperty(env, this.name);
+          return PropertyUtils.getProperty(env, name);
         }
 
         innerEnv = (Map<String, Object>) val;
       }
-      return PropertyUtils.getProperty(env, this.name);
+      return PropertyUtils.getProperty(env, name);
 
     } catch (Throwable t) {
       if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
@@ -320,8 +325,10 @@ public class AviatorJavaType extends AviatorObject {
       }
       if (RuntimeUtils.getInstance(env).getOptionValue(Options.NIL_WHEN_PROPERTY_NOT_FOUND).bool) {
         return null;
+      } else if (throwExceptionNotFound) {
+        throw new ExpressionRuntimeException("Could not find variable " + name, t);
       } else {
-        throw new ExpressionRuntimeException("Could not find variable " + this.name, t);
+        return null;
       }
     }
   }

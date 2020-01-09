@@ -63,6 +63,16 @@ public class GrammarUnitTest {
   }
 
   @Test
+  public void testVariableSyntaxSugerForFunction() {
+    assertEquals(0L, AviatorEvaluator.execute("m = seq.map(\"func\", lambda()->0 end); m.func()"));
+    assertEquals(10000.0d,
+        AviatorEvaluator.execute("m = seq.map('square', lambda(x)-> x*x end); m.square(100.0)"));
+
+    assertEquals(8L, AviatorEvaluator.execute(
+        "m = seq.map('x', lambda(x)-> x end, 'y', lambda(x) -> x+1  end);  m.x(3) + m.y(4)"));
+  }
+
+  @Test
   public void testScientificNumber() {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
     assertEquals(new BigDecimal("1.2e308"), AviatorEvaluator.compile("1.2e308").execute());
