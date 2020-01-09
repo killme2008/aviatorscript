@@ -89,6 +89,7 @@ import com.googlecode.aviator.runtime.function.string.StringStartsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringSubStringFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;
 import com.googlecode.aviator.runtime.function.system.BooleanFunction;
+import com.googlecode.aviator.runtime.function.system.CompareFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.IdentityFunction;
@@ -479,6 +480,7 @@ public final class AviatorEvaluatorInstance {
   private void loadLib() {
     // Load internal functions
     // load sys lib
+    addFunction(new CompareFunction());
     addFunction(new SysDateFunction());
     addFunction(new PrintlnFunction());
     addFunction(new PrintFunction());
@@ -568,11 +570,11 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                      * Compiled
-                                                                                      * expression
-                                                                                      * task
-                                                                                      */> cacheExpressions =
-      new ConcurrentHashMap<String, FutureTask<Expression>>();
+   * Compiled
+   * expression
+   * task
+   */> cacheExpressions =
+   new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
 
