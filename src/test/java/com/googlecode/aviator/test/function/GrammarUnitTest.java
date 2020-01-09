@@ -52,6 +52,21 @@ public class GrammarUnitTest {
 
 
   @Test
+  public void testScientificNumber() {
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
+    assertEquals(new BigDecimal("1.2e308"), AviatorEvaluator.compile("1.2e308").execute());
+    assertEquals(new BigDecimal("1.2e-308"), AviatorEvaluator.compile("1.2E-308").execute());
+    assertEquals(new BigDecimal("-1.2e-308"), AviatorEvaluator.compile("-1.2E-308").execute());
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL, true);
+    assertEquals(new BigDecimal("1.2e308"), AviatorEvaluator.compile("1.2e308").execute());
+    assertEquals(new BigDecimal("1.2e-308"), AviatorEvaluator.compile("1.2E-308").execute());
+    assertEquals(new BigDecimal("-1.2e-308"), AviatorEvaluator.compile("-1.2E-308").execute());
+
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
+    AviatorEvaluator.setOption(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL, false);
+  }
+
+  @Test
   public void testIssue186() {
     Expression exp = AviatorEvaluator.compile("1==1");
     assertTrue(exp.getVariableFullNames().isEmpty());
