@@ -126,15 +126,10 @@ public class ExpressionLexer {
       }
 
       if (analyse) {
-        if (this.peek == ' ' || this.peek == '\t' || this.peek == '\r') {
+        if (this.peek == ' ' || this.peek == '\t' || this.peek == '\r' || this.peek == '\n') {
           continue;
         }
-        if (this.peek == '\n') {
-          throw new CompileExpressionErrorException(
-              "Aviator doesn't support multi-lines expression at " + this.iterator.getIndex());
-        } else {
-          break;
-        }
+        break;
       } else {
         char ch = this.peek;
         int index = this.iterator.getIndex();

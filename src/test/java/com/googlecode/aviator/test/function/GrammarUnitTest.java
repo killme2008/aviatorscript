@@ -52,6 +52,17 @@ public class GrammarUnitTest {
 
 
   @Test
+  public void testMultilineExpressions() {
+    assertEquals(7, AviatorEvaluator.execute("a=3;\r\na+4"));
+    try {
+      AviatorEvaluator.execute("4>5 \r\n 6");
+      fail();
+    } catch (ExpressionSyntaxErrorException e) {
+
+    }
+  }
+
+  @Test
   public void testScientificNumber() {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
     assertEquals(new BigDecimal("1.2e308"), AviatorEvaluator.compile("1.2e308").execute());

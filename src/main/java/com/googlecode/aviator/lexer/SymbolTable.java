@@ -37,6 +37,7 @@ public class SymbolTable {
     RESERVED.put("false", Variable.FALSE);
     RESERVED.put("nil", Variable.NIL);
     RESERVED.put("lambda", Variable.LAMBDA);
+    RESERVED.put("end", Variable.END);
   }
 
   public static boolean isReserved(final Variable v) {
