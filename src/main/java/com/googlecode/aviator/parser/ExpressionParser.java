@@ -17,6 +17,7 @@ package com.googlecode.aviator.parser;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -295,8 +296,15 @@ public class ExpressionParser implements Parser {
         } else {
           // this.back();
           // assignment
-          ternary();
+          if (this.lookhead == Variable.IF) {
+            ifClause();
+          } else {
+            ternary();
+          }
           this.codeGenerator.onAssignment(this.lookhead);
+          if (this.lookhead != null && !expectChar(';')) {
+            reportSyntaxError("Expect ';' after assignment");
+          }
           // this.reportSyntaxError("Aviator doesn't support assignment");
         }
       } else if (expectChar('!')) {
@@ -559,6 +567,9 @@ public class ExpressionParser implements Parser {
     if (this.lookhead == null) {
       reportSyntaxError("invalid value");
     }
+    if (this.lookhead == Variable.IF) {
+      return;
+    }
     if (expectChar('(')) {
       this.parenDepth++;
       this.depthState.add(DepthState.Parent);
@@ -602,6 +613,8 @@ public class ExpressionParser implements Parser {
       }
     } else if (expectChar('/')) {
       pattern();
+    } else if (expectChar('}')) {
+      return;
     } else {
       reportSyntaxError("invalid value");
     }
@@ -860,16 +873,117 @@ public class ExpressionParser implements Parser {
     return this.codeGenerator.getResult();
   }
 
-
   private void statement() {
-    ternary();
     ensureDepthState();
-    while (expectChar(';')) {
-      this.codeGenerator.onTernaryEnd(this.lookhead);
+    boolean clearStack = false;
+    while (true) {
+      Token<?> token = this.lookhead;
+      if (this.lookhead == Variable.IF) {
+        ifClause();
+        clearStack = true;
+      } else {
+        if (clearStack) {
+          this.codeGenerator.onTernaryEnd(this.lookhead);
+        }
+        ternary();
+        if (expectChar(';')) {
+          this.codeGenerator.onTernaryEnd(this.lookhead);
+          move(true);
+        }
+        clearStack = false;
+      }
+      ensureDepthState();
+      if (token == this.lookhead || this.lookhead == null) {
+        break;
+      }
+    }
+  }
+
+  // private void statement() {
+  // ternary();
+  // ensureDepthState();
+  // while (expectChar(';')) {
+  // this.codeGenerator.onTernaryEnd(this.lookhead);
+  // move(true);
+  // ternary();
+  // ensureDepthState();
+  // }
+  // }
+
+  private void ifClause() {
+    move(true);
+    if (expectChar('(')) {
       move(true);
       ternary();
-      ensureDepthState();
+      if (!expectChar(')')) {
+        reportSyntaxError("Missing ')' to close 'if' test clause");
+      }
+      move(true);
+      this.codeGenerator.onTernaryBoolean(this.lookhead);
+      if (expectChar('{')) {
+        move(true);
+        this.lambdaDepth++;
+        this.depthState.add(DepthState.Lambda);
+        this.codeGenerator.onLambdaDefineStart(this.prevToken);
+        this.codeGenerator.onLambdaBodyStart(this.lookhead);
+        statement();
+        this.codeGenerator.onLambdaBodyEnd(this.lookhead);
+        this.lambdaDepth--;
+        this.depthState.removeLast();
+        this.parenDepth++;
+        this.depthState.add(DepthState.Parent);
+        this.codeGenerator.onMethodName(new DelegateToken(this.lookhead.getStartIndex(),
+            this.lookhead, DelegateTokenType.Method_Name));
+        this.parenDepth--;
+        this.depthState.removeLast();
+        this.codeGenerator.onMethodInvoke(this.lookhead, Collections.EMPTY_LIST);
+        this.codeGenerator.onTernaryLeft(this.lookhead);
+      } else {
+        throw new ExpressionSyntaxErrorException("Expect '{' for if clause");
+      }
+      if (!expectChar('}')) {
+        reportSyntaxError("Missing '}' to close 'if' body");
+      }
+      move(true);
+    } else {
+      throw new ExpressionSyntaxErrorException("Expect '(' after if for test clause");
     }
+    elseClause();
+  }
+
+  private void elseClause() {
+    if (this.lookhead == Variable.ELSE) {
+      move(true);
+      if (expectChar('{')) {
+        move(true);
+        this.lambdaDepth++;
+        this.depthState.add(DepthState.Lambda);
+        this.codeGenerator.onLambdaDefineStart(this.lookhead);
+        this.codeGenerator.onLambdaBodyStart(this.lookhead);
+        statement();
+        this.codeGenerator.onLambdaBodyEnd(this.lookhead);
+        this.lambdaDepth--;
+        this.depthState.removeLast();
+        this.parenDepth++;
+        this.depthState.add(DepthState.Parent);
+        this.codeGenerator.onMethodName(new DelegateToken(this.lookhead.getStartIndex(),
+            this.lookhead, DelegateTokenType.Method_Name));
+        this.parenDepth--;
+        this.depthState.removeLast();
+        this.codeGenerator.onMethodInvoke(this.lookhead, Collections.EMPTY_LIST);
+        this.codeGenerator.onTernaryRight(this.lookhead);
+      } else {
+        throw new ExpressionSyntaxErrorException("Expect '{' for else clause");
+      }
+      if (!expectChar('}')) {
+        reportSyntaxError("Missing '}' to close 'else' body");
+      }
+      move(true);
+    } else {
+      // Missing else clause, always nil.
+      this.codeGenerator.onConstant(Variable.NIL);
+    }
+
   }
 
 

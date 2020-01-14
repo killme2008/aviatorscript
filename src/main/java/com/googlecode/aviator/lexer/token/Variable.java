@@ -91,7 +91,7 @@ public class Variable extends AbstractToken<Object> {
   };
 
   /**
-   * End keyword
+   * end keyword
    */
   public static final Variable END = new Variable("end", -1) {
 
@@ -102,7 +102,54 @@ public class Variable extends AbstractToken<Object> {
 
   };
 
+  /**
+   * if keyword
+   */
+  public static final Variable IF = new Variable("if", -1) {
 
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+  /**
+   * else keyword
+   */
+  public static final Variable ELSE = new Variable("else", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+
+  /**
+   * for keyword
+   */
+  public static final Variable FOR = new Variable("for", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+  /**
+   * for keyword
+   */
+  public static final Variable IN = new Variable("in", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
 
   @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
