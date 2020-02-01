@@ -1,12 +1,13 @@
 package com.googlecode.aviator.example;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Expression;
 
 
 public class SimpleExample {
   public static void main(final String[] args) throws Exception {
-    Long result = (Long) AviatorEvaluator
-        .execute("a=5; b=if(1==1) { println('if'); 3+a } else {println('else'); 4-a} a+b");
-    System.out.println(result);
+    Expression exp = AviatorEvaluator.getInstance().compileScript(
+        "/Users/boyan/programming/java/others/aviator/src/test/java/com/googlecode/aviator/example/test.aviator");
+    exp.execute();
   }
 }

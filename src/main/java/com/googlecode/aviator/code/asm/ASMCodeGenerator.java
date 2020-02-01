@@ -541,6 +541,9 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onTernaryEnd(final Token<?> lookhead) {
+    if (this.operandsCount == 0) {
+      return;
+    }
     while (--this.operandsCount > 0) {
       this.mv.visitInsn(POP);
     }
@@ -754,6 +757,13 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+
+  @Override
+  public void onReturn(final Token<?> lookhead) {
+    end();
+  }
+
+
   /*
    * (non-Javadoc)
    *
@@ -783,6 +793,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       throw new CompileExpressionErrorException("define class error", e);
     }
   }
+
 
   private void end() {
     endVisitMethodCode();
@@ -985,7 +996,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       String fieldName = getInnerName(token.getLexeme());
       this.constantPool.put(token, fieldName);
       this.classWriter.visitField(ACC_PRIVATE + ACC_FINAL, fieldName, OBJECT_DESC, null, null)
-          .visitEnd();
+      .visitEnd();
     }
   }
 

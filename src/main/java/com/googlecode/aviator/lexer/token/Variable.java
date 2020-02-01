@@ -140,9 +140,21 @@ public class Variable extends AbstractToken<Object> {
   };
 
   /**
-   * for keyword
+   * in keyword
    */
   public static final Variable IN = new Variable("in", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+  /**
+   * return keyword
+   */
+  public static final Variable RETURN = new Variable("return", -1) {
 
     @Override
     public Object getValue(final Map<String, Object> env) {

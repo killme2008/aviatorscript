@@ -1,5 +1,5 @@
 package com.googlecode.aviator.parser;
 
 enum DepthState {
-  Parent, Bracket, Lambda
+  Parent, Bracket, Lambda, Brace,
 }

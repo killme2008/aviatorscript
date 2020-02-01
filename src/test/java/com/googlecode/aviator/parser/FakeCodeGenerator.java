@@ -84,6 +84,12 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
   @Override
+  public void onReturn(final Token<?> lookhead) {
+    appendToken("return");
+  }
+
+
+  @Override
   public void onAndLeft(final Token<?> lookhead) {
 
   }

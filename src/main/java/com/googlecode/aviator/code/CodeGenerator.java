@@ -143,4 +143,5 @@ public interface CodeGenerator {
 
   public void onArrayIndexEnd(Token<?> lookhead);
 
+  public void onReturn(Token<?> lookhead);
 }

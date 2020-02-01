@@ -17,6 +17,10 @@
 package com.googlecode.aviator;
 
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -151,6 +155,25 @@ public final class AviatorEvaluatorInstance {
       this.functionLoaders = new ArrayList<FunctionLoader>();
     }
     this.functionLoaders.add(loader);
+  }
+
+  /**
+   * Compile a script file into expression.
+   *
+   * @param file the script file path
+   * @return
+   */
+  public Expression compileScript(final String path) throws IOException {
+    File file = new File(path);
+    try (FileReader fr = new FileReader(file); BufferedReader reader = new BufferedReader(fr)) {
+      StringBuilder script = new StringBuilder();
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        script.append(line).append("\r\n");
+      }
+      System.out.println(script);
+      return compile(script.toString());
+    }
   }
 
 
@@ -570,11 +593,11 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                      * Compiled
-                                                                                      * expression
-                                                                                      * task
-                                                                                      */> cacheExpressions =
-      new ConcurrentHashMap<String, FutureTask<Expression>>();
+   * Compiled
+   * expression
+   * task
+   */> cacheExpressions =
+   new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
 
