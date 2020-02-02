@@ -14,8 +14,7 @@ public class ScopeInfo {
   Deque<DepthState> depthState;
 
   public ScopeInfo(final int parenDepth, final int bracketDepth, final int lambdaDepth,
-      final int braceDepth,
-      final Deque<DepthState> depthState) {
+      final int braceDepth, final Deque<DepthState> depthState) {
     super();
     this.parenDepth = parenDepth;
     this.bracketDepth = bracketDepth;

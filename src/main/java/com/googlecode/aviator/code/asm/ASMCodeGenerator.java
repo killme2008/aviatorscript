@@ -996,7 +996,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       String fieldName = getInnerName(token.getLexeme());
       this.constantPool.put(token, fieldName);
       this.classWriter.visitField(ACC_PRIVATE + ACC_FINAL, fieldName, OBJECT_DESC, null, null)
-      .visitEnd();
+          .visitEnd();
     }
   }
 

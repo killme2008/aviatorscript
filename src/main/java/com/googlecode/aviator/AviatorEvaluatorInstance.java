@@ -77,6 +77,7 @@ import com.googlecode.aviator.runtime.function.seq.SeqNewListFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewSetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqPutFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqRemoveFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
@@ -562,6 +563,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new SeqAddFunction());
     addFunction(new SeqRemoveFunction());
     addFunction(new SeqGetFunction());
+    addFunction(new SeqPutFunction());
     addFunction(new SeqMinFunction());
     addFunction(new SeqMaxFunction());
     addFunction(new SeqMapFunction());
@@ -593,11 +595,11 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-   * Compiled
-   * expression
-   * task
-   */> cacheExpressions =
-   new ConcurrentHashMap<String, FutureTask<Expression>>();
+                                                                                      * Compiled
+                                                                                      * expression
+                                                                                      * task
+                                                                                      */> cacheExpressions =
+      new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
 

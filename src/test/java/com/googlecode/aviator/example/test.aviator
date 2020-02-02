@@ -1,8 +1,20 @@
+m = seq.map();
 fib = lambda(n) ->
   if(n <= 2) {
     return 1;
   } 
-  fib(n-1) + fib(n-2)
+  v = seq.get(m ,n);
+  if(v!=nil) {
+    return v;
+  }
+  x = fib(n-1) + fib(n-2);
+  seq.put(m,n,x);
+  x
 end;
 
-println(fib(10));
+start = now();
+a = fib(20);
+b = fib(21);
+c = a + b;
+println("cost:" + (now() - start) + " ms.");
+c

@@ -109,9 +109,8 @@ public class ExpressionParser implements Parser {
    */
   @Override
   public ScopeInfo enterScope() {
-    ScopeInfo info =
-        new ScopeInfo(this.parenDepth, this.bracketDepth, this.lambdaDepth, this.braceDepth,
-            this.depthState);
+    ScopeInfo info = new ScopeInfo(this.parenDepth, this.bracketDepth, this.lambdaDepth,
+        this.braceDepth, this.depthState);
     this.parenDepth = 0;
     this.bracketDepth = 0;
     this.lambdaDepth = 0;
@@ -846,8 +845,8 @@ public class ExpressionParser implements Parser {
         this.lookhead != null && this.lookhead.getStartIndex() > 0 ? this.lookhead.getStartIndex()
             : this.lexer.getCurrentIndex();
 
-        throw new ExpressionSyntaxErrorException(
-            "Syntax error:" + message + " at " + index + ", current token: " + this.lookhead
+    throw new ExpressionSyntaxErrorException(
+        "Syntax error:" + message + " at " + index + ", current token: " + this.lookhead
             + ". Parsing expression: `" + this.lexer.getScanString() + "^^`");
   }
 
@@ -876,7 +875,7 @@ public class ExpressionParser implements Parser {
     if (this.lookhead != null) {
       if (clauseType == ClauseType.Ternary) {
         reportSyntaxError("Unexpect token '" + currentTokenLexeme()
-        + "', maybe forget to insert ';' to complete last expression ");
+            + "', maybe forget to insert ';' to complete last expression ");
       } else {
         reportSyntaxError("Unexpect token '" + currentTokenLexeme() + "'");
       }

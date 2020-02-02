@@ -125,7 +125,10 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public boolean containsKey(final Object key) {
-    return getmOverrides(true).containsKey(key) || this.mDefaults.containsKey(key);
+    Map<String, Object> overrides = getmOverrides(true);
+    return overrides.containsKey(key)
+        || (this.mDefaults != overrides && this.mDefaults != this ? this.mDefaults.containsKey(key)
+            : false);
   }
 
   /**
