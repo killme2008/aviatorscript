@@ -716,8 +716,7 @@ public class ExpressionParser implements Parser {
     this.bracketDepth++;
     this.depthState.add(DepthState.Bracket);
     if (RESERVED_WORDS.contains(this.prevToken.getLexeme())) {
-      throw new ExpressionSyntaxErrorException(
-          this.prevToken.getLexeme() + " could not use [] operator");
+      reportSyntaxError(this.prevToken.getLexeme() + " could not use [] operator");
     }
 
     ternary();
@@ -845,9 +844,11 @@ public class ExpressionParser implements Parser {
         this.lookhead != null && this.lookhead.getStartIndex() > 0 ? this.lookhead.getStartIndex()
             : this.lexer.getCurrentIndex();
 
-    throw new ExpressionSyntaxErrorException(
+    ExpressionSyntaxErrorException e = new ExpressionSyntaxErrorException(
         "Syntax error:" + message + " at " + index + ", current token: " + this.lookhead
             + ". Parsing expression: `" + this.lexer.getScanString() + "^^`");
+    e.setStackTrace(new StackTraceElement[0]);
+    throw e;
   }
 
 

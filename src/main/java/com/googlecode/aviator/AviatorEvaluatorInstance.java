@@ -172,7 +172,6 @@ public final class AviatorEvaluatorInstance {
       while ((line = reader.readLine()) != null) {
         script.append(line).append("\r\n");
       }
-      System.out.println(script);
       return compile(script.toString());
     }
   }
