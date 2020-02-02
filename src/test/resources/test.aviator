@@ -3,12 +3,12 @@ fib = lambda(n) ->
   if(n <= 2) {
     return 1;
   } 
-  v = seq.get(m ,n);
+  v = seq.get(m, n);
   if(v!=nil) {
     return v;
   }
-  x = fib(n-1) + fib(n-2);
-  seq.put(m,n,x);
+  x = fib(n - 1) + fib(n - 2);
+  seq.put(m, n, x);
   x
 end;
 

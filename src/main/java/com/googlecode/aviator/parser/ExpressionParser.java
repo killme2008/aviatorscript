@@ -844,10 +844,26 @@ public class ExpressionParser implements Parser {
         this.lookhead != null && this.lookhead.getStartIndex() > 0 ? this.lookhead.getStartIndex()
             : this.lexer.getCurrentIndex();
 
-    ExpressionSyntaxErrorException e = new ExpressionSyntaxErrorException(
-        "Syntax error:" + message + " at " + index + ", current token: " + this.lookhead
-            + ". Parsing expression: `" + this.lexer.getScanString() + "^^`");
-    e.setStackTrace(new StackTraceElement[0]);
+    if (this.lookhead != null) {
+      this.lexer.pushback(this.lookhead);
+    }
+
+    String msg = "Syntax error: " + message + //
+        " at " + index + //
+        ", current token: " + //
+        this.lookhead + ",\nwhile parsing expression: `\n" + //
+        this.lexer.getScanString() + "^^\n`";
+
+    ExpressionSyntaxErrorException e = new ExpressionSyntaxErrorException(msg);
+    StackTraceElement[] traces = e.getStackTrace();
+    List<StackTraceElement> filteredTraces = new ArrayList<>();
+    for (StackTraceElement t : traces) {
+      if (t.getClassName().equals(this.getClass().getName())) {
+        continue;
+      }
+      filteredTraces.add(t);
+    }
+    e.setStackTrace(filteredTraces.toArray(new StackTraceElement[filteredTraces.size()]));
     throw e;
   }
 
