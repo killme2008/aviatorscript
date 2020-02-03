@@ -16,7 +16,6 @@
 package com.googlecode.aviator.runtime.function.seq;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
 import java.util.Map;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -50,8 +49,8 @@ public class SeqReduceFunction extends AbstractFunction {
     AviatorObject result = arg3;
     Class<?> clazz = first.getClass();
 
-    if (Collection.class.isAssignableFrom(clazz)) {
-      for (Object obj : (Collection<?>) first) {
+    if (Iterable.class.isAssignableFrom(clazz)) {
+      for (Object obj : (Iterable<?>) first) {
         result = fun.call(env, result, AviatorRuntimeJavaType.valueOf(obj));
       }
     } else if (Map.class.isAssignableFrom(clazz)) {

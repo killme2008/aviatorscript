@@ -13,20 +13,22 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class TraceFunction implements AviatorFunction {
 
-  private AviatorFunction rawFunc;
+  private final AviatorFunction rawFunc;
 
-
-
-  private TraceFunction(AviatorFunction rawFunc) {
+  private TraceFunction(final AviatorFunction rawFunc) {
     super();
     this.rawFunc = rawFunc;
   }
 
-  public static AviatorFunction wrapTrace(AviatorFunction func) {
+  public static AviatorFunction wrapTrace(final AviatorFunction func) {
     return new TraceFunction(func);
   }
 
-  private void trace(Map<String, Object> env, Object... args) {
+  private void traceResult(final Map<String, Object> env, final Object result) {
+    RuntimeUtils.printlnTrace(env, "Result : " + result);
+  }
+
+  private void traceArgs(final Map<String, Object> env, final Object... args) {
     StringBuilder sb = new StringBuilder();
     boolean wasFirst = true;
     for (Object arg : args) {
@@ -41,7 +43,7 @@ public class TraceFunction implements AviatorFunction {
         sb.append(((AviatorObject) arg).desc(env));
       }
     }
-    RuntimeUtils.printTrace(env, "Func   : " + this.getName() + "(" + sb.toString() + ")");
+    RuntimeUtils.printlnTrace(env, "Func   : " + getName() + "(" + sb.toString() + ")");
   }
 
   @Override
@@ -50,228 +52,298 @@ public class TraceFunction implements AviatorFunction {
   }
 
   @Override
-  public AviatorObject call(Map<String, Object> env) {
-    trace(env);
-    return this.rawFunc.call(env);
+  public AviatorObject call(final Map<String, Object> env) {
+    traceArgs(env);
+    AviatorObject ret = this.rawFunc.call(env);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
-    trace(env, arg1);
-    return this.rawFunc.call(env, arg1);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
+    traceArgs(env, arg1);
+    AviatorObject ret = this.rawFunc.call(env, arg1);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
-    trace(env, arg1, arg2);
-    return rawFunc.call(env, arg1, arg2);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
+    traceArgs(env, arg1, arg2);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3) {
-    trace(env, arg1, arg2, arg3);
-    return rawFunc.call(env, arg1, arg2, arg3);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3) {
+    traceArgs(env, arg1, arg2, arg3);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4) {
-    trace(env, arg1, arg2, arg3, arg4);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4) {
+    traceArgs(env, arg1, arg2, arg3, arg4);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5) {
-    trace(env, arg1, arg2, arg3, arg4, arg5);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    AviatorObject ret =
+        this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    AviatorObject ret =
+        this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+    AviatorObject ret =
+        this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
-        arg12);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12, AviatorObject arg13) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
-        arg12, arg13);
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12, final AviatorObject arg13) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12,
+        arg13);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12, arg13);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12, final AviatorObject arg13,
+      final AviatorObject arg14) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
         arg14);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
-        arg12, arg13, arg14);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12, arg13, arg14);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
-      AviatorObject arg15) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12, final AviatorObject arg13,
+      final AviatorObject arg14, final AviatorObject arg15) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
         arg14, arg15);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
-        arg12, arg13, arg14, arg15);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12, arg13, arg14, arg15);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
-      AviatorObject arg15, AviatorObject arg16) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12, final AviatorObject arg13,
+      final AviatorObject arg14, final AviatorObject arg15, final AviatorObject arg16) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
         arg14, arg15, arg16);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
-        arg12, arg13, arg14, arg15, arg16);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12, arg13, arg14, arg15, arg16);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
-      AviatorObject arg15, AviatorObject arg16, AviatorObject arg17) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12, final AviatorObject arg13,
+      final AviatorObject arg14, final AviatorObject arg15, final AviatorObject arg16,
+      final AviatorObject arg17) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
         arg14, arg15, arg16, arg17);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
-        arg12, arg13, arg14, arg15, arg16, arg17);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
-      AviatorObject arg15, AviatorObject arg16, AviatorObject arg17, AviatorObject arg18) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12, final AviatorObject arg13,
+      final AviatorObject arg14, final AviatorObject arg15, final AviatorObject arg16,
+      final AviatorObject arg17, final AviatorObject arg18) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
         arg14, arg15, arg16, arg17, arg18);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
-        arg12, arg13, arg14, arg15, arg16, arg17, arg18);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
-      AviatorObject arg15, AviatorObject arg16, AviatorObject arg17, AviatorObject arg18,
-      AviatorObject arg19) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12, final AviatorObject arg13,
+      final AviatorObject arg14, final AviatorObject arg15, final AviatorObject arg16,
+      final AviatorObject arg17, final AviatorObject arg18, final AviatorObject arg19) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
         arg14, arg15, arg16, arg17, arg18, arg19);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
-        arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
-      AviatorObject arg15, AviatorObject arg16, AviatorObject arg17, AviatorObject arg18,
-      AviatorObject arg19, AviatorObject arg20) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12, final AviatorObject arg13,
+      final AviatorObject arg14, final AviatorObject arg15, final AviatorObject arg16,
+      final AviatorObject arg17, final AviatorObject arg18, final AviatorObject arg19,
+      final AviatorObject arg20) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
         arg14, arg15, arg16, arg17, arg18, arg19, arg20);
-    return rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11,
-        arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20);
+    traceResult(env, ret);
+    return ret;
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3, AviatorObject arg4, AviatorObject arg5, AviatorObject arg6,
-      AviatorObject arg7, AviatorObject arg8, AviatorObject arg9, AviatorObject arg10,
-      AviatorObject arg11, AviatorObject arg12, AviatorObject arg13, AviatorObject arg14,
-      AviatorObject arg15, AviatorObject arg16, AviatorObject arg17, AviatorObject arg18,
-      AviatorObject arg19, AviatorObject arg20, AviatorObject... args) {
-    trace(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7,
+      final AviatorObject arg8, final AviatorObject arg9, final AviatorObject arg10,
+      final AviatorObject arg11, final AviatorObject arg12, final AviatorObject arg13,
+      final AviatorObject arg14, final AviatorObject arg15, final AviatorObject arg16,
+      final AviatorObject arg17, final AviatorObject arg18, final AviatorObject arg19,
+      final AviatorObject arg20, final AviatorObject... args) {
+    traceArgs(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,
         arg14, arg15, arg16, arg17, arg18, arg19, arg20, "...");
-    return this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10,
-        arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, args);
+    AviatorObject ret = this.rawFunc.call(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
+        arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, args);
+    traceResult(env, ret);
+    return ret;
   }
 }

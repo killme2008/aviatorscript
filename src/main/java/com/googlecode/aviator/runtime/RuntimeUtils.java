@@ -54,7 +54,7 @@ public final class RuntimeUtils {
   }
 
 
-  public static final void printTrace(final Map<String, Object> env, final String msg) {
+  public static final void printlnTrace(final Map<String, Object> env, final String msg) {
     try {
       getInstance(env).getTraceOutputStream().write(("[Aviator TRACE] " + msg + "\n").getBytes());
     } catch (IOException e) {

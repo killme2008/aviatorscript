@@ -72,7 +72,7 @@ public abstract class ClassExpression extends BaseExpression {
     try {
       Object result = execute0(env);
       if (RuntimeUtils.isTracedEval(env)) {
-        RuntimeUtils.printTrace(env, "Result : " + result);
+        RuntimeUtils.printlnTrace(env, "Result : " + result);
       }
       return result;
     } catch (ExpressionRuntimeException e) {

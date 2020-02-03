@@ -42,8 +42,8 @@ public class SeqIncludeFunction extends AbstractFunction {
     }
     Class<?> clazz = first.getClass();
     boolean contains = false;
-    if (Collection.class.isAssignableFrom(clazz)) {
-      Collection<?> seq = (Collection<?>) first;
+    if (Iterable.class.isAssignableFrom(clazz)) {
+      Iterable<?> seq = (Collection<?>) first;
       try {
         for (Object obj : seq) {
           if (AviatorRuntimeJavaType.valueOf(obj).compare(arg2, env) == 0) {

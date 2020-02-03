@@ -10,8 +10,12 @@ public class SimpleExample {
     Expression exp = AviatorEvaluator.getInstance()
         .compileScript(SimpleExample.class.getResource("/test.aviator").getFile());
 
-    System.out.println(exp.execute());
+    // System.out.println(exp.execute());
 
-    System.out.println(AviatorEvaluator.execute("map(range(1,10), lambda(x) -> x+1 end)"));
+    // AviatorEvaluator.setOption(Options.TRACE_EVAL, true);
+    System.out.println(AviatorEvaluator.execute("sum = 0;  t = lambda(x) -> sum = 3 end; t(4)"));
+    System.out.println(AviatorEvaluator.execute("sum = 0 ; if(true) { sum = 3 } println(sum)"));
+    System.out.println(AviatorEvaluator
+        .execute("sum = 0 ; for x in range(0,10) { println(x); sum = sum + x; } println(sum)"));
   }
 }

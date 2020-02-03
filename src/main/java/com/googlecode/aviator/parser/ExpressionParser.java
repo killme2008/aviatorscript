@@ -37,6 +37,7 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.FunctionArgument;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 
 /**
@@ -46,6 +47,8 @@ import com.googlecode.aviator.runtime.FunctionArgument;
  *
  */
 public class ExpressionParser implements Parser {
+  private static final Variable ReducerFunctionVar = new Variable("__reducer", -1);
+
   private final ExpressionLexer lexer;
 
   static final Set<String> RESERVED_WORDS = new HashSet<String>();
@@ -901,7 +904,7 @@ public class ExpressionParser implements Parser {
   }
 
   private static enum ClauseType {
-    If, For, Ternary, Return, Empty
+    If, For, Ternary, Return, Unmatched
   }
 
   private ClauseType clause() {
@@ -909,7 +912,7 @@ public class ExpressionParser implements Parser {
       ifClause();
       return ClauseType.If;
     } else if (this.lookhead == Variable.FOR) {
-      // TODO
+      forClause();
       return ClauseType.For;
     } else if (this.lookhead == Variable.RETURN) {
       returnClause();
@@ -917,7 +920,61 @@ public class ExpressionParser implements Parser {
     } else {
       int cgTimes = this.getCGTimes;
       ternary();
-      return cgTimes == this.getCGTimes ? ClauseType.Empty : ClauseType.Ternary;
+      return cgTimes == this.getCGTimes ? ClauseType.Unmatched : ClauseType.Ternary;
+    }
+  }
+
+  private void forClause() {
+    move(true);
+
+    Token<?> reducerArg = this.lookhead;
+    // TODO assert reducerArg
+    move(true);
+    if (this.lookhead == Variable.IN) {
+      move(true);
+      Variable seqVar = new Variable(AviatorRuntimeJavaType.genName(), -1);
+      getCodeGeneratorWithTimes().onConstant(seqVar);
+      ternary();
+      if (expectChar('{')) {
+        move(true);
+        this.braceDepth++;
+        {
+          // assign seq to a temp variable.
+          getCodeGeneratorWithTimes().onAssignment(this.lookhead);
+          getCodeGeneratorWithTimes().onTernaryEnd(this.lookhead);
+          getCodeGeneratorWithTimes().onMethodName(ReducerFunctionVar);
+          getCodeGeneratorWithTimes().onConstant(seqVar);
+          getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        }
+
+        // create a lambda function with for loop body
+        {
+
+          this.lambdaDepth++;
+          this.depthState.add(DepthState.Brace);
+          getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken);
+          getCodeGeneratorWithTimes().onLambdaArgument(reducerArg);
+          getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+          statement();
+          getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+          this.lambdaDepth--;
+          this.depthState.removeLast();
+        }
+        getCodeGenerator().onMethodParameter(this.lookhead);
+        getCodeGenerator().onMethodInvoke(this.lookhead, Collections.EMPTY_LIST);
+
+        if (expectChar('}')) {
+          move(true);
+          this.braceDepth--;
+        } else {
+          reportSyntaxError("Missing '}' in for loop");
+        }
+
+      } else {
+        reportSyntaxError("Expect '{' in for loop");
+      }
+    } else {
+      reportSyntaxError("Expect 'in' keyword while using for loop");
     }
   }
 
@@ -944,7 +1001,7 @@ public class ExpressionParser implements Parser {
       }
 
       ClauseType nextClauseType = clause();
-      if (nextClauseType == ClauseType.Empty) {
+      if (nextClauseType == ClauseType.Unmatched) {
         break;
       }
       clauseType = nextClauseType;
