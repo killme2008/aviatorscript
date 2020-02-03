@@ -13,7 +13,7 @@ import com.googlecode.aviator.utils.Reflector;
 /**
  * seq.array function to create a new array.
  *
- * @author boyan(boyan@antfin.com)
+ * @author dennis(killme2008@gmail.com)
  * @since 4.2.4
  *
  */

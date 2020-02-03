@@ -7,7 +7,7 @@ import com.googlecode.aviator.utils.LRUMap;
 /**
  * DateFormat cache
  * 
- * @author boyan
+ * @author dennis(killme2008@gmail.com)
  * 
  */
 public class DateFormatCache {

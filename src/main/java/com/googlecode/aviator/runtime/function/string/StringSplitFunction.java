@@ -11,7 +11,7 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 /**
  * string.split function
  * 
- * @author boyan
+ * @author dennis(killme2008@gmail.com)
  * 
  */
 public class StringSplitFunction extends AbstractFunction {

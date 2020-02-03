@@ -13,7 +13,7 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 /**
  * string_to_date function
  * 
- * @author boyan
+ * @author dennis(killme2008@gmail.com)
  * 
  */
 public class String2DateFunction extends AbstractFunction {

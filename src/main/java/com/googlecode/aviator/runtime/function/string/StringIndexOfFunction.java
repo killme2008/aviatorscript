@@ -10,7 +10,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 /**
  * String.indexOf function
  * 
- * @author boyan
+ * @author dennis(killme2008@gmail.com)
  * @Date 2011-7-13
  * 
  */

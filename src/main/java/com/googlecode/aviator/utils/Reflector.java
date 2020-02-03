@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Some code is copied from
  * https://github.com/clojure/clojure/blob/master/src/jvm/clojure/lang/Reflector.java
  *
- * @author boyan(boyan@antfin.com)
+ * @author dennis(killme2008@gmail.com)
  *
  */
 public class Reflector {

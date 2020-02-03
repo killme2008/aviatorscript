@@ -8,7 +8,8 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 /**
  * A compare function.
  *
- * @author killme2008(killme2008@gmail.com)
+ * @since 5.0.0
+ * @author dennis(killme2008@gmail.com)
  *
  */
 public class CompareFunction extends AbstractFunction {

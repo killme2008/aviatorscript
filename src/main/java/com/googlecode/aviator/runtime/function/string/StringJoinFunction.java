@@ -13,7 +13,7 @@ import com.googlecode.aviator.runtime.type.AviatorString;
 /**
  * string.join function
  * 
- * @author boyan
+ * @author dennis(killme2008@gmail.com)
  * 
  */
 public class StringJoinFunction extends AbstractFunction {

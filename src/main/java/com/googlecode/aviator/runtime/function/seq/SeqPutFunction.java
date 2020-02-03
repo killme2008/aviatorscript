@@ -12,7 +12,7 @@ import com.googlecode.aviator.utils.TypeUtils;
 /**
  * seq.put function to set a element value by index(for list) or key(for map).
  *
- * @since 4.1.2
+ * @since 5.0.0
  * @author dennis
  *
  */

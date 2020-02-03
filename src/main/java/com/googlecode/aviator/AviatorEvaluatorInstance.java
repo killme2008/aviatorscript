@@ -92,6 +92,7 @@ import com.googlecode.aviator.runtime.function.string.StringReplaceFirstFunction
 import com.googlecode.aviator.runtime.function.string.StringSplitFunction;
 import com.googlecode.aviator.runtime.function.string.StringStartsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringSubStringFunction;
+import com.googlecode.aviator.runtime.function.system.AssertFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;
 import com.googlecode.aviator.runtime.function.system.BooleanFunction;
 import com.googlecode.aviator.runtime.function.system.CompareFunction;
@@ -530,6 +531,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new MinFunction());
     addFunction(new MaxFunction());
     addFunction(new IdentityFunction());
+    addFunction(new AssertFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());

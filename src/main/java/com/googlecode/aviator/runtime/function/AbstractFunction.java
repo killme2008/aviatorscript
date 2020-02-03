@@ -9,7 +9,7 @@ import com.googlecode.aviator.runtime.type.AviatorType;
 /**
  * Abstract function implementation
  *
- * @author boyan
+ * @author dennis(killme2008@gmail.com)
  * @Date 2011-7-12
  *
  */

@@ -12,7 +12,7 @@ import com.googlecode.aviator.runtime.type.AviatorString;
 /**
  * date_to_string function
  * 
- * @author boyan
+ * @author dennis(killme2008@gmail.com)
  * 
  */
 public class Date2StringFunction extends AbstractFunction {

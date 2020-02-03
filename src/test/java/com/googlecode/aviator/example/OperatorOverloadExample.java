@@ -16,7 +16,7 @@ public class OperatorOverloadExample {
   /**
    * Overload divide operator, when the dividend is zero,return 0.
    *
-   * @author boyan(boyan@antfin.com)
+   * @author dennis(killme2008@gmail.com)
    *
    */
   public static class OverloadDivide extends AbstractFunction {
