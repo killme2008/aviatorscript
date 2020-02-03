@@ -273,7 +273,7 @@ public class AviatorJavaType extends AviatorObject {
 
     Object v = value.getValue(env);
     env.put(this.name, v);
-    return new AviatorRuntimeJavaType(v);
+    return AviatorRuntimeJavaType.valueOf(v);
   }
 
   private AviatorObject setProperty(final AviatorObject value, final Map<String, Object> env) {
@@ -287,7 +287,7 @@ public class AviatorJavaType extends AviatorObject {
         }
         throw new ExpressionRuntimeException("Can't assign value to " + this.name, t);
       }
-      return new AviatorRuntimeJavaType(v);
+      return AviatorRuntimeJavaType.valueOf(v);
     } else {
       throw new ExpressionRuntimeException("Can't assign value to " + this.name
           + ", Options.ENABLE_PROPERTY_SYNTAX_SUGAR is disabled.");

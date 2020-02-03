@@ -12,9 +12,9 @@ public class SeqCountFunctionUnitTest {
   @Test
   public void testCount_Array() {
     AviatorObject[] args = new AviatorObject[1];
-    args[0] = new AviatorRuntimeJavaType(new String[10]);
+    args[0] = AviatorRuntimeJavaType.valueOf(new String[10]);
     SeqCountFunction fun = new SeqCountFunction();
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType(new String[10]));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf(new String[10]));
     assertEquals(10, result.getValue(null));
   }
 
@@ -23,7 +23,7 @@ public class SeqCountFunctionUnitTest {
   public void testCount_EmptyArray() {
 
     SeqCountFunction fun = new SeqCountFunction();
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType(new String[0]));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf(new String[0]));
     assertEquals(0, result.getValue(null));
   }
 
@@ -35,7 +35,7 @@ public class SeqCountFunctionUnitTest {
     set.add(2);
 
     SeqCountFunction fun = new SeqCountFunction();
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType(set));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf(set));
     assertEquals(2, result.getValue(null));
   }
 
@@ -43,7 +43,7 @@ public class SeqCountFunctionUnitTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCount_String() {
     SeqCountFunction fun = new SeqCountFunction();
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
   }
 
 }

@@ -17,12 +17,12 @@ public class SeqPredicateFunctionUnitTest {
   @Test
   public void testPredicate_eq() {
     SeqPredicateFunction fun =
-        new SeqPredicateFunction("eq", OperatorType.EQ, new AviatorRuntimeJavaType("hello"));
+        new SeqPredicateFunction("eq", OperatorType.EQ, AviatorRuntimeJavaType.valueOf("hello"));
 
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
     assertTrue(result.booleanValue(null));
 
-    result = fun.call(null, new AviatorRuntimeJavaType("he1lo"));
+    result = fun.call(null, AviatorRuntimeJavaType.valueOf("he1lo"));
     assertFalse(result.booleanValue(null));
   }
 
@@ -30,12 +30,12 @@ public class SeqPredicateFunctionUnitTest {
   @Test
   public void testPredicate_neq() {
     SeqPredicateFunction fun =
-        new SeqPredicateFunction("neq", OperatorType.NEQ, new AviatorRuntimeJavaType("hello"));
+        new SeqPredicateFunction("neq", OperatorType.NEQ, AviatorRuntimeJavaType.valueOf("hello"));
 
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
     assertFalse(result.booleanValue(null));
 
-    result = fun.call(null, new AviatorRuntimeJavaType("he1lo"));
+    result = fun.call(null, AviatorRuntimeJavaType.valueOf("he1lo"));
     assertTrue(result.booleanValue(null));
   }
 
@@ -43,12 +43,12 @@ public class SeqPredicateFunctionUnitTest {
   @Test
   public void testPredicate_gt() {
     SeqPredicateFunction fun =
-        new SeqPredicateFunction("gt", OperatorType.GT, new AviatorRuntimeJavaType("hello"));
+        new SeqPredicateFunction("gt", OperatorType.GT, AviatorRuntimeJavaType.valueOf("hello"));
 
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
     assertFalse(result.booleanValue(null));
 
-    result = fun.call(null, new AviatorRuntimeJavaType("iello"));
+    result = fun.call(null, AviatorRuntimeJavaType.valueOf("iello"));
     assertTrue(result.booleanValue(null));
   }
 
@@ -56,15 +56,15 @@ public class SeqPredicateFunctionUnitTest {
   @Test
   public void testPredicate_ge() {
     SeqPredicateFunction fun =
-        new SeqPredicateFunction("ge", OperatorType.GE, new AviatorRuntimeJavaType("hello"));
+        new SeqPredicateFunction("ge", OperatorType.GE, AviatorRuntimeJavaType.valueOf("hello"));
 
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
     assertTrue(result.booleanValue(null));
 
-    result = fun.call(null, new AviatorRuntimeJavaType("iello"));
+    result = fun.call(null, AviatorRuntimeJavaType.valueOf("iello"));
     assertTrue(result.booleanValue(null));
 
-    result = fun.call(null, new AviatorRuntimeJavaType("aello"));
+    result = fun.call(null, AviatorRuntimeJavaType.valueOf("aello"));
     assertFalse(result.booleanValue(null));
   }
 
@@ -72,12 +72,12 @@ public class SeqPredicateFunctionUnitTest {
   @Test
   public void testPredicate_lt() {
     SeqPredicateFunction fun =
-        new SeqPredicateFunction("lt", OperatorType.LT, new AviatorRuntimeJavaType("hello"));
+        new SeqPredicateFunction("lt", OperatorType.LT, AviatorRuntimeJavaType.valueOf("hello"));
 
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
     assertFalse(result.booleanValue(null));
 
-    result = fun.call(null, new AviatorRuntimeJavaType("ae1lo"));
+    result = fun.call(null, AviatorRuntimeJavaType.valueOf("ae1lo"));
     assertTrue(result.booleanValue(null));
   }
 
@@ -85,15 +85,15 @@ public class SeqPredicateFunctionUnitTest {
   @Test
   public void testPredicate_le() {
     SeqPredicateFunction fun =
-        new SeqPredicateFunction("le", OperatorType.LE, new AviatorRuntimeJavaType("hello"));
+        new SeqPredicateFunction("le", OperatorType.LE, AviatorRuntimeJavaType.valueOf("hello"));
 
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
     assertTrue(result.booleanValue(null));
 
-    result = fun.call(null, new AviatorRuntimeJavaType("ae1lo"));
+    result = fun.call(null, AviatorRuntimeJavaType.valueOf("ae1lo"));
     assertTrue(result.booleanValue(null));
 
-    result = fun.call(null, new AviatorRuntimeJavaType("ie1lo"));
+    result = fun.call(null, AviatorRuntimeJavaType.valueOf("ie1lo"));
     assertFalse(result.booleanValue(null));
 
   }
@@ -102,8 +102,8 @@ public class SeqPredicateFunctionUnitTest {
   @Test(expected = IllegalArgumentException.class)
   public void testPredicate_IllegalArguments() {
     SeqPredicateFunction fun =
-        new SeqPredicateFunction("le", OperatorType.LE, new AviatorRuntimeJavaType("hello"));
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"), null);
+        new SeqPredicateFunction("le", OperatorType.LE, AviatorRuntimeJavaType.valueOf("hello"));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"), null);
 
   }
 
@@ -111,8 +111,8 @@ public class SeqPredicateFunctionUnitTest {
   @Test(expected = ExpressionRuntimeException.class)
   public void testPredicate_IllegalOperator() {
     SeqPredicateFunction fun =
-        new SeqPredicateFunction("and", OperatorType.AND, new AviatorRuntimeJavaType("hello"));
-    AviatorObject result = fun.call(null, new AviatorRuntimeJavaType("hello"));
+        new SeqPredicateFunction("and", OperatorType.AND, AviatorRuntimeJavaType.valueOf("hello"));
+    AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
   }
 
   @Test
@@ -123,7 +123,7 @@ public class SeqPredicateFunctionUnitTest {
     }
     SeqPredicateFunction predicate = new SeqPredicateFunction("eq_temp_1", OperatorType.EQ,
         new AviatorString("value1"), new AviatorString("key1"));
-    AviatorObject result = predicate.call(null, new AviatorRuntimeJavaType(data));
+    AviatorObject result = predicate.call(null, AviatorRuntimeJavaType.valueOf(data));
     assertTrue(result.booleanValue(null));
   }
 }

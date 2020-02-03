@@ -22,5 +22,5 @@ package com.googlecode.aviator.runtime.type;
  *
  */
 public enum AviatorType {
-  Long, Double, String, JavaType, Boolean, Pattern, Nil, Method, BigInt, Decimal, Lambda;
+  Long, Double, String, JavaType, Boolean, Pattern, Nil, Method, BigInt, Decimal, Lambda, Range;
 }

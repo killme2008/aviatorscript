@@ -28,7 +28,7 @@ public class SeqFilterFunctionUnitTest {
     env.put("eq_temp_1", predicate);
     SeqFilterFunction fun = new SeqFilterFunction();
     AviatorObject result =
-        fun.call(env, new AviatorRuntimeJavaType(strs), new AviatorJavaType("eq_temp_1"));
+        fun.call(env, AviatorRuntimeJavaType.valueOf(strs), new AviatorJavaType("eq_temp_1"));
     Object[] array = (Object[]) result.getValue(null);
     assertEquals(1, array.length);
     for (Object i : array) {
@@ -51,7 +51,7 @@ public class SeqFilterFunctionUnitTest {
 
     SeqFilterFunction fun = new SeqFilterFunction();
     AviatorObject result =
-        fun.call(env, new AviatorRuntimeJavaType(strs), new AviatorJavaType("eq_temp_1"));
+        fun.call(env, AviatorRuntimeJavaType.valueOf(strs), new AviatorJavaType("eq_temp_1"));
     LinkedList list = (LinkedList) result.getValue(null);
     assertEquals(1, list.size());
     for (Object i : list) {
@@ -64,8 +64,8 @@ public class SeqFilterFunctionUnitTest {
   public void testFilter_String() {
     SeqFilterFunction fun = new SeqFilterFunction();
 
-    AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, new AviatorRuntimeJavaType("hello"),
-        new AviatorJavaType("string.length"));
+    AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP,
+        AviatorRuntimeJavaType.valueOf("hello"), new AviatorJavaType("string.length"));
   }
 
   @Test
@@ -81,7 +81,7 @@ public class SeqFilterFunctionUnitTest {
     env.put("eq_temp_1", predicate);
     SeqFilterFunction fun = new SeqFilterFunction();
     AviatorObject result =
-        fun.call(env, new AviatorRuntimeJavaType(data), new AviatorJavaType("eq_temp_1"));
+        fun.call(env, AviatorRuntimeJavaType.valueOf(data), new AviatorJavaType("eq_temp_1"));
     Map map = ((Map) result.getValue(null));
     assertEquals(1, map.size());
     for (Object value : map.values()) {

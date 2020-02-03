@@ -52,17 +52,17 @@ public class SeqReduceFunction extends AbstractFunction {
 
     if (Collection.class.isAssignableFrom(clazz)) {
       for (Object obj : (Collection<?>) first) {
-        result = fun.call(env, result, new AviatorRuntimeJavaType(obj));
+        result = fun.call(env, result, AviatorRuntimeJavaType.valueOf(obj));
       }
     } else if (Map.class.isAssignableFrom(clazz)) {
       for (Object obj : ((Map<?, ?>) first).entrySet()) {
-        result = fun.call(env, result, new AviatorRuntimeJavaType(obj));
+        result = fun.call(env, result, AviatorRuntimeJavaType.valueOf(obj));
       }
     } else if (clazz.isArray()) {
       int length = Array.getLength(first);
       for (int i = 0; i < length; i++) {
         Object obj = Array.get(first, i);
-        result = fun.call(env, result, new AviatorRuntimeJavaType(obj));
+        result = fun.call(env, result, AviatorRuntimeJavaType.valueOf(obj));
       }
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");

@@ -26,6 +26,7 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.runtime.type.Range;
 
 
 /**
@@ -52,33 +53,39 @@ public class SeqMapFunction extends AbstractFunction {
     }
     Class<?> clazz = first.getClass();
 
-    if (Collection.class.isAssignableFrom(clazz)) {
+    if (Iterable.class.isAssignableFrom(clazz)) {
       Collection<Object> result = null;
-      try {
-        result = (Collection<Object>) clazz.newInstance();
-      } catch (Throwable t) {
-        // ignore
-        result = new ArrayList<Object>();
+      if (clazz == Range.class) {
+        result = new ArrayList<>();
+      } else {
+        try {
+          result = (Collection<Object>) clazz.newInstance();
+        } catch (Throwable t) {
+          // ignore
+          result = new ArrayList<Object>();
+        }
       }
-      for (Object obj : (Collection<?>) first) {
-        result.add(fun.call(env, new AviatorRuntimeJavaType(obj)).getValue(env));
+
+      for (Object obj : (Iterable<?>) first) {
+        result.add(fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).getValue(env));
       }
-      return new AviatorRuntimeJavaType(result);
+      return AviatorRuntimeJavaType.valueOf(result);
     } else if (Map.class.isAssignableFrom(clazz)) {
       Collection<Object> result = new ArrayList<Object>();
       for (Object obj : ((Map<?, ?>) first).entrySet()) {
-        result.add(fun.call(env, new AviatorRuntimeJavaType(obj)).getValue(env));
+        result.add(fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).getValue(env));
       }
-      return new AviatorRuntimeJavaType(result);
+      return AviatorRuntimeJavaType.valueOf(result);
     } else if (clazz.isArray()) {
       int length = Array.getLength(first);
       Object result = Array.newInstance(Object.class, length);
       int index = 0;
       for (int i = 0; i < length; i++) {
         Object obj = Array.get(first, i);
-        Array.set(result, index++, fun.call(env, new AviatorRuntimeJavaType(obj)).getValue(env));
+        Array.set(result, index++,
+            fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).getValue(env));
       }
-      return new AviatorRuntimeJavaType(result);
+      return AviatorRuntimeJavaType.valueOf(result);
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
     }

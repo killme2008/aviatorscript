@@ -37,8 +37,8 @@ public class SeqSomeFunction extends AbstractFunction {
     if (Collection.class.isAssignableFrom(clazz)) {
       for (Object obj : (Collection<?>) first) {
         // return first fun returns true element.
-        if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
-          return new AviatorRuntimeJavaType(obj);
+        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
+          return AviatorRuntimeJavaType.valueOf(obj);
         }
       }
     } else if (clazz.isArray()) {
@@ -46,8 +46,8 @@ public class SeqSomeFunction extends AbstractFunction {
       for (int i = 0; i < length; i++) {
         Object obj = Array.get(first, i);
         // return first fun returns true element.
-        if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
-          return new AviatorRuntimeJavaType(obj);
+        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
+          return AviatorRuntimeJavaType.valueOf(obj);
         }
       }
     } else {

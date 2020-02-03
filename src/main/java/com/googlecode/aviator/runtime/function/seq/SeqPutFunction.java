@@ -58,7 +58,7 @@ public class SeqPutFunction extends AbstractFunction {
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " is not a collection.");
     }
-    return new AviatorRuntimeJavaType(previousVal);
+    return AviatorRuntimeJavaType.valueOf(previousVal);
   }
 
 }

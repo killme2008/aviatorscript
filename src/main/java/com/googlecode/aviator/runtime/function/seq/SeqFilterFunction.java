@@ -61,11 +61,11 @@ public class SeqFilterFunction extends AbstractFunction {
         result = new ArrayList<Object>();
       }
       for (Object obj : (Collection<?>) first) {
-        if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
+        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
           result.add(obj);
         }
       }
-      return new AviatorRuntimeJavaType(result);
+      return AviatorRuntimeJavaType.valueOf(result);
     } else if (Map.class.isAssignableFrom(clazz)) {
       Map<Object, Object> result;
       try {
@@ -76,22 +76,22 @@ public class SeqFilterFunction extends AbstractFunction {
       }
       Map<?, ?> map = (Map<?, ?>) first;
       for (Map.Entry<?, ?> entry : map.entrySet()) {
-        if (fun.call(env, new AviatorRuntimeJavaType(entry)).booleanValue(env)) {
+        if (fun.call(env, AviatorRuntimeJavaType.valueOf(entry)).booleanValue(env)) {
           result.put(entry.getKey(), entry.getValue());
         }
       }
-      return new AviatorRuntimeJavaType(result);
+      return AviatorRuntimeJavaType.valueOf(result);
     } else if (clazz.isArray()) {
       // Object[] seq = (Object[]) first;
       List<Object> result = new ArrayList<Object>();
       int length = Array.getLength(first);
       for (int i = 0; i < length; i++) {
         Object obj = Array.get(first, i);
-        if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
+        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
           result.add(obj);
         }
       }
-      return new AviatorRuntimeJavaType(result.toArray());
+      return AviatorRuntimeJavaType.valueOf(result.toArray());
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
     }

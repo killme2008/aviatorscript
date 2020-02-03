@@ -106,6 +106,8 @@ import com.googlecode.aviator.runtime.function.system.NowFunction;
 import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
+import com.googlecode.aviator.runtime.function.system.RangeFunction;
+import com.googlecode.aviator.runtime.function.system.ReducerFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
@@ -532,6 +534,8 @@ public final class AviatorEvaluatorInstance {
     addFunction(new MaxFunction());
     addFunction(new IdentityFunction());
     addFunction(new AssertFunction());
+    addFunction(new RangeFunction());
+    addFunction(new ReducerFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());

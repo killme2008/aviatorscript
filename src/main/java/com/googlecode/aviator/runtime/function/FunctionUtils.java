@@ -177,7 +177,7 @@ public class FunctionUtils {
     } else if (ret instanceof AviatorObject) {
       return (AviatorObject) ret;
     } else {
-      return new AviatorRuntimeJavaType(ret);
+      return AviatorRuntimeJavaType.valueOf(ret);
     }
   }
 

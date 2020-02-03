@@ -33,7 +33,7 @@ public class SeqNewMapFunction extends AbstractVariadicFunction {
       i += 2;
     }
 
-    return new AviatorRuntimeJavaType(map);
+    return AviatorRuntimeJavaType.valueOf(map);
   }
 
 }

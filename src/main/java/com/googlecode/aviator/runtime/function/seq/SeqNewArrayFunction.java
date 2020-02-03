@@ -65,7 +65,7 @@ public class SeqNewArrayFunction extends AbstractVariadicFunction {
         Array.set(ret, i - 1, Reflector.boxArg(clazz, args[i].getValue(env)));
       }
 
-      return new AviatorRuntimeJavaType(ret);
+      return AviatorRuntimeJavaType.valueOf(ret);
     } catch (Throwable t) {
       throw Reflector.sneakyThrow(t);
     }

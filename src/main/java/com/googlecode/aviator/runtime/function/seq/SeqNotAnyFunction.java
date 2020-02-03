@@ -34,7 +34,7 @@ public class SeqNotAnyFunction extends AbstractFunction {
 
     if (Collection.class.isAssignableFrom(clazz)) {
       for (Object obj : (Collection<?>) first) {
-        if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
+        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
           return AviatorBoolean.FALSE;
         }
       }
@@ -42,7 +42,7 @@ public class SeqNotAnyFunction extends AbstractFunction {
       int length = Array.getLength(first);
       for (int i = 0; i < length; i++) {
         Object obj = Array.get(first, i);
-        if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
+        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
           return AviatorBoolean.FALSE;
         }
       }

@@ -11,5 +11,7 @@ public class SimpleExample {
         .compileScript(SimpleExample.class.getResource("/test.aviator").getFile());
 
     System.out.println(exp.execute());
+
+    System.out.println(AviatorEvaluator.execute("map(range(1,10), lambda(x) -> x+1 end)"));
   }
 }

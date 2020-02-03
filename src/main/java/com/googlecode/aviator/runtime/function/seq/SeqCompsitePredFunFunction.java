@@ -44,7 +44,7 @@ public class SeqCompsitePredFunFunction extends AbstractVariadicFunction {
   public AviatorObject variadicCall(Map<String, Object> env, AviatorObject... args) {
     if (args == null || args.length == 0)
       return AviatorBoolean.valueOf(op == LogicOp.AND);
-    return new AviatorRuntimeJavaType(createFunction(env, args, op));
+    return AviatorRuntimeJavaType.valueOf(createFunction(env, args, op));
   }
 
 

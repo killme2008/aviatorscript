@@ -29,7 +29,7 @@ public class SeqNewSetFunction extends AbstractVariadicFunction {
       set.add(obj.getValue(env));
     }
 
-    return new AviatorRuntimeJavaType(set);
+    return AviatorRuntimeJavaType.valueOf(set);
   }
 
 

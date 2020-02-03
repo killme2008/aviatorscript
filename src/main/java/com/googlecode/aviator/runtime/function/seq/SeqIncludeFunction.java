@@ -46,7 +46,7 @@ public class SeqIncludeFunction extends AbstractFunction {
       Collection<?> seq = (Collection<?>) first;
       try {
         for (Object obj : seq) {
-          if (new AviatorRuntimeJavaType(obj).compare(arg2, env) == 0) {
+          if (AviatorRuntimeJavaType.valueOf(obj).compare(arg2, env) == 0) {
             contains = true;
             break;
           }
@@ -61,7 +61,7 @@ public class SeqIncludeFunction extends AbstractFunction {
         int length = Array.getLength(first);
         for (int i = 0; i < length; i++) {
           Object obj = Array.get(first, i);
-          if (new AviatorRuntimeJavaType(obj).compare(arg2, env) == 0) {
+          if (AviatorRuntimeJavaType.valueOf(obj).compare(arg2, env) == 0) {
             contains = true;
             break;
           }

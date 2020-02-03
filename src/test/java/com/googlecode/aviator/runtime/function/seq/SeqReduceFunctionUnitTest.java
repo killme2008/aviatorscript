@@ -32,9 +32,9 @@ public class SeqReduceFunctionUnitTest {
     m.put("b", "2");
 
     SeqReduceFunction fun = new SeqReduceFunction();
-    AviatorObject result = fun.call(this.env, new AviatorRuntimeJavaType(m),
+    AviatorObject result = fun.call(this.env, AviatorRuntimeJavaType.valueOf(m),
         (AviatorObject) AviatorEvaluator.execute("lambda(x, y) -> x + long(y.value) end"),
-        new AviatorRuntimeJavaType(5));
+        AviatorRuntimeJavaType.valueOf(5));
     assertNotNull(result);
     assertEquals(8, result.getValue(null));
   }
@@ -47,8 +47,8 @@ public class SeqReduceFunctionUnitTest {
     }
 
     SeqReduceFunction fun = new SeqReduceFunction();
-    AviatorObject result = fun.call(this.env, new AviatorRuntimeJavaType(a),
-        new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
+    AviatorObject result = fun.call(this.env, AviatorRuntimeJavaType.valueOf(a),
+        new AviatorJavaType("+"), AviatorRuntimeJavaType.valueOf(0));
     assertNotNull(result);
     assertEquals(45, result.getValue(null));
 
@@ -65,8 +65,8 @@ public class SeqReduceFunctionUnitTest {
     }
 
     SeqReduceFunction fun = new SeqReduceFunction();
-    AviatorObject result = fun.call(this.env, new AviatorRuntimeJavaType(a),
-        new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
+    AviatorObject result = fun.call(this.env, AviatorRuntimeJavaType.valueOf(a),
+        new AviatorJavaType("+"), AviatorRuntimeJavaType.valueOf(0));
 
   }
 
@@ -79,8 +79,8 @@ public class SeqReduceFunctionUnitTest {
     }
 
     SeqReduceFunction fun = new SeqReduceFunction();
-    AviatorObject result = fun.call(this.env, new AviatorRuntimeJavaType(a),
-        new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
+    AviatorObject result = fun.call(this.env, AviatorRuntimeJavaType.valueOf(a),
+        new AviatorJavaType("+"), AviatorRuntimeJavaType.valueOf(0));
     assertNotNull(result);
     assertEquals(45, result.getValue(null));
 
@@ -96,7 +96,7 @@ public class SeqReduceFunctionUnitTest {
 
     SeqReduceFunction fun = new SeqReduceFunction();
     AviatorObject result =
-        fun.call(this.env, new AviatorRuntimeJavaType(a), new AviatorJavaType("+"));
+        fun.call(this.env, AviatorRuntimeJavaType.valueOf(a), new AviatorJavaType("+"));
   }
 
 
@@ -104,8 +104,9 @@ public class SeqReduceFunctionUnitTest {
   public void testReduce_String() {
 
     SeqReduceFunction fun = new SeqReduceFunction();
-    AviatorObject result = fun.call(AviatorEvaluator.FUNC_MAP, new AviatorRuntimeJavaType("hello"),
-        new AviatorJavaType("+"), new AviatorRuntimeJavaType(0));
+    AviatorObject result =
+        fun.call(AviatorEvaluator.FUNC_MAP, AviatorRuntimeJavaType.valueOf("hello"),
+            new AviatorJavaType("+"), AviatorRuntimeJavaType.valueOf(0));
   }
 
 }

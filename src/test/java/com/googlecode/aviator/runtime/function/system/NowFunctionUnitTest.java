@@ -20,7 +20,7 @@ public class NowFunctionUnitTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCall_WithOneArgument() {
     NowFunction now = new NowFunction();
-    now.call(null, new AviatorRuntimeJavaType(1));
+    now.call(null, AviatorRuntimeJavaType.valueOf(1));
   }
 
 }

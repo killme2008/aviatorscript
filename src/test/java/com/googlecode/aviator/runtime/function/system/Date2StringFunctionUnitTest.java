@@ -17,11 +17,11 @@ public class Date2StringFunctionUnitTest {
     assertEquals("date_to_string", function.getName());
     Date date = new Date();
     assertEquals(DateFormatCache.getOrCreateDateFormat("yyyyMMdd").format(date),
-        function.call(null, new AviatorRuntimeJavaType(date), new AviatorString("yyyyMMdd"))
+        function.call(null, AviatorRuntimeJavaType.valueOf(date), new AviatorString("yyyyMMdd"))
             .getValue(null));
 
     assertEquals(DateFormatCache.getOrCreateDateFormat("yyyy--MM--dd").format(date),
-        function.call(null, new AviatorRuntimeJavaType(date), new AviatorString("yyyy--MM--dd"))
+        function.call(null, AviatorRuntimeJavaType.valueOf(date), new AviatorString("yyyy--MM--dd"))
             .getValue(null));
 
   }
@@ -30,6 +30,6 @@ public class Date2StringFunctionUnitTest {
   @Test(expected = ClassCastException.class)
   public void testCall_NotDate() {
     assertEquals("date_to_string", function.getName());
-    function.call(null, new AviatorRuntimeJavaType(1), new AviatorString("yyyyMMdd"));
+    function.call(null, AviatorRuntimeJavaType.valueOf(1), new AviatorString("yyyyMMdd"));
   }
 }

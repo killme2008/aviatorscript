@@ -30,7 +30,7 @@ public class String2DateFunction extends AbstractFunction {
     String format = FunctionUtils.getStringValue(arg2, env);
     SimpleDateFormat dateFormat = DateFormatCache.getOrCreateDateFormat(format);
     try {
-      return new AviatorRuntimeJavaType(dateFormat.parse(source));
+      return AviatorRuntimeJavaType.valueOf(dateFormat.parse(source));
     } catch (ParseException e) {
       throw new ExpressionRuntimeException("Cast string to date failed", e);
     }

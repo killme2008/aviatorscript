@@ -49,18 +49,20 @@ public class SeqMakePredicateFunFunction extends AbstractFunction {
 
   @Override
   public AviatorObject call(Map<String, Object> env) {
-    return new AviatorRuntimeJavaType(new SeqPredicateFunction(this.name, this.opType, this.value));
+    return AviatorRuntimeJavaType
+        .valueOf(new SeqPredicateFunction(this.name, this.opType, this.value));
   }
 
 
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
-    return new AviatorRuntimeJavaType(new SeqPredicateFunction(this.name, this.opType, arg1));
+    return AviatorRuntimeJavaType.valueOf(new SeqPredicateFunction(this.name, this.opType, arg1));
   }
 
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
-    return new AviatorRuntimeJavaType(new SeqPredicateFunction(this.name, this.opType, arg1, arg2));
+    return AviatorRuntimeJavaType
+        .valueOf(new SeqPredicateFunction(this.name, this.opType, arg1, arg2));
   }
 
   @Override
