@@ -496,7 +496,7 @@ public class ASMCodeGeneratorUnitTest {
   public void testOnMatch() throws Exception {
     this.codeGenerator.onConstant(new StringToken("killme2008@gmail.com", 0));
     this.codeGenerator
-        .onConstant(new PatternToken("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-z]{2,4}$", 1));
+    .onConstant(new PatternToken("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-z]{2,4}$", 1));
     this.codeGenerator.onMatch(null);
     Object result = eval(new HashMap<String, Object>());
     assertEquals(Boolean.TRUE, result);
@@ -532,12 +532,12 @@ public class ASMCodeGeneratorUnitTest {
       }
 
       @Override
-      public ScopeInfo enterScope() {
+      public ScopeInfo enterScope(final boolean inForLoop) {
         return null;
       }
     });
     assertNull(this.codeGenerator.getLambdaGenerator());
-    this.codeGenerator.onLambdaDefineStart(new Variable("lambda", 0));
+    this.codeGenerator.onLambdaDefineStart(new Variable("lambda", 0), false);
     LambdaGenerator lambdaGenerator = this.codeGenerator.getLambdaGenerator();
     assertNotNull(lambdaGenerator);
     this.codeGenerator.onLambdaArgument(new Variable("x", 1));

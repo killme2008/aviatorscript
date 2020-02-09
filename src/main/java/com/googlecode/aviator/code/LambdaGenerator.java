@@ -150,7 +150,7 @@ public class LambdaGenerator implements CodeGenerator {
       this.mv = this.classWriter.visitMethod(ACC_PUBLIC + +ACC_FINAL, "call",
           "(Ljava/util/Map;" + argsDec + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
           "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;" + argsDec
-              + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
+          + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
           null);
       this.mv.visitCode();
 
@@ -263,13 +263,6 @@ public class LambdaGenerator implements CodeGenerator {
   @Override
   public void onBitOr(final Token<?> lookhead) {
     this.codeGenerator.onBitOr(lookhead);
-  }
-
-
-
-  @Override
-  public void onReturn(final Token<?> lookhead) {
-    this.codeGenerator.onReturn(lookhead);
   }
 
 
@@ -477,8 +470,8 @@ public class LambdaGenerator implements CodeGenerator {
 
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead) {
-    this.codeGenerator.onLambdaDefineStart(lookhead);
+  public void onLambdaDefineStart(final Token<?> lookhead, final boolean inForLoop) {
+    this.codeGenerator.onLambdaDefineStart(lookhead, inForLoop);
   }
 
 

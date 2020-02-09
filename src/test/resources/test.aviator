@@ -9,7 +9,7 @@ fib = lambda(n) ->
   }
   x = fib(n - 1) + fib(n - 2);
   seq.put(m, n, x);
-  x
+  return x;
 end;
 
 start = now();

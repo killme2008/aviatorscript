@@ -1,4 +1,4 @@
-package com.googlecode.aviator.runtime.function.system;
+package com.googlecode.aviator.runtime.function.reducer;
 
 /**
  *

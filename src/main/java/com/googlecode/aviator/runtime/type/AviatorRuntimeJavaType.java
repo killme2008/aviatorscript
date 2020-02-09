@@ -30,12 +30,12 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
   public static final ThreadLocal<VarNameGenerator> TEMP_VAR_GEN =
       new ThreadLocal<VarNameGenerator>() {
 
-        @Override
-        protected VarNameGenerator initialValue() {
-          return new VarNameGenerator();
-        }
+    @Override
+    protected VarNameGenerator initialValue() {
+      return new VarNameGenerator();
+    }
 
-      };
+  };
 
   protected final Object object;
 

@@ -163,6 +163,30 @@ public class Variable extends AbstractToken<Object> {
 
   };
 
+  /**
+   * return keyword
+   */
+  public static final Variable BREAK = new Variable("break", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+  /**
+   * return keyword
+   */
+  public static final Variable CONTINUE = new Variable("continue", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
   @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
     return TokenType.Variable;

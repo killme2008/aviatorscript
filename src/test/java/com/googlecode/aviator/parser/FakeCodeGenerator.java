@@ -82,13 +82,6 @@ public class FakeCodeGenerator implements CodeGenerator {
     }
   }
 
-
-  @Override
-  public void onReturn(final Token<?> lookhead) {
-    appendToken("return");
-  }
-
-
   @Override
   public void onAndLeft(final Token<?> lookhead) {
 
@@ -307,8 +300,8 @@ public class FakeCodeGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead) {
-    this.scopes.push(this.parser.enterScope());
+  public void onLambdaDefineStart(final Token<?> lookhead, final boolean inForLoop) {
+    this.scopes.push(this.parser.enterScope(inForLoop));
   }
 
 

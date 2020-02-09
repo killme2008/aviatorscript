@@ -43,6 +43,8 @@ public class SymbolTable {
     RESERVED.put("for", Variable.FOR);
     RESERVED.put("in", Variable.IN);
     RESERVED.put("return", Variable.RETURN);
+    RESERVED.put("break", Variable.BREAK);
+    RESERVED.put("continue", Variable.CONTINUE);
   }
 
   public static boolean isReserved(final Variable v) {

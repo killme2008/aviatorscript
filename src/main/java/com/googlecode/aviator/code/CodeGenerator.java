@@ -129,7 +129,7 @@ public interface CodeGenerator {
 
   public void onMethodInvoke(Token<?> lookhead, List<FunctionArgument> params);
 
-  public void onLambdaDefineStart(Token<?> lookhead);
+  public void onLambdaDefineStart(Token<?> lookhead, boolean inForLoop);
 
   public void onLambdaArgument(Token<?> lookhead);
 
@@ -142,6 +142,4 @@ public interface CodeGenerator {
   public void onArrayIndexStart(Token<?> token);
 
   public void onArrayIndexEnd(Token<?> lookhead);
-
-  public void onReturn(Token<?> lookhead);
 }

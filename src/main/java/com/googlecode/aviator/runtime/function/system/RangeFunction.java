@@ -23,7 +23,8 @@ public class RangeFunction extends AbstractFunction {
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {
-    return new Range((AviatorNumber) arg1, (AviatorNumber) arg2, AviatorLong.valueOf(1));
+    return new Range(AviatorNumber.valueOf(arg1.getValue(env)),
+        AviatorNumber.valueOf(arg2.getValue(env)), AviatorLong.valueOf(1));
   }
 
   @Override

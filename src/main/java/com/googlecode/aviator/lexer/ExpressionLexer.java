@@ -43,6 +43,7 @@ public class ExpressionLexer {
   private char peek;
   // Char iterator for string
   private final CharacterIterator iterator;
+  private int lineNo;
   // symbol table
   private final SymbolTable symbolTable;
   // Tokens buffer
@@ -59,6 +60,7 @@ public class ExpressionLexer {
     this.symbolTable = new SymbolTable();
     this.peek = this.iterator.current();
     this.instance = instance;
+    this.lineNo = 1;
     this.mathContext = this.instance.getOptionValue(Options.MATH_CONTEXT).mathContext;
     this.parseFloatIntoDecimal =
         this.instance.getOptionValue(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL).bool;
@@ -66,6 +68,12 @@ public class ExpressionLexer {
         this.instance.getOptionValue(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL).bool;
 
   }
+
+  public int getLineNo() {
+    return this.lineNo;
+  }
+
+
 
   /**
    * Push back token
@@ -127,6 +135,9 @@ public class ExpressionLexer {
 
       if (analyse) {
         if (this.peek == ' ' || this.peek == '\t' || this.peek == '\r' || this.peek == '\n') {
+          if (this.peek == '\n') {
+            this.lineNo++;
+          }
           continue;
         }
         break;

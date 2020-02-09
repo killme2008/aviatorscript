@@ -66,7 +66,6 @@ public final class RuntimeUtils {
     return getInstance(env).getOptionValue(Options.TRACE_EVAL).bool;
   }
 
-
   public static AviatorFunction getFunction(final Object object, final Map<String, Object> env) {
     if (object instanceof AviatorFunction) {
       return (AviatorFunction) object;

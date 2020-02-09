@@ -9,7 +9,7 @@ public interface Parser {
 
   void setCodeGenerator(CodeGenerator codeGenerator);
 
-  ScopeInfo enterScope();
+  ScopeInfo enterScope(boolean inForLoop);
 
   void restoreScope(ScopeInfo info);
 

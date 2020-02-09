@@ -756,14 +756,6 @@ public class ASMCodeGenerator implements CodeGenerator {
     visitUnaryOperator(OperatorType.NEG, "neg");
   }
 
-
-
-  @Override
-  public void onReturn(final Token<?> lookhead) {
-    end();
-  }
-
-
   /*
    * (non-Javadoc)
    *
@@ -996,7 +988,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       String fieldName = getInnerName(token.getLexeme());
       this.constantPool.put(token, fieldName);
       this.classWriter.visitField(ACC_PRIVATE + ACC_FINAL, fieldName, OBJECT_DESC, null, null)
-          .visitEnd();
+      .visitEnd();
     }
   }
 
@@ -1195,12 +1187,12 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead) {
+  public void onLambdaDefineStart(final Token<?> lookhead, final boolean inForLoop) {
     if (this.lambdaGenerator == null) {
       // TODO cache?
       this.lambdaGenerator =
           new LambdaGenerator(this.instance, this, this.parser, this.classLoader);
-      this.lambdaGenerator.setScopeInfo(this.parser.enterScope());
+      this.lambdaGenerator.setScopeInfo(this.parser.enterScope(inForLoop));
     } else {
       throw new CompileExpressionErrorException("Compile lambda error");
     }

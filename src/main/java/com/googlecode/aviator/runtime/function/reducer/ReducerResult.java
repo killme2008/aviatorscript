@@ -1,4 +1,4 @@
-package com.googlecode.aviator.runtime.function.system;
+package com.googlecode.aviator.runtime.function.reducer;
 
 import java.util.Map;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -6,13 +6,13 @@ import com.googlecode.aviator.runtime.type.AviatorType;
 
 /**
  * ReducerResult in looping.
- * 
+ *
  * @author dennis(killme2008@gmail.com)
  * @since 5.0.0
  */
 public class ReducerResult extends AviatorObject {
-  ReducerState state;
-  AviatorObject obj;
+  public final ReducerState state;
+  public final AviatorObject obj;
 
 
   public static ReducerResult withCont(final AviatorObject obj) {
@@ -26,6 +26,13 @@ public class ReducerResult extends AviatorObject {
   public static ReducerResult withReturn(final AviatorObject obj) {
     return new ReducerResult(ReducerState.Return, obj);
   }
+
+  ReducerResult(final ReducerState state) {
+    super();
+    this.state = state;
+    this.obj = this;
+  }
+
 
   ReducerResult(final ReducerState state, final AviatorObject obj) {
     super();
@@ -45,6 +52,9 @@ public class ReducerResult extends AviatorObject {
 
   @Override
   public Object getValue(final Map<String, Object> env) {
+    if (this.obj == this) {
+      return this;
+    }
     return this.obj.getValue(env);
   }
 

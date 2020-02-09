@@ -59,6 +59,10 @@ import com.googlecode.aviator.runtime.function.math.MathRoundFunction;
 import com.googlecode.aviator.runtime.function.math.MathSinFunction;
 import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
+import com.googlecode.aviator.runtime.function.reducer.ReducerContFunction;
+import com.googlecode.aviator.runtime.function.reducer.ReducerBreakFunction;
+import com.googlecode.aviator.runtime.function.reducer.ReducerFunction;
+import com.googlecode.aviator.runtime.function.reducer.ReducerReturnFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
@@ -107,7 +111,6 @@ import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
 import com.googlecode.aviator.runtime.function.system.RangeFunction;
-import com.googlecode.aviator.runtime.function.system.ReducerFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
@@ -535,7 +538,12 @@ public final class AviatorEvaluatorInstance {
     addFunction(new IdentityFunction());
     addFunction(new AssertFunction());
     addFunction(new RangeFunction());
+    // for-loop
     addFunction(new ReducerFunction());
+    addFunction(new ReducerReturnFunction());
+    addFunction(new ReducerContFunction());
+    addFunction(new ReducerBreakFunction());
+
 
     // load string lib
     addFunction(new StringContainsFunction());
@@ -600,11 +608,11 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                      * Compiled
-                                                                                      * expression
-                                                                                      * task
-                                                                                      */> cacheExpressions =
-      new ConcurrentHashMap<String, FutureTask<Expression>>();
+   * Compiled
+   * expression
+   * task
+   */> cacheExpressions =
+   new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
 
