@@ -15,26 +15,28 @@ import com.googlecode.aviator.utils.Env;
  */
 public class LambdaFunctionBootstrap {
   // the generated lambda class name
-  private String name;
+  private final String name;
   // The compiled lambda body expression
-  private Expression expression;
+  private final Expression expression;
   // The method handle to create lambda instance.
-  private MethodHandle constructor;
+  private final MethodHandle constructor;
   // The arguments list.
-  private List<String> arguments;
+  private final List<String> arguments;
+  private final boolean newLexicalScope;
 
 
   public String getName() {
     return this.name;
   }
 
-  public LambdaFunctionBootstrap(String name, Expression expression, MethodHandle constructor,
-      List<String> arguments) {
+  public LambdaFunctionBootstrap(final String name, final Expression expression,
+      final MethodHandle constructor, final List<String> arguments, final boolean newLexicalScope) {
     super();
     this.name = name;
     this.expression = expression;
     this.constructor = constructor;
     this.arguments = arguments;
+    this.newLexicalScope = newLexicalScope;
   }
 
 
@@ -44,9 +46,9 @@ public class LambdaFunctionBootstrap {
    * @param env
    * @return
    */
-  public LambdaFunction newInstance(Env env) {
+  public LambdaFunction newInstance(final Env env) {
     try {
-      return (LambdaFunction) constructor.invoke(arguments, expression, env);
+      return (LambdaFunction) this.constructor.invoke(this.arguments, this.expression, env);
     } catch (ExpressionRuntimeException e) {
       throw e;
     } catch (Throwable t) {

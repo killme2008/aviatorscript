@@ -1,7 +1,8 @@
-package com.googlecode.aviator.runtime.function.reducer;
+package com.googlecode.aviator.runtime.function.internal;
 
 import java.lang.reflect.Array;
 import java.util.Map;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
@@ -58,7 +59,7 @@ public class ReducerFunction extends AbstractFunction {
         } else if (intermediateResult.state == ReducerState.Break) {
           break;
         } else {
-          return intermediateResult.obj;
+          return AviatorRuntimeJavaType.wrap(intermediateResult);
         }
       }
     } else if (Map.class.isAssignableFrom(clazz)) {
@@ -74,7 +75,7 @@ public class ReducerFunction extends AbstractFunction {
         } else if (intermediateResult.state == ReducerState.Break) {
           break;
         } else {
-          return intermediateResult.obj;
+          return AviatorRuntimeJavaType.wrap(intermediateResult);
         }
       }
     } else if (clazz.isArray()) {
@@ -92,14 +93,19 @@ public class ReducerFunction extends AbstractFunction {
         } else if (intermediateResult.state == ReducerState.Break) {
           break;
         } else {
-          return intermediateResult.obj;
+          return AviatorRuntimeJavaType.wrap(intermediateResult);
         }
       }
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
     }
 
-    return remainingFn.call(env);
+    AviatorObject otherResult = remainingFn.call(env);
+    if (otherResult == AviatorEvaluatorInstance.REDUCER_EMPTY) {
+      return AviatorRuntimeJavaType.wrap(result);
+    } else {
+      return otherResult;
+    }
   }
 
 }

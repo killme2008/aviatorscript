@@ -20,25 +20,29 @@ import java.util.Map;
 
 /**
  * Lex token interface
- * 
+ *
  * @author dennis
- * 
+ *
  * @param <T>
  */
 public interface Token<T> {
-  public enum TokenType {
+  enum TokenType {
     String, Variable, Number, Char, Operator, Pattern, Delegate
   }
 
+  Token<T> withMeta(String name, Object v);
 
-  public T getValue(Map<String, Object> env);
+  Map<String, Object> getMetaMap();
+
+  <V> V getMeta(final String name, final V defaultVal);
+
+  T getValue(Map<String, Object> env);
+
+  TokenType getType();
 
 
-  public TokenType getType();
+  String getLexeme();
 
 
-  public String getLexeme();
-
-
-  public int getStartIndex();
+  int getStartIndex();
 }

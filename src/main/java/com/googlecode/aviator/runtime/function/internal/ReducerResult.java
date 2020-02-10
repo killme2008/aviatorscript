@@ -1,7 +1,8 @@
-package com.googlecode.aviator.runtime.function.reducer;
+package com.googlecode.aviator.runtime.function.internal;
 
 import java.util.Map;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorType;
 
 /**
@@ -10,9 +11,13 @@ import com.googlecode.aviator.runtime.type.AviatorType;
  * @author dennis(killme2008@gmail.com)
  * @since 5.0.0
  */
-public class ReducerResult extends AviatorObject {
+public class ReducerResult extends AviatorRuntimeJavaType {
   public final ReducerState state;
   public final AviatorObject obj;
+
+  public static ReducerResult withEmpty(final AviatorObject obj) {
+    return new ReducerResult(ReducerState.Empty, obj);
+  }
 
 
   public static ReducerResult withCont(final AviatorObject obj) {
@@ -27,15 +32,8 @@ public class ReducerResult extends AviatorObject {
     return new ReducerResult(ReducerState.Return, obj);
   }
 
-  ReducerResult(final ReducerState state) {
-    super();
-    this.state = state;
-    this.obj = this;
-  }
-
-
   ReducerResult(final ReducerState state, final AviatorObject obj) {
-    super();
+    super(obj);
     this.state = state;
     this.obj = obj;
   }

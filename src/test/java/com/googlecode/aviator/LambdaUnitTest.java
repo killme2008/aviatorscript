@@ -57,10 +57,9 @@ public class LambdaUnitTest {
     assertEquals(19, AviatorEvaluator.execute("test(4)(5)(6) + a", env));
   }
 
-  @Test(expected = ExpressionRuntimeException.class)
-  public void testIssue101() {
+  public void testLambdaDynamicScope() {
     String exp = "a=1; b = lambda(x) -> a+ x end ; a=4 ; b(5)";
-    AviatorEvaluator.execute(exp); // throw exception
+    assertEquals(9, AviatorEvaluator.execute(exp)); // throw exception
   }
 
   @Test
@@ -73,10 +72,10 @@ public class LambdaUnitTest {
     private int a;
 
     public int getA() {
-      return a;
+      return this.a;
     }
 
-    public void setA(int a) {
+    public void setA(final int a) {
       this.a = a;
     }
 

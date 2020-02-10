@@ -496,7 +496,7 @@ public class ASMCodeGeneratorUnitTest {
   public void testOnMatch() throws Exception {
     this.codeGenerator.onConstant(new StringToken("killme2008@gmail.com", 0));
     this.codeGenerator
-    .onConstant(new PatternToken("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-z]{2,4}$", 1));
+        .onConstant(new PatternToken("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-z]{2,4}$", 1));
     this.codeGenerator.onMatch(null);
     Object result = eval(new HashMap<String, Object>());
     assertEquals(Boolean.TRUE, result);
@@ -506,7 +506,7 @@ public class ASMCodeGeneratorUnitTest {
   @Test
   public void testOnMethod_withoutArguments() throws Exception {
     this.codeGenerator.onMethodName(new Variable("sysdate", -1));
-    this.codeGenerator.onMethodInvoke(null, null);
+    this.codeGenerator.onMethodInvoke(null);
     Object result = eval(new HashMap<String, Object>());
     assertNotNull(result);
     assertTrue(result instanceof Date);
@@ -537,7 +537,7 @@ public class ASMCodeGeneratorUnitTest {
       }
     });
     assertNull(this.codeGenerator.getLambdaGenerator());
-    this.codeGenerator.onLambdaDefineStart(new Variable("lambda", 0), false);
+    this.codeGenerator.onLambdaDefineStart(new Variable("lambda", 0));
     LambdaGenerator lambdaGenerator = this.codeGenerator.getLambdaGenerator();
     assertNotNull(lambdaGenerator);
     this.codeGenerator.onLambdaArgument(new Variable("x", 1));
@@ -566,7 +566,7 @@ public class ASMCodeGeneratorUnitTest {
     this.codeGenerator.onMethodParameter(null);
     this.codeGenerator.onConstant(new NumberToken(5L, "5"));
     this.codeGenerator.onMethodParameter(null);
-    this.codeGenerator.onMethodInvoke(null, null);
+    this.codeGenerator.onMethodInvoke(null);
     Object result = eval(new HashMap<String, Object>());
     assertEquals("llo", result);
   }

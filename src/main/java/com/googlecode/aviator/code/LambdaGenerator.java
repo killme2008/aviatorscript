@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.asm.ClassWriter;
 import com.googlecode.aviator.asm.MethodVisitor;
@@ -36,7 +37,6 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.ScopeInfo;
-import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Env;
@@ -58,16 +58,18 @@ public class LambdaGenerator implements CodeGenerator {
   private static final AtomicLong LAMBDA_COUNTER = new AtomicLong();
   private MethodVisitor mv;
   private ScopeInfo scopeInfo;
+  private final boolean newLexicalScope;
 
   public LambdaGenerator(final AviatorEvaluatorInstance instance,
       final CodeGenerator parentCodeGenerator, final Parser parser,
-      final AviatorClassLoader classLoader) {
+      final AviatorClassLoader classLoader, final boolean newLexicalScope) {
     this.arguments = new ArrayList<String>();
     this.instance = instance;
     this.parentCodeGenerator = parentCodeGenerator;
     this.codeGenerator = instance.newCodeGenerator(classLoader);
     this.codeGenerator.setParser(parser);
     this.classLoader = classLoader;
+    this.newLexicalScope = newLexicalScope;
     // Generate lambda class name
     this.className =
         "Lambda_" + System.currentTimeMillis() + "_" + LAMBDA_COUNTER.getAndIncrement();
@@ -150,7 +152,7 @@ public class LambdaGenerator implements CodeGenerator {
       this.mv = this.classWriter.visitMethod(ACC_PUBLIC + +ACC_FINAL, "call",
           "(Ljava/util/Map;" + argsDec + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
           "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;" + argsDec
-          + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
+              + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
           null);
       this.mv.visitCode();
 
@@ -217,10 +219,16 @@ public class LambdaGenerator implements CodeGenerator {
         defineClass =
             ClassDefiner.defineClass(this.className, LambdaFunction.class, bytes, this.classLoader);
       }
+      if (this.newLexicalScope) {
+        // Don't unbox reducer result because it's in a new lexical scope
+        ((BaseExpression) expression).setUnBoxReducerResult(false);
+
+      }
       Constructor<?> constructor =
           defineClass.getConstructor(List.class, Expression.class, Env.class);
       MethodHandle methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
-      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, this.arguments);
+      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, this.arguments,
+          this.newLexicalScope);
     } catch (Exception e) {
       throw new CompileExpressionErrorException("define lambda class error", e);
     }
@@ -463,15 +471,15 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onMethodInvoke(final Token<?> lookhead, final List<FunctionArgument> params) {
-    this.codeGenerator.onMethodInvoke(lookhead, params);
+  public void onMethodInvoke(final Token<?> lookhead) {
+    this.codeGenerator.onMethodInvoke(lookhead);
   }
 
 
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead, final boolean inForLoop) {
-    this.codeGenerator.onLambdaDefineStart(lookhead, inForLoop);
+  public void onLambdaDefineStart(final Token<?> lookhead) {
+    this.codeGenerator.onLambdaDefineStart(lookhead);
   }
 
 

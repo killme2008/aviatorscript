@@ -50,6 +50,12 @@ import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
+import com.googlecode.aviator.runtime.function.internal.IfReturnFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerResult;
+import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -59,10 +65,6 @@ import com.googlecode.aviator.runtime.function.math.MathRoundFunction;
 import com.googlecode.aviator.runtime.function.math.MathSinFunction;
 import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
-import com.googlecode.aviator.runtime.function.reducer.ReducerContFunction;
-import com.googlecode.aviator.runtime.function.reducer.ReducerBreakFunction;
-import com.googlecode.aviator.runtime.function.reducer.ReducerFunction;
-import com.googlecode.aviator.runtime.function.reducer.ReducerReturnFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
@@ -128,6 +130,8 @@ import com.googlecode.aviator.runtime.type.AviatorNil;
  *
  */
 public final class AviatorEvaluatorInstance {
+
+  public static final ReducerResult REDUCER_EMPTY = ReducerResult.withEmpty(AviatorNil.NIL);
 
   private AviatorClassLoader aviatorClassLoader;
 
@@ -538,12 +542,12 @@ public final class AviatorEvaluatorInstance {
     addFunction(new IdentityFunction());
     addFunction(new AssertFunction());
     addFunction(new RangeFunction());
-    // for-loop
+    // for-loop and if statement supporting
     addFunction(new ReducerFunction());
     addFunction(new ReducerReturnFunction());
     addFunction(new ReducerContFunction());
     addFunction(new ReducerBreakFunction());
-
+    addFunction(new IfReturnFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());
@@ -608,11 +612,11 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-   * Compiled
-   * expression
-   * task
-   */> cacheExpressions =
-   new ConcurrentHashMap<String, FutureTask<Expression>>();
+                                                                                      * Compiled
+                                                                                      * expression
+                                                                                      * task
+                                                                                      */> cacheExpressions =
+      new ConcurrentHashMap<String, FutureTask<Expression>>();
 
 
 

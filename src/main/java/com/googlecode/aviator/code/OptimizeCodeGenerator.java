@@ -45,7 +45,6 @@ import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.parser.Parser;
-import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -55,6 +54,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorPattern;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorString;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 
 
@@ -67,7 +67,7 @@ import com.googlecode.aviator.utils.Env;
 public class OptimizeCodeGenerator implements CodeGenerator {
   private final ASMCodeGenerator codeGen;
 
-  private final List<Token<?>> tokenList = new ArrayList<Token<?>>();
+  private final List<Token<?>> tokenList = new ArrayList<>();
 
   private LambdaGenerator lambdaGenerator;
 
@@ -145,7 +145,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             break;
           default:
             Map<Integer, DelegateTokenType> index2DelegateType =
-            getIndex2DelegateTypeMap(operatorType);
+                getIndex2DelegateTypeMap(operatorType);
             final int result = executeOperator(i, operatorType, operandCount, index2DelegateType);
             if (result < 0) {
               compactTokenList();
@@ -486,7 +486,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
               this.codeGen.onJoinRight(token);
               break;
             case FUNC:
-              this.codeGen.onMethodInvoke(token, op.getParams());
+              this.codeGen.onMethodInvoke(token);
               break;
             case INDEX:
               this.codeGen.onArrayIndexEnd(token);
@@ -582,22 +582,21 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onAdd(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.ADD));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.ADD));
 
   }
 
 
   @Override
   public void onAndLeft(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.And_Left));
+    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.And_Left));
   }
 
 
   @Override
   public void onAndRight(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.AND));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.AND));
 
   }
 
@@ -611,15 +610,14 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onDiv(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.DIV));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.DIV));
 
   }
 
 
   @Override
   public void onArrayIndexStart(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Index_Start));
+    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Index_Start));
 
   }
 
@@ -641,8 +639,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onArray(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Array));
+    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Array));
 
   }
 
@@ -650,7 +647,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onEq(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.EQ));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.EQ));
 
   }
 
@@ -658,7 +655,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onGe(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GE));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GE));
 
   }
 
@@ -666,22 +663,21 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onGt(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GT));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GT));
 
   }
 
 
   @Override
   public void onJoinLeft(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Join_Left));
+    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Join_Left));
   }
 
 
   @Override
   public void onJoinRight(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.OR));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.OR));
 
   }
 
@@ -689,7 +685,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onLe(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LE));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LE));
 
   }
 
@@ -697,7 +693,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onLt(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LT));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LT));
 
   }
 
@@ -711,10 +707,10 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onMethodInvoke(final Token<?> lookhead, final List<FunctionArgument> params) {
+  public void onMethodInvoke(final Token<?> lookhead) {
     OperatorToken token =
         new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.FUNC);
-    token.setParams(params);
+    token.setMetaMap(lookhead != null ? lookhead.getMetaMap() : null);
     this.tokenList.add(token);
 
   }
@@ -722,28 +718,27 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onMethodName(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Method_Name));
+    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Method_Name));
 
   }
 
 
   @Override
   public void onMethodParameter(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Method_Param));
+    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Method_Param));
 
   }
 
 
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead, final boolean inForLoop) {
+  public void onLambdaDefineStart(final Token<?> lookhead) {
     if (this.lambdaGenerator == null) {
       // TODO cache?
-      this.lambdaGenerator =
-          new LambdaGenerator(this.instance, this, this.parser, this.codeGen.getClassLoader());
-      this.lambdaGenerator.setScopeInfo(this.parser.enterScope(inForLoop));
+      Boolean newLexicalScope = lookhead.getMeta(Constants.SCOPE_META, false);
+      this.lambdaGenerator = new LambdaGenerator(this.instance, this, this.parser,
+          this.codeGen.getClassLoader(), newLexicalScope);
+      this.lambdaGenerator.setScopeInfo(this.parser.enterScope(newLexicalScope));
     } else {
       throw new CompileExpressionErrorException("Compile lambda error");
     }
@@ -771,8 +766,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       this.lambdaBootstraps = new HashMap<String, LambdaFunctionBootstrap>();
     }
     this.lambdaBootstraps.put(bootstrap.getName(), bootstrap);
-    DelegateToken token = new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(),
-        lookhead, DelegateTokenType.Lambda_New);
+    DelegateToken token = new DelegateToken(lookhead, DelegateTokenType.Lambda_New);
     token.setLambdaFunctionBootstrap(bootstrap);
     this.tokenList.add(token);
     this.parser.restoreScope(this.lambdaGenerator.getScopeInfo());
@@ -784,7 +778,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onMod(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MOD));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MOD));
 
   }
 
@@ -800,7 +794,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onNeg(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEG));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEG));
 
   }
 
@@ -808,7 +802,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onNeq(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEQ));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEQ));
 
   }
 
@@ -816,7 +810,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onNot(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NOT));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NOT));
 
   }
 
@@ -824,23 +818,21 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   @Override
   public void onSub(final Token<?> lookhead) {
     this.tokenList
-    .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.SUB));
+        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.SUB));
 
   }
 
 
   @Override
   public void onTernaryBoolean(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Ternary_Boolean));
+    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Ternary_Boolean));
 
   }
 
 
   @Override
   public void onTernaryLeft(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Ternary_Left));
+    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Ternary_Left));
 
   }
 
@@ -854,8 +846,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onTernaryEnd(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead == null ? -1 : lookhead.getStartIndex(), lookhead,
-        DelegateTokenType.Ternay_End));
+    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Ternay_End));
   }
 
 

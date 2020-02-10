@@ -9,12 +9,10 @@ fib = lambda(n) ->
   }
   x = fib(n - 1) + fib(n - 2);
   seq.put(m, n, x);
-  return x;
+  x
 end;
 
 start = now();
-a = fib(20);
-b = fib(21);
-c = a + b;
+println(fib(3));
 println("cost:" + (now() - start) + " ms.");
 c

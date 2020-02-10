@@ -77,6 +77,7 @@ import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
@@ -988,7 +989,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       String fieldName = getInnerName(token.getLexeme());
       this.constantPool.put(token, fieldName);
       this.classWriter.visitField(ACC_PRIVATE + ACC_FINAL, fieldName, OBJECT_DESC, null, null)
-      .visitEnd();
+          .visitEnd();
     }
   }
 
@@ -1030,7 +1031,11 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onMethodInvoke(final Token<?> lookhead, final List<FunctionArgument> params) {
+  public void onMethodInvoke(final Token<?> lookhead) {
+    @SuppressWarnings("unchecked")
+    final List<FunctionArgument> params = lookhead != null
+        ? (List<FunctionArgument>) lookhead.getMeta(Constants.PARAMS_META, Collections.EMPTY_LIST)
+        : Collections.EMPTY_LIST;
 
     if (this.instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool) {
       if (params != null && !params.isEmpty()) {
@@ -1187,12 +1192,13 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead, final boolean inForLoop) {
+  public void onLambdaDefineStart(final Token<?> lookhead) {
     if (this.lambdaGenerator == null) {
+      Boolean newLexicalScope = lookhead.getMeta(Constants.SCOPE_META, false);
       // TODO cache?
       this.lambdaGenerator =
-          new LambdaGenerator(this.instance, this, this.parser, this.classLoader);
-      this.lambdaGenerator.setScopeInfo(this.parser.enterScope(inForLoop));
+          new LambdaGenerator(this.instance, this, this.parser, this.classLoader, newLexicalScope);
+      this.lambdaGenerator.setScopeInfo(this.parser.enterScope(newLexicalScope));
     } else {
       throw new CompileExpressionErrorException("Compile lambda error");
     }

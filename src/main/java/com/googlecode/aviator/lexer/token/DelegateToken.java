@@ -19,11 +19,11 @@ public class DelegateToken extends AbstractToken<Token<?>> {
 
 
   public LambdaFunctionBootstrap getLambdaFunctionBootstrap() {
-    return lambdaFunctionBootstrap;
+    return this.lambdaFunctionBootstrap;
   }
 
 
-  public void setLambdaFunctionBootstrap(LambdaFunctionBootstrap lambdaFunctionBootstrap) {
+  public void setLambdaFunctionBootstrap(final LambdaFunctionBootstrap lambdaFunctionBootstrap) {
     this.lambdaFunctionBootstrap = lambdaFunctionBootstrap;
   }
 
@@ -36,19 +36,19 @@ public class DelegateToken extends AbstractToken<Token<?>> {
 
 
   public Token<?> getToken() {
-    return token;
+    return this.token;
   }
 
 
   public DelegateTokenType getDelegateTokenType() {
-    return delegateTokenType;
+    return this.delegateTokenType;
   }
 
 
-  public DelegateToken(int startIndex, Token<?> token, DelegateTokenType type) {
-    super(startIndex, token != null ? token.getLexeme() : "");
+  public DelegateToken(final Token<?> token, final DelegateTokenType type) {
+    super(token != null ? token.getStartIndex() : -1, token != null ? token.getLexeme() : "");
     this.token = token;
-    delegateTokenType = type;
+    this.delegateTokenType = type;
   }
 
 
@@ -59,7 +59,7 @@ public class DelegateToken extends AbstractToken<Token<?>> {
 
 
   @Override
-  public Token<?> getValue(Map<String, Object> env) {
+  public Token<?> getValue(final Map<String, Object> env) {
     return this.token;
   }
 

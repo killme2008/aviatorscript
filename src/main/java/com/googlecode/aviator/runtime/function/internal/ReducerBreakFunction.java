@@ -1,8 +1,10 @@
-package com.googlecode.aviator.runtime.function.reducer;
+package com.googlecode.aviator.runtime.function.internal;
 
 import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 /**
  * Internal reducer-break function for 'for-loop' structure.
@@ -20,7 +22,6 @@ public class ReducerBreakFunction extends AbstractFunction {
 
   @Override
   public AviatorObject call(final Map<String, Object> env) {
-    ReducerResult reducerResult = new ReducerResult(ReducerState.Break);
-    return reducerResult;
+    return AviatorRuntimeJavaType.wrap(new ReducerResult(ReducerState.Break, AviatorNil.NIL));
   }
 }

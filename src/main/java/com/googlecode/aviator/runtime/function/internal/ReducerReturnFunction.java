@@ -1,26 +1,27 @@
-package com.googlecode.aviator.runtime.function.reducer;
+package com.googlecode.aviator.runtime.function.internal;
 
 import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 /**
- * Internal reducer-continue function for 'for-loop' structure.
+ * Internal reducer-return function for 'for-loop' structure.
  *
  * @since 5.0.0
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class ReducerContFunction extends AbstractFunction {
+public class ReducerReturnFunction extends AbstractFunction {
 
   @Override
   public String getName() {
-    return "__reducer_cont";
+    return "__reducer_return";
   }
 
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
-    return new ReducerResult(ReducerState.Cont);
+    return AviatorRuntimeJavaType.wrap(new ReducerResult(ReducerState.Return, arg1));
   }
 
 }

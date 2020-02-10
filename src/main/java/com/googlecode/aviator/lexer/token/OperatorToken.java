@@ -15,9 +15,7 @@
  **/
 package com.googlecode.aviator.lexer.token;
 
-import java.util.List;
 import java.util.Map;
-import com.googlecode.aviator.runtime.FunctionArgument;
 
 
 /**
@@ -29,20 +27,6 @@ import com.googlecode.aviator.runtime.FunctionArgument;
 public class OperatorToken extends AbstractToken<OperatorType> {
 
   private final OperatorType operatorType;
-
-  private List<FunctionArgument> params;
-
-
-
-  public List<FunctionArgument> getParams() {
-    return this.params;
-  }
-
-
-  public void setParams(final List<FunctionArgument> params) {
-    this.params = params;
-  }
-
 
   public OperatorType getOperatorType() {
     return this.operatorType;

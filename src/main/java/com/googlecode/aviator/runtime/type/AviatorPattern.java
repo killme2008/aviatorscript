@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
 
@@ -79,7 +80,7 @@ public class AviatorPattern extends AviatorObject {
           if (captureGroups && env != Collections.EMPTY_MAP) {
             int groupCount = m.groupCount();
             for (int i = 0; i <= groupCount; i++) {
-              env.put("$" + i, m.group(i));
+              ((Env) env).override("$" + i, m.group(i));
             }
           }
           return AviatorBoolean.TRUE;

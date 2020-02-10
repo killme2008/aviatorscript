@@ -21,6 +21,7 @@ import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.runtime.FunctionArgument;
+import com.googlecode.aviator.utils.Constants;
 
 
 /**
@@ -228,7 +229,8 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onMethodInvoke(final Token<?> lookhead, final List<FunctionArgument> params) {
+  public void onMethodInvoke(final Token<?> lookhead) {
+    final List<FunctionArgument> params = lookhead.getMeta(Constants.PARAMS_META, null);
     appendToken("method_invoke<" + (params == null ? "" : params.toString()) + ">");
 
   }
@@ -300,8 +302,8 @@ public class FakeCodeGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead, final boolean inForLoop) {
-    this.scopes.push(this.parser.enterScope(inForLoop));
+  public void onLambdaDefineStart(final Token<?> lookhead) {
+    this.scopes.push(this.parser.enterScope(lookhead.getMeta(Constants.SCOPE_META, false)));
   }
 
 

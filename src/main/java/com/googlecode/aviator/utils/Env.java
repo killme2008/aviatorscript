@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 
@@ -69,18 +68,6 @@ public class Env implements Map<String, Object> {
   }
 
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
-
-  private Map<String, String> capturedVars;
-
-  public void capture(final String var, final String expression) {
-    if (var.equals(Variable.FUNC_ARGS_VAR)) {
-      return;
-    }
-    if (this.capturedVars == null) {
-      this.capturedVars = new HashMap<>();
-    }
-    this.capturedVars.put(var, expression);
-  }
 
   /**
    * Constructs an env instance with empty state.
@@ -168,6 +155,9 @@ public class Env implements Map<String, Object> {
     if (Variable.ENV_VAR.equals(key)) {
       return this;
     }
+    if (Constants.ReducerEmptyVal.getLexeme().equals(key)) {
+      return AviatorEvaluatorInstance.REDUCER_EMPTY;
+    }
     if (Variable.FUNC_ARGS_VAR.equals(key)) {
       return FunctionUtils.getFunctionArguments(this);
     }
@@ -209,7 +199,27 @@ public class Env implements Map<String, Object> {
   }
 
   /**
-   * Set an override value. This just adds the key-value pair to the override map.
+   * Set an override value.
+   *
+   * @param key
+   * @param value
+   * @return
+   */
+  public Object override(final String key, final Object value) {
+    Object prior;
+    Map<String, Object> overrides = getmOverrides(false);
+    if (overrides.containsKey(key)) {
+      prior = overrides.put(key, value);
+    } else {
+      overrides.put(key, value);
+      prior = this.mDefaults != null ? this.mDefaults.get(key) : null;
+    }
+    return prior;
+  }
+
+  /**
+   * Assign an value, if it's already in overrides, it will update it, otherwise set it to default
+   * map.
    *
    * @param key
    * @param value
@@ -217,18 +227,17 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Object put(final String key, final Object value) {
-    if (this.capturedVars != null && this.capturedVars.containsKey(key)) {
-      throw new ExpressionRuntimeException("Can't assignment value to captured variable.The `" + key
-          + "` is already captured by lambda.");
-    }
-
     Object prior;
     Map<String, Object> overrides = getmOverrides(false);
     if (overrides.containsKey(key)) {
       prior = overrides.put(key, value);
     } else {
-      overrides.put(key, value);
-      prior = this.mDefaults.get(key);
+      if (this.mDefaults != null && this.mDefaults.containsKey(key)) {
+        prior = this.mDefaults.put(key, value);
+      } else {
+        overrides.put(key, value);
+        prior = this.mDefaults != null ? this.mDefaults.get(key) : null;
+      }
     }
     return prior;
   }
