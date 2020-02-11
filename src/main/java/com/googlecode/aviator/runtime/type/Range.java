@@ -76,6 +76,11 @@ public final class Range extends AviatorObject implements Iterable<AviatorNumber
       }
 
       @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
       public AviatorNumber next() {
         if (!hasNext()) {
           throw new NoSuchElementException();
