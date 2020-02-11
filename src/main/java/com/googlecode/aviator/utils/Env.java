@@ -31,8 +31,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.type.Range;
 
 /**
  * Expression execute environment.Modifed from ChainedMap in jibx.
@@ -152,14 +152,17 @@ public class Env implements Map<String, Object> {
   public Object get(final Object key) {
     // Should check ENV_VAR at first
     // TODO: performance tweak
-    if (Variable.ENV_VAR.equals(key)) {
+    if (Constants.ENV_VAR.equals(key)) {
       return this;
     }
     if (Constants.ReducerEmptyVal.getLexeme().equals(key)) {
       return AviatorEvaluatorInstance.REDUCER_EMPTY;
     }
-    if (Variable.FUNC_ARGS_VAR.equals(key)) {
+    if (Constants.FUNC_ARGS_VAR.equals(key)) {
       return FunctionUtils.getFunctionArguments(this);
+    }
+    if ("__reducer_loop".equals(key)) {
+      return Range.LOOP;
     }
     Map<String, Object> overrides = getmOverrides(true);
     Object ret = null;
@@ -169,7 +172,7 @@ public class Env implements Map<String, Object> {
       ret = this.mDefaults.get(key);
     }
     if (ret == null) {
-      if (Variable.INSTANCE_VAR.equals(key)) {
+      if (Constants.INSTANCE_VAR.equals(key)) {
         return this.instance;
       }
     }
@@ -303,8 +306,8 @@ public class Env implements Map<String, Object> {
   public String toString() {
     StringBuffer buf = new StringBuffer(32 * size());
     buf.append(super.toString()).append("{"). //
-        append(Variable.INSTANCE_VAR).append("=").append(this.instance).append(", ").//
-        append(Variable.ENV_VAR).append("=").append("<this>");
+        append(Constants.INSTANCE_VAR).append("=").append(this.instance).append(", ").//
+        append(Constants.ENV_VAR).append("=").append("<this>");
 
     Iterator<String> it = keySet().iterator();
     boolean hasNext = it.hasNext();

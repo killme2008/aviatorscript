@@ -28,7 +28,7 @@ import com.googlecode.aviator.lexer.token.Variable;
  */
 public class SymbolTable {
 
-  private final Map<String, Variable> table = new HashMap<String, Variable>();
+  private final Map<String, Variable> table = new HashMap<>();
 
   private static final Map<String, Variable> RESERVED = new HashMap<>();
 
@@ -45,6 +45,8 @@ public class SymbolTable {
     RESERVED.put("return", Variable.RETURN);
     RESERVED.put("break", Variable.BREAK);
     RESERVED.put("continue", Variable.CONTINUE);
+    RESERVED.put("let", Variable.LET);
+    RESERVED.put("while", Variable.WHILE);
   }
 
   public static boolean isReserved(final Variable v) {

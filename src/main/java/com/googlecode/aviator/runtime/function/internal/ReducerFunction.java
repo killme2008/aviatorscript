@@ -10,6 +10,7 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.runtime.type.Range;
 
 /**
  * Internal reducer function for 'for-loop' structure.
@@ -42,17 +43,17 @@ public class ReducerFunction extends AbstractFunction {
     if (coll == null) {
       throw new NullPointerException("null seq");
     }
+
+
+
     AviatorObject result = null;
 
-    Class<?> clazz = coll.getClass();
-
-    if (Iterable.class.isAssignableFrom(clazz)) {
-      for (Object obj : (Iterable<?>) coll) {
-        result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
+    if (coll == Range.LOOP) {
+      while (true) {
+        result = iteratorFn.call(env);
         if (!(result instanceof ReducerResult)) {
           continue;
         }
-
         ReducerResult intermediateResult = (ReducerResult) result;
         if (intermediateResult.state == ReducerState.Cont) {
           continue;
@@ -62,42 +63,64 @@ public class ReducerFunction extends AbstractFunction {
           return AviatorRuntimeJavaType.wrap(intermediateResult);
         }
       }
-    } else if (Map.class.isAssignableFrom(clazz)) {
-      for (Object obj : ((Map<?, ?>) coll).entrySet()) {
-        result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
-        if (result.isNull(env) || !(result instanceof ReducerResult)) {
-          continue;
-        }
 
-        ReducerResult intermediateResult = (ReducerResult) result;
-        if (intermediateResult.state == ReducerState.Cont) {
-          continue;
-        } else if (intermediateResult.state == ReducerState.Break) {
-          break;
-        } else {
-          return AviatorRuntimeJavaType.wrap(intermediateResult);
-        }
-      }
-    } else if (clazz.isArray()) {
-      int length = Array.getLength(coll);
-      for (int i = 0; i < length; i++) {
-        Object obj = Array.get(coll, i);
-        result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
-        if (result.isNull(env) || !(result instanceof ReducerResult)) {
-          continue;
-        }
-
-        ReducerResult intermediateResult = (ReducerResult) result;
-        if (intermediateResult.state == ReducerState.Cont) {
-          continue;
-        } else if (intermediateResult.state == ReducerState.Break) {
-          break;
-        } else {
-          return AviatorRuntimeJavaType.wrap(intermediateResult);
-        }
-      }
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
+
+      Class<?> clazz = coll.getClass();
+
+      if (Iterable.class.isAssignableFrom(clazz)) {
+        for (Object obj : (Iterable<?>) coll) {
+          result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
+          if (!(result instanceof ReducerResult)) {
+            continue;
+          }
+
+          ReducerResult intermediateResult = (ReducerResult) result;
+          if (intermediateResult.state == ReducerState.Cont) {
+            continue;
+          } else if (intermediateResult.state == ReducerState.Break) {
+            break;
+          } else {
+            return AviatorRuntimeJavaType.wrap(intermediateResult);
+          }
+        }
+      } else if (Map.class.isAssignableFrom(clazz)) {
+        for (Object obj : ((Map<?, ?>) coll).entrySet()) {
+          result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
+          if (result.isNull(env) || !(result instanceof ReducerResult)) {
+            continue;
+          }
+
+          ReducerResult intermediateResult = (ReducerResult) result;
+          if (intermediateResult.state == ReducerState.Cont) {
+            continue;
+          } else if (intermediateResult.state == ReducerState.Break) {
+            break;
+          } else {
+            return AviatorRuntimeJavaType.wrap(intermediateResult);
+          }
+        }
+      } else if (clazz.isArray()) {
+        int length = Array.getLength(coll);
+        for (int i = 0; i < length; i++) {
+          Object obj = Array.get(coll, i);
+          result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
+          if (result.isNull(env) || !(result instanceof ReducerResult)) {
+            continue;
+          }
+
+          ReducerResult intermediateResult = (ReducerResult) result;
+          if (intermediateResult.state == ReducerState.Cont) {
+            continue;
+          } else if (intermediateResult.state == ReducerState.Break) {
+            break;
+          } else {
+            return AviatorRuntimeJavaType.wrap(intermediateResult);
+          }
+        }
+      } else {
+        throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
+      }
     }
 
     AviatorObject otherResult = remainingFn.call(env);

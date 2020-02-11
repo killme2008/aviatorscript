@@ -12,7 +12,10 @@ import com.googlecode.aviator.utils.Env;
  * @since 5.0.0
  */
 public final class Range extends AviatorObject implements Iterable<AviatorNumber> {
+
   private static final AviatorLong ZERO = AviatorLong.valueOf(0L);
+  public static final Range LOOP = new Range(ZERO, ZERO, ZERO);
+
   private final AviatorNumber step;
   private final AviatorNumber start;
   private final AviatorNumber end;

@@ -581,8 +581,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onAdd(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.ADD));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.ADD));
 
   }
 
@@ -595,8 +594,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onAndRight(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.AND));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.AND));
 
   }
 
@@ -609,8 +607,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onDiv(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.DIV));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.DIV));
 
   }
 
@@ -625,15 +622,13 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onAssignment(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(),
-        OperatorType.ASSIGNMENT));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.ASSIGNMENT));
   }
 
 
   @Override
   public void onArrayIndexEnd(final Token<?> lookhead) {
-    this.tokenList.add(
-        new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.INDEX));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.INDEX));
   }
 
 
@@ -646,24 +641,21 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onEq(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.EQ));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.EQ));
 
   }
 
 
   @Override
   public void onGe(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GE));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.GE));
 
   }
 
 
   @Override
   public void onGt(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.GT));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.GT));
 
   }
 
@@ -676,40 +668,35 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onJoinRight(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.OR));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.OR));
 
   }
 
 
   @Override
   public void onLe(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LE));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.LE));
 
   }
 
 
   @Override
   public void onLt(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.LT));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.LT));
 
   }
 
 
   @Override
   public void onMatch(final Token<?> lookhead) {
-    this.tokenList.add(
-        new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MATCH));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.MATCH));
 
   }
 
 
   @Override
   public void onMethodInvoke(final Token<?> lookhead) {
-    OperatorToken token =
-        new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.FUNC);
+    OperatorToken token = new OperatorToken(lookhead, OperatorType.FUNC);
     token.setMetaMap(lookhead != null ? lookhead.getMetaMap() : null);
     this.tokenList.add(token);
 
@@ -777,48 +764,42 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onMod(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MOD));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.MOD));
 
   }
 
 
   @Override
   public void onMult(final Token<?> lookhead) {
-    this.tokenList.add(
-        new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.MULT));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.MULT));
 
   }
 
 
   @Override
   public void onNeg(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEG));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.NEG));
 
   }
 
 
   @Override
   public void onNeq(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NEQ));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.NEQ));
 
   }
 
 
   @Override
   public void onNot(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.NOT));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.NOT));
 
   }
 
 
   @Override
   public void onSub(final Token<?> lookhead) {
-    this.tokenList
-        .add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.SUB));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.SUB));
 
   }
 
@@ -839,8 +820,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onTernaryRight(final Token<?> lookhead) {
-    this.tokenList.add(
-        new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.TERNARY));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.TERNARY));
   }
 
 
@@ -852,55 +832,48 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onBitAnd(final Token<?> lookhead) {
-    this.tokenList.add(
-        new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.BIT_AND));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.BIT_AND));
 
   }
 
 
   @Override
   public void onBitNot(final Token<?> lookhead) {
-    this.tokenList.add(
-        new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.BIT_NOT));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.BIT_NOT));
   }
 
 
   @Override
   public void onBitOr(final Token<?> lookhead) {
-    this.tokenList.add(
-        new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.BIT_OR));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.BIT_OR));
 
   }
 
 
   @Override
   public void onShiftLeft(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(),
-        OperatorType.SHIFT_LEFT));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.SHIFT_LEFT));
 
   }
 
 
   @Override
   public void onShiftRight(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(),
-        OperatorType.SHIFT_RIGHT));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.SHIFT_RIGHT));
 
   }
 
 
   @Override
   public void onUnsignedShiftRight(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(),
-        OperatorType.U_SHIFT_RIGHT));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.U_SHIFT_RIGHT));
 
   }
 
 
   @Override
   public void onBitXor(final Token<?> lookhead) {
-    this.tokenList.add(
-        new OperatorToken(lookhead == null ? -1 : lookhead.getStartIndex(), OperatorType.BIT_XOR));
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.BIT_XOR));
 
   }
 

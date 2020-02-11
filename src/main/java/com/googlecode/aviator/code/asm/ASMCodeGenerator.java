@@ -400,7 +400,13 @@ public class ASMCodeGenerator implements CodeGenerator {
   public void onAssignment(final Token<?> lookhead) {
     loadEnv();
 
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "setValue",
+    String methodName = "setValue";
+
+    if (lookhead.getMeta("let", false)) {
+      methodName = "defineValue";
+    }
+
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, methodName,
         "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
     this.popOperand(3);
     this.pushOperand();

@@ -26,10 +26,6 @@ import java.util.Map;
  */
 public class Variable extends AbstractToken<Object> {
 
-  public static final String INSTANCE_VAR = "__instance__";
-  public static final String ENV_VAR = "__env__";
-  public static final String FUNC_ARGS_VAR = "__args__";
-
   public boolean isQuote() {
     return this.quote;
   }
@@ -179,6 +175,30 @@ public class Variable extends AbstractToken<Object> {
    * return keyword
    */
   public static final Variable CONTINUE = new Variable("continue", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+  /**
+   * let keyword
+   */
+  public static final Variable LET = new Variable("let", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+  /**
+   * while keyword
+   */
+  public static final Variable WHILE = new Variable("while", -1) {
 
     @Override
     public Object getValue(final Map<String, Object> env) {

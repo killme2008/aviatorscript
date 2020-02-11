@@ -26,6 +26,7 @@ import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -260,6 +261,21 @@ public class AviatorJavaType extends AviatorObject {
       return env.get(name);
     }
     return null;
+  }
+
+
+  @Override
+  public AviatorObject defineValue(final AviatorObject value, final Map<String, Object> env) {
+    if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
+      throw new ExpressionRuntimeException("Disabled variable assignment.");
+    }
+    if (this.name.contains(".")) {
+      return setProperty(value, env);
+    }
+
+    Object v = value.getValue(env);
+    ((Env) env).override(this.name, v);
+    return AviatorRuntimeJavaType.valueOf(v);
   }
 
   @Override
