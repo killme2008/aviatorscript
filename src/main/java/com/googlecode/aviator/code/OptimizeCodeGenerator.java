@@ -515,6 +515,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             case SHIFT_RIGHT:
               this.codeGen.onShiftRight(token);
               break;
+            case DEFINE:
+              this.codeGen.onAssignment(token.withMeta(Constants.DEFINE_META, true));
+              break;
             case ASSIGNMENT:
               this.codeGen.onAssignment(token);
               break;
@@ -622,7 +625,10 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onAssignment(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.ASSIGNMENT));
+    this.tokenList.add(new OperatorToken(lookhead,
+        (lookhead == null || !lookhead.getMeta(Constants.DEFINE_META, false))
+            ? OperatorType.ASSIGNMENT
+            : OperatorType.DEFINE));
   }
 
 

@@ -402,7 +402,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
     String methodName = "setValue";
 
-    if (lookhead.getMeta("let", false)) {
+    if (lookhead.getMeta(Constants.DEFINE_META, false)) {
       methodName = "defineValue";
     }
 

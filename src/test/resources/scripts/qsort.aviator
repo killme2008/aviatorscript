@@ -1,8 +1,8 @@
-swap = lambda(xs, l, r) ->
+fn swap(xs, l, r) {
   let temp = xs[l];
   xs[l] = xs[r];
   xs[r] = temp; 
-end;
+}
 
 partition = lambda(xs, l, r, p)  ->
   while(l<=r) {
@@ -21,25 +21,36 @@ partition = lambda(xs, l, r, p)  ->
   return l;
 end;
 
-qsort0 = lambda(xs, l, r) ->
-  if(l>=r) {
-    return nil;
+fn qsort0(xs, l, r) {
+  if(l >= r) {
+    return;
   }
-  let mid = (l+r)/2;
-  let p = xs[mid];
+  
+  let p = xs[(l+r)/2];
   let i = partition(xs, l, r, p);
   qsort0(xs, l, i-1);
   qsort0(xs, i, r);
-end;
+}
 
 qsort = lambda(xs) ->
   qsort0(xs, 0, count(xs)-1);
 end;
 
-let xs = seq.array(int, 9,-2, 3, 100, 0, 7, 2, 5);
 
+
+cost = 0;
+xs = 0;
+
+for i in range(0, 100000) {
+start = now();
+ xs = seq.array(int, 9,-2, 3, i, 0, 7, 2, 5);
 qsort(xs);
+cost = now()-start;
+}
 
+println("cost: " + cost + " ms.");
 for i in xs {
  println(i);
 }
+
+

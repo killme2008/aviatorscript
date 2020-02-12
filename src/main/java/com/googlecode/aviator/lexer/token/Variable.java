@@ -81,7 +81,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -93,7 +93,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -105,7 +105,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -117,7 +117,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -130,7 +130,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -142,7 +142,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -154,7 +154,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -166,7 +166,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -178,7 +178,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -190,7 +190,7 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
@@ -202,7 +202,31 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
+    }
+
+  };
+
+  /**
+   * fn keyword
+   */
+  public static final Variable FN = new Variable("fn", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * elsif keyword
+   */
+  public static final Variable ELSIF = new Variable("elsif", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
     }
 
   };

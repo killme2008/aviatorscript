@@ -37,6 +37,7 @@ public class SymbolTable {
     RESERVED.put("false", Variable.FALSE);
     RESERVED.put("nil", Variable.NIL);
     RESERVED.put("lambda", Variable.LAMBDA);
+    RESERVED.put("fn", Variable.FN);
     RESERVED.put("end", Variable.END);
     RESERVED.put("if", Variable.IF);
     RESERVED.put("else", Variable.ELSE);
@@ -47,6 +48,7 @@ public class SymbolTable {
     RESERVED.put("continue", Variable.CONTINUE);
     RESERVED.put("let", Variable.LET);
     RESERVED.put("while", Variable.WHILE);
+    RESERVED.put("elsif", Variable.ELSIF);
   }
 
   public static boolean isReserved(final Variable v) {

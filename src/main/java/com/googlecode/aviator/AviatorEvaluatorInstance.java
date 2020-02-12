@@ -50,7 +50,7 @@ import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
-import com.googlecode.aviator.runtime.function.internal.IfReturnFunction;
+import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
@@ -547,7 +547,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new ReducerReturnFunction());
     addFunction(new ReducerContFunction());
     addFunction(new ReducerBreakFunction());
-    addFunction(new IfReturnFunction());
+    addFunction(new IfCallccFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());

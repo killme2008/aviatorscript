@@ -9,16 +9,16 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 /**
- * __if_return function
+ * __if_callcc function
  *
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class IfReturnFunction extends AbstractFunction {
+public class IfCallccFunction extends AbstractFunction {
 
   @Override
   public String getName() {
-    return "__if_return";
+    return "__if_callcc";
   }
 
   @Override
@@ -31,7 +31,7 @@ public class IfReturnFunction extends AbstractFunction {
       AviatorObject result = otherClausesFn.call(env);
       // No remaining statements, return the if statement result.
       if (result == AviatorEvaluatorInstance.REDUCER_EMPTY) {
-        return AviatorRuntimeJavaType.wrap(arg1);
+        return arg1;
       }
       return result;
     }

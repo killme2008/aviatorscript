@@ -13,7 +13,7 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.Range;
 
 /**
- * Internal reducer function for 'for-loop' structure.
+ * Internal reducer-callcc function for 'for-loop' structure.
  *
  * @since 5.0.0
  * @author dennis(killme2008@gmail.com)
@@ -23,21 +23,21 @@ public class ReducerFunction extends AbstractFunction {
 
   @Override
   public String getName() {
-    return "__reducer";
+    return "__reducer_callcc";
   }
 
   @Override
-  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+  public final AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2, final AviatorObject arg3) {
 
     Object coll = arg1.getValue(env);
     AviatorFunction iteratorFn = FunctionUtils.getFunction(arg2, env, 2);
-    AviatorFunction remainingFn = FunctionUtils.getFunction(arg3, env, 0);
+    AviatorFunction continuationFn = FunctionUtils.getFunction(arg3, env, 0);
     if (iteratorFn == null) {
       throw new FunctionNotFoundException(
           "There is no function named " + ((AviatorJavaType) arg2).getName());
     }
-    if (remainingFn == null) {
+    if (continuationFn == null) {
       throw new FunctionNotFoundException("remainingFn not found, Shoud not happen");
     }
     if (coll == null) {
@@ -49,6 +49,7 @@ public class ReducerFunction extends AbstractFunction {
     AviatorObject result = null;
 
     if (coll == Range.LOOP) {
+      // while statement
       while (true) {
         result = iteratorFn.call(env);
         if (!(result instanceof ReducerResult)) {
@@ -63,9 +64,8 @@ public class ReducerFunction extends AbstractFunction {
           return AviatorRuntimeJavaType.wrap(intermediateResult);
         }
       }
-
     } else {
-
+      // for..in loop
       Class<?> clazz = coll.getClass();
 
       if (Iterable.class.isAssignableFrom(clazz)) {
@@ -123,11 +123,13 @@ public class ReducerFunction extends AbstractFunction {
       }
     }
 
-    AviatorObject otherResult = remainingFn.call(env);
-    if (otherResult == AviatorEvaluatorInstance.REDUCER_EMPTY) {
+
+    AviatorObject contResult = continuationFn.call(env);
+    if (contResult == AviatorEvaluatorInstance.REDUCER_EMPTY) {
+      // empty continuation, return current result.
       return AviatorRuntimeJavaType.wrap(result);
     } else {
-      return otherResult;
+      return contResult;
     }
   }
 

@@ -161,7 +161,7 @@ public class Env implements Map<String, Object> {
     if (Constants.FUNC_ARGS_VAR.equals(key)) {
       return FunctionUtils.getFunctionArguments(this);
     }
-    if ("__reducer_loop".equals(key)) {
+    if (Constants.ReducerLoop.equals(key)) {
       return Range.LOOP;
     }
     Map<String, Object> overrides = getmOverrides(true);

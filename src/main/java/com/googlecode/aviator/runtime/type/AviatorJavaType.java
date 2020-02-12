@@ -534,11 +534,11 @@ public class AviatorJavaType extends AviatorObject {
     Object thisValue = getValue(env);
     if (!thisValue.getClass().isArray() && !(thisValue instanceof List)) {
       throw new ExpressionRuntimeException(
-          desc(env) + " is not a array or list,could not use [] to get element");
+          desc(env) + " is not an array or list,could not use [] to get element");
     }
     Object indexValue = indexObject.getValue(env);
     if (!isInteger(indexValue)) {
-      throw new IllegalArgumentException("Illegal index " + indexObject.desc(env));
+      throw new IllegalArgumentException("Illegal index: " + indexObject.desc(env));
     }
     int index = ((Number) indexValue).intValue();
     if (thisValue.getClass().isArray()) {
