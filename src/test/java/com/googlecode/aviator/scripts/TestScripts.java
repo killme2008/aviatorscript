@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.util.Arrays;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class TestScripts {
 
   public Object testScript(final String name, final Object... args) {
     try {
-      System.out.println("Testing script " + name);
+      System.out.println("Testing script " + name + " with args: " + Arrays.toString(args));
       Expression exp = this.instance
           .compileScript(TestScripts.class.getResource("/scripts/" + name).getFile(), true);
       return exp.execute(AviatorEvaluator.newEnv(args));
@@ -194,5 +195,19 @@ public class TestScripts {
       assertSortArray((int[]) testScript("qsort.av", "a", a), i);
     }
 
+    // selection sort
+    for (int i = 10; i < 100; i++) {
+      int[] a = genRandomIntArray(i);
+      assertSortArray((int[]) testScript("selection_sort.av", "a", a), i);
+    }
+
+
+    // test fibonacci
+    assertEquals(0, testScript("fibonacci.av", "n", 0));
+    assertEquals(1, testScript("fibonacci.av", "n", 1));
+    assertEquals(1, testScript("fibonacci.av", "n", 2));
+    assertEquals(55, testScript("fibonacci.av", "n", 10));
+    assertEquals(610, testScript("fibonacci.av", "n", 15));
+    assertEquals(6765, testScript("fibonacci.av", "n", 20));
   }
 }

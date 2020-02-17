@@ -18,6 +18,7 @@ package com.googlecode.aviator.utils;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.HashMap;
 import java.util.Map;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 
@@ -97,5 +98,7 @@ public class TypeUtils {
     ret = x.divide(ret, mathContext);
     return ret;
   }
+
+  public static final Map<String, Class<?>> PRIMITIVE_TYPES = new HashMap<>();
 
 }
