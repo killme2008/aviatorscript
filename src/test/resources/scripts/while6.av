@@ -1,0 +1,10 @@
+fn rand_int(n) {
+  long(rand() * n)
+}
+
+let a = 0 ;
+while (a=rand_int(10)) < 5 {
+  continue;
+}
+
+return a;

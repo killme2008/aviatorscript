@@ -87,7 +87,7 @@ public enum Options {
    * effects(such as assignment) to user passed-in env., otherwise aviator will wrap the user
    * passed-in env and does not make any side effects into it.
    *
-   * Default is false.
+   * Default is true.
    */
   USE_USER_ENV_AS_TOP_ENV_DIRECTLY,
 

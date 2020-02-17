@@ -1,6 +1,7 @@
 package com.googlecode.aviator.scripts;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
@@ -135,5 +136,31 @@ public class TestScripts {
       assertEquals(56, testScript("for_return3.av"));
       assertEquals(6, testScript("for_return4.av"));
     }
+  }
+
+  @Test
+  public void testWhileLoop() {
+    assertEquals(10, testScript("while1.av"));
+    assertEquals(10, testScript("while2.av"));
+    assertEquals(10, testScript("while3.av"));
+    assertEquals(10, testScript("while4.av"));
+    final Object[] tuple = (Object[]) testScript("while5.av", "a", 1, "b", 10);
+    assertEquals(2, tuple.length);
+    assertEquals(6, tuple[0]);
+    assertEquals(5, tuple[1]);
+    for (int i = 0; i < 10; i++) {
+      final long r = (long) testScript("while6.av");
+      System.out.println("rand_int(10)=" + r);
+      assertTrue(r >= 5);
+    }
+  }
+
+  @Test
+  public void testLet() {
+    assertEquals(1, testScript("let1.av"));
+    assertEquals(1, testScript("let2.av"));
+    assertEquals(null, testScript("let3.av"));
+    assertEquals(9, testScript("let4.av"));
+    assertEquals(9, testScript("let5.av"));
   }
 }
