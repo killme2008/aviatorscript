@@ -1,8 +1,10 @@
 package com.googlecode.aviator.scripts;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
@@ -162,5 +164,35 @@ public class TestScripts {
     assertEquals(null, testScript("let3.av"));
     assertEquals(9, testScript("let4.av"));
     assertEquals(9, testScript("let5.av"));
+  }
+
+  private final Random rand = new Random();
+
+  public int[] genRandomIntArray(final int size) {
+    int[] a = new int[size];
+    for (int i = 0; i < size; i++) {
+      a[i] = this.rand.nextInt();
+    }
+    return a;
+  }
+
+  public void assertSortArray(final int[] a, final int size) {
+    assertNotNull(a);
+    assertEquals(size, a.length);
+    int prev = a[0];
+    for (int i = 0; i < a.length; i++) {
+      assertTrue(prev <= a[i]);
+      prev = a[i];
+    }
+  }
+
+  @Test
+  public void testFunctions() {
+    // test qsort
+    for (int i = 10; i < 100; i++) {
+      int[] a = genRandomIntArray(i);
+      assertSortArray((int[]) testScript("qsort.av", "a", a), i);
+    }
+
   }
 }
