@@ -45,6 +45,7 @@ import com.googlecode.aviator.code.OptimizeCodeGenerator;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
+import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
@@ -54,7 +55,6 @@ import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
-import com.googlecode.aviator.runtime.function.internal.ReducerResult;
 import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
@@ -120,6 +120,8 @@ import com.googlecode.aviator.runtime.function.system.TupleFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
+import com.googlecode.aviator.utils.Constants;
+import com.googlecode.aviator.utils.Reflector;
 
 
 /**
@@ -130,8 +132,6 @@ import com.googlecode.aviator.runtime.type.AviatorNil;
  *
  */
 public final class AviatorEvaluatorInstance {
-
-  public static final ReducerResult REDUCER_EMPTY = ReducerResult.withEmpty(AviatorNil.NIL);
 
   private AviatorClassLoader aviatorClassLoader;
 
@@ -172,18 +172,29 @@ public final class AviatorEvaluatorInstance {
    * Compile a script file into expression.
    *
    * @param file the script file path
+   * @param cached whether to cached the compiled result
    * @return
    */
-  public Expression compileScript(final String path) throws IOException {
+  public Expression compileScript(final String path, final boolean cached) throws IOException {
     File file = new File(path);
     try (FileReader fr = new FileReader(file); BufferedReader reader = new BufferedReader(fr)) {
       StringBuilder script = new StringBuilder();
       String line = null;
       while ((line = reader.readLine()) != null) {
-        script.append(line).append("\r\n");
+        script.append(line).append(Constants.NEWLINE);
       }
-      return compile(script.toString());
+      return compile(script.toString(), cached);
     }
+  }
+
+  /**
+   * Compile a script file into expression, it doesn't cache the compiled result.
+   *
+   * @param file the script file path
+   * @return
+   */
+  public Expression compileScript(final String path) throws IOException {
+    return this.compileScript(path, false);
   }
 
 
@@ -887,9 +898,14 @@ public final class AviatorEvaluatorInstance {
       final FutureTask<Expression> task) {
     try {
       return task.get();
-    } catch (Exception e) {
+    } catch (Throwable t) {
       this.cacheExpressions.remove(expression);
-      throw new CompileExpressionErrorException("Compile expression failure:" + expression, e);
+      final Throwable cause = t.getCause();
+      if (cause instanceof ExpressionSyntaxErrorException
+          || cause instanceof CompileExpressionErrorException) {
+        Reflector.sneakyThrow(cause);
+      }
+      throw new CompileExpressionErrorException("Compile expression failure:" + expression, t);
     }
   }
 

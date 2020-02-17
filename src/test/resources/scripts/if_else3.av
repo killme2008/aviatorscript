@@ -1,0 +1,4 @@
+if(true) {
+  return 3;
+}
+j.fail();

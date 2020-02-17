@@ -8,7 +8,7 @@ public class SimpleExample {
   public static void main(final String[] args) throws Exception {
     // AviatorEvaluator.setOption(Options.TRACE_EVAL, true);
     Expression exp = AviatorEvaluator.getInstance()
-        .compileScript(SimpleExample.class.getResource("/scripts/if_else1.aviator").getFile());
+        .compileScript(SimpleExample.class.getResource("/scripts/for1.av").getFile());
 
     System.out.println(exp.execute());
     //

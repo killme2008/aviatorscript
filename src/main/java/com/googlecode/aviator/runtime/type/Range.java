@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 import com.googlecode.aviator.utils.Env;
 
 /**
- * A range in [start, end] with step.
+ * A range in [start, end) with step.
  *
  * @author dennis(killme2008@gmail.com)
  * @since 5.0.0
@@ -72,9 +72,9 @@ public final class Range extends AviatorObject implements Iterable<AviatorNumber
       @Override
       public boolean hasNext() {
         if (Range.this.step.compare(ZERO, Env.EMPTY_ENV) >= 0) {
-          return this.current.compare(Range.this.end, Env.EMPTY_ENV) <= 0;
+          return this.current.compare(Range.this.end, Env.EMPTY_ENV) < 0;
         } else {
-          return this.current.compare(Range.this.end, Env.EMPTY_ENV) >= 0;
+          return this.current.compare(Range.this.end, Env.EMPTY_ENV) > 0;
         }
       }
 

@@ -1,0 +1,7 @@
+if(true) {
+ 	j.assertTrue(true);
+ 	1
+}else {
+ 	j.fail();
+ 	2
+}

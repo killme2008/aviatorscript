@@ -69,6 +69,13 @@ public class ExpressionLexer {
 
   }
 
+
+
+  public SymbolTable getSymbolTable() {
+    return this.symbolTable;
+  }
+
+
   public int getLineNo() {
     return this.lineNo;
   }
@@ -309,7 +316,7 @@ public class ExpressionLexer {
       }
       Variable variable = new Variable(lexeme, startIndex);
       variable.setQuote(true);
-      return reserverVar(lexeme, variable);
+      return this.symbolTable.reserve(variable);
     }
     if (Character.isJavaIdentifierStart(this.peek)) {
       int startIndex = this.iterator.getIndex();
@@ -320,7 +327,7 @@ public class ExpressionLexer {
       } while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.');
       String lexeme = sb.toString();
       Variable variable = new Variable(lexeme, startIndex);
-      return reserverVar(lexeme, variable);
+      return this.symbolTable.reserve(variable);
     }
 
     if (isBinaryOP(this.peek)) {
@@ -391,17 +398,6 @@ public class ExpressionLexer {
   public String getScanString() {
     return this.expression.substring(0, this.iterator.getIndex());
   }
-
-  private Token<?> reserverVar(final String lexeme, final Variable variable) {
-    // If it is a reserved word(true/false/nil/lambda)
-    if (this.symbolTable.contains(lexeme)) {
-      return this.symbolTable.getVariable(lexeme);
-    } else {
-      this.symbolTable.reserve(lexeme, variable);
-      return variable;
-    }
-  }
-
 
   private String getBigNumberLexeme(final StringBuffer sb) {
     String lexeme = sb.toString();

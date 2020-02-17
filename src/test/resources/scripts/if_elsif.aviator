@@ -1,9 +1,0 @@
-a=101;
-
-if(a > 100 ) {
-  println("a is greater than 100.");
-} elsif (a > 10) {
- println("a is greater than 10.");
-} else {
-  println("a is less than 10.");
-}

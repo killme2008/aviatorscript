@@ -2,7 +2,6 @@ package com.googlecode.aviator.runtime.function.internal;
 
 import java.lang.reflect.Array;
 import java.util.Map;
-import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
@@ -11,6 +10,7 @@ import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.Range;
+import com.googlecode.aviator.utils.Constants;
 
 /**
  * Internal reducer-callcc function for 'for-loop' structure.
@@ -57,8 +57,10 @@ public class ReducerFunction extends AbstractFunction {
         }
         ReducerResult intermediateResult = (ReducerResult) result;
         if (intermediateResult.state == ReducerState.Cont) {
+          result = intermediateResult.obj;
           continue;
         } else if (intermediateResult.state == ReducerState.Break) {
+          result = intermediateResult.obj;
           break;
         } else {
           return AviatorRuntimeJavaType.wrap(intermediateResult);
@@ -77,8 +79,10 @@ public class ReducerFunction extends AbstractFunction {
 
           ReducerResult intermediateResult = (ReducerResult) result;
           if (intermediateResult.state == ReducerState.Cont) {
+            result = intermediateResult.obj;
             continue;
           } else if (intermediateResult.state == ReducerState.Break) {
+            result = intermediateResult.obj;
             break;
           } else {
             return AviatorRuntimeJavaType.wrap(intermediateResult);
@@ -93,8 +97,10 @@ public class ReducerFunction extends AbstractFunction {
 
           ReducerResult intermediateResult = (ReducerResult) result;
           if (intermediateResult.state == ReducerState.Cont) {
+            result = intermediateResult.obj;
             continue;
           } else if (intermediateResult.state == ReducerState.Break) {
+            result = intermediateResult.obj;
             break;
           } else {
             return AviatorRuntimeJavaType.wrap(intermediateResult);
@@ -111,8 +117,10 @@ public class ReducerFunction extends AbstractFunction {
 
           ReducerResult intermediateResult = (ReducerResult) result;
           if (intermediateResult.state == ReducerState.Cont) {
+            result = intermediateResult.obj;
             continue;
           } else if (intermediateResult.state == ReducerState.Break) {
+            result = intermediateResult.obj;
             break;
           } else {
             return AviatorRuntimeJavaType.wrap(intermediateResult);
@@ -125,7 +133,7 @@ public class ReducerFunction extends AbstractFunction {
 
 
     AviatorObject contResult = continuationFn.call(env);
-    if (contResult == AviatorEvaluatorInstance.REDUCER_EMPTY) {
+    if (contResult == Constants.REDUCER_EMPTY) {
       // empty continuation, return current result.
       return AviatorRuntimeJavaType.wrap(result);
     } else {

@@ -1,0 +1,8 @@
+let z = 0;
+for x in range(0, a) {
+  z = x;
+  for y in range(0, x) {
+    break;
+  }  
+}
+z

@@ -37,6 +37,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -787,7 +788,7 @@ public class FunctionTest {
   }
 
 
-  @Test(expected = ExpressionRuntimeException.class)
+  @Test(expected = ExpressionSyntaxErrorException.class)
   public void testDecimalBitAnd() {
     AviatorEvaluator.exec("3M< & 2M");
   }

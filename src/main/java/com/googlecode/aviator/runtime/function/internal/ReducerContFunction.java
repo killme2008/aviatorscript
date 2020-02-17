@@ -22,7 +22,7 @@ public class ReducerContFunction extends AbstractFunction {
 
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
-    return AviatorRuntimeJavaType.wrap(new ReducerResult(ReducerState.Cont, AviatorNil.NIL));
+    return AviatorRuntimeJavaType.wrap(ReducerResult.withCont(AviatorNil.NIL));
   }
 
 }

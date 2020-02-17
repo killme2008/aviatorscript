@@ -1,0 +1,12 @@
+let z = seq.array(int, 0, 0, 0);
+for x in range(0, a) {
+  for y in range(0, x) {
+    if(z[2] > 10) {
+       break;
+    }
+    z[0] = x;
+    z[1] = y;
+    z[2] = x * y;
+  }
+}
+return z;

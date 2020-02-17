@@ -32,7 +32,7 @@ public class ReducerResult extends AviatorRuntimeJavaType {
     return new ReducerResult(ReducerState.Return, obj);
   }
 
-  ReducerResult(final ReducerState state, final AviatorObject obj) {
+  private ReducerResult(final ReducerState state, final AviatorObject obj) {
     super(obj);
     this.state = state;
     this.obj = obj;

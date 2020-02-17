@@ -352,7 +352,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       }
       switch (token.getType()) {
         case Variable:
-          if (SymbolTable.isReserved((Variable) token)) {
+          if (SymbolTable.isReservedKeyword((Variable) token)) {
             continue;
           }
 

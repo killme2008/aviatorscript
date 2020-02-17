@@ -21,6 +21,7 @@ public class ReducerReturnFunction extends AbstractFunction {
 
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
-    return AviatorRuntimeJavaType.wrap(new ReducerResult(ReducerState.Return, arg1));
+    return AviatorRuntimeJavaType
+        .wrap(ReducerResult.withReturn(AviatorRuntimeJavaType.valueOf(arg1.getValue(env))));
   }
 }

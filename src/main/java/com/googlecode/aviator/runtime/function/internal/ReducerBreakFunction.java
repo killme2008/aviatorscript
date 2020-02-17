@@ -22,11 +22,11 @@ public class ReducerBreakFunction extends AbstractFunction {
 
   @Override
   public AviatorObject call(final Map<String, Object> env) {
-    return AviatorRuntimeJavaType.wrap(new ReducerResult(ReducerState.Break, AviatorNil.NIL));
+    return AviatorRuntimeJavaType.wrap(ReducerResult.withBreak(AviatorNil.NIL));
   }
 
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
-    return new ReducerResult(ReducerState.Break, AviatorNil.NIL);
+    return ReducerResult.withBreak(AviatorNil.NIL);
   }
 }

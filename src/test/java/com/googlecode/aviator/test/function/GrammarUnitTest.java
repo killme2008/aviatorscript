@@ -33,7 +33,6 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
-import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -1048,12 +1047,12 @@ public class GrammarUnitTest {
     assertEquals("d", AviatorEvaluator.exec("(string.split(s,','))[3]", "a,b,c,d"));
   }
 
-  @Test(expected = CompileExpressionErrorException.class)
+  @Test(expected = ExpressionSyntaxErrorException.class)
   public void testIllegalArrayIndexAccessWithMethod1() {
     AviatorEvaluator.exec("string.split('a,b,c,d',',')[0");
   }
 
-  @Test(expected = CompileExpressionErrorException.class)
+  @Test(expected = ExpressionSyntaxErrorException.class)
   public void testIllegalArrayIndexAccessWithMethod2() {
     AviatorEvaluator.exec("string.split('a,b,c,d',','[0]");
   }

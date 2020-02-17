@@ -2,6 +2,8 @@ package com.googlecode.aviator.utils;
 
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Variable;
+import com.googlecode.aviator.runtime.function.internal.ReducerResult;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 
 public class Constants {
   public static final Variable ReducerEmptyVal = new Variable("__reducer_empty", -1);
@@ -17,6 +19,9 @@ public class Constants {
   public static final String FUNC_ARGS_VAR = "__args__";
   static final String ReducerLoop = "__reducer_loop";
   public static final String DEFINE_META = "define";
+  public static final Variable REDUCER_LOOP = new Variable("__reducer_loop", -1);
+  public static final String NEWLINE = "\r\n";
+  public static final ReducerResult REDUCER_EMPTY = ReducerResult.withEmpty(AviatorNil.NIL);
 
   private Constants() {
 

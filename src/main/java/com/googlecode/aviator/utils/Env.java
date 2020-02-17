@@ -156,7 +156,7 @@ public class Env implements Map<String, Object> {
       return this;
     }
     if (Constants.ReducerEmptyVal.getLexeme().equals(key)) {
-      return AviatorEvaluatorInstance.REDUCER_EMPTY;
+      return Constants.REDUCER_EMPTY;
     }
     if (Constants.FUNC_ARGS_VAR.equals(key)) {
       return FunctionUtils.getFunctionArguments(this);

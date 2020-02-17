@@ -1,0 +1,9 @@
+sum = 0;
+for x in range(0, a) {
+   for y in range(0, a) {
+     for z in range(0, a) {
+        sum = sum + x + y + z;
+     }
+   }
+}
+sum
