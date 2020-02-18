@@ -101,4 +101,17 @@ public class TypeUtils {
 
   public static final Map<String, Class<?>> PRIMITIVE_TYPES = new HashMap<>();
 
+
+  static {
+    TypeUtils.PRIMITIVE_TYPES.put("int", Integer.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("long", Long.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("double", Double.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("float", Float.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("bool", Boolean.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("char", Character.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("byte", Byte.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("void", Void.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("short", Short.TYPE);
+  }
+
 }

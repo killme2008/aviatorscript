@@ -23,18 +23,6 @@ public class SeqArrayFunction extends AbstractVariadicFunction {
     return "seq.array";
   }
 
-  static {
-    TypeUtils.PRIMITIVE_TYPES.put("int", Integer.TYPE);
-    TypeUtils.PRIMITIVE_TYPES.put("long", Long.TYPE);
-    TypeUtils.PRIMITIVE_TYPES.put("double", Double.TYPE);
-    TypeUtils.PRIMITIVE_TYPES.put("float", Float.TYPE);
-    TypeUtils.PRIMITIVE_TYPES.put("bool", Boolean.TYPE);
-    TypeUtils.PRIMITIVE_TYPES.put("char", Character.TYPE);
-    TypeUtils.PRIMITIVE_TYPES.put("byte", Byte.TYPE);
-    TypeUtils.PRIMITIVE_TYPES.put("void", Void.TYPE);
-    TypeUtils.PRIMITIVE_TYPES.put("short", Short.TYPE);
-  }
-
   @Override
   public AviatorObject variadicCall(final Map<String, Object> env, final AviatorObject... args) {
     if (args == null || args.length == 0) {
