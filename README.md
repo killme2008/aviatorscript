@@ -31,9 +31,10 @@
 
 # News
 
+
+* [4.2.10](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.10), some bug fixes and new features #191
 * [4.2.9](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.9),  Some bug fixes(#184, #186) and supports list/array elements assignment.
 * [4.2.8](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.8),  Fixed #181  and wraps function returned value to ensure it's not null (replaced by AviatorNil).
-* [4.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.7),  Fixed parser bug #177
 
 
 # Dependency
