@@ -728,7 +728,7 @@ public class ExpressionLexerUnitTest {
   }
 
 
-  @Test(expected = CompileExpressionErrorException.class)
+  @Test
   public void testScanHasLine() {
     this.lexer = new ExpressionLexer(this.instance, "4+5>\n5");
 

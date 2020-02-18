@@ -3,6 +3,7 @@ package com.googlecode.aviator.runtime;
 import java.io.IOException;
 import java.math.MathContext;
 import java.util.Map;
+import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -28,7 +29,10 @@ public final class RuntimeUtils {
    * @return
    */
   public static final AviatorEvaluatorInstance getInstance(final Map<String, Object> env) {
-    return ((Env) env).getInstance();
+    if (env instanceof Env) {
+      return ((Env) env).getInstance();
+    }
+    return AviatorEvaluator.getInstance();
 
   }
 

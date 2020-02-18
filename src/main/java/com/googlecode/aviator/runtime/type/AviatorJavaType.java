@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.apache.commons.beanutils.PropertyUtils;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -246,36 +247,60 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public Object getValue(final Map<String, Object> env) {
+    return getValueFromEnv(this.name, env, true);
+  }
 
+  public static Object getValueFromEnv(final String name, final Map<String, Object> env,
+      final boolean throwExceptionNotFound) {
     if (env != null) {
-      if (this.name.contains(".") && RuntimeUtils.getInstance(env)
+      if (name.contains(".") && RuntimeUtils.getInstance(env)
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
-        return getProperty(env);
+        return getProperty(name, env, throwExceptionNotFound);
       }
-      return env.get(this.name);
+      return env.get(name);
     }
     return null;
   }
 
   @Override
   public AviatorObject setValue(final AviatorObject value, final Map<String, Object> env) {
-    if (this.name.contains(".")) {
-      throw new ExpressionRuntimeException("Can't assignment value to `" + this.name + "`");
-    }
-
     if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
       throw new ExpressionRuntimeException("Disabled variable assignment.");
+    }
+    if (this.name.contains(".")) {
+      return setProperty(value, env);
     }
 
     Object v = value.getValue(env);
     env.put(this.name, v);
-    return value;
+    return new AviatorRuntimeJavaType(v);
   }
 
+  private AviatorObject setProperty(final AviatorObject value, final Map<String, Object> env) {
+    if (RuntimeUtils.getInstance(env).getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
+      Object v = value.getValue(env);
+      try {
+        PropertyUtils.setProperty(env, this.name, value.getValue(env));
+      } catch (Throwable t) {
+        if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
+          t.printStackTrace();
+        }
+        throw new ExpressionRuntimeException("Can't assign value to " + this.name, t);
+      }
+      return new AviatorRuntimeJavaType(v);
+    } else {
+      throw new ExpressionRuntimeException("Can't assign value to " + this.name
+          + ", Options.ENABLE_PROPERTY_SYNTAX_SUGAR is disabled.");
+    }
+  }
+
+  public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
+
   @SuppressWarnings("unchecked")
-  private Object getProperty(final Map<String, Object> env) {
+  private static Object getProperty(final String name, final Map<String, Object> env,
+      final boolean throwExceptionNotFound) {
     try {
-      String[] names = this.name.split("\\.");
+      String[] names = SPLIT_PAT.split(name);
       Map<String, Object> innerEnv = env;
       for (int i = 0; i < names.length; i++) {
         // Fast path for nested map.
@@ -287,12 +312,12 @@ public class AviatorJavaType extends AviatorObject {
 
         // fallback to property utils
         if (!(val instanceof Map)) {
-          return PropertyUtils.getProperty(env, this.name);
+          return PropertyUtils.getProperty(env, name);
         }
 
         innerEnv = (Map<String, Object>) val;
       }
-      return PropertyUtils.getProperty(env, this.name);
+      return PropertyUtils.getProperty(env, name);
 
     } catch (Throwable t) {
       if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
@@ -300,8 +325,10 @@ public class AviatorJavaType extends AviatorObject {
       }
       if (RuntimeUtils.getInstance(env).getOptionValue(Options.NIL_WHEN_PROPERTY_NOT_FOUND).bool) {
         return null;
+      } else if (throwExceptionNotFound) {
+        throw new ExpressionRuntimeException("Could not find variable " + name, t);
       } else {
-        throw new ExpressionRuntimeException("Could not find variable " + this.name, t);
+        return null;
       }
     }
   }

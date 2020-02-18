@@ -126,15 +126,10 @@ public class ExpressionLexer {
       }
 
       if (analyse) {
-        if (this.peek == ' ' || this.peek == '\t' || this.peek == '\r') {
+        if (this.peek == ' ' || this.peek == '\t' || this.peek == '\r' || this.peek == '\n') {
           continue;
         }
-        if (this.peek == '\n') {
-          throw new CompileExpressionErrorException(
-              "Aviator doesn't support multi-lines expression at " + this.iterator.getIndex());
-        } else {
-          break;
-        }
+        break;
       } else {
         char ch = this.peek;
         int index = this.iterator.getIndex();
@@ -221,6 +216,7 @@ public class ExpressionLexer {
             int n = digit;
             nextChar();
             while (Character.isDigit(this.peek)) {
+              sb.append(this.peek);
               n = 10 * n + Character.digit(this.peek, 10);
               nextChar();
             }
@@ -250,6 +246,8 @@ public class ExpressionLexer {
 
       } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'E'
           || this.peek == 'e' || this.peek == 'M' || this.peek == 'N');
+
+
       Number value;
       if (isBigDecimal) {
         value = new BigDecimal(getBigNumberLexeme(sb), this.mathContext);

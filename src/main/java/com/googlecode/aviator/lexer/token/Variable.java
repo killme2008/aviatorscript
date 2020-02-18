@@ -90,6 +90,19 @@ public class Variable extends AbstractToken<Object> {
 
   };
 
+  /**
+   * End keyword
+   */
+  public static final Variable END = new Variable("end", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return false;
+    }
+
+  };
+
+
 
   @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
