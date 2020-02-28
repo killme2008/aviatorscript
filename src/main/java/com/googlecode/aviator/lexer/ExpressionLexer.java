@@ -303,7 +303,16 @@ public class ExpressionLexer {
     // It is a variable
     if (this.peek == '#') {
       int startIndex = this.iterator.getIndex();
-      nextChar(); // skip $
+      nextChar(); // skip '#'
+
+      if (this.peek == '#') {
+        // ## comments
+        while (this.peek != CharacterIterator.DONE && this.peek != '\n') {
+          nextChar();
+        }
+        return this.scan(analyse);
+      }
+
       StringBuilder sb = new StringBuilder();
       while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '['
           || this.peek == ']') {

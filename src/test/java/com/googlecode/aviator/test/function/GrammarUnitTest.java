@@ -62,6 +62,13 @@ public class GrammarUnitTest {
   }
 
   @Test
+  public void testComments() {
+    assertEquals(7, AviatorEvaluator.execute("a=3;a ## a variable\n+4"));
+    assertEquals(15,
+        AviatorEvaluator.execute("##single comments\r\n   7+8\r\n## another comments"));
+  }
+
+  @Test
   public void testVariableSyntaxSugerForFunction() {
     assertEquals(0L, AviatorEvaluator.execute("m = seq.map(\"func\", lambda()->0 end); m.func()"));
     assertEquals(10000.0d,

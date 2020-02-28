@@ -37,6 +37,11 @@ public class TestScripts {
   }
 
   @Test
+  public void testComments() {
+    assertEquals(6, testScript("comments.av"));
+  }
+
+  @Test
   public void testIfElse() {
     assertEquals(1, testScript("if_else1.av"));
     assertEquals(2, testScript("if_else2.av"));

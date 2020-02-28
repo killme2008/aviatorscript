@@ -1,15 +1,23 @@
+## create a cache:  n -> fib(n)
 cache = seq.map();
+
+## the function to return the nth fibonacci number.
 fib = lambda(n) ->
   assert(n < 1024);
   if n <= 1 {
+     ## fib(0) = 1
+     ## fib(1) = 1
      return n;
   }
-  
+  ## try to find result from cache
   let v = seq.get(cache, n);
   if v != nil {
+    ## found, return it directly
     return v;
   }
+  ## calculate when not found: fib(n) = fib(n-1) + fib(n-2);
   let v = fib(n - 1) + fib(n - 2);
+  ## put the result to cache
   seq.put(cache, n, v);
   v
 end;
