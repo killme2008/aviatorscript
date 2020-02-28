@@ -95,7 +95,7 @@ See [user guide](https://www.yuque.com/boyan-avfmj/aviatorscript) for details.
 # Links
 
 * downloads: <https://github.com/killme2008/aviator/releases>
-* documents: <https://github.com/killme2008/aviator/wiki>
+* documents: <https://www.yuque.com/boyan-avfmj/aviatorscript>
 * javadoc: <http://fnil.net/aviator/apidocs/>
 * author:  dennis (killme2008@gmail.com)
 * spring boot: <https://github.com/mengxiangrui007/spring-boot-rule-jsr94>
