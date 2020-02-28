@@ -62,6 +62,16 @@ public class GrammarUnitTest {
   }
 
   @Test
+  public void testIssue200() {
+    AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, true);
+    try {
+      assertEquals("nullabc", AviatorEvaluator.execute("a.b.c + 'abc'"));
+    } finally {
+      AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, false);
+    }
+  }
+
+  @Test
   public void testComments() {
     assertEquals(7, AviatorEvaluator.execute("a=3;a ## a variable\n+4"));
     assertEquals(15,

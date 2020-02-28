@@ -558,6 +558,7 @@ public class AviatorJavaType extends AviatorObject {
   @Override
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     final Object value = getValue(env);
+    Object otherValue;
     if (value instanceof Number) {
       AviatorNumber aviatorNumber = AviatorNumber.valueOf(value);
       return aviatorNumber.add(other, env);
@@ -566,6 +567,8 @@ public class AviatorJavaType extends AviatorObject {
       return aviatorString.add(other, env);
     } else if (value instanceof Boolean) {
       return AviatorBoolean.valueOf((Boolean) value).add(other, env);
+    } else if (value == null && (otherValue = other.getValue(env)) instanceof CharSequence) {
+      return new AviatorString("null" + otherValue);
     } else {
       return super.add(other, env);
     }
