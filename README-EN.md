@@ -89,7 +89,7 @@ System.out.println(AviatorEvaluator.execute("floatValue(3)"));
 System.out.println(AviatorEvaluator.execute("add(3M, 4M)"));
 ```
 
-See [user guide](https://github.com/killme2008/aviator/wiki) for details.
+See [user guide](https://www.yuque.com/boyan-avfmj/aviatorscript) for details.
 
 
 # Links

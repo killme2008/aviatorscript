@@ -91,7 +91,7 @@ System.out.println(AviatorEvaluator.execute("floatValue(3)"));
 System.out.println(AviatorEvaluator.execute("add(3M, 4M)"));
 ```
 
-更详细的请阅读[用户指南](https://github.com/killme2008/aviator/wiki)。
+更详细的请阅读[用户指南](https://www.yuque.com/boyan-avfmj/aviatorscript)。
 
 # Links
 
