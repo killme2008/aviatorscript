@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.asm.ClassWriter;
 import com.googlecode.aviator.asm.MethodVisitor;
@@ -206,7 +205,7 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
   public LambdaFunctionBootstrap getLmabdaBootstrap() {
-    Expression expression = getResult();
+    Expression expression = getResult(!this.newLexicalScope);
     endVisitClass();
     byte[] bytes = this.classWriter.toByteArray();
     try {
@@ -218,11 +217,6 @@ public class LambdaGenerator implements CodeGenerator {
       } else {
         defineClass =
             ClassDefiner.defineClass(this.className, LambdaFunction.class, bytes, this.classLoader);
-      }
-      if (this.newLexicalScope) {
-        // Don't unbox reducer result because it's in a new lexical scope
-        ((BaseExpression) expression).setUnBoxReducerResult(false);
-
       }
       Constructor<?> constructor =
           defineClass.getConstructor(List.class, Expression.class, Env.class);
@@ -448,8 +442,8 @@ public class LambdaGenerator implements CodeGenerator {
 
 
   @Override
-  public Expression getResult() {
-    return this.codeGenerator.getResult();
+  public Expression getResult(final boolean unboxObject) {
+    return this.codeGenerator.getResult(unboxObject);
   }
 
 

@@ -54,6 +54,11 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   @Override
+  public AviatorObject deref(final Map<String, Object> env) {
+    return AviatorRuntimeJavaType.valueOf(getValue(env));
+  }
+
+  @Override
   public AviatorObject div(final AviatorObject other, final Map<String, Object> env) {
     final Object value = getValue(env);
     switch (other.getAviatorType()) {

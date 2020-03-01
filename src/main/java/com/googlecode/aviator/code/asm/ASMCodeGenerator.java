@@ -234,11 +234,16 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
-  private void endVisitMethodCode() {
+  private void endVisitMethodCode(final boolean unboxObject) {
     if (this.operandsCount > 0) {
       loadEnv();
-      this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "getValue",
-          "(Ljava/util/Map;)Ljava/lang/Object;");
+      if (unboxObject) {
+        this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "getValue",
+            "(Ljava/util/Map;)Ljava/lang/Object;");
+      } else {
+        this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "deref",
+            "(Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      }
       this.mv.visitInsn(ARETURN);
       this.popOperand();
       this.popOperand();
@@ -769,8 +774,8 @@ public class ASMCodeGenerator implements CodeGenerator {
    * @see com.googlecode.aviator.code.CodeGenerator#getResult()
    */
   @Override
-  public Expression getResult() {
-    end();
+  public Expression getResult(final boolean unboxObject) {
+    end(unboxObject);
 
     byte[] bytes = this.classWriter.toByteArray();
     try {
@@ -794,8 +799,8 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
-  private void end() {
-    endVisitMethodCode();
+  private void end(final boolean unboxObject) {
+    endVisitMethodCode(unboxObject);
     endVisitClass();
   }
 

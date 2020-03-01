@@ -13,12 +13,11 @@ import com.googlecode.aviator.runtime.type.AviatorType;
  */
 public class ReducerResult extends AviatorRuntimeJavaType {
   public final ReducerState state;
-  public final AviatorObject obj;
+  public AviatorObject obj;
 
   public static ReducerResult withEmpty(final AviatorObject obj) {
     return new ReducerResult(ReducerState.Empty, obj);
   }
-
 
   public static ReducerResult withCont(final AviatorObject obj) {
     return new ReducerResult(ReducerState.Cont, obj);
@@ -36,6 +35,12 @@ public class ReducerResult extends AviatorRuntimeJavaType {
     super(obj);
     this.state = state;
     this.obj = obj;
+  }
+
+  @Override
+  public AviatorObject deref(final Map<String, Object> env) {
+    this.obj = this.obj.deref(env);
+    return this;
   }
 
   @Override

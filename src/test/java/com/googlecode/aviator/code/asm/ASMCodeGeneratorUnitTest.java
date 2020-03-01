@@ -67,7 +67,7 @@ public class ASMCodeGeneratorUnitTest {
   @Test
   public void testOnConstant_Nil() throws Exception {
     this.codeGenerator.onConstant(Variable.NIL);
-    Expression exp = this.codeGenerator.getResult();
+    Expression exp = this.codeGenerator.getResult(true);
     Object result = exp.execute();
     assertNull(result);
   }
@@ -76,7 +76,7 @@ public class ASMCodeGeneratorUnitTest {
   @Test
   public void testOnConstant_Long() throws Exception {
     this.codeGenerator.onConstant(new NumberToken(3L, "3"));
-    Expression exp = this.codeGenerator.getResult();
+    Expression exp = this.codeGenerator.getResult(true);
     Object result = exp.execute();
     assertEquals(3L, result);
   }
@@ -85,7 +85,7 @@ public class ASMCodeGeneratorUnitTest {
   @Test
   public void testOnConstant_Double() throws Exception {
     this.codeGenerator.onConstant(new NumberToken(3.3D, "3.3"));
-    Expression exp = this.codeGenerator.getResult();
+    Expression exp = this.codeGenerator.getResult(true);
     Object result = exp.execute();
     assertEquals(3.3D, result);
   }
@@ -94,7 +94,7 @@ public class ASMCodeGeneratorUnitTest {
   @Test
   public void testOnConstant_Boolean_False() throws Exception {
     this.codeGenerator.onConstant(Variable.FALSE);
-    Expression exp = this.codeGenerator.getResult();
+    Expression exp = this.codeGenerator.getResult(true);
     Object result = exp.execute();
     assertEquals(Boolean.FALSE, result);
   }
@@ -103,7 +103,7 @@ public class ASMCodeGeneratorUnitTest {
   @Test
   public void testOnConstant_Boolean_True() throws Exception {
     this.codeGenerator.onConstant(Variable.TRUE);
-    Expression exp = this.codeGenerator.getResult();
+    Expression exp = this.codeGenerator.getResult(true);
     Object result = exp.execute();
     assertEquals(Boolean.TRUE, result);
   }
@@ -112,7 +112,7 @@ public class ASMCodeGeneratorUnitTest {
   @Test
   public void testOnConstant_String() throws Exception {
     this.codeGenerator.onConstant(new StringToken("hello", 0));
-    Expression exp = this.codeGenerator.getResult();
+    Expression exp = this.codeGenerator.getResult(true);
     Object result = exp.execute();
     assertEquals("hello", result);
   }
@@ -121,7 +121,7 @@ public class ASMCodeGeneratorUnitTest {
   @Test
   public void testOnConstant_Pattern() throws Exception {
     this.codeGenerator.onConstant(new PatternToken("[a-z_A-Z]+", 0));
-    Expression exp = this.codeGenerator.getResult();
+    Expression exp = this.codeGenerator.getResult(true);
     Object result = exp.execute();
     assertTrue(result instanceof Pattern);
     assertEquals("[a-z_A-Z]+", result.toString());
@@ -131,7 +131,7 @@ public class ASMCodeGeneratorUnitTest {
   @Test
   public void testOnConstant_Variable() throws Exception {
     this.codeGenerator.onConstant(new Variable("a", 0));
-    Expression exp = this.codeGenerator.getResult();
+    Expression exp = this.codeGenerator.getResult(true);
     HashMap<String, Object> env = new HashMap<String, Object>();
     long now = System.currentTimeMillis();
     env.put("a", now);
@@ -301,7 +301,7 @@ public class ASMCodeGeneratorUnitTest {
 
   private Object eval(final Map<String, Object> env)
       throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-    Expression exp = this.codeGenerator.getResult();
+    Expression exp = this.codeGenerator.getResult(true);
     return exp.execute(env);
   }
 

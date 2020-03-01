@@ -899,7 +899,7 @@ public class ExpressionParser implements Parser {
         reportSyntaxError("unexpect token '" + currentTokenLexeme() + "'");
       }
     }
-    return getCodeGeneratorWithTimes().getResult();
+    return getCodeGeneratorWithTimes().getResult(true);
   }
 
   static enum StatementType {
@@ -1334,7 +1334,7 @@ public class ExpressionParser implements Parser {
         getCodeGeneratorWithTimes().onLambdaDefineStart(
             this.prevToken.withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
         getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
-        if (isWhile || statements() == StatementType.Empty) {
+        if (isWhile || isElsif || statements() == StatementType.Empty) {
           getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
         } else {
           if (ifBodyHasReturn && elseBodyHasReturn && !isElsif) {

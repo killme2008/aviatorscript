@@ -23,8 +23,6 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
-import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
@@ -75,9 +73,6 @@ public abstract class ClassExpression extends BaseExpression {
       Object result = execute0(env);
       if (RuntimeUtils.isTracedEval(env)) {
         RuntimeUtils.printlnTrace(env, "Result : " + result);
-      }
-      if (this.unBoxReducerResult && result instanceof AviatorRuntimeJavaType) {
-        return ((AviatorObject) result).getValue(env);
       }
       return result;
     } catch (ExpressionRuntimeException e) {

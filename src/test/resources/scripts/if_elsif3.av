@@ -5,4 +5,5 @@ if(a > 100 ) {
 } else {
   return "a is less than 10.";
 }
-j.fail();
+
+return "statement after if";

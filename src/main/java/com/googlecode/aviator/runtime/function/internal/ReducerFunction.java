@@ -63,7 +63,7 @@ public class ReducerFunction extends AbstractFunction {
           result = intermediateResult.obj;
           break;
         } else {
-          return AviatorRuntimeJavaType.wrap(intermediateResult);
+          return intermediateResult;
         }
       }
     } else {
@@ -85,7 +85,7 @@ public class ReducerFunction extends AbstractFunction {
             result = intermediateResult.obj;
             break;
           } else {
-            return AviatorRuntimeJavaType.wrap(intermediateResult);
+            return intermediateResult;
           }
         }
       } else if (Map.class.isAssignableFrom(clazz)) {
@@ -103,7 +103,7 @@ public class ReducerFunction extends AbstractFunction {
             result = intermediateResult.obj;
             break;
           } else {
-            return AviatorRuntimeJavaType.wrap(intermediateResult);
+            return intermediateResult;
           }
         }
       } else if (clazz.isArray()) {
@@ -123,7 +123,7 @@ public class ReducerFunction extends AbstractFunction {
             result = intermediateResult.obj;
             break;
           } else {
-            return AviatorRuntimeJavaType.wrap(intermediateResult);
+            return intermediateResult;
           }
         }
       } else {
@@ -135,7 +135,7 @@ public class ReducerFunction extends AbstractFunction {
     AviatorObject contResult = continuationFn.call(env);
     if (contResult == Constants.REDUCER_EMPTY) {
       // empty continuation, return current result.
-      return AviatorRuntimeJavaType.wrap(result);
+      return result;
     } else {
       return contResult;
     }

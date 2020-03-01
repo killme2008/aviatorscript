@@ -117,7 +117,7 @@ public interface CodeGenerator {
 
   public void onNeg(Token<?> lookhead);
 
-  public Expression getResult();
+  public Expression getResult(boolean unboxObject);
 
   public void onConstant(Token<?> lookhead);
 

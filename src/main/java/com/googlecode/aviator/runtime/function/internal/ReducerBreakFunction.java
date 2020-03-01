@@ -4,7 +4,6 @@ import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 /**
  * Internal reducer-break function for 'for-loop' structure.
@@ -22,7 +21,7 @@ public class ReducerBreakFunction extends AbstractFunction {
 
   @Override
   public AviatorObject call(final Map<String, Object> env) {
-    return AviatorRuntimeJavaType.wrap(ReducerResult.withBreak(AviatorNil.NIL));
+    return ReducerResult.withBreak(AviatorNil.NIL);
   }
 
   @Override

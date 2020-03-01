@@ -178,6 +178,9 @@ public abstract class AviatorObject {
     return (Boolean) getValue(env);
   }
 
+  public AviatorObject deref(final Map<String, Object> env) {
+    return this;
+  }
 
   /**
    * Access array or list element

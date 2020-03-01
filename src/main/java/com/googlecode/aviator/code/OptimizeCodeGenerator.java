@@ -337,7 +337,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public Expression getResult() {
+  public Expression getResult(final boolean unboxObject) {
     // execute literal expression
     while (execute() > 0) {
       ;
@@ -414,7 +414,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       // call asm to generate byte codes
       callASM(variables, methods, constants);
       // get result from asm
-      exp = this.codeGen.getResult();
+      exp = this.codeGen.getResult(unboxObject);
     }
 
 

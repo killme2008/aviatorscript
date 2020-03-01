@@ -52,7 +52,7 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public Expression getResult() {
+  public Expression getResult(final boolean unboxObject) {
     return null;
   }
 

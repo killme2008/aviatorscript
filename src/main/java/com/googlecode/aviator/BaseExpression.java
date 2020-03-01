@@ -25,11 +25,6 @@ public abstract class BaseExpression implements Expression {
   protected AviatorEvaluatorInstance instance;
   private Env compileEnv;
   private Map<Integer, List<FunctionArgument>> funcsArgs = Collections.emptyMap();
-  protected boolean unBoxReducerResult = true; // whether to unbox reducer result.
-
-  public void setUnBoxReducerResult(final boolean unBoxReducerResult) {
-    this.unBoxReducerResult = unBoxReducerResult;
-  }
 
   public BaseExpression(final AviatorEvaluatorInstance instance, final List<String> varNames) {
     super();

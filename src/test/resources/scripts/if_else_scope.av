@@ -1,0 +1,14 @@
+let a = 1;
+
+if(b > 100) {
+ a = "b is greater than 100.";
+ let a = "if";
+}elsif( b > 10) {
+ a = "b is greater than 10.";
+ let a = "elsif";
+}else {
+ a = "b is " + b + ".";
+ let a = "else";
+}
+
+return a;

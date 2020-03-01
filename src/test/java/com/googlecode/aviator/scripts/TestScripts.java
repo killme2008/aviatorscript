@@ -66,11 +66,15 @@ public class TestScripts {
 
     assertEquals("a is less than 10.", testScript("if_elsif3.av", "a", 8));
     assertEquals("a is greater than 10.", testScript("if_elsif3.av", "a", 12));
-    assertEquals("a is greater than 100.", testScript("if_elsif3.av", "a", 112));
+    assertEquals("statement after if", testScript("if_elsif3.av", "a", 112));
 
     assertEquals(7, testScript("if_else7.av"));
     assertEquals(8, testScript("if_else8.av"));
     assertEquals(null, testScript("if_else9.av"));
+
+    assertEquals("b is greater than 100.", testScript("if_else_scope.av", "b", 101));
+    assertEquals("b is greater than 10.", testScript("if_else_scope.av", "b", 11));
+    assertEquals("b is 1.", testScript("if_else_scope.av", "b", 1));
   }
 
   private int testSum(final int n) {

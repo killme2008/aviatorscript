@@ -5,7 +5,6 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.utils.Constants;
 
 /**
@@ -25,7 +24,7 @@ public class IfCallccFunction extends AbstractFunction {
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {
     if (arg1 instanceof ReducerResult && ((ReducerResult) arg1).state != ReducerState.Cont) {
-      return AviatorRuntimeJavaType.wrap(arg1);
+      return arg1;
     } else {
       AviatorFunction otherClausesFn = FunctionUtils.getFunction(arg2, env, 0);
       AviatorObject result = otherClausesFn.call(env);

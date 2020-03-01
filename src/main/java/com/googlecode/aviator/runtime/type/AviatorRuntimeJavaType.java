@@ -49,10 +49,6 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
     return new AviatorRuntimeJavaType(object);
   }
 
-  public static AviatorRuntimeJavaType wrap(final Object obj) {
-    return new AviatorRuntimeJavaType(obj);
-  }
-
   /**
    * Deprecated since 5.0.0, please use {@link AviatorRuntimeJavaType#valueOf(Object)} instead.
    *
