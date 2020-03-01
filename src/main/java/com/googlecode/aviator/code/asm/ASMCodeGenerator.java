@@ -67,6 +67,7 @@ import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.LambdaGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.Token;
@@ -100,6 +101,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   private static final String FIELD_PREFIX = "f";
   // evaluator instance
   private final AviatorEvaluatorInstance instance;
+  private SymbolTable symbolTable;
   /**
    * Compile environment only has the *instance*.
    */
@@ -274,14 +276,16 @@ public class ASMCodeGenerator implements CodeGenerator {
   private void makeConstructor() {
 
     this.mv = this.classWriter.visitMethod(ACC_PUBLIC, CONSTRUCTOR_METHOD_NAME,
-        "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;)V", null, null);
+        "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;Lcom/googlecode/aviator/lexer/SymbolTable;)V",
+        null, null);
     this.mv.visitCode();
     this.mv.visitVarInsn(ALOAD, 0);
     this.mv.visitVarInsn(ALOAD, 1);
     this.mv.visitVarInsn(ALOAD, 2);
+    this.mv.visitVarInsn(ALOAD, 3);
     this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/ClassExpression",
         CONSTRUCTOR_METHOD_NAME,
-        "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;)V");
+        "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;Lcom/googlecode/aviator/lexer/SymbolTable;)V");
     if (!this.innerVars.isEmpty()) {
       for (Map.Entry<String, String> entry : this.innerVars.entrySet()) {
         String outterName = entry.getKey();
@@ -290,8 +294,9 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitTypeInsn(NEW, JAVA_TYPE_OWNER);
         this.mv.visitInsn(DUP);
         this.mv.visitLdcInsn(outterName);
+        this.mv.visitVarInsn(ALOAD, 3);
         this.mv.visitMethodInsn(INVOKESPECIAL, JAVA_TYPE_OWNER, CONSTRUCTOR_METHOD_NAME,
-            "(Ljava/lang/String;)V");
+            "(Ljava/lang/String;Lcom/googlecode/aviator/lexer/SymbolTable;)V");
         this.mv.visitFieldInsn(PUTFIELD, this.className, innerName,
             "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;");
       }
@@ -303,9 +308,10 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitVarInsn(ALOAD, 0);
         this.mv.visitVarInsn(ALOAD, 1);
         this.mv.visitLdcInsn(outterName);
+        this.mv.visitVarInsn(ALOAD, 3);
         this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/AviatorEvaluatorInstance",
             "getFunction",
-            "(Ljava/lang/String;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
+            "(Ljava/lang/String;Lcom/googlecode/aviator/lexer/SymbolTable;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
         this.mv.visitFieldInsn(PUTFIELD, this.className, innerName,
             "Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
       }
@@ -782,9 +788,9 @@ public class ASMCodeGenerator implements CodeGenerator {
       Class<?> defineClass =
           ClassDefiner.defineClass(this.className, Expression.class, bytes, this.classLoader);
       Constructor<?> constructor =
-          defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class);
+          defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class, SymbolTable.class);
       ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
-          new ArrayList<String>(this.varTokens.keySet()));
+          new ArrayList<String>(this.varTokens.keySet()), this.symbolTable);
       exp.setLambdaBootstraps(this.lambdaBootstraps);
       exp.setFuncsArgs(this.funcsArgs);
       return exp;
@@ -972,8 +978,10 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
-  public void initVariables(final Map<String, Integer/* counter */> varTokens) {
+  public void initVariables(final Map<String, Integer/* counter */> varTokens,
+      final SymbolTable symbolTable) {
     this.varTokens = varTokens;
+    this.symbolTable = symbolTable;
     this.innerVars = new HashMap<>(varTokens.size());
     for (String outterVarName : varTokens.keySet()) {
       // Use inner variable name instead of outter variable name

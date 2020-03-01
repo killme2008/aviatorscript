@@ -428,7 +428,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   private void callASM(final Map<String, Integer/* counter */> variables,
       final Map<String, Integer/* counter */> methods, final Set<Token<?>> constants) {
     this.codeGen.initConstants(constants);
-    this.codeGen.initVariables(variables);
+    this.codeGen.initVariables(variables, this.parser.getSymbolTable());
     this.codeGen.initMethods(methods);
     this.codeGen.setLambdaBootstraps(this.lambdaBootstraps);
     this.codeGen.start();

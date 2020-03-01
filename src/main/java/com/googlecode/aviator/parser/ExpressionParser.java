@@ -24,6 +24,7 @@ import com.googlecode.aviator.Options;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.DelegateToken;
 import com.googlecode.aviator.lexer.token.DelegateToken.DelegateTokenType;
@@ -71,6 +72,11 @@ public class ExpressionParser implements Parser {
   @Override
   public CodeGenerator getCodeGenerator() {
     return this.codeGenerator;
+  }
+
+  @Override
+  public SymbolTable getSymbolTable() {
+    return this.lexer.getSymbolTable();
   }
 
   /*
@@ -1329,22 +1335,27 @@ public class ExpressionParser implements Parser {
     }
 
     {
-      // create a lambda function wraps statements after loop statement (statements)
-      {
-        getCodeGeneratorWithTimes().onLambdaDefineStart(
-            this.prevToken.withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
-        getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
-        if (isWhile || isElsif || statements() == StatementType.Empty) {
-          getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
-        } else {
-          if (ifBodyHasReturn && elseBodyHasReturn && !isElsif) {
-            reportSyntaxError("unreachable code");
+      //
+      if (isWhile || isElsif) {
+        // Load ReducerEmptyVal directly.
+        getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
+      } else {
+        // create a lambda function wraps statements after loop statement (statements)
+        {
+          getCodeGeneratorWithTimes().onLambdaDefineStart(
+              this.prevToken.withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
+          getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+          if (statements() == StatementType.Empty) {
+            getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
+          } else {
+            if (ifBodyHasReturn && elseBodyHasReturn && !isElsif) {
+              reportSyntaxError("unreachable code");
+            }
           }
+          getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
         }
-        getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
-        getCodeGenerator().onMethodParameter(this.lookhead);
       }
-
+      getCodeGenerator().onMethodParameter(this.lookhead);
       // call __if_callcc(result, statements)
       getCodeGenerator().onMethodInvoke(this.lookhead);
       this.scope.newLexicalScope = newLexicalScope;

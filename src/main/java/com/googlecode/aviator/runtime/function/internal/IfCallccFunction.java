@@ -2,7 +2,6 @@ package com.googlecode.aviator.runtime.function.internal;
 
 import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
-import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Constants;
@@ -26,7 +25,11 @@ public class IfCallccFunction extends AbstractFunction {
     if (arg1 instanceof ReducerResult && ((ReducerResult) arg1).state != ReducerState.Cont) {
       return arg1;
     } else {
-      AviatorFunction otherClausesFn = FunctionUtils.getFunction(arg2, env, 0);
+      final Object nextClauseVal = arg2.getValue(env);
+      if (nextClauseVal == Constants.REDUCER_EMPTY) {
+        return arg1;
+      }
+      AviatorFunction otherClausesFn = (AviatorFunction) nextClauseVal;
       AviatorObject result = otherClausesFn.call(env);
       // No remaining statements, return the if statement result.
       if (result == Constants.REDUCER_EMPTY) {

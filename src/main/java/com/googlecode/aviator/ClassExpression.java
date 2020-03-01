@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
@@ -46,8 +47,9 @@ public abstract class ClassExpression extends BaseExpression {
     this.lambdaBootstraps = lambdaBootstraps;
   }
 
-  public ClassExpression(final AviatorEvaluatorInstance instance, final List<String> varNames) {
-    super(instance, varNames);
+  public ClassExpression(final AviatorEvaluatorInstance instance, final List<String> varNames,
+      final SymbolTable symbolTable) {
+    super(instance, varNames, symbolTable);
   }
 
   public LambdaFunction newLambda(final Env env, final String name) {

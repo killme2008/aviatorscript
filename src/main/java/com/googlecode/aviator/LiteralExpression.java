@@ -34,7 +34,7 @@ public class LiteralExpression extends BaseExpression {
 
   public LiteralExpression(final AviatorEvaluatorInstance instance, final Object result,
       final List<String> varNames) {
-    super(instance, varNames);
+    super(instance, varNames, null);
     this.result = result;
   }
 

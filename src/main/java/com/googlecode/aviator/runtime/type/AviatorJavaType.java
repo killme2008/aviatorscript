@@ -24,8 +24,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.beanutils.PropertyUtils;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
@@ -37,7 +39,8 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class AviatorJavaType extends AviatorObject {
 
-  private final String name;
+  private String name;
+  private final boolean containsDot;
 
   @Override
   public AviatorType getAviatorType() {
@@ -49,8 +52,42 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   public AviatorJavaType(final String name) {
+    this(name, null);
+  }
+
+  public AviatorJavaType(final String name, final SymbolTable symbolTable) {
     super();
-    this.name = name;
+    String rName = reserveName(name);
+    if (rName != null) {
+      this.name = rName;
+    } else {
+      if (symbolTable != null) {
+        this.name = symbolTable.reserve(name).getLexeme();
+      } else {
+        this.name = name;
+      }
+    }
+    this.containsDot = this.name.contains(".");
+  }
+
+  /**
+   * Reserved special var names, return null if not successes.
+   *
+   * @param name
+   * @return
+   */
+  private static String reserveName(final String name) {
+    if (Constants.ENV_VAR.equals(name)) {
+      return Constants.ENV_VAR;
+    } else if (Constants.ReducerEmptyVal.getLexeme().equals(name)) {
+      return Constants.ReducerEmptyVal.getLexeme();
+    } else if (Constants.FUNC_ARGS_VAR.equals(name)) {
+      return Constants.FUNC_ARGS_VAR;
+    } else if (Constants.REDUCER_LOOP_VAR.equals(name)) {
+      return Constants.REDUCER_LOOP_VAR;
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -253,13 +290,13 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public Object getValue(final Map<String, Object> env) {
-    return getValueFromEnv(this.name, env, true);
+    return getValueFromEnv(this.name, this.containsDot, env, true);
   }
 
-  public static Object getValueFromEnv(final String name, final Map<String, Object> env,
-      final boolean throwExceptionNotFound) {
+  public static Object getValueFromEnv(final String name, final boolean nameContainsDot,
+      final Map<String, Object> env, final boolean throwExceptionNotFound) {
     if (env != null) {
-      if (name.contains(".") && RuntimeUtils.getInstance(env)
+      if (nameContainsDot && RuntimeUtils.getInstance(env)
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
         return getProperty(name, env, throwExceptionNotFound);
       }
@@ -274,7 +311,7 @@ public class AviatorJavaType extends AviatorObject {
     if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
       throw new ExpressionRuntimeException("Disabled variable assignment.");
     }
-    if (this.name.contains(".")) {
+    if (this.containsDot) {
       return setProperty(value, env);
     }
 
@@ -288,7 +325,7 @@ public class AviatorJavaType extends AviatorObject {
     if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
       throw new ExpressionRuntimeException("Disabled variable assignment.");
     }
-    if (this.name.contains(".")) {
+    if (this.containsDot) {
       return setProperty(value, env);
     }
 
@@ -325,7 +362,8 @@ public class AviatorJavaType extends AviatorObject {
       Map<String, Object> innerEnv = env;
       for (int i = 0; i < names.length; i++) {
         // Fast path for nested map.
-        Object val = innerEnv.get(names[i]);
+        String rName = reserveName(names[i]);
+        Object val = innerEnv.get(rName != null ? rName : names[i]);
 
         if (i == names.length - 1) {
           return val;

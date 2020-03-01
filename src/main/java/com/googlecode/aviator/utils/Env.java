@@ -152,16 +152,16 @@ public class Env implements Map<String, Object> {
   public Object get(final Object key) {
     // Should check ENV_VAR at first
     // TODO: performance tweak
-    if (Constants.ENV_VAR.equals(key)) {
+    if (Constants.ENV_VAR == key) {
       return this;
     }
-    if (Constants.ReducerEmptyVal.getLexeme().equals(key)) {
+    if (Constants.ReducerEmptyVal.getLexeme() == key) {
       return Constants.REDUCER_EMPTY;
     }
-    if (Constants.FUNC_ARGS_VAR.equals(key)) {
+    if (Constants.FUNC_ARGS_VAR == key) {
       return FunctionUtils.getFunctionArguments(this);
     }
-    if (Constants.ReducerLoop.equals(key)) {
+    if (Constants.REDUCER_LOOP_VAR == key) {
       return Range.LOOP;
     }
     Map<String, Object> overrides = getmOverrides(true);
@@ -340,7 +340,7 @@ public class Env implements Map<String, Object> {
       if (readOnly) {
         return EMPTY_ENV;
       }
-      this.mOverrides = new HashMap<String, Object>();
+      this.mOverrides = new HashMap<>();
     }
     return this.mOverrides;
   }

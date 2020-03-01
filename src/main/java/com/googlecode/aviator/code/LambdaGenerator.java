@@ -62,7 +62,7 @@ public class LambdaGenerator implements CodeGenerator {
   public LambdaGenerator(final AviatorEvaluatorInstance instance,
       final CodeGenerator parentCodeGenerator, final Parser parser,
       final AviatorClassLoader classLoader, final boolean newLexicalScope) {
-    this.arguments = new ArrayList<String>();
+    this.arguments = new ArrayList<>();
     this.instance = instance;
     this.parentCodeGenerator = parentCodeGenerator;
     this.codeGenerator = instance.newCodeGenerator(classLoader);
@@ -221,8 +221,7 @@ public class LambdaGenerator implements CodeGenerator {
       Constructor<?> constructor =
           defineClass.getConstructor(List.class, Expression.class, Env.class);
       MethodHandle methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
-      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, this.arguments,
-          this.newLexicalScope);
+      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, this.arguments);
     } catch (Exception e) {
       throw new CompileExpressionErrorException("define lambda class error", e);
     }
@@ -483,14 +482,10 @@ public class LambdaGenerator implements CodeGenerator {
     this.codeGenerator.onLambdaArgument(lookhead);
   }
 
-
-
   @Override
   public void onLambdaBodyStart(final Token<?> lookhead) {
     this.codeGenerator.onLambdaBodyStart(lookhead);
   }
-
-
 
   @Override
   public void onLambdaBodyEnd(final Token<?> lookhead) {

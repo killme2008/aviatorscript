@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.lexer.SymbolTable;
+import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.utils.Env;
 
@@ -25,12 +27,15 @@ public abstract class BaseExpression implements Expression {
   protected AviatorEvaluatorInstance instance;
   private Env compileEnv;
   private Map<Integer, List<FunctionArgument>> funcsArgs = Collections.emptyMap();
+  protected SymbolTable symbolTable;
 
-  public BaseExpression(final AviatorEvaluatorInstance instance, final List<String> varNames) {
+  public BaseExpression(final AviatorEvaluatorInstance instance, final List<String> varNames,
+      final SymbolTable symbolTable) {
     super();
+    this.symbolTable = symbolTable;
     this.varFullNames = varNames;
     this.instance = instance;
-    LinkedHashSet<String> tmp = new LinkedHashSet<String>(varNames.size());
+    LinkedHashSet<String> tmp = new LinkedHashSet<>(varNames.size());
     // process nested names
     for (String name : varNames) {
       if (name.contains(".")) {
@@ -41,6 +46,24 @@ public abstract class BaseExpression implements Expression {
     this.varNames = new ArrayList<String>(tmp);
   }
 
+  @Override
+  public Map<String, Object> newEnv(final Object... args) {
+    if (args != null && args.length % 2 != 0) {
+      throw new IllegalArgumentException("Expect arguments number is even.");
+    }
+    Map<String, Object> env = new HashMap<>(args != null ? args.length : 10);
+    if (args != null) {
+      for (int i = 0; i < args.length; i += 2) {
+        String key = (String) args[i];
+        Variable var = null;
+        if (this.symbolTable != null && (var = this.symbolTable.getVariable(key)) != null) {
+          key = var.getLexeme();
+        }
+        env.put(key, args[i + 1]);
+      }
+    }
+    return env;
+  }
 
   public void setFuncsArgs(final Map<Integer, List<FunctionArgument>> funcsArgs) {
     if (funcsArgs != null) {
@@ -73,6 +96,15 @@ public abstract class BaseExpression implements Expression {
     this.expression = expression;
   }
 
+
+  @Override
+  public String addSymbol(final String name) {
+    if (this.symbolTable != null) {
+      return this.symbolTable.reserve(name).getLexeme();
+    } else {
+      return name;
+    }
+  }
 
   /*
    * (non-Javadoc)

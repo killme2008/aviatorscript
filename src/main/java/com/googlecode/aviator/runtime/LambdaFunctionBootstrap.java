@@ -22,7 +22,6 @@ public class LambdaFunctionBootstrap {
   private final MethodHandle constructor;
   // The arguments list.
   private final List<String> arguments;
-  private final boolean newLexicalScope;
 
 
   public String getName() {
@@ -30,13 +29,12 @@ public class LambdaFunctionBootstrap {
   }
 
   public LambdaFunctionBootstrap(final String name, final Expression expression,
-      final MethodHandle constructor, final List<String> arguments, final boolean newLexicalScope) {
+      final MethodHandle constructor, final List<String> arguments) {
     super();
     this.name = name;
     this.expression = expression;
     this.constructor = constructor;
     this.arguments = arguments;
-    this.newLexicalScope = newLexicalScope;
   }
 
 

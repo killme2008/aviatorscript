@@ -87,6 +87,15 @@ public class SymbolTable {
     return var != null ? var : this.table.get(name);
   }
 
+  public Variable reserve(final String lexeme) {
+    if (isReserved(lexeme)) {
+      return getVariable(lexeme);
+    } else {
+      final Variable var = new Variable(lexeme, -1);
+      this.table.put(lexeme, var);
+      return var;
+    }
+  }
 
   public Token<?> reserve(final Variable variable) {
     String lexeme = variable.getLexeme();

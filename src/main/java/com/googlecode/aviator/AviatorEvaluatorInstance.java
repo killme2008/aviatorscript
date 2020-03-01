@@ -47,6 +47,7 @@ import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
@@ -65,7 +66,6 @@ import com.googlecode.aviator.runtime.function.math.MathRoundFunction;
 import com.googlecode.aviator.runtime.function.math.MathSinFunction;
 import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
-import com.googlecode.aviator.runtime.function.seq.SeqNewArrayFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqArrayFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
@@ -80,6 +80,7 @@ import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMaxFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMinFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqNewArrayFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewListFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewSetFunction;
@@ -739,14 +740,23 @@ public final class AviatorEvaluatorInstance {
     return (AviatorFunction) this.funcMap.remove(name);
   }
 
+  /**
+   * @see #getFunction(String, SymbolTable)
+   * @param name
+   * @return
+   */
+  public AviatorFunction getFunction(final String name) {
+    return this.getFunction(name, null);
+  }
 
   /**
    * Retrieve an aviator function by name,throw exception if not found or null.It's not thread-safe.
    *
    * @param name
+   * @param symbolTablee
    * @return
    */
-  public AviatorFunction getFunction(final String name) {
+  public AviatorFunction getFunction(final String name, final SymbolTable symbolTable) {
     AviatorFunction function = (AviatorFunction) this.funcMap.get(name);
     if (function == null && this.functionLoaders != null) {
       for (FunctionLoader loader : this.functionLoaders) {
@@ -760,7 +770,7 @@ public final class AviatorEvaluatorInstance {
     }
     if (function == null) {
       // Returns a delegate function that will try to find the function from runtime env.
-      function = new RuntimeFunctionDelegator(name, this.functionMissing);
+      function = new RuntimeFunctionDelegator(name, symbolTable, this.functionMissing);
     }
     return function;
   }

@@ -32,6 +32,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.LambdaGenerator;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.PatternToken;
@@ -524,6 +525,11 @@ public class ASMCodeGeneratorUnitTest {
       @Override
       public void restoreScope(final ScopeInfo info) {
 
+      }
+
+      @Override
+      public SymbolTable getSymbolTable() {
+        return null;
       }
 
       @Override
