@@ -155,7 +155,7 @@ public class Env implements Map<String, Object> {
     if (Constants.ENV_VAR == key) {
       return this;
     }
-    if (Constants.ReducerEmptyVal.getLexeme() == key) {
+    if (Constants.REDUCER_EMPTY_VAR == key) {
       return Constants.REDUCER_EMPTY;
     }
     if (Constants.FUNC_ARGS_VAR == key) {
@@ -164,17 +164,15 @@ public class Env implements Map<String, Object> {
     if (Constants.REDUCER_LOOP_VAR == key) {
       return Range.LOOP;
     }
+    if (Constants.INSTANCE_VAR == key) {
+      return this.instance;
+    }
     Map<String, Object> overrides = getmOverrides(true);
     Object ret = null;
     if (overrides.containsKey(key)) {
       ret = overrides.get(key);
     } else {
       ret = this.mDefaults.get(key);
-    }
-    if (ret == null) {
-      if (Constants.INSTANCE_VAR.equals(key)) {
-        return this.instance;
-      }
     }
     return ret;
   }
@@ -241,11 +239,11 @@ public class Env implements Map<String, Object> {
     if (overrides.containsKey(key)) {
       prior = overrides.put(key, value);
     } else {
-      if (this.mDefaults != null && this.mDefaults.containsKey(key)) {
+      if (this.mDefaults.containsKey(key)) {
         prior = this.mDefaults.put(key, value);
       } else {
         overrides.put(key, value);
-        prior = this.mDefaults != null ? this.mDefaults.get(key) : null;
+        prior = this.mDefaults.get(key);
       }
     }
     return prior;

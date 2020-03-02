@@ -6,7 +6,8 @@ import com.googlecode.aviator.runtime.function.internal.ReducerResult;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 
 public class Constants {
-  public static final Variable ReducerEmptyVal = new Variable("__reducer_empty", -1);
+  public static final String REDUCER_EMPTY_VAR = "__reducer_empty";
+  public static final Variable ReducerEmptyVal = new Variable(REDUCER_EMPTY_VAR, -1);
   public static final Variable IfReturnFn = new Variable("__if_callcc", -1);
   public static final Token<?> ReducerBreakFn = new Variable("__reducer_break", -1);
   public static final Token<?> ReducerContFn = new Variable("__reducer_cont", -1);

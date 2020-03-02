@@ -171,6 +171,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void setParser(final Parser parser) {
     this.parser = parser;
+    this.symbolTable = parser.getSymbolTable();
   }
 
 
@@ -978,10 +979,8 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
-  public void initVariables(final Map<String, Integer/* counter */> varTokens,
-      final SymbolTable symbolTable) {
+  public void initVariables(final Map<String, Integer/* counter */> varTokens) {
     this.varTokens = varTokens;
-    this.symbolTable = symbolTable;
     this.innerVars = new HashMap<>(varTokens.size());
     for (String outterVarName : varTokens.keySet()) {
       // Use inner variable name instead of outter variable name

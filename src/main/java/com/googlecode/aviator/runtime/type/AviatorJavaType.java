@@ -85,6 +85,8 @@ public class AviatorJavaType extends AviatorObject {
       return Constants.FUNC_ARGS_VAR;
     } else if (Constants.REDUCER_LOOP_VAR.equals(name)) {
       return Constants.REDUCER_LOOP_VAR;
+    } else if (Constants.INSTANCE_VAR.equals(name)) {
+      return Constants.INSTANCE_VAR;
     } else {
       return null;
     }
