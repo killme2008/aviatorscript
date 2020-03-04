@@ -1,0 +1,22 @@
+## examples/if.av
+
+if false {
+   println("in if body");
+} else {
+   println("in else body");
+}
+
+let a = rand(1100);
+
+if a > 1000 {
+  println("a is greater than 1000.");
+} elsif a > 100 {
+  println("a is greater than 100.");
+} elsif a > 10 {
+   println("a is greater than 10.");
+} else {
+   println("a is less than 10 ");
+}
+
+println("a is " + a + ".");
+

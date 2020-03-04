@@ -52,7 +52,7 @@ public class AviatorPattern extends AviatorObject {
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
-        return new AviatorString(this.pattern.pattern() + ((AviatorString) other).lexeme);
+        return new AviatorString(this.pattern.pattern() + ((AviatorString) other).getLexeme());
       case JavaType:
         AviatorJavaType javaType = (AviatorJavaType) other;
         final Object otherValue = javaType.getValue(env);
@@ -73,7 +73,7 @@ public class AviatorPattern extends AviatorObject {
     switch (other.getAviatorType()) {
       case String:
         AviatorString aviatorString = (AviatorString) other;
-        Matcher m = this.pattern.matcher(aviatorString.lexeme);
+        Matcher m = this.pattern.matcher(aviatorString.getLexeme());
         if (m.matches()) {
           boolean captureGroups = RuntimeUtils.getInstance(env)
               .getOptionValue(Options.PUT_CAPTURING_GROUPS_INTO_ENV).bool;

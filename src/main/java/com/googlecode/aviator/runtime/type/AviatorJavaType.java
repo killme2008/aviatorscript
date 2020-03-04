@@ -317,9 +317,17 @@ public class AviatorJavaType extends AviatorObject {
       return setProperty(value, env);
     }
 
-    Object v = value.getValue(env);
+    Object v = getAssignedValue(value, env);
     ((Env) env).override(this.name, v);
     return AviatorRuntimeJavaType.valueOf(v);
+  }
+
+  private Object getAssignedValue(final AviatorObject value, final Map<String, Object> env) {
+    Object v = value.getValue(env);
+    if (v instanceof AviatorObject) {
+      v = ((AviatorObject) v).deref(env);
+    }
+    return v;
   }
 
   @Override
@@ -331,7 +339,7 @@ public class AviatorJavaType extends AviatorObject {
       return setProperty(value, env);
     }
 
-    Object v = value.getValue(env);
+    Object v = getAssignedValue(value, env);
     env.put(this.name, v);
     return AviatorRuntimeJavaType.valueOf(v);
   }

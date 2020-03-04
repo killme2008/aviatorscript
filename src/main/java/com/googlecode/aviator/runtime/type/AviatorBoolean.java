@@ -51,7 +51,7 @@ public class AviatorBoolean extends AviatorObject {
   public AviatorObject add(AviatorObject other, Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
-        return new AviatorString(this.value.toString() + ((AviatorString) other).lexeme);
+        return new AviatorString(this.value.toString() + ((AviatorString) other).getLexeme());
       case JavaType:
         AviatorJavaType javaType = (AviatorJavaType) other;
         final Object otherJavaValue = javaType.getValue(env);

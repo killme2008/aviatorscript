@@ -28,7 +28,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public class AviatorString extends AviatorObject {
-  final String lexeme;
+  private final String lexeme;
 
   @Override
   public AviatorType getAviatorType() {
@@ -36,40 +36,26 @@ public class AviatorString extends AviatorObject {
   }
 
   @Override
-  public Object getValue(Map<String, Object> env) {
-    return this.lexeme;
+  public Object getValue(final Map<String, Object> env) {
+    return getLexeme();
   }
 
-  public AviatorString(String lexeme) {
+  public AviatorString(final String lexeme) {
     super();
     this.lexeme = lexeme;
   }
 
   @Override
-  public AviatorObject add(AviatorObject other, Map<String, Object> env) {
-    switch (other.getAviatorType()) {
-      case String:
-        final AviatorString otherString = (AviatorString) other;
-        return new AviatorString(this.lexeme + otherString.lexeme);
-      case Boolean:
-        final AviatorBoolean otherBoolean = (AviatorBoolean) other;
-        return new AviatorString(this.lexeme + otherBoolean.value);
-      case BigInt:
-      case Decimal:
-      case Long:
-      case Double:
-        final AviatorNumber otherNumber = (AviatorNumber) other;
-        return new AviatorString(this.lexeme + otherNumber.getValue(env));
-      case Nil:
-      case JavaType:
-        return new AviatorString(this.lexeme + other.getValue(env));
-      case Pattern:
-        final AviatorPattern otherPatterh = (AviatorPattern) other;
-        return new AviatorString(this.lexeme + otherPatterh.pattern.pattern());
+  public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
+    final StringBuilder sb = new StringBuilder(this.lexeme);
 
-      default:
-        return super.add(other, env);
+    if (other.getAviatorType() == AviatorType.Pattern) {
+      final AviatorPattern otherPatterh = (AviatorPattern) other;
+      sb.append(otherPatterh.pattern.pattern());
+    } else {
+      sb.append(other.getValue(env));
     }
+    return new AviatorStringBuilder(sb);
   }
 
   private static final ThreadLocal<SimpleDateFormat> DATE_FORMATTER =
@@ -85,7 +71,7 @@ public class AviatorString extends AviatorObject {
   private int tryCompareDate(final Date otherDate) {
     try {
       final SimpleDateFormat simpleDateFormat = DATE_FORMATTER.get();
-      final Date thisDate = simpleDateFormat.parse(this.lexeme);
+      final Date thisDate = simpleDateFormat.parse(getLexeme());
       return thisDate.compareTo(otherDate);
     } catch (final Throwable t) {
       throw new ExpressionRuntimeException("Compare date error", t);
@@ -93,56 +79,57 @@ public class AviatorString extends AviatorObject {
   }
 
   @Override
-  public int compare(AviatorObject other, Map<String, Object> env) {
+  public int compare(final AviatorObject other, final Map<String, Object> env) {
     if (this == other) {
       return 0;
     }
     switch (other.getAviatorType()) {
       case String:
         final AviatorString otherString = (AviatorString) other;
-        if (this.lexeme == null && otherString.lexeme != null) {
+        if (getLexeme() == null && otherString.getLexeme() != null) {
           return -1;
-        } else if (this.lexeme != null && otherString.lexeme == null) {
+        } else if (getLexeme() != null && otherString.getLexeme() == null) {
           return 1;
-        } else if (this.lexeme == null && otherString.lexeme == null) {
+        } else if (getLexeme() == null && otherString.getLexeme() == null) {
           return 0;
         } else {
-          return this.lexeme.compareTo(otherString.lexeme);
+          return getLexeme().compareTo(otherString.getLexeme());
         }
       case JavaType:
         final AviatorJavaType javaType = (AviatorJavaType) other;
         final Object otherJavaValue = javaType.getValue(env);
-        if (this.lexeme == null && otherJavaValue == null) {
+        if (getLexeme() == null && otherJavaValue == null) {
           return 0;
-        } else if (this.lexeme != null && otherJavaValue == null) {
+        } else if (getLexeme() != null && otherJavaValue == null) {
           return 1;
         }
         if (TypeUtils.isString(otherJavaValue)) {
-          if (this.lexeme == null) {
+          if (getLexeme() == null) {
             return -1;
           } else {
-            return this.lexeme.compareTo(String.valueOf(otherJavaValue));
+            return getLexeme().compareTo(String.valueOf(otherJavaValue));
           }
         } else if (otherJavaValue instanceof Date) {
-          return this.tryCompareDate((Date) otherJavaValue);
+          return tryCompareDate((Date) otherJavaValue);
         } else {
           throw new ExpressionRuntimeException(
-              "Could not compare " + this.desc(env) + " with " + other.desc(env));
+              "Could not compare " + desc(env) + " with " + other.desc(env));
         }
       case Nil:
-        if (this.lexeme == null) {
+        if (getLexeme() == null) {
           return 0;
         } else {
           return 1;
         }
       default:
         throw new ExpressionRuntimeException(
-            "Could not compare " + this.desc(env) + " with " + other.desc(env));
+            "Could not compare " + desc(env) + " with " + other.desc(env));
     }
   }
 
   public String getLexeme() {
     return this.lexeme;
   }
+
 
 }
