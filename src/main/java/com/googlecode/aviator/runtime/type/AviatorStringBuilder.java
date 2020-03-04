@@ -34,7 +34,12 @@ public class AviatorStringBuilder extends AviatorString {
 
   @Override
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
-    this.sb.append(other.getValue(env));
-    return this;
+    if (other.getAviatorType() == AviatorType.Pattern) {
+      final AviatorPattern otherPatterh = (AviatorPattern) other;
+      this.sb.append(otherPatterh.pattern.pattern());
+    } else {
+      this.sb.append(other.getValue(env));
+    }
+    return new AviatorStringBuilder(this.sb);
   }
 }
