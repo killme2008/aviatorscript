@@ -17,20 +17,19 @@ package com.googlecode.aviator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
  * A expression
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public interface Expression {
 
   /**
    * Execute expression with environment
-   * 
+   *
    * @param env Binding variable environment
    * @return
    */
@@ -39,7 +38,7 @@ public interface Expression {
 
   /**
    * Execute expression with empty environment
-   * 
+   *
    * @return
    */
   Object execute();
@@ -48,7 +47,7 @@ public interface Expression {
   /**
    * Returns this expression's all variable names in order when using AviatorEvaluator.EVAL
    * mode,else returns empty set
-   * 
+   *
    * @see com.googlecode.aviator.AviatorEvaluator#EVAL
    * @return
    */
@@ -58,9 +57,27 @@ public interface Expression {
   /**
    * Returns this expression's all variable full names in order when using AviatorEvaluator.EVAL
    * mode,else returns empty set
-   * 
+   *
    * @return
    */
   List<String> getVariableFullNames();
+
+  /**
+   * Created a faster env map(compare variable names by reference).The arguments should be a
+   * sequence of pair <String, Object>.
+   *
+   * @param args
+   * @return an env map
+   */
+  Map<String, Object> newEnv(final Object... args);
+
+  /**
+   * Adds the specified symbol to the symbol table and returns a reference to the unique symbol. If
+   * the symbol already exists, the previous symbol reference is returned instead, in order
+   * guarantee that symbol references remain unique.
+   *
+   * @param name The symbol name.
+   */
+  String addSymbol(String name);
 
 }

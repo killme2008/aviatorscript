@@ -39,6 +39,34 @@ public class ExpressionParserUnitTest {
     this.instance = AviatorEvaluator.newInstance();
   }
 
+
+  @Test
+  public void testComments() {
+    this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "3 ##4"),
+        this.codeGenerator);
+    this.parser.parse();
+    assertEquals("3", this.codeGenerator.getPostFixExpression());
+  }
+
+  @Test
+  public void testSingleComment() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "## a comment\n 3+1"), this.codeGenerator);
+    this.parser.parse();
+    assertEquals("3 1 +", this.codeGenerator.getPostFixExpression());
+  }
+
+
+  @Test
+  public void testMultilineComments() {
+    this.parser = new ExpressionParser(this.instance,
+        new ExpressionLexer(this.instance, "## a comment\n## two comments\n 3+1"),
+        this.codeGenerator);
+    this.parser.parse();
+    assertEquals("3 1 +", this.codeGenerator.getPostFixExpression());
+  }
+
+
   @Test
   public void testIssue77() {
     this.instance.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);

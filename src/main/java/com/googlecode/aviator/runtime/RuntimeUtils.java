@@ -54,7 +54,7 @@ public final class RuntimeUtils {
   }
 
 
-  public static final void printTrace(final Map<String, Object> env, final String msg) {
+  public static final void printlnTrace(final Map<String, Object> env, final String msg) {
     try {
       getInstance(env).getTraceOutputStream().write(("[Aviator TRACE] " + msg + "\n").getBytes());
     } catch (IOException e) {
@@ -65,7 +65,6 @@ public final class RuntimeUtils {
   public static final boolean isTracedEval(final Map<String, Object> env) {
     return getInstance(env).getOptionValue(Options.TRACE_EVAL).bool;
   }
-
 
   public static AviatorFunction getFunction(final Object object, final Map<String, Object> env) {
     if (object instanceof AviatorFunction) {
@@ -88,5 +87,4 @@ public final class RuntimeUtils {
       e.printStackTrace();
     }
   }
-
 }

@@ -36,7 +36,6 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.ScopeInfo;
-import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Env;
@@ -58,16 +57,18 @@ public class LambdaGenerator implements CodeGenerator {
   private static final AtomicLong LAMBDA_COUNTER = new AtomicLong();
   private MethodVisitor mv;
   private ScopeInfo scopeInfo;
+  private final boolean newLexicalScope;
 
   public LambdaGenerator(final AviatorEvaluatorInstance instance,
       final CodeGenerator parentCodeGenerator, final Parser parser,
-      final AviatorClassLoader classLoader) {
-    this.arguments = new ArrayList<String>();
+      final AviatorClassLoader classLoader, final boolean newLexicalScope) {
+    this.arguments = new ArrayList<>();
     this.instance = instance;
     this.parentCodeGenerator = parentCodeGenerator;
     this.codeGenerator = instance.newCodeGenerator(classLoader);
     this.codeGenerator.setParser(parser);
     this.classLoader = classLoader;
+    this.newLexicalScope = newLexicalScope;
     // Generate lambda class name
     this.className =
         "Lambda_" + System.currentTimeMillis() + "_" + LAMBDA_COUNTER.getAndIncrement();
@@ -204,7 +205,7 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
   public LambdaFunctionBootstrap getLmabdaBootstrap() {
-    Expression expression = getResult();
+    Expression expression = getResult(!this.newLexicalScope);
     endVisitClass();
     byte[] bytes = this.classWriter.toByteArray();
     try {
@@ -264,7 +265,6 @@ public class LambdaGenerator implements CodeGenerator {
   public void onBitOr(final Token<?> lookhead) {
     this.codeGenerator.onBitOr(lookhead);
   }
-
 
 
   @Override
@@ -441,8 +441,8 @@ public class LambdaGenerator implements CodeGenerator {
 
 
   @Override
-  public Expression getResult() {
-    return this.codeGenerator.getResult();
+  public Expression getResult(final boolean unboxObject) {
+    return this.codeGenerator.getResult(unboxObject);
   }
 
 
@@ -464,8 +464,8 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onMethodInvoke(final Token<?> lookhead, final List<FunctionArgument> params) {
-    this.codeGenerator.onMethodInvoke(lookhead, params);
+  public void onMethodInvoke(final Token<?> lookhead) {
+    this.codeGenerator.onMethodInvoke(lookhead);
   }
 
 
@@ -482,14 +482,10 @@ public class LambdaGenerator implements CodeGenerator {
     this.codeGenerator.onLambdaArgument(lookhead);
   }
 
-
-
   @Override
   public void onLambdaBodyStart(final Token<?> lookhead) {
     this.codeGenerator.onLambdaBodyStart(lookhead);
   }
-
-
 
   @Override
   public void onLambdaBodyEnd(final Token<?> lookhead) {

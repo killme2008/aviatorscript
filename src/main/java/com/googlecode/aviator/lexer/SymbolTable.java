@@ -17,6 +17,7 @@ package com.googlecode.aviator.lexer;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Variable;
 
 
@@ -28,31 +29,39 @@ import com.googlecode.aviator.lexer.token.Variable;
  */
 public class SymbolTable {
 
-  private final Map<String, Variable> table = new HashMap<String, Variable>();
+  private final Map<String, Variable> table = new HashMap<>();
 
   private static final Map<String, Variable> RESERVED = new HashMap<>();
 
+  private static void reserveKeyword(final Variable v) {
+    RESERVED.put(v.getLexeme(), v);
+  }
+
   static {
-    RESERVED.put("true", Variable.TRUE);
-    RESERVED.put("false", Variable.FALSE);
-    RESERVED.put("nil", Variable.NIL);
-    RESERVED.put("lambda", Variable.LAMBDA);
-    RESERVED.put("end", Variable.END);
+    reserveKeyword(Variable.TRUE);
+    reserveKeyword(Variable.FALSE);
+    reserveKeyword(Variable.NIL);
+    reserveKeyword(Variable.LAMBDA);
+    reserveKeyword(Variable.FN);
+    reserveKeyword(Variable.END);
+    reserveKeyword(Variable.IF);
+    reserveKeyword(Variable.ELSE);
+    reserveKeyword(Variable.FOR);
+    reserveKeyword(Variable.IN);
+    reserveKeyword(Variable.RETURN);
+    reserveKeyword(Variable.BREAK);
+    reserveKeyword(Variable.CONTINUE);
+    reserveKeyword(Variable.LET);
+    reserveKeyword(Variable.WHILE);
+    reserveKeyword(Variable.ELSIF);
   }
 
-  public static boolean isReserved(final Variable v) {
-    return RESERVED.containsKey(v.getLexeme());
+  public static boolean isReservedKeyword(final String name) {
+    return RESERVED.containsKey(name);
   }
 
-
-  /**
-   * Reserve variable
-   *
-   * @param name
-   * @param value
-   */
-  public void reserve(final String name, final Variable value) {
-    this.table.put(name, value);
+  public static boolean isReservedKeyword(final Variable v) {
+    return isReservedKeyword(v.getLexeme());
   }
 
 
@@ -62,8 +71,8 @@ public class SymbolTable {
    * @param name
    * @return
    */
-  public boolean contains(final String name) {
-    return RESERVED.containsKey(name) || this.table.containsKey(name);
+  public boolean isReserved(final String name) {
+    return isReservedKeyword(name) || this.table.containsKey(name);
   }
 
 
@@ -76,5 +85,26 @@ public class SymbolTable {
   public Variable getVariable(final String name) {
     Variable var = RESERVED.get(name);
     return var != null ? var : this.table.get(name);
+  }
+
+  public Variable reserve(final String lexeme) {
+    if (isReserved(lexeme)) {
+      return getVariable(lexeme);
+    } else {
+      final Variable var = new Variable(lexeme, -1);
+      this.table.put(lexeme, var);
+      return var;
+    }
+  }
+
+  public Token<?> reserve(final Variable variable) {
+    String lexeme = variable.getLexeme();
+    if (isReserved(lexeme)) {
+      return getVariable(lexeme);
+    } else {
+      final String name = lexeme;
+      this.table.put(name, variable);
+      return variable;
+    }
   }
 }

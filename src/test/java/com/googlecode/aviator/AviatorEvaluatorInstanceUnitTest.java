@@ -385,6 +385,7 @@ public class AviatorEvaluatorInstanceUnitTest {
       String output = new String(bs.toByteArray());
       assertEquals(
           "[Aviator TRACE] Func   : string.replace_all(<String, hello>,<String, l>,<String, c>)\n"
+              + "[Aviator TRACE] Result : <String, hecco>\n"
               + "[Aviator TRACE]          <String, hecco> + <String,  world> => <String, hecco world>\n"
               + "[Aviator TRACE] Result : hecco world\n",
           output);

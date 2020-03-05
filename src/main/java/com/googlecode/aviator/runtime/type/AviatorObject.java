@@ -65,6 +65,11 @@ public abstract class AviatorObject {
         "Can't assign value " + value.desc(env) + " to " + desc(env));
   }
 
+  public AviatorObject defineValue(final AviatorObject value, final Map<String, Object> env) {
+    throw new ExpressionRuntimeException(
+        "Can't assign value " + value.desc(env) + " to " + desc(env));
+  }
+
   public AviatorObject not(final Map<String, Object> env) {
     throw new ExpressionRuntimeException(desc(env) + " doesn't support not operation '!'");
   }
@@ -173,6 +178,9 @@ public abstract class AviatorObject {
     return (Boolean) getValue(env);
   }
 
+  public AviatorObject deref(final Map<String, Object> env) {
+    return this;
+  }
 
   /**
    * Access array or list element

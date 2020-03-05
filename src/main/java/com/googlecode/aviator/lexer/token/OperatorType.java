@@ -20,6 +20,7 @@ import com.googlecode.aviator.exception.IllegalArityException;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -81,22 +82,24 @@ public enum OperatorType {
 
   TERNARY("?:", 3),
 
-  ASSIGNMENT("=", 2);
+  ASSIGNMENT("=", 2),
+
+  DEFINE("=", 2);
 
   public final String token;
 
   public final int operandCount;
 
 
-  OperatorType(String token, int operandCount) {
+  OperatorType(final String token, final int operandCount) {
     this.token = token;
     this.operandCount = operandCount;
   }
 
-  public AviatorObject eval(AviatorObject[] args, Map<String, Object> env) {
+  public AviatorObject eval(final AviatorObject[] args, final Map<String, Object> env) {
     if (args.length < this.operandCount) {
-      throw new IllegalArityException("Expect " + this.operandCount + " parameters for "
-          + this.name() + ", but have " + args.length + " arguments.");
+      throw new IllegalArityException("Expect " + this.operandCount + " parameters for " + name()
+          + ", but have " + args.length + " arguments.");
     }
     switch (this) {
       case ADD:
@@ -105,6 +108,10 @@ public enum OperatorType {
         return args[0].sub(args[1], env);
       case MOD:
         return args[0].mod(args[1], env);
+      case DEFINE:
+        // TODO check type?
+        ((Env) env).override((String) args[0].getValue(env), args[1].getValue(env));
+        return args[1];
       case ASSIGNMENT:
         // TODO check type?
         env.put((String) args[0].getValue(env), args[1].getValue(env));

@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
 
@@ -51,7 +52,7 @@ public class AviatorPattern extends AviatorObject {
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
-        return new AviatorString(this.pattern.pattern() + ((AviatorString) other).lexeme);
+        return new AviatorString(this.pattern.pattern() + ((AviatorString) other).getLexeme());
       case JavaType:
         AviatorJavaType javaType = (AviatorJavaType) other;
         final Object otherValue = javaType.getValue(env);
@@ -72,14 +73,14 @@ public class AviatorPattern extends AviatorObject {
     switch (other.getAviatorType()) {
       case String:
         AviatorString aviatorString = (AviatorString) other;
-        Matcher m = this.pattern.matcher(aviatorString.lexeme);
+        Matcher m = this.pattern.matcher(aviatorString.getLexeme());
         if (m.matches()) {
           boolean captureGroups = RuntimeUtils.getInstance(env)
               .getOptionValue(Options.PUT_CAPTURING_GROUPS_INTO_ENV).bool;
           if (captureGroups && env != Collections.EMPTY_MAP) {
             int groupCount = m.groupCount();
             for (int i = 0; i <= groupCount; i++) {
-              env.put("$" + i, m.group(i));
+              ((Env) env).override("$" + i, m.group(i));
             }
           }
           return AviatorBoolean.TRUE;

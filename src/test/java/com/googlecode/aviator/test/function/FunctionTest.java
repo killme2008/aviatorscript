@@ -37,6 +37,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -47,6 +48,21 @@ import com.googlecode.aviator.utils.Env;
 
 
 public class FunctionTest {
+
+  @Test
+  public void testCmp() {
+    assertEquals(0, AviatorEvaluator.execute("cmp(1,1)"));
+    assertEquals(1, AviatorEvaluator.execute("cmp(2,1)"));
+    assertEquals(-1, AviatorEvaluator.execute("cmp(2,3)"));
+    assertEquals(0, AviatorEvaluator.execute("cmp('hello','hello')"));
+    assertEquals(-32, AviatorEvaluator.execute("cmp('hEllo','hello')"));
+  }
+
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testCmpWrongType() {
+    assertEquals(0, AviatorEvaluator.execute("cmp(1,'hello')"));
+  }
+
   @Test
   public void testArithmeticExpression() {
     assertEquals(1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10,
@@ -772,7 +788,7 @@ public class FunctionTest {
   }
 
 
-  @Test(expected = ExpressionRuntimeException.class)
+  @Test(expected = ExpressionSyntaxErrorException.class)
   public void testDecimalBitAnd() {
     AviatorEvaluator.exec("3M< & 2M");
   }

@@ -166,15 +166,15 @@ public class OperationRuntime {
 
     switch (args.length) {
       case 1:
-        RuntimeUtils.printTrace(env,
+        RuntimeUtils.printlnTrace(env,
             TRACE_PREFIX + opType.token + desc(args[0], env) + " => " + desc(result, env));
         break;
       case 2:
-        RuntimeUtils.printTrace(env, TRACE_PREFIX + desc(args[0], env) + WHITE_SPACE + opType.token
-            + WHITE_SPACE + desc(args[1], env) + " => " + desc(result, env));
+        RuntimeUtils.printlnTrace(env, TRACE_PREFIX + desc(args[0], env) + WHITE_SPACE
+            + opType.token + WHITE_SPACE + desc(args[1], env) + " => " + desc(result, env));
         break;
       case 3:
-        RuntimeUtils.printTrace(env,
+        RuntimeUtils.printlnTrace(env,
             TRACE_PREFIX + desc(args[0], env) + WHITE_SPACE + "?" + WHITE_SPACE + desc(args[0], env)
                 + WHITE_SPACE + ":" + WHITE_SPACE + desc(args[1], env) + " => "
                 + desc(result, env));

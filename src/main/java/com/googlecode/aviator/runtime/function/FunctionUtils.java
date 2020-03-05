@@ -117,8 +117,10 @@ public class FunctionUtils {
       throw new ClassCastException(arg.desc(env) + " is not a function");
     }
     // Runtime type.
-    if (arg instanceof AviatorRuntimeJavaType && arg.getValue(env) instanceof AviatorFunction) {
-      return (AviatorFunction) arg.getValue(env);
+    Object val = null;
+    if (arg instanceof AviatorRuntimeJavaType
+        && (val = arg.getValue(env)) instanceof AviatorFunction) {
+      return (AviatorFunction) val;
     }
     if (arg instanceof AviatorFunction) {
       return (AviatorFunction) arg;
@@ -177,7 +179,7 @@ public class FunctionUtils {
     } else if (ret instanceof AviatorObject) {
       return (AviatorObject) ret;
     } else {
-      return new AviatorRuntimeJavaType(ret);
+      return AviatorRuntimeJavaType.valueOf(ret);
     }
   }
 

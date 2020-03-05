@@ -20,7 +20,7 @@ public class RandomFunctionUnitTest {
 
   public void testCallWithOneArg() {
     RandomFunction rand = new RandomFunction();
-    AviatorObject result = rand.call(null, new AviatorRuntimeJavaType(1));
+    AviatorObject result = rand.call(null, AviatorRuntimeJavaType.valueOf(1));
     assertTrue(((Integer) result.getValue(null)) < 1);
     assertTrue(((Integer) result.getValue(null)) >= 0);
   }
@@ -30,6 +30,6 @@ public class RandomFunctionUnitTest {
   public void testCallIllegalArgument() {
     RandomFunction rand = new RandomFunction();
     AviatorObject result =
-        rand.call(null, new AviatorRuntimeJavaType(1), new AviatorRuntimeJavaType(2));
+        rand.call(null, AviatorRuntimeJavaType.valueOf(1), AviatorRuntimeJavaType.valueOf(2));
   }
 }

@@ -25,7 +25,7 @@ public class TupleFunction extends AbstractVariadicFunction {
     for (int i = 0; i < args.length; i++) {
       tuple[i] = args[i].getValue(env);
     }
-    return new AviatorRuntimeJavaType(tuple);
+    return AviatorRuntimeJavaType.valueOf(tuple);
   }
 
 }

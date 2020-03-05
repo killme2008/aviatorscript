@@ -1,0 +1,7 @@
+if(a > 100 ) {
+  "a is greater than 100."
+} elsif (a > 10) {
+  return "a is greater than 10.";
+} else {
+  return "a is less than 10.";
+}

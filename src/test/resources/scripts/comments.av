@@ -1,0 +1,11 @@
+## create a function to sum x,y and z.
+fn sum(x, ##the first argument
+    y, ##the second argument
+    z) ##the third argument
+    {
+    ## return the result
+    return x + ## a comment
+     y+ ## another comment
+     z;
+}
+sum(1,2,3)

@@ -43,6 +43,7 @@ public class ExpressionLexer {
   private char peek;
   // Char iterator for string
   private final CharacterIterator iterator;
+  private int lineNo;
   // symbol table
   private final SymbolTable symbolTable;
   // Tokens buffer
@@ -59,6 +60,7 @@ public class ExpressionLexer {
     this.symbolTable = new SymbolTable();
     this.peek = this.iterator.current();
     this.instance = instance;
+    this.lineNo = 1;
     this.mathContext = this.instance.getOptionValue(Options.MATH_CONTEXT).mathContext;
     this.parseFloatIntoDecimal =
         this.instance.getOptionValue(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL).bool;
@@ -66,6 +68,19 @@ public class ExpressionLexer {
         this.instance.getOptionValue(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL).bool;
 
   }
+
+
+
+  public SymbolTable getSymbolTable() {
+    return this.symbolTable;
+  }
+
+
+  public int getLineNo() {
+    return this.lineNo;
+  }
+
+
 
   /**
    * Push back token
@@ -127,6 +142,9 @@ public class ExpressionLexer {
 
       if (analyse) {
         if (this.peek == ' ' || this.peek == '\t' || this.peek == '\r' || this.peek == '\n') {
+          if (this.peek == '\n') {
+            this.lineNo++;
+          }
           continue;
         }
         break;
@@ -285,7 +303,16 @@ public class ExpressionLexer {
     // It is a variable
     if (this.peek == '#') {
       int startIndex = this.iterator.getIndex();
-      nextChar(); // skip $
+      nextChar(); // skip '#'
+
+      if (this.peek == '#') {
+        // ## comments
+        while (this.peek != CharacterIterator.DONE && this.peek != '\n') {
+          nextChar();
+        }
+        return this.scan(analyse);
+      }
+
       StringBuilder sb = new StringBuilder();
       while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '['
           || this.peek == ']') {
@@ -298,7 +325,7 @@ public class ExpressionLexer {
       }
       Variable variable = new Variable(lexeme, startIndex);
       variable.setQuote(true);
-      return reserverVar(lexeme, variable);
+      return this.symbolTable.reserve(variable);
     }
     if (Character.isJavaIdentifierStart(this.peek)) {
       int startIndex = this.iterator.getIndex();
@@ -309,7 +336,7 @@ public class ExpressionLexer {
       } while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.');
       String lexeme = sb.toString();
       Variable variable = new Variable(lexeme, startIndex);
-      return reserverVar(lexeme, variable);
+      return this.symbolTable.reserve(variable);
     }
 
     if (isBinaryOP(this.peek)) {
@@ -380,17 +407,6 @@ public class ExpressionLexer {
   public String getScanString() {
     return this.expression.substring(0, this.iterator.getIndex());
   }
-
-  private Token<?> reserverVar(final String lexeme, final Variable variable) {
-    // If it is a reserved word(true/false/nil/lambda)
-    if (this.symbolTable.contains(lexeme)) {
-      return this.symbolTable.getVariable(lexeme);
-    } else {
-      this.symbolTable.reserve(lexeme, variable);
-      return variable;
-    }
-  }
-
 
   private String getBigNumberLexeme(final StringBuffer sb) {
     String lexeme = sb.toString();

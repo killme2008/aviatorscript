@@ -26,10 +26,6 @@ import java.util.Map;
  */
 public class Variable extends AbstractToken<Object> {
 
-  public static final String INSTANCE_VAR = "__instance__";
-  public static final String ENV_VAR = "__env__";
-  public static final String FUNC_ARGS_VAR = "__args__";
-
   public boolean isQuote() {
     return this.quote;
   }
@@ -85,24 +81,155 @@ public class Variable extends AbstractToken<Object> {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
     }
 
   };
 
   /**
-   * End keyword
+   * end keyword
    */
   public static final Variable END = new Variable("end", -1) {
 
     @Override
     public Object getValue(final Map<String, Object> env) {
-      return false;
+      return this;
+    }
+
+  };
+
+  /**
+   * if keyword
+   */
+  public static final Variable IF = new Variable("if", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * else keyword
+   */
+  public static final Variable ELSE = new Variable("else", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
     }
 
   };
 
 
+  /**
+   * for keyword
+   */
+  public static final Variable FOR = new Variable("for", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * in keyword
+   */
+  public static final Variable IN = new Variable("in", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * return keyword
+   */
+  public static final Variable RETURN = new Variable("return", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * return keyword
+   */
+  public static final Variable BREAK = new Variable("break", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * return keyword
+   */
+  public static final Variable CONTINUE = new Variable("continue", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * let keyword
+   */
+  public static final Variable LET = new Variable("let", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * while keyword
+   */
+  public static final Variable WHILE = new Variable("while", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * fn keyword
+   */
+  public static final Variable FN = new Variable("fn", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  /**
+   * elsif keyword
+   */
+  public static final Variable ELSIF = new Variable("elsif", -1) {
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
 
   @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {

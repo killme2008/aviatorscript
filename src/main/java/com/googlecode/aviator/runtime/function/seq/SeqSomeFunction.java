@@ -1,7 +1,6 @@
 package com.googlecode.aviator.runtime.function.seq;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
 import java.util.Map;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -22,7 +21,8 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 public class SeqSomeFunction extends AbstractFunction {
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
     Object first = arg1.getValue(env);
     AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 1);
     if (fun == null) {
@@ -34,11 +34,11 @@ public class SeqSomeFunction extends AbstractFunction {
     }
     Class<?> clazz = first.getClass();
 
-    if (Collection.class.isAssignableFrom(clazz)) {
-      for (Object obj : (Collection<?>) first) {
+    if (Iterable.class.isAssignableFrom(clazz)) {
+      for (Object obj : (Iterable<?>) first) {
         // return first fun returns true element.
-        if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
-          return new AviatorRuntimeJavaType(obj);
+        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
+          return AviatorRuntimeJavaType.valueOf(obj);
         }
       }
     } else if (clazz.isArray()) {
@@ -46,8 +46,8 @@ public class SeqSomeFunction extends AbstractFunction {
       for (int i = 0; i < length; i++) {
         Object obj = Array.get(first, i);
         // return first fun returns true element.
-        if (fun.call(env, new AviatorRuntimeJavaType(obj)).booleanValue(env)) {
-          return new AviatorRuntimeJavaType(obj);
+        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
+          return AviatorRuntimeJavaType.valueOf(obj);
         }
       }
     } else {

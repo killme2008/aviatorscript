@@ -17,6 +17,10 @@
 package com.googlecode.aviator;
 
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -41,11 +45,18 @@ import com.googlecode.aviator.code.OptimizeCodeGenerator;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
+import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
+import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -56,6 +67,7 @@ import com.googlecode.aviator.runtime.function.math.MathSinFunction;
 import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqArrayFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
 import com.googlecode.aviator.runtime.function.seq.SeqContainsKeyFunction;
@@ -73,6 +85,7 @@ import com.googlecode.aviator.runtime.function.seq.SeqNewListFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewSetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqPutFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqRemoveFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
@@ -87,8 +100,10 @@ import com.googlecode.aviator.runtime.function.string.StringReplaceFirstFunction
 import com.googlecode.aviator.runtime.function.string.StringSplitFunction;
 import com.googlecode.aviator.runtime.function.string.StringStartsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringSubStringFunction;
+import com.googlecode.aviator.runtime.function.system.AssertFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;
 import com.googlecode.aviator.runtime.function.system.BooleanFunction;
+import com.googlecode.aviator.runtime.function.system.CompareFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.IdentityFunction;
@@ -99,6 +114,7 @@ import com.googlecode.aviator.runtime.function.system.NowFunction;
 import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
+import com.googlecode.aviator.runtime.function.system.RangeFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
@@ -106,6 +122,8 @@ import com.googlecode.aviator.runtime.function.system.TupleFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
+import com.googlecode.aviator.utils.Constants;
+import com.googlecode.aviator.utils.Reflector;
 
 
 /**
@@ -150,6 +168,35 @@ public final class AviatorEvaluatorInstance {
       this.functionLoaders = new ArrayList<FunctionLoader>();
     }
     this.functionLoaders.add(loader);
+  }
+
+  /**
+   * Compile a script file into expression.
+   *
+   * @param file the script file path
+   * @param cached whether to cached the compiled result
+   * @return
+   */
+  public Expression compileScript(final String path, final boolean cached) throws IOException {
+    File file = new File(path);
+    try (FileReader fr = new FileReader(file); BufferedReader reader = new BufferedReader(fr)) {
+      StringBuilder script = new StringBuilder();
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        script.append(line).append(Constants.NEWLINE);
+      }
+      return compile(script.toString(), cached);
+    }
+  }
+
+  /**
+   * Compile a script file into expression, it doesn't cache the compiled result.
+   *
+   * @param file the script file path
+   * @return
+   */
+  public Expression compileScript(final String path) throws IOException {
+    return this.compileScript(path, false);
   }
 
 
@@ -479,6 +526,7 @@ public final class AviatorEvaluatorInstance {
   private void loadLib() {
     // Load internal functions
     // load sys lib
+    addFunction(new CompareFunction());
     addFunction(new SysDateFunction());
     addFunction(new PrintlnFunction());
     addFunction(new PrintFunction());
@@ -505,6 +553,14 @@ public final class AviatorEvaluatorInstance {
     addFunction(new MinFunction());
     addFunction(new MaxFunction());
     addFunction(new IdentityFunction());
+    addFunction(new AssertFunction());
+    addFunction(new RangeFunction());
+    // for-loop and if statement supporting
+    addFunction(new ReducerFunction());
+    addFunction(new ReducerReturnFunction());
+    addFunction(new ReducerContFunction());
+    addFunction(new ReducerBreakFunction());
+    addFunction(new IfCallccFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());
@@ -531,12 +587,14 @@ public final class AviatorEvaluatorInstance {
 
     // seq lib
     addFunction(new SeqNewArrayFunction());
+    addFunction(new SeqArrayFunction());
     addFunction(new SeqNewListFunction());
     addFunction(new SeqNewMapFunction());
     addFunction(new SeqNewSetFunction());
     addFunction(new SeqAddFunction());
     addFunction(new SeqRemoveFunction());
     addFunction(new SeqGetFunction());
+    addFunction(new SeqPutFunction());
     addFunction(new SeqMinFunction());
     addFunction(new SeqMaxFunction());
     addFunction(new SeqMapFunction());
@@ -682,14 +740,23 @@ public final class AviatorEvaluatorInstance {
     return (AviatorFunction) this.funcMap.remove(name);
   }
 
+  /**
+   * @see #getFunction(String, SymbolTable)
+   * @param name
+   * @return
+   */
+  public AviatorFunction getFunction(final String name) {
+    return this.getFunction(name, null);
+  }
 
   /**
    * Retrieve an aviator function by name,throw exception if not found or null.It's not thread-safe.
    *
    * @param name
+   * @param symbolTablee
    * @return
    */
-  public AviatorFunction getFunction(final String name) {
+  public AviatorFunction getFunction(final String name, final SymbolTable symbolTable) {
     AviatorFunction function = (AviatorFunction) this.funcMap.get(name);
     if (function == null && this.functionLoaders != null) {
       for (FunctionLoader loader : this.functionLoaders) {
@@ -703,7 +770,7 @@ public final class AviatorEvaluatorInstance {
     }
     if (function == null) {
       // Returns a delegate function that will try to find the function from runtime env.
-      function = new RuntimeFunctionDelegator(name, this.functionMissing);
+      function = new RuntimeFunctionDelegator(name, symbolTable, this.functionMissing);
     }
     return function;
   }
@@ -843,9 +910,14 @@ public final class AviatorEvaluatorInstance {
       final FutureTask<Expression> task) {
     try {
       return task.get();
-    } catch (Exception e) {
+    } catch (Throwable t) {
       this.cacheExpressions.remove(expression);
-      throw new CompileExpressionErrorException("Compile expression failure:" + expression, e);
+      final Throwable cause = t.getCause();
+      if (cause instanceof ExpressionSyntaxErrorException
+          || cause instanceof CompileExpressionErrorException) {
+        Reflector.sneakyThrow(cause);
+      }
+      throw new CompileExpressionErrorException("Compile expression failure:" + expression, t);
     }
   }
 

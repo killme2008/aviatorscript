@@ -1,0 +1,8 @@
+i = 0;
+while(true) {
+  i = i +1;
+  if i>=10 {
+    return i;
+  }
+}
+j.fail();

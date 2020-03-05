@@ -55,19 +55,19 @@ public class AviatorStringUnitTest {
   public void testAddJavaType() {
     final AviatorString s = new AviatorString("hello ");
     AviatorJavaType javaType = new AviatorJavaType("s");
-    assertEquals("hello world", s.add(javaType, this.createEnvWith("s", "world")).getValue(null));
+    assertEquals("hello world", s.add(javaType, createEnvWith("s", "world")).getValue(null));
 
     javaType = new AviatorJavaType("true");
-    assertEquals("hello true", s.add(javaType, this.createEnvWith(null, null)).getValue(null));
+    assertEquals("hello true", s.add(javaType, createEnvWith(null, null)).getValue(null));
 
     javaType = new AviatorJavaType("a");
-    assertEquals("hello 400", s.add(javaType, this.createEnvWith("a", 400)).getValue(null));
+    assertEquals("hello 400", s.add(javaType, createEnvWith("a", 400)).getValue(null));
 
     javaType = new AviatorJavaType("a");
-    assertEquals("hello 3.4", s.add(javaType, this.createEnvWith("a", 3.4f)).getValue(null));
+    assertEquals("hello 3.4", s.add(javaType, createEnvWith("a", 3.4f)).getValue(null));
   }
 
-  private Map<String, Object> createEnvWith(String name, Object obj) {
+  private Map<String, Object> createEnvWith(final String name, final Object obj) {
     final Map<String, Object> env = new HashMap<String, Object>();
     if (name != null) {
       env.put(name, obj);
@@ -111,13 +111,13 @@ public class AviatorStringUnitTest {
     assertTrue(s.compare(js, env) < 0);
     assertTrue(js.compare(s, env) > 0);
 
-    AviatorRuntimeJavaType jr = new AviatorRuntimeJavaType("a");
+    AviatorObject jr = AviatorRuntimeJavaType.valueOf("a");
     assertTrue(s.compare(jr, env) < 0);
     assertTrue(jr.compare(s, env) > 0);
 
     // both null
     assertTrue(s.compare(js, null) == 0);
-    assertTrue(s.compare(new AviatorRuntimeJavaType(null), null) == 0);
+    assertTrue(s.compare(AviatorRuntimeJavaType.valueOf(null), null) == 0);
   }
 
   @Test
@@ -125,22 +125,22 @@ public class AviatorStringUnitTest {
     final AviatorString s = new AviatorString("hello ");
     assertEquals("hello ", s.getLexeme());
     AviatorJavaType n = new AviatorJavaType("s");
-    assertTrue(s.compare(n, this.createEnvWith("s", "world")) < 0);
-    assertEquals(0, s.compare(s, this.createEnvWith("s", "world")));
+    assertTrue(s.compare(n, createEnvWith("s", "world")) < 0);
+    assertEquals(0, s.compare(s, createEnvWith("s", "world")));
 
     n = new AviatorJavaType("s");
-    assertFalse(s.compare(n, this.createEnvWith("s", "awt")) < 0);
+    assertFalse(s.compare(n, createEnvWith("s", "awt")) < 0);
   }
 
   @Test
   public void testCompareJavaChar() {
     final AviatorString s = new AviatorString("hello ");
     AviatorJavaType n = new AviatorJavaType("s");
-    assertTrue(s.compare(n, this.createEnvWith("s", 'w')) < 0);
-    assertEquals(0, s.compare(s, this.createEnvWith("s", 'w')));
+    assertTrue(s.compare(n, createEnvWith("s", 'w')) < 0);
+    assertEquals(0, s.compare(s, createEnvWith("s", 'w')));
 
     n = new AviatorJavaType("s");
-    assertFalse(s.compare(n, this.createEnvWith("s", 'a')) < 0);
+    assertFalse(s.compare(n, createEnvWith("s", 'a')) < 0);
   }
 
   @Test(expected = ExpressionRuntimeException.class)
@@ -168,7 +168,7 @@ public class AviatorStringUnitTest {
   public void testCompareJavaNumber() {
     final AviatorString s = new AviatorString("hello ");
     final AviatorJavaType n = new AviatorJavaType("f");
-    s.compare(n, this.createEnvWith("f", 3.4f));
+    s.compare(n, createEnvWith("f", 3.4f));
   }
 
   @Test(expected = ExpressionRuntimeException.class)

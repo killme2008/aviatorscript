@@ -49,9 +49,20 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
     return new AviatorRuntimeJavaType(object);
   }
 
+  /**
+   * Deprecated since 5.0.0, please use {@link AviatorRuntimeJavaType#valueOf(Object)} instead.
+   *
+   * @deprecated
+   * @param object
+   */
+  @Deprecated
   public AviatorRuntimeJavaType(final Object object) {
-    super(TEMP_VAR_GEN.get().gen());
+    super(genName());
     this.object = object;
+  }
+
+  public static String genName() {
+    return TEMP_VAR_GEN.get().gen();
   }
 
 

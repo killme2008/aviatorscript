@@ -32,19 +32,19 @@ public class LiteralExpression extends BaseExpression {
   private final Object result;
 
 
-  public LiteralExpression(AviatorEvaluatorInstance instance, Object result,
-      List<String> varNames) {
-    super(instance, varNames);
+  public LiteralExpression(final AviatorEvaluatorInstance instance, final Object result,
+      final List<String> varNames) {
+    super(instance, varNames, null);
     this.result = result;
   }
 
 
   @Override
-  public Object execute(Map<String, Object> map) {
+  public Object execute(final Map<String, Object> map) {
     Env env = genTopEnv(map);
     if (RuntimeUtils.isTracedEval(env)) {
-      RuntimeUtils.printTrace(env, "Tracing: " + this.getExpression());
-      RuntimeUtils.printTrace(env, "Result : " + this.getExpression());
+      RuntimeUtils.printlnTrace(env, "Tracing: " + getExpression());
+      RuntimeUtils.printlnTrace(env, "Result : " + getExpression());
     }
     return this.result;
   }

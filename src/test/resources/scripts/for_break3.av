@@ -1,0 +1,10 @@
+let y = 0;
+for x in range(0, a) {
+  if(x > 3) {
+     break;
+  } else {
+     y = x;
+  }
+  y = y * y;
+}
+return y;

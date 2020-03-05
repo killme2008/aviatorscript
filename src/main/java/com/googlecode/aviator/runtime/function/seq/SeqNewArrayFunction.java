@@ -1,48 +1,37 @@
 package com.googlecode.aviator.runtime.function.seq;
 
 import java.lang.reflect.Array;
-import java.util.HashMap;
 import java.util.Map;
-import com.googlecode.aviator.runtime.function.AbstractVariadicFunction;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorType;
 import com.googlecode.aviator.utils.Reflector;
+import com.googlecode.aviator.utils.TypeUtils;
 
 /**
- * seq.array function to create a new array.
+ * seq.array_of function to create a new array of special type and size.
  *
- * @author boyan(boyan@antfin.com)
+ * @author dennis(killme2008@gmail.com)
  * @since 4.2.4
  *
  */
-public class SeqNewArrayFunction extends AbstractVariadicFunction {
+public class SeqNewArrayFunction extends AbstractFunction {
   @Override
   public String getName() {
-    return "seq.array";
+    return "seq.array_of";
   }
 
-  private static final Map<String, Class<?>> PRIMITIVE_TYPES = new HashMap<>();
-  static {
-    PRIMITIVE_TYPES.put("int", Integer.TYPE);
-    PRIMITIVE_TYPES.put("long", Long.TYPE);
-    PRIMITIVE_TYPES.put("double", Double.TYPE);
-    PRIMITIVE_TYPES.put("float", Float.TYPE);
-    PRIMITIVE_TYPES.put("bool", Boolean.TYPE);
-    PRIMITIVE_TYPES.put("char", Character.TYPE);
-    PRIMITIVE_TYPES.put("byte", Byte.TYPE);
-    PRIMITIVE_TYPES.put("void", Void.TYPE);
-    PRIMITIVE_TYPES.put("short", Short.TYPE);
-  }
+
 
   @Override
-  public AviatorObject variadicCall(final Map<String, Object> env, final AviatorObject... args) {
-    if (args == null || args.length == 0) {
-      throw new IllegalArgumentException("Missing arguments for seq.array");
-    }
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
 
-    AviatorObject clazzVar = args[0];
+    AviatorObject clazzVar = arg1;
+    Number len = FunctionUtils.getNumberValue(arg2, env);
 
 
     if (clazzVar == null || clazzVar.getAviatorType() != AviatorType.JavaType) {
@@ -50,25 +39,20 @@ public class SeqNewArrayFunction extends AbstractVariadicFunction {
           "Invalid class:" + (clazzVar == null ? "null" : clazzVar.desc(env)));
     }
 
-
     try {
       String name = ((AviatorJavaType) clazzVar).getName();
       Class<?> clazz = null;
-      if (PRIMITIVE_TYPES.containsKey(name)) {
-        clazz = PRIMITIVE_TYPES.get(name);
+      if (TypeUtils.PRIMITIVE_TYPES.containsKey(name)) {
+        clazz = TypeUtils.PRIMITIVE_TYPES.get(name);
       } else {
         clazz = Class.forName(name);
       }
-      Object ret = Array.newInstance(clazz, args.length - 1);
-
-      for (int i = 1; i < args.length; i++) {
-        Array.set(ret, i - 1, Reflector.boxArg(clazz, args[i].getValue(env)));
-      }
-
-      return new AviatorRuntimeJavaType(ret);
+      return AviatorRuntimeJavaType.valueOf(Array.newInstance(clazz, len.intValue()));
     } catch (Throwable t) {
       throw Reflector.sneakyThrow(t);
     }
   }
 
 }
+
+

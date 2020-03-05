@@ -1,26 +1,22 @@
 package com.googlecode.aviator;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
 
 public class SimpleELPerformanceTest extends TestCase {
   public void test_perf() throws Exception {
 
-    Map<String, Object> ctx = new HashMap<String, Object>();
-    ctx.put("a", 1001);
-    ctx.put("b", 4);
-    ctx.put("c", 5);
-
     // AviatorEvaluator.setTrace(true);
     for (int i = 0; i < 10; ++i) {
-      perf(ctx);
+      perf();
     }
   }
 
-  private void perf(final Map<String, Object> ctx) {
+  private void perf() {
     Expression exp = AviatorEvaluator.compile("(a+b+100)*c*100");
+    Map<String, Object> ctx = exp.newEnv("a", 1001, "b", 4, "c", 5);
+
     long startMillis = System.currentTimeMillis();
 
     final int COUNT = 10000 * 1000;

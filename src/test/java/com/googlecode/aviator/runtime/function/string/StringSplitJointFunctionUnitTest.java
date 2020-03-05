@@ -26,9 +26,9 @@ public class StringSplitJointFunctionUnitTest {
     assertArrayEquals(new String[] {"a", "b", "c", "d", "e", "f", "g"}, tmps);
 
     assertEquals("a b c d e f g", (String) joinFn
-        .call(null, new AviatorRuntimeJavaType(tmps), new AviatorString(" ")).getValue(null));
+        .call(null, AviatorRuntimeJavaType.valueOf(tmps), new AviatorString(" ")).getValue(null));
     assertEquals("abcdefg",
-        (String) joinFn.call(null, new AviatorRuntimeJavaType(tmps)).getValue(null));
+        (String) joinFn.call(null, AviatorRuntimeJavaType.valueOf(tmps)).getValue(null));
   }
 
 
@@ -40,7 +40,7 @@ public class StringSplitJointFunctionUnitTest {
     list.add("world");
     list.add("aviator");
     assertEquals("hello world aviator", (String) joinFn
-        .call(null, new AviatorRuntimeJavaType(list), new AviatorString(" ")).getValue(null));
+        .call(null, AviatorRuntimeJavaType.valueOf(list), new AviatorString(" ")).getValue(null));
   }
 
 }

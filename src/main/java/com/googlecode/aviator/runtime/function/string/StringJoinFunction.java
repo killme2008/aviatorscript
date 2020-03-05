@@ -12,9 +12,9 @@ import com.googlecode.aviator.runtime.type.AviatorString;
 
 /**
  * string.join function
- * 
- * @author boyan
- * 
+ *
+ * @author dennis(killme2008@gmail.com)
+ *
  */
 public class StringJoinFunction extends AbstractFunction {
   @Override
@@ -24,29 +24,32 @@ public class StringJoinFunction extends AbstractFunction {
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
     Object target = arg1.getValue(env);
-    if (target == null)
+    if (target == null) {
       throw new ExpressionRuntimeException("Could not replace with null string");
+    }
     return join(env, arg1, target, "");
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
     Object target = arg1.getValue(env);
     String split = FunctionUtils.getStringValue(arg2, env);
-    if (target == null)
+    if (target == null) {
       throw new ExpressionRuntimeException("Could not replace with null string");
+    }
     return join(env, arg1, target, split);
   }
 
 
-  private AviatorObject join(Map<String, Object> env, AviatorObject arg1, Object target,
-      String split) {
+  private AviatorObject join(final Map<String, Object> env, final AviatorObject arg1,
+      final Object target, final String split) {
     Class<?> clazz = target.getClass();
 
-    StringBuffer sb = new StringBuffer(50);
+    StringBuilder sb = new StringBuilder(50);
     if (Collection.class.isAssignableFrom(clazz)) {
       boolean wasFirst = true;
       for (Object obj : (Collection<?>) target) {
@@ -66,7 +69,8 @@ public class StringJoinFunction extends AbstractFunction {
   }
 
 
-  private boolean append(StringBuffer sb, String split, boolean wasFirst, Object obj) {
+  private boolean append(final StringBuilder sb, final String split, boolean wasFirst,
+      final Object obj) {
     String str = obj == null ? "null" : obj.toString();
     if (wasFirst) {
       sb.append(str);

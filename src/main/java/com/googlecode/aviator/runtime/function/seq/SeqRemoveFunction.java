@@ -21,7 +21,8 @@ public class SeqRemoveFunction extends AbstractFunction {
 
   @SuppressWarnings("rawtypes")
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
 
     Object coll = arg1.getValue(env);
     Object element = arg2.getValue(env);

@@ -66,8 +66,8 @@ public class PrintFunctionUnitTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCall_WithFourArgument() throws Exception {
-    this.fun.call(null, new AviatorRuntimeJavaType(0), new AviatorRuntimeJavaType(0),
-        new AviatorRuntimeJavaType(0), new AviatorRuntimeJavaType(0));
+    this.fun.call(null, AviatorRuntimeJavaType.valueOf(0), AviatorRuntimeJavaType.valueOf(0),
+        AviatorRuntimeJavaType.valueOf(0), AviatorRuntimeJavaType.valueOf(0));
 
   }
 

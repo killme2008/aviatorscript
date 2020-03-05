@@ -1,0 +1,9 @@
+if( 3> 1 ? true: false) {
+ 	j.assertTrue(true);
+ 	1
+}else {
+ 	j.fail();
+ 	2
+}
+
+5

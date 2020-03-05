@@ -15,11 +15,9 @@
  **/
 package com.googlecode.aviator.code;
 
-import java.util.List;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.Parser;
-import com.googlecode.aviator.runtime.FunctionArgument;
 
 
 /**
@@ -119,7 +117,7 @@ public interface CodeGenerator {
 
   public void onNeg(Token<?> lookhead);
 
-  public Expression getResult();
+  public Expression getResult(boolean unboxObject);
 
   public void onConstant(Token<?> lookhead);
 
@@ -127,7 +125,7 @@ public interface CodeGenerator {
 
   public void onMethodParameter(Token<?> lookhead);
 
-  public void onMethodInvoke(Token<?> lookhead, List<FunctionArgument> params);
+  public void onMethodInvoke(Token<?> lookhead);
 
   public void onLambdaDefineStart(Token<?> lookhead);
 
@@ -142,5 +140,4 @@ public interface CodeGenerator {
   public void onArrayIndexStart(Token<?> token);
 
   public void onArrayIndexEnd(Token<?> lookhead);
-
 }

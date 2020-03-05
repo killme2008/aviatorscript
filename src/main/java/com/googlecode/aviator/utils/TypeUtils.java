@@ -18,6 +18,7 @@ package com.googlecode.aviator.utils;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.HashMap;
 import java.util.Map;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 
@@ -25,41 +26,41 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
 /**
  * Java type to aviator type utilities
  *
- * @author boyan
+ * @author dennis(killme2008@gmail.com)
  *
  */
 public class TypeUtils {
 
-  public static final boolean isBigInt(Object value) {
+  public static final boolean isBigInt(final Object value) {
     return value instanceof BigInteger;
   }
 
 
-  public static final boolean isDecimal(Object value) {
+  public static final boolean isDecimal(final Object value) {
     return value instanceof BigDecimal;
   }
 
 
-  public static final boolean isLong(Object value) {
+  public static final boolean isLong(final Object value) {
     return value instanceof Integer || value instanceof Long || value instanceof Byte
         || value instanceof Short;
   }
 
 
-  public static final boolean isDouble(Object value) {
+  public static final boolean isDouble(final Object value) {
     return value instanceof Float || value instanceof Double;
 
   }
 
 
-  public static final boolean isString(Object value) {
+  public static final boolean isString(final Object value) {
     return value instanceof String || value instanceof Character;
   }
 
   public static long NEWTON_METHOD_REPEATS = 10000;
 
 
-  public static int comapreLong(long x, long y) {
+  public static int comapreLong(final long x, final long y) {
     if (x > y) {
       return 1;
     } else if (x < y) {
@@ -76,7 +77,7 @@ public class TypeUtils {
    * @param x
    * @return
    */
-  public static BigDecimal ln(Map<String, Object> env, BigDecimal x) {
+  public static BigDecimal ln(final Map<String, Object> env, BigDecimal x) {
     if (x.equals(BigDecimal.ONE)) {
       return BigDecimal.ZERO;
     }
@@ -96,6 +97,21 @@ public class TypeUtils {
 
     ret = x.divide(ret, mathContext);
     return ret;
+  }
+
+  public static final Map<String, Class<?>> PRIMITIVE_TYPES = new HashMap<>();
+
+
+  static {
+    TypeUtils.PRIMITIVE_TYPES.put("int", Integer.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("long", Long.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("double", Double.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("float", Float.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("bool", Boolean.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("char", Character.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("byte", Byte.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("void", Void.TYPE);
+    TypeUtils.PRIMITIVE_TYPES.put("short", Short.TYPE);
   }
 
 }

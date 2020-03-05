@@ -29,7 +29,7 @@ public class SeqNewListFunction extends AbstractVariadicFunction {
       list.add(obj.getValue(env));
     }
 
-    return new AviatorRuntimeJavaType(list);
+    return AviatorRuntimeJavaType.valueOf(list);
   }
 
 

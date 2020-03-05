@@ -24,8 +24,11 @@ import java.util.regex.Pattern;
 import org.apache.commons.beanutils.PropertyUtils;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
+import com.googlecode.aviator.utils.Constants;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -36,7 +39,8 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class AviatorJavaType extends AviatorObject {
 
-  private final String name;
+  private String name;
+  private final boolean containsDot;
 
   @Override
   public AviatorType getAviatorType() {
@@ -48,8 +52,49 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   public AviatorJavaType(final String name) {
+    this(name, null);
+  }
+
+  public AviatorJavaType(final String name, final SymbolTable symbolTable) {
     super();
-    this.name = name;
+    String rName = reserveName(name);
+    if (rName != null) {
+      this.name = rName;
+    } else {
+      if (symbolTable != null) {
+        this.name = symbolTable.reserve(name).getLexeme();
+      } else {
+        this.name = name;
+      }
+    }
+    this.containsDot = this.name.contains(".");
+  }
+
+  /**
+   * Reserved special var names, return null if not successes.
+   *
+   * @param name
+   * @return
+   */
+  private static String reserveName(final String name) {
+    if (Constants.ENV_VAR.equals(name)) {
+      return Constants.ENV_VAR;
+    } else if (Constants.ReducerEmptyVal.getLexeme().equals(name)) {
+      return Constants.ReducerEmptyVal.getLexeme();
+    } else if (Constants.FUNC_ARGS_VAR.equals(name)) {
+      return Constants.FUNC_ARGS_VAR;
+    } else if (Constants.REDUCER_LOOP_VAR.equals(name)) {
+      return Constants.REDUCER_LOOP_VAR;
+    } else if (Constants.INSTANCE_VAR.equals(name)) {
+      return Constants.INSTANCE_VAR;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public AviatorObject deref(final Map<String, Object> env) {
+    return AviatorRuntimeJavaType.valueOf(getValue(env));
   }
 
   @Override
@@ -247,13 +292,13 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public Object getValue(final Map<String, Object> env) {
-    return getValueFromEnv(this.name, env, true);
+    return getValueFromEnv(this.name, this.containsDot, env, true);
   }
 
-  public static Object getValueFromEnv(final String name, final Map<String, Object> env,
-      final boolean throwExceptionNotFound) {
+  public static Object getValueFromEnv(final String name, final boolean nameContainsDot,
+      final Map<String, Object> env, final boolean throwExceptionNotFound) {
     if (env != null) {
-      if (name.contains(".") && RuntimeUtils.getInstance(env)
+      if (nameContainsDot && RuntimeUtils.getInstance(env)
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
         return getProperty(name, env, throwExceptionNotFound);
       }
@@ -262,18 +307,41 @@ public class AviatorJavaType extends AviatorObject {
     return null;
   }
 
+
+  @Override
+  public AviatorObject defineValue(final AviatorObject value, final Map<String, Object> env) {
+    if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
+      throw new ExpressionRuntimeException("Disabled variable assignment.");
+    }
+    if (this.containsDot) {
+      return setProperty(value, env);
+    }
+
+    Object v = getAssignedValue(value, env);
+    ((Env) env).override(this.name, v);
+    return AviatorRuntimeJavaType.valueOf(v);
+  }
+
+  private Object getAssignedValue(final AviatorObject value, final Map<String, Object> env) {
+    Object v = value.getValue(env);
+    if (v instanceof AviatorObject) {
+      v = ((AviatorObject) v).deref(env);
+    }
+    return v;
+  }
+
   @Override
   public AviatorObject setValue(final AviatorObject value, final Map<String, Object> env) {
     if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
       throw new ExpressionRuntimeException("Disabled variable assignment.");
     }
-    if (this.name.contains(".")) {
+    if (this.containsDot) {
       return setProperty(value, env);
     }
 
-    Object v = value.getValue(env);
+    Object v = getAssignedValue(value, env);
     env.put(this.name, v);
-    return new AviatorRuntimeJavaType(v);
+    return AviatorRuntimeJavaType.valueOf(v);
   }
 
   private AviatorObject setProperty(final AviatorObject value, final Map<String, Object> env) {
@@ -287,7 +355,7 @@ public class AviatorJavaType extends AviatorObject {
         }
         throw new ExpressionRuntimeException("Can't assign value to " + this.name, t);
       }
-      return new AviatorRuntimeJavaType(v);
+      return AviatorRuntimeJavaType.valueOf(v);
     } else {
       throw new ExpressionRuntimeException("Can't assign value to " + this.name
           + ", Options.ENABLE_PROPERTY_SYNTAX_SUGAR is disabled.");
@@ -304,7 +372,8 @@ public class AviatorJavaType extends AviatorObject {
       Map<String, Object> innerEnv = env;
       for (int i = 0; i < names.length; i++) {
         // Fast path for nested map.
-        Object val = innerEnv.get(names[i]);
+        String rName = reserveName(names[i]);
+        Object val = innerEnv.get(rName != null ? rName : names[i]);
 
         if (i == names.length - 1) {
           return val;
@@ -518,11 +587,11 @@ public class AviatorJavaType extends AviatorObject {
     Object thisValue = getValue(env);
     if (!thisValue.getClass().isArray() && !(thisValue instanceof List)) {
       throw new ExpressionRuntimeException(
-          desc(env) + " is not a array or list,could not use [] to get element");
+          desc(env) + " is not an array or list,could not use [] to get element");
     }
     Object indexValue = indexObject.getValue(env);
     if (!isInteger(indexValue)) {
-      throw new IllegalArgumentException("Illegal index " + indexObject.desc(env));
+      throw new IllegalArgumentException("Illegal index: " + indexObject.desc(env));
     }
     int index = ((Number) indexValue).intValue();
     if (thisValue.getClass().isArray()) {
@@ -542,6 +611,7 @@ public class AviatorJavaType extends AviatorObject {
   @Override
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     final Object value = getValue(env);
+    Object otherValue;
     if (value instanceof Number) {
       AviatorNumber aviatorNumber = AviatorNumber.valueOf(value);
       return aviatorNumber.add(other, env);
@@ -550,6 +620,8 @@ public class AviatorJavaType extends AviatorObject {
       return aviatorString.add(other, env);
     } else if (value instanceof Boolean) {
       return AviatorBoolean.valueOf((Boolean) value).add(other, env);
+    } else if (value == null && (otherValue = other.getValue(env)) instanceof CharSequence) {
+      return new AviatorString("null" + otherValue);
     } else {
       return super.add(other, env);
     }

@@ -1,0 +1,23 @@
+fn swap(data,i,j) {
+  let temp = data[i];
+  data[i] = data[j];
+  data[j] = temp;
+}
+fn selection_sort(data) {
+   let len = count(data);
+   for i in range(0, len) {
+     let min = i;
+     for j in range(i+1, len) {
+        if data[j] < data[min] {
+           min = j;
+        }         
+     }
+     swap(data, i, min);
+   }
+   return data;
+}
+j.assertNull(len);
+j.assertNull(min);
+j.assertNull(data);
+
+selection_sort(a)

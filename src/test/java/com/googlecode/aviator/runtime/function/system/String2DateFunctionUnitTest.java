@@ -17,7 +17,7 @@ public class String2DateFunctionUnitTest {
     assertEquals("string_to_date", function.getName());
     String source = "2011-09-17";
     Date date = (Date) function
-        .call(null, new AviatorRuntimeJavaType(source), new AviatorString("yyyy-MM-dd"))
+        .call(null, AviatorRuntimeJavaType.valueOf(source), new AviatorString("yyyy-MM-dd"))
         .getValue(null);
 
     assertNotNull(date);
@@ -31,6 +31,6 @@ public class String2DateFunctionUnitTest {
   @Test(expected = ClassCastException.class)
   public void testCall_NotDate() {
     assertEquals("string_to_date", function.getName());
-    function.call(null, new AviatorRuntimeJavaType(1), new AviatorString("yyyyMMdd"));
+    function.call(null, AviatorRuntimeJavaType.valueOf(1), new AviatorString("yyyyMMdd"));
   }
 }

@@ -15,11 +15,14 @@
  **/
 package com.googlecode.aviator.lexer.token;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Base token class
- * 
+ *
  * @author dennis
- * 
+ *
  * @param <T>
  */
 public abstract class AbstractToken<T> implements Token<T> {
@@ -27,9 +30,44 @@ public abstract class AbstractToken<T> implements Token<T> {
   private final int startIndex;
 
   protected final String lexeme;
+  private Map<String, Object> metaMap;
 
 
-  public AbstractToken(int startIndex, String lexeme) {
+  @Override
+  public Map<String, Object> getMetaMap() {
+    return this.metaMap;
+  }
+
+
+  public void setMetaMap(final Map<String, Object> metaMap) {
+    this.metaMap = metaMap;
+  }
+
+
+  @Override
+  public Token<T> withMeta(final String name, final Object v) {
+    if (this.metaMap == null) {
+      this.metaMap = new HashMap<String, Object>();
+    }
+    this.metaMap.put(name, v);
+    return this;
+  }
+
+
+  @Override
+  public <V> V getMeta(final String name, final V defaultVal) {
+    if (this.metaMap == null) {
+      return defaultVal;
+    }
+    V val = (V) this.metaMap.get(name);
+    if (val == null) {
+      return defaultVal;
+    }
+    return val;
+  }
+
+
+  public AbstractToken(final int startIndex, final String lexeme) {
     super();
     this.startIndex = startIndex;
     this.lexeme = lexeme;
@@ -50,7 +88,7 @@ public abstract class AbstractToken<T> implements Token<T> {
 
   @Override
   public String toString() {
-    return "[type='" + getType().name() + "',lexeme='" + getLexeme() + "',index=" + startIndex
+    return "[type='" + getType().name() + "',lexeme='" + getLexeme() + "',index=" + this.startIndex
         + "]";
   }
 
@@ -59,14 +97,14 @@ public abstract class AbstractToken<T> implements Token<T> {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((lexeme == null) ? 0 : lexeme.hashCode());
-    result = prime * result + startIndex;
+    result = prime * result + ((this.lexeme == null) ? 0 : this.lexeme.hashCode());
+    result = prime * result + this.startIndex;
     return result;
   }
 
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
@@ -77,14 +115,14 @@ public abstract class AbstractToken<T> implements Token<T> {
       return false;
     }
     AbstractToken<?> other = (AbstractToken<?>) obj;
-    if (lexeme == null) {
+    if (this.lexeme == null) {
       if (other.lexeme != null) {
         return false;
       }
-    } else if (!lexeme.equals(other.lexeme)) {
+    } else if (!this.lexeme.equals(other.lexeme)) {
       return false;
     }
-    if (startIndex != other.startIndex) {
+    if (this.startIndex != other.startIndex) {
       return false;
     }
     return true;

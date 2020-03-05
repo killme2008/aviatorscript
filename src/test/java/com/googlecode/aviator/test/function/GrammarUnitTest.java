@@ -33,7 +33,6 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
-import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -60,6 +59,23 @@ public class GrammarUnitTest {
     } catch (ExpressionSyntaxErrorException e) {
 
     }
+  }
+
+  @Test
+  public void testIssue200() {
+    AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, true);
+    try {
+      assertEquals("nullabc", AviatorEvaluator.execute("a.b.c + 'abc'"));
+    } finally {
+      AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, false);
+    }
+  }
+
+  @Test
+  public void testComments() {
+    assertEquals(7, AviatorEvaluator.execute("a=3;a ## a variable\n+4"));
+    assertEquals(15,
+        AviatorEvaluator.execute("##single comments\r\n   7+8\r\n## another comments"));
   }
 
   @Test
@@ -1048,12 +1064,12 @@ public class GrammarUnitTest {
     assertEquals("d", AviatorEvaluator.exec("(string.split(s,','))[3]", "a,b,c,d"));
   }
 
-  @Test(expected = CompileExpressionErrorException.class)
+  @Test(expected = ExpressionSyntaxErrorException.class)
   public void testIllegalArrayIndexAccessWithMethod1() {
     AviatorEvaluator.exec("string.split('a,b,c,d',',')[0");
   }
 
-  @Test(expected = CompileExpressionErrorException.class)
+  @Test(expected = ExpressionSyntaxErrorException.class)
   public void testIllegalArrayIndexAccessWithMethod2() {
     AviatorEvaluator.exec("string.split('a,b,c,d',','[0]");
   }

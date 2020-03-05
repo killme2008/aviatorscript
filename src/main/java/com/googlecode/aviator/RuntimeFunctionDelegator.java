@@ -2,6 +2,7 @@ package com.googlecode.aviator;
 
 import java.util.Map;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.function.system.ConstantFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -276,11 +277,18 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
   }
 
   private final String name;
+  private final boolean containsDot;
 
   private final FunctionMissing functionMissing;
 
-  RuntimeFunctionDelegator(final String name, final FunctionMissing functionMissing) {
-    this.name = name;
+  RuntimeFunctionDelegator(final String name, final SymbolTable symbolTable,
+      final FunctionMissing functionMissing) {
+    if (symbolTable != null) {
+      this.name = symbolTable.reserve(name).getLexeme();
+    } else {
+      this.name = name;
+    }
+    this.containsDot = this.name.contains(".");
     this.functionMissing = functionMissing;
   }
 
@@ -290,7 +298,7 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
   }
 
   private AviatorFunction getFunc(final Map<String, Object> env, final AviatorObject... args) {
-    Object val = AviatorJavaType.getValueFromEnv(this.name, env, false);
+    Object val = AviatorJavaType.getValueFromEnv(this.name, this.containsDot, env, false);
     if (val instanceof AviatorFunction) {
       return (AviatorFunction) val;
     }

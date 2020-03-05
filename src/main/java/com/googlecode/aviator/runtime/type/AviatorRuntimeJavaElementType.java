@@ -45,6 +45,6 @@ public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
       default:
         throw new ExpressionRuntimeException("Unknown container type: " + this.containerType);
     }
-    return new AviatorRuntimeJavaType(val);
+    return AviatorRuntimeJavaType.valueOf(val);
   }
 }

@@ -3,7 +3,7 @@ package com.googlecode.aviator.annotation;
 /**
  * Import method scopes
  *
- * @author boyan(boyan@antfin.com)
+ * @author dennis(killme2008@gmail.com)
  *
  */
 public enum ImportScope {

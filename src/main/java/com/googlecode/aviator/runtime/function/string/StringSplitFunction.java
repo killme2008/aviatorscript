@@ -11,7 +11,7 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 /**
  * string.split function
  * 
- * @author boyan
+ * @author dennis(killme2008@gmail.com)
  * 
  */
 public class StringSplitFunction extends AbstractFunction {
@@ -29,7 +29,7 @@ public class StringSplitFunction extends AbstractFunction {
       throw new ExpressionRuntimeException("Could not split with null string");
     String regex = FunctionUtils.getStringValue(arg2, env);
     int limit = FunctionUtils.getNumberValue(arg3, env).intValue();
-    return new AviatorRuntimeJavaType(target.split(regex, limit));
+    return AviatorRuntimeJavaType.valueOf(target.split(regex, limit));
   }
 
 
@@ -39,6 +39,6 @@ public class StringSplitFunction extends AbstractFunction {
     if (target == null)
       throw new ExpressionRuntimeException("Could not replace with null string");
     String regex = FunctionUtils.getStringValue(arg2, env);
-    return new AviatorRuntimeJavaType(target.split(regex));
+    return AviatorRuntimeJavaType.valueOf(target.split(regex));
   }
 }

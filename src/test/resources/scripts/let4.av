@@ -1,0 +1,19 @@
+let a = 1;
+sum = 0;
+{
+  let a = 2;
+  { 
+    let b = 3;
+    {
+      let c = 4;
+      sum = a + b +c;
+    }
+    j.assertTrue(c == nil);
+  }
+   j.assertTrue(b == nil);
+   j.assertTrue(c == nil);
+   j.assertTrue(a == 2);
+}
+ j.assertTrue(a == 1);
+ 
+return sum;

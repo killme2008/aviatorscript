@@ -45,7 +45,7 @@ public class SeqSortFunction extends AbstractFunction {
       List<?> list = (List<?>) first;
       Object[] a = list.toArray();
       Arrays.sort(a);
-      return new AviatorRuntimeJavaType(Arrays.asList(a));
+      return AviatorRuntimeJavaType.valueOf(Arrays.asList(a));
     } else if (clazz.isArray()) {
       int length = Array.getLength(first);
       Object[] dup = (Object[]) Array.newInstance(first.getClass().getComponentType(), length);
@@ -54,7 +54,7 @@ public class SeqSortFunction extends AbstractFunction {
       }
       // System.arraycopy(array, 0, dup, 0, dup.length);
       Arrays.sort(dup);
-      return new AviatorRuntimeJavaType(dup);
+      return AviatorRuntimeJavaType.valueOf(dup);
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
     }

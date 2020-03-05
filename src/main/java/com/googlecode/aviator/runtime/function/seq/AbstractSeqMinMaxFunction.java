@@ -22,7 +22,7 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
   }
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
     Object first = arg1.getValue(env);
     if (first == null) {
       return AviatorNil.NIL;
@@ -31,12 +31,8 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
 
     boolean wasFirst = true;
 
-    if (Collection.class.isAssignableFrom(clazz)) {
-      Collection<?> list = (Collection<?>) first;
-
-      if (list.isEmpty()) {
-        return AviatorNil.NIL;
-      }
+    if (Iterable.class.isAssignableFrom(clazz)) {
+      Iterable<?> list = (Collection<?>) first;
 
       Object result = null;
       for (Object obj : list) {
@@ -77,7 +73,7 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
 
   protected abstract Op getOp();
 
-  private Object compareObjects(Object result, Object obj, boolean wasFirst) {
+  private Object compareObjects(Object result, final Object obj, final boolean wasFirst) {
     if (obj == null) {
       switch (getOp()) {
         case Min:
@@ -97,7 +93,7 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private boolean compare(Object result, Object obj) {
+  private boolean compare(final Object result, final Object obj) {
     try {
       int c = ((Comparable) obj).compareTo(result);
       switch (getOp()) {

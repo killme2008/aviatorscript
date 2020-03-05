@@ -38,7 +38,7 @@ public class SysDateFunction extends AbstractFunction {
 
   @Override
   public AviatorObject call(Map<String, Object> env) {
-    return new AviatorRuntimeJavaType(new Date());
+    return AviatorRuntimeJavaType.valueOf(new Date());
   }
 
 }

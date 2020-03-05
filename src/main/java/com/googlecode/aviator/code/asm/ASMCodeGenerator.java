@@ -67,6 +67,7 @@ import com.googlecode.aviator.code.CodeGenerator;
 import com.googlecode.aviator.code.LambdaGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.Token;
@@ -77,6 +78,7 @@ import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
@@ -99,6 +101,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   private static final String FIELD_PREFIX = "f";
   // evaluator instance
   private final AviatorEvaluatorInstance instance;
+  private SymbolTable symbolTable;
   /**
    * Compile environment only has the *instance*.
    */
@@ -168,6 +171,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void setParser(final Parser parser) {
     this.parser = parser;
+    this.symbolTable = parser.getSymbolTable();
   }
 
 
@@ -233,11 +237,16 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
-  private void endVisitMethodCode() {
+  private void endVisitMethodCode(final boolean unboxObject) {
     if (this.operandsCount > 0) {
       loadEnv();
-      this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "getValue",
-          "(Ljava/util/Map;)Ljava/lang/Object;");
+      if (unboxObject) {
+        this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "getValue",
+            "(Ljava/util/Map;)Ljava/lang/Object;");
+      } else {
+        this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "deref",
+            "(Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      }
       this.mv.visitInsn(ARETURN);
       this.popOperand();
       this.popOperand();
@@ -268,14 +277,16 @@ public class ASMCodeGenerator implements CodeGenerator {
   private void makeConstructor() {
 
     this.mv = this.classWriter.visitMethod(ACC_PUBLIC, CONSTRUCTOR_METHOD_NAME,
-        "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;)V", null, null);
+        "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;Lcom/googlecode/aviator/lexer/SymbolTable;)V",
+        null, null);
     this.mv.visitCode();
     this.mv.visitVarInsn(ALOAD, 0);
     this.mv.visitVarInsn(ALOAD, 1);
     this.mv.visitVarInsn(ALOAD, 2);
+    this.mv.visitVarInsn(ALOAD, 3);
     this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/ClassExpression",
         CONSTRUCTOR_METHOD_NAME,
-        "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;)V");
+        "(Lcom/googlecode/aviator/AviatorEvaluatorInstance;Ljava/util/List;Lcom/googlecode/aviator/lexer/SymbolTable;)V");
     if (!this.innerVars.isEmpty()) {
       for (Map.Entry<String, String> entry : this.innerVars.entrySet()) {
         String outterName = entry.getKey();
@@ -284,8 +295,9 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitTypeInsn(NEW, JAVA_TYPE_OWNER);
         this.mv.visitInsn(DUP);
         this.mv.visitLdcInsn(outterName);
+        this.mv.visitVarInsn(ALOAD, 3);
         this.mv.visitMethodInsn(INVOKESPECIAL, JAVA_TYPE_OWNER, CONSTRUCTOR_METHOD_NAME,
-            "(Ljava/lang/String;)V");
+            "(Ljava/lang/String;Lcom/googlecode/aviator/lexer/SymbolTable;)V");
         this.mv.visitFieldInsn(PUTFIELD, this.className, innerName,
             "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;");
       }
@@ -297,9 +309,10 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitVarInsn(ALOAD, 0);
         this.mv.visitVarInsn(ALOAD, 1);
         this.mv.visitLdcInsn(outterName);
+        this.mv.visitVarInsn(ALOAD, 3);
         this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/AviatorEvaluatorInstance",
             "getFunction",
-            "(Ljava/lang/String;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
+            "(Ljava/lang/String;Lcom/googlecode/aviator/lexer/SymbolTable;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
         this.mv.visitFieldInsn(PUTFIELD, this.className, innerName,
             "Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
       }
@@ -399,7 +412,13 @@ public class ASMCodeGenerator implements CodeGenerator {
   public void onAssignment(final Token<?> lookhead) {
     loadEnv();
 
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "setValue",
+    String methodName = "setValue";
+
+    if (lookhead.getMeta(Constants.DEFINE_META, false)) {
+      methodName = "defineValue";
+    }
+
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, methodName,
         "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
     this.popOperand(3);
     this.pushOperand();
@@ -541,6 +560,9 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onTernaryEnd(final Token<?> lookhead) {
+    if (this.operandsCount == 0) {
+      return;
+    }
     while (--this.operandsCount > 0) {
       this.mv.visitInsn(POP);
     }
@@ -753,24 +775,23 @@ public class ASMCodeGenerator implements CodeGenerator {
     visitUnaryOperator(OperatorType.NEG, "neg");
   }
 
-
   /*
    * (non-Javadoc)
    *
    * @see com.googlecode.aviator.code.CodeGenerator#getResult()
    */
   @Override
-  public Expression getResult() {
-    end();
+  public Expression getResult(final boolean unboxObject) {
+    end(unboxObject);
 
     byte[] bytes = this.classWriter.toByteArray();
     try {
       Class<?> defineClass =
           ClassDefiner.defineClass(this.className, Expression.class, bytes, this.classLoader);
       Constructor<?> constructor =
-          defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class);
+          defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class, SymbolTable.class);
       ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
-          new ArrayList<String>(this.varTokens.keySet()));
+          new ArrayList<String>(this.varTokens.keySet()), this.symbolTable);
       exp.setLambdaBootstraps(this.lambdaBootstraps);
       exp.setFuncsArgs(this.funcsArgs);
       return exp;
@@ -784,8 +805,9 @@ public class ASMCodeGenerator implements CodeGenerator {
     }
   }
 
-  private void end() {
-    endVisitMethodCode();
+
+  private void end(final boolean unboxObject) {
+    endVisitMethodCode(unboxObject);
     endVisitClass();
   }
 
@@ -1027,7 +1049,11 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onMethodInvoke(final Token<?> lookhead, final List<FunctionArgument> params) {
+  public void onMethodInvoke(final Token<?> lookhead) {
+    @SuppressWarnings("unchecked")
+    final List<FunctionArgument> params = lookhead != null
+        ? (List<FunctionArgument>) lookhead.getMeta(Constants.PARAMS_META, Collections.EMPTY_LIST)
+        : Collections.EMPTY_LIST;
 
     if (this.instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool) {
       if (params != null && !params.isEmpty()) {
@@ -1186,10 +1212,11 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onLambdaDefineStart(final Token<?> lookhead) {
     if (this.lambdaGenerator == null) {
+      Boolean newLexicalScope = lookhead.getMeta(Constants.SCOPE_META, false);
       // TODO cache?
       this.lambdaGenerator =
-          new LambdaGenerator(this.instance, this, this.parser, this.classLoader);
-      this.lambdaGenerator.setScopeInfo(this.parser.enterScope());
+          new LambdaGenerator(this.instance, this, this.parser, this.classLoader, newLexicalScope);
+      this.lambdaGenerator.setScopeInfo(this.parser.enterScope(newLexicalScope));
     } else {
       throw new CompileExpressionErrorException("Compile lambda error");
     }
