@@ -729,8 +729,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     if (this.lambdaGenerator == null) {
       // TODO cache?
       Boolean newLexicalScope = lookhead.getMeta(Constants.SCOPE_META, false);
+      Boolean inheritEnv = lookhead.getMeta(Constants.INHERIT_ENV_META, false);
       this.lambdaGenerator = new LambdaGenerator(this.instance, this, this.parser,
-          this.codeGen.getClassLoader(), newLexicalScope);
+          this.codeGen.getClassLoader(), newLexicalScope, inheritEnv);
       this.lambdaGenerator.setScopeInfo(this.parser.enterScope(newLexicalScope));
     } else {
       throw new CompileExpressionErrorException("Compile lambda error");

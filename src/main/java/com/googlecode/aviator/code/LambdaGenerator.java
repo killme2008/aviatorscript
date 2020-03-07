@@ -58,10 +58,12 @@ public class LambdaGenerator implements CodeGenerator {
   private MethodVisitor mv;
   private ScopeInfo scopeInfo;
   private final boolean newLexicalScope;
+  private final boolean inheritEnv;
 
   public LambdaGenerator(final AviatorEvaluatorInstance instance,
       final CodeGenerator parentCodeGenerator, final Parser parser,
-      final AviatorClassLoader classLoader, final boolean newLexicalScope) {
+      final AviatorClassLoader classLoader, final boolean newLexicalScope,
+      final boolean inheritEnv) {
     this.arguments = new ArrayList<>();
     this.instance = instance;
     this.parentCodeGenerator = parentCodeGenerator;
@@ -69,6 +71,7 @@ public class LambdaGenerator implements CodeGenerator {
     this.codeGenerator.setParser(parser);
     this.classLoader = classLoader;
     this.newLexicalScope = newLexicalScope;
+    this.inheritEnv = inheritEnv;
     // Generate lambda class name
     this.className =
         "Lambda_" + System.currentTimeMillis() + "_" + LAMBDA_COUNTER.getAndIncrement();
@@ -221,7 +224,8 @@ public class LambdaGenerator implements CodeGenerator {
       Constructor<?> constructor =
           defineClass.getConstructor(List.class, Expression.class, Env.class);
       MethodHandle methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
-      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, this.arguments);
+      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, this.arguments,
+          this.inheritEnv);
     } catch (Exception e) {
       throw new CompileExpressionErrorException("define lambda class error", e);
     }

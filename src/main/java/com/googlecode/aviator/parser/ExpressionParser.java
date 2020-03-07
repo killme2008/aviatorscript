@@ -991,8 +991,9 @@ public class ExpressionParser implements Parser {
 
     // create a lambda function wraps statements after while(statements)
     {
-      getCodeGeneratorWithTimes().onLambdaDefineStart(
-          this.prevToken.withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
+      getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken //
+          .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
+          .withMeta(Constants.INHERIT_ENV_META, true));
       getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
       if (statements() == StatementType.Empty) {
         getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
@@ -1086,8 +1087,9 @@ public class ExpressionParser implements Parser {
 
     // create a lambda function wraps statements after loop statement (statements)
     {
-      getCodeGeneratorWithTimes().onLambdaDefineStart(
-          this.prevToken.withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
+      getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken //
+          .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
+          .withMeta(Constants.INHERIT_ENV_META, true));
       getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
       if (statements() == StatementType.Empty) {
         getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
@@ -1209,8 +1211,9 @@ public class ExpressionParser implements Parser {
 
         // create a lambda function wraps statements after for-loop(statements)
         {
-          getCodeGeneratorWithTimes().onLambdaDefineStart(
-              this.prevToken.withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
+          getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken //
+              .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
+              .withMeta(Constants.INHERIT_ENV_META, true));
           getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
           if (statements() == StatementType.Empty) {
             getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
@@ -1342,8 +1345,9 @@ public class ExpressionParser implements Parser {
       } else {
         // create a lambda function wraps statements after loop statement (statements)
         {
-          getCodeGeneratorWithTimes().onLambdaDefineStart(
-              this.prevToken.withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
+          getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken //
+              .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
+              .withMeta(Constants.INHERIT_ENV_META, true));
           getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
           if (statements() == StatementType.Empty) {
             getCodeGenerator().onConstant(Constants.ReducerEmptyVal);

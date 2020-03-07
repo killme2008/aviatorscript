@@ -23,6 +23,13 @@ public abstract class LambdaFunction extends AbstractFunction {
   // closure context
   protected Env context;
 
+  // whether to inherit parent env
+  private boolean inheritEnv = false;
+
+  public void setInheritEnv(final boolean inheritEnv) {
+    this.inheritEnv = inheritEnv;
+  }
+
   public LambdaFunction(final List<String> arguments, final Expression expression,
       final Env context) {
     super();
@@ -33,8 +40,13 @@ public abstract class LambdaFunction extends AbstractFunction {
 
   protected Map<String, Object> newEnv(final Map<String, Object> parentEnv,
       final AviatorObject... args) {
-    Env env = new Env(new Env(parentEnv, this.context));
-    env.setInstance(this.context.getInstance());
+    Env env = null;
+    if (!this.inheritEnv) {
+      env = new Env(new Env(parentEnv, this.context));
+      env.setInstance(this.context.getInstance());
+    } else {
+      env = (Env) parentEnv;
+    }
     int i = 0;
     for (String name : this.arguments) {
       env.override(name, args[i++].getValue(parentEnv));

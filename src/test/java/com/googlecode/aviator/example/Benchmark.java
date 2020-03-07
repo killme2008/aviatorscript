@@ -8,9 +8,17 @@ import com.googlecode.aviator.Options;
 
 public class Benchmark {
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) throws Exception {
     // benchCompile();
-    benchCaptureGroupsOptions();
+    // benchCaptureGroupsOptions();
+    benchmarkScript();
+  }
+
+  private static void benchmarkScript() throws Exception {
+    Expression exp = AviatorEvaluator.getInstance()
+        .compileScript(SimpleExample.class.getResource("/scripts/benchmark.av").getFile());
+
+    System.out.println(exp.execute());
   }
 
   private static void benchCaptureGroupsOptions() {

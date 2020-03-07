@@ -22,6 +22,7 @@ public class LambdaFunctionBootstrap {
   private final MethodHandle constructor;
   // The arguments list.
   private final List<String> arguments;
+  private final boolean inheritEnv;
 
 
   public String getName() {
@@ -29,12 +30,13 @@ public class LambdaFunctionBootstrap {
   }
 
   public LambdaFunctionBootstrap(final String name, final Expression expression,
-      final MethodHandle constructor, final List<String> arguments) {
+      final MethodHandle constructor, final List<String> arguments, final boolean inheritEnv) {
     super();
     this.name = name;
     this.expression = expression;
     this.constructor = constructor;
     this.arguments = arguments;
+    this.inheritEnv = inheritEnv;
   }
 
 
@@ -46,7 +48,10 @@ public class LambdaFunctionBootstrap {
    */
   public LambdaFunction newInstance(final Env env) {
     try {
-      return (LambdaFunction) this.constructor.invoke(this.arguments, this.expression, env);
+      final LambdaFunction fn =
+          (LambdaFunction) this.constructor.invoke(this.arguments, this.expression, env);
+      fn.setInheritEnv(this.inheritEnv);
+      return fn;
     } catch (ExpressionRuntimeException e) {
       throw e;
     } catch (Throwable t) {

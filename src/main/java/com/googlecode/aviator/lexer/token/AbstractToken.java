@@ -15,7 +15,7 @@
  **/
 package com.googlecode.aviator.lexer.token;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
@@ -40,6 +40,7 @@ public abstract class AbstractToken<T> implements Token<T> {
 
 
   public void setMetaMap(final Map<String, Object> metaMap) {
+    assert (metaMap == null || metaMap instanceof IdentityHashMap);
     this.metaMap = metaMap;
   }
 
@@ -47,7 +48,7 @@ public abstract class AbstractToken<T> implements Token<T> {
   @Override
   public Token<T> withMeta(final String name, final Object v) {
     if (this.metaMap == null) {
-      this.metaMap = new HashMap<String, Object>();
+      this.metaMap = new IdentityHashMap<>();
     }
     this.metaMap.put(name, v);
     return this;
