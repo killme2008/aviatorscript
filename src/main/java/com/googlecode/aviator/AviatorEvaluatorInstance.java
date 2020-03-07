@@ -107,6 +107,7 @@ import com.googlecode.aviator.runtime.function.system.CompareFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.IdentityFunction;
+import com.googlecode.aviator.runtime.function.system.IsDefFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
 import com.googlecode.aviator.runtime.function.system.MaxFunction;
 import com.googlecode.aviator.runtime.function.system.MinFunction;
@@ -119,6 +120,7 @@ import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
 import com.googlecode.aviator.runtime.function.system.TupleFunction;
+import com.googlecode.aviator.runtime.function.system.UndefFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -555,6 +557,8 @@ public final class AviatorEvaluatorInstance {
     addFunction(new IdentityFunction());
     addFunction(new AssertFunction());
     addFunction(new RangeFunction());
+    addFunction(new IsDefFunction());
+    addFunction(new UndefFunction());
     // for-loop and if statement supporting
     addFunction(new ReducerFunction());
     addFunction(new ReducerReturnFunction());

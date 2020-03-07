@@ -64,6 +64,22 @@ public class FunctionTest {
   }
 
   @Test
+  public void testIsDefUndef() {
+    assertFalse((boolean) AviatorEvaluator.execute("is_def(x)"));
+    assertTrue((boolean) AviatorEvaluator.execute("let x=1; is_def(x)"));
+    assertTrue((boolean) AviatorEvaluator.execute("let x=1; { is_def(x) }"));
+    assertFalse((boolean) AviatorEvaluator.execute("{ let x=1; }{ is_def(x) }"));
+    assertTrue((boolean) AviatorEvaluator.execute("{ let x=1; }{ let x=2; {is_def(x)} }"));
+
+    // test undef
+    assertEquals(1, AviatorEvaluator.execute("let x=1; undef(x)"));
+    assertFalse((boolean) AviatorEvaluator.execute("let x=1; undef(x); is_def(x)"));
+    assertEquals(null, AviatorEvaluator.execute("let x=1; undef(x); return x;"));
+    assertTrue((boolean) AviatorEvaluator.execute(" let x=1; { undef(x); { is_def(x)} }"));
+    assertTrue((boolean) AviatorEvaluator.execute(" let x=1; { undef(x); } is_def(x)"));
+  }
+
+  @Test
   public void testArithmeticExpression() {
     assertEquals(1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10,
         AviatorEvaluator.execute("1+2+3+4+5+6+7+8+9+10"));

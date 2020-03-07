@@ -269,10 +269,25 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Object remove(final Object key) {
-    if (getmOverrides(false).containsKey(key)) {
+    if (getmOverrides(true).containsKey(key)) {
       return getmOverrides(false).remove(key);
     } else {
       return this.mDefaults.remove(key);
+    }
+  }
+
+  /**
+   * Remove a key-value pair from overrides.
+   *
+   * @param key
+   * @return
+   */
+  public Object forgot(final Object key) {
+    final Map<String, Object> overrides = getmOverrides(true);
+    if (overrides != this.mDefaults && overrides.containsKey(key)) {
+      return getmOverrides(false).remove(key);
+    } else {
+      return null;
     }
   }
 

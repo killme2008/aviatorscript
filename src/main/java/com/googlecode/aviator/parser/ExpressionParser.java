@@ -1085,7 +1085,7 @@ public class ExpressionParser implements Parser {
       getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
     }
 
-    // create a lambda function wraps statements after loop statement (statements)
+    // create a lambda function wraps statements after scope statement (statements)
     {
       getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken //
           .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
