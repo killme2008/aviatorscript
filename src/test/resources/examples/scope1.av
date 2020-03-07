@@ -1,0 +1,12 @@
+## examples/scope1.av
+
+let a = 1;  ## 全局作用域内的 a
+
+{
+  ## 嵌套作用域 scope1
+  let a = 2; ## 定义了 scope1 内有效的变量 a
+  println(a); ##打印 scope1 内的 a
+  a = 3; ##给 scope1 的变量 a 赋值
+}
+
+println(a);  ## 打印全局作用域的 a

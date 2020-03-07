@@ -1,0 +1,9 @@
+## examples/comment.av
+## Author: dennis
+## Email: killme2008@gmail.com
+## Desc: 这是一个测试注释的脚本
+
+a = 1; ## 行尾注释
+
+println(a);
+

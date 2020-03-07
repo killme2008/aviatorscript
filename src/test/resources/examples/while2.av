@@ -1,0 +1,12 @@
+## examples/while2.av
+
+let sum = 1;
+
+while true {
+  sum = sum + sum;
+  if sum > 1000 {
+    break;
+  }
+}
+
+println(sum);

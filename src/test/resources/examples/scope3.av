@@ -1,0 +1,23 @@
+## examples/scope3.av
+
+let a = 1;
+{
+  a = 2;
+  let a = 3;
+  b = 4;
+  {
+    a = 5;
+    b = 6;
+    let c = 7;
+    println("a in scope2:" + a);
+    println("b in scope2:" + b);
+    println("c in scope2:" + c);
+  }
+  println("a in scope1:" + a);
+  println("b in scope1:" + b);
+  println("c in scope1:" + c);
+}
+
+println("a in global scope:" + a);
+println("b in global scope:" + b);
+println("c in global scope:" + c);
