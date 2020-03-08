@@ -19,11 +19,16 @@ package com.googlecode.aviator;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -108,6 +113,7 @@ import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.IdentityFunction;
 import com.googlecode.aviator.runtime.function.system.IsDefFunction;
+import com.googlecode.aviator.runtime.function.system.LoadFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
 import com.googlecode.aviator.runtime.function.system.MaxFunction;
 import com.googlecode.aviator.runtime.function.system.MinFunction;
@@ -116,6 +122,7 @@ import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
 import com.googlecode.aviator.runtime.function.system.RangeFunction;
+import com.googlecode.aviator.runtime.function.system.RequireFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
@@ -125,6 +132,7 @@ import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.utils.Constants;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
 
@@ -176,19 +184,87 @@ public final class AviatorEvaluatorInstance {
    * Compile a script file into expression.
    *
    * @param file the script file path
-   * @param cached whether to cached the compiled result
+   * @param cached whether to cached the compiled result with key=path.
    * @return
    */
   public Expression compileScript(final String path, final boolean cached) throws IOException {
-    File file = new File(path);
-    try (FileReader fr = new FileReader(file); BufferedReader reader = new BufferedReader(fr)) {
+    InputStream file = tryFindFileStream(path);
+    try (Reader fr = new InputStreamReader(file, Charset.forName("utf-8"));
+        BufferedReader reader = new BufferedReader(fr)) {
       StringBuilder script = new StringBuilder();
       String line = null;
       while ((line = reader.readLine()) != null) {
         script.append(line).append(Constants.NEWLINE);
       }
-      return compile(script.toString(), cached);
+      return compile(path, script.toString(), cached);
     }
+  }
+
+  private InputStream tryFindFileStream(final String path) throws IOException {
+    // 1. absolute path
+    final File file = new File(path);
+    if (file.exists()) {
+      return new FileInputStream(file);
+    }
+    InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+    if (stream != null) {
+      return stream;
+    }
+    if (!path.startsWith("/")) {
+      stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("/" + path);
+      if (stream != null) {
+        return stream;
+      }
+    }
+    throw new FileNotFoundException("File not found: " + path);
+  }
+
+  /**
+   * Loads a script from path and return it's exports.
+   *
+   * @param path
+   * @param args arguments to execute the script.
+   * @throws Exception
+   */
+  public Env loadScript(final String path) throws IOException {
+    Expression exp = this.compileScript(path);
+    final Env exports = new Env();
+    Map<String, Object> env = exp.newEnv("exports", exports);
+    exp.execute(env);
+    exports.setInstance(this);
+    return exports;
+  }
+
+
+  /**
+   * Loads a script from path and return it's exports.
+   *
+   * @param path
+   * @param args arguments to execute the script.
+   * @throws Exception
+   */
+  public Env requireScript(final String path) throws IOException {
+    Env exports = (Env) this.exportNamespaces.get(path);
+    if (exports != null) {
+      return exports;
+    } else {
+      // TODO better lock
+      synchronized (path.intern()) {
+        exports = (Env) this.exportNamespaces.get(path);
+        if (exports != null) {
+          return exports;
+        }
+        exports = loadScript(path);
+        this.exportNamespaces.put(path, exports);
+        return exports;
+      }
+    }
+  }
+
+
+
+  public Map<String, Object> getExportNamespaces() {
+    return this.exportNamespaces;
   }
 
   /**
@@ -400,6 +476,19 @@ public final class AviatorEvaluatorInstance {
     Map<Options, Value> newOpts = new IdentityHashMap<>(this.options);
     newOpts.put(opt, opt.intoValue(val));
     this.options = newOpts;
+
+    if (opt == Options.ENABLE_REQUIRE_LOAD_SCRIPTS) {
+      if (getOptionValue(opt).bool) {
+        addLoadAndRequireFunction();
+      } else {
+        removeLoadAndRequireFunction();
+      }
+    }
+  }
+
+  private void removeLoadAndRequireFunction() {
+    this.removeFunction(Constants.LOAD_FN);
+    this.removeFunction(Constants.REQUIRE_FN);
   }
 
 
@@ -521,6 +610,9 @@ public final class AviatorEvaluatorInstance {
 
   private final Map<String, Object> funcMap = new HashMap<String, Object>();
 
+  private final ConcurrentHashMap<String/* namespace */, Object /* exports */> exportNamespaces =
+      new ConcurrentHashMap<>();
+
   private final Map<OperatorType, AviatorFunction> opsMap =
       new IdentityHashMap<OperatorType, AviatorFunction>();
 
@@ -559,6 +651,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new RangeFunction());
     addFunction(new IsDefFunction());
     addFunction(new UndefFunction());
+
     // for-loop and if statement supporting
     addFunction(new ReducerFunction());
     addFunction(new ReducerReturnFunction());
@@ -624,6 +717,12 @@ public final class AviatorEvaluatorInstance {
         new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
     addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
     addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
+  }
+
+  private void addLoadAndRequireFunction() {
+    // load and require
+    addFunction(new RequireFunction());
+    addFunction(new LoadFunction());
   }
 
   /**
@@ -841,9 +940,19 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Expression getCachedExpression(final String expression) {
-    FutureTask<Expression> task = this.cacheExpressions.get(expression);
+    return getCachedExpressionByKey(expression);
+  }
+
+  /**
+   * Returns a compiled expression in cache by cacheKey.
+   *
+   * @param cacheKey
+   * @return
+   */
+  public Expression getCachedExpressionByKey(final String cacheKey) {
+    FutureTask<Expression> task = this.cacheExpressions.get(cacheKey);
     if (task != null) {
-      return getCompiledExpression(expression, task);
+      return getCompiledExpression(cacheKey, task);
     } else {
       return null;
     }
@@ -871,7 +980,6 @@ public final class AviatorEvaluatorInstance {
   }
 
 
-
   /**
    * Compile a text expression to Expression object
    *
@@ -880,12 +988,27 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Expression compile(final String expression, final boolean cached) {
+    return this.compile(expression, expression, cached);
+  }
+
+  /**
+   * Compile a text expression to Expression object
+   *
+   * @param cacheKey unique key for caching.
+   * @param expression text expression
+   * @param cached Whether to cache the compiled result,make true to cache it.
+   * @return
+   */
+  public Expression compile(final String cacheKey, final String expression, final boolean cached) {
     if (expression == null || expression.trim().length() == 0) {
       throw new CompileExpressionErrorException("Blank expression");
     }
+    if (cacheKey == null || cacheKey.trim().length() == 0) {
+      throw new CompileExpressionErrorException("Blank cacheKey");
+    }
 
     if (cached) {
-      FutureTask<Expression> task = this.cacheExpressions.get(expression);
+      FutureTask<Expression> task = this.cacheExpressions.get(cacheKey);
       if (task != null) {
         return getCompiledExpression(expression, task);
       }
@@ -896,12 +1019,12 @@ public final class AviatorEvaluatorInstance {
         }
 
       });
-      FutureTask<Expression> existedTask = this.cacheExpressions.putIfAbsent(expression, task);
+      FutureTask<Expression> existedTask = this.cacheExpressions.putIfAbsent(cacheKey, task);
       if (existedTask == null) {
         existedTask = task;
         existedTask.run();
       }
-      return getCompiledExpression(expression, existedTask);
+      return getCompiledExpression(cacheKey, existedTask);
 
     } else {
       return innerCompile(expression, cached);
@@ -910,18 +1033,19 @@ public final class AviatorEvaluatorInstance {
   }
 
 
-  private Expression getCompiledExpression(final String expression,
+  private Expression getCompiledExpression(final String cacheKey,
       final FutureTask<Expression> task) {
     try {
       return task.get();
     } catch (Throwable t) {
-      this.cacheExpressions.remove(expression);
+      this.cacheExpressions.remove(cacheKey);
       final Throwable cause = t.getCause();
       if (cause instanceof ExpressionSyntaxErrorException
           || cause instanceof CompileExpressionErrorException) {
         Reflector.sneakyThrow(cause);
       }
-      throw new CompileExpressionErrorException("Compile expression failure:" + expression, t);
+      throw new CompileExpressionErrorException("Compile expression failure, cacheKey=" + cacheKey,
+          t);
     }
   }
 
@@ -1048,7 +1172,16 @@ public final class AviatorEvaluatorInstance {
    * @param expression
    */
   public void invalidateCache(final String expression) {
-    this.cacheExpressions.remove(expression);
+    invalidateCacheByKey(expression);
+  }
+
+  /**
+   * Invalidate expression cache by cacheKey
+   *
+   * @param cacheKey
+   */
+  public void invalidateCacheByKey(final String cacheKey) {
+    this.cacheExpressions.remove(cacheKey);
   }
 
 

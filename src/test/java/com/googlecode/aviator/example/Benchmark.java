@@ -15,8 +15,7 @@ public class Benchmark {
   }
 
   private static void benchmarkScript() throws Exception {
-    Expression exp = AviatorEvaluator.getInstance()
-        .compileScript(SimpleExample.class.getResource("/scripts/benchmark.av").getFile());
+    Expression exp = AviatorEvaluator.getInstance().compileScript("scripts/benchmark.av");
 
     System.out.println(exp.execute());
   }

@@ -1,0 +1,45 @@
+## Author: dennis
+## Desc: a script to define a quick-sort function qsort.
+
+fn swap(xs, l, r) {
+  let temp = xs[l];
+  xs[l] = xs[r];
+  xs[r] = temp; 
+}
+
+fn partition(xs, l, r, p)  {
+  while l <= r {
+    while xs[l] < p  {
+      l = l+1;
+    }
+    while xs[r] > p {
+      r = r -1;
+    } 
+    if l <= r {
+      swap(xs, l, r);
+       l = l+1;
+       r = r -1;
+    }
+  }
+  return l;
+}
+
+fn qsort0(xs, l, r) {
+  if l >= r {
+    return;
+  }
+  
+  let p = xs[(l+r)/2];
+  let i = partition(xs, l, r, p);
+  qsort0(xs, l, i-1);
+  qsort0(xs, i, r);
+}
+
+qsort = lambda(xs) ->
+  qsort0(xs, 0, count(xs)-1);
+  return xs;
+end;
+
+## export qsort
+exports.sort = qsort;
+

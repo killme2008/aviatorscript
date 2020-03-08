@@ -24,6 +24,8 @@ public class Constants {
   public static final Variable REDUCER_LOOP = new Variable("__reducer_loop", -1);
   public static final String NEWLINE = "\r\n";
   public static final ReducerResult REDUCER_EMPTY = ReducerResult.withEmpty(AviatorNil.NIL);
+  public static final String REQUIRE_FN = "require";
+  public static final String LOAD_FN = "load";
 
   private Constants() {
 

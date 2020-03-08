@@ -77,6 +77,9 @@ public class FunctionTest {
     assertEquals(null, AviatorEvaluator.execute("let x=1; undef(x); return x;"));
     assertTrue((boolean) AviatorEvaluator.execute(" let x=1; { undef(x); { is_def(x)} }"));
     assertTrue((boolean) AviatorEvaluator.execute(" let x=1; { undef(x); } is_def(x)"));
+
+    assertTrue((boolean) AviatorEvaluator.execute("is_def(x)", AviatorEvaluator.newEnv("x", 1)));
+    assertFalse((boolean) AviatorEvaluator.execute("is_def(y)", AviatorEvaluator.newEnv("x", 1)));
   }
 
   @Test

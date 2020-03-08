@@ -73,6 +73,7 @@ public enum Options {
   /**
    * Enable property access syntax sugar, use common-beantuils to access property such as "a.b.c"
    * etc. Default value is true, enable this behaviour.
+   *
    */
   ENABLE_PROPERTY_SYNTAX_SUGAR,
 
@@ -97,7 +98,18 @@ public enum Options {
    *
    * @since 4.1.2
    */
-  DISABLE_ASSIGNMENT;
+  DISABLE_ASSIGNMENT,
+  /**
+   * Whether to enable internal vars such as __env__, __instance__, __args__ etc.in scripts.Default
+   * is true(enable).
+   *
+   * @since 5.0.0
+   */
+  ENABLE_INTERNAL_VARS,
+  /**
+   * Whether to enable load(script) and require(script) in scripts. Default is false(disabled).
+   */
+  ENABLE_REQUIRE_LOAD_SCRIPTS;
 
   private static final boolean TRACE_DEFAULT_VAL =
       Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
@@ -153,6 +165,8 @@ public enum Options {
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
       case TRACE:
+      case ENABLE_REQUIRE_LOAD_SCRIPTS:
+      case ENABLE_INTERNAL_VARS:
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
@@ -182,6 +196,8 @@ public enum Options {
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
       case TRACE:
+      case ENABLE_REQUIRE_LOAD_SCRIPTS:
+      case ENABLE_INTERNAL_VARS:
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
@@ -210,6 +226,8 @@ public enum Options {
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
       case TRACE:
+      case ENABLE_REQUIRE_LOAD_SCRIPTS:
+      case ENABLE_INTERNAL_VARS:
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
@@ -256,6 +274,7 @@ public enum Options {
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
       case ALWAYS_USE_DOUBLE_AS_DECIMAL:
+      case ENABLE_REQUIRE_LOAD_SCRIPTS:
         return FALSE_VALUE;
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
         return TRUE_VALUE;
@@ -277,6 +296,8 @@ public enum Options {
         return FALSE_VALUE;
       case DISABLE_ASSIGNMENT:
         return FALSE_VALUE;
+      case ENABLE_INTERNAL_VARS:
+        return TRUE_VALUE;
     }
     return null;
   }

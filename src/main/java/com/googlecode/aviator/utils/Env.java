@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.Range;
 
@@ -152,20 +153,23 @@ public class Env implements Map<String, Object> {
   public Object get(final Object key) {
     // Should check ENV_VAR at first
     // TODO: performance tweak
-    if (Constants.ENV_VAR == key) {
-      return this;
+    if (Constants.REDUCER_LOOP_VAR == key) {
+      return Range.LOOP;
     }
     if (Constants.REDUCER_EMPTY_VAR == key) {
       return Constants.REDUCER_EMPTY;
     }
-    if (Constants.FUNC_ARGS_VAR == key) {
-      return FunctionUtils.getFunctionArguments(this);
-    }
-    if (Constants.REDUCER_LOOP_VAR == key) {
-      return Range.LOOP;
-    }
-    if (Constants.INSTANCE_VAR == key) {
-      return this.instance;
+
+    if (this.instance.getOptionValue(Options.ENABLE_INTERNAL_VARS).bool) {
+      if (Constants.ENV_VAR == key) {
+        return this;
+      }
+      if (Constants.FUNC_ARGS_VAR == key) {
+        return FunctionUtils.getFunctionArguments(this);
+      }
+      if (Constants.INSTANCE_VAR == key) {
+        return this.instance;
+      }
     }
     Map<String, Object> overrides = getmOverrides(true);
     Object ret = null;

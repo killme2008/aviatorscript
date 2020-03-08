@@ -25,7 +25,7 @@ public class UndefFunction extends AbstractFunction {
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
     if (arg1.getAviatorType() != AviatorType.JavaType) {
       throw new IllegalArgumentException(
-          "Invalid argument type for is_def: " + arg1.getAviatorType());
+          "Invalid argument type for undef: " + arg1.getAviatorType());
     }
     return FunctionUtils.wrapReturn(((Env) env).forgot(((AviatorJavaType) arg1).getName()));
   }

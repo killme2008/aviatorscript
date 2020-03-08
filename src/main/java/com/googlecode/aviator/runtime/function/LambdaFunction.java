@@ -42,9 +42,12 @@ public abstract class LambdaFunction extends AbstractFunction {
       final AviatorObject... args) {
     Env env = null;
     if (!this.inheritEnv) {
-      env = new Env(new Env(parentEnv, this.context));
+      final Env contextEnv = new Env(parentEnv, this.context);
+      contextEnv.setInstance(this.context.getInstance());
+      env = new Env(contextEnv);
       env.setInstance(this.context.getInstance());
     } else {
+      assert (parentEnv == this.context);
       env = (Env) parentEnv;
     }
     int i = 0;

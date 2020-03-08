@@ -1,0 +1,14 @@
+let q = require('examples/qsort.av');
+
+fn rand_list(n) {
+  let a = seq.list();
+  for i in range(0, n) {
+    seq.add(a, rand(n));
+  }
+  return a;
+}
+
+let a = rand_list(20);
+println("before sorting: " + a);
+q.sort(a);
+println("after sorting: " + a);

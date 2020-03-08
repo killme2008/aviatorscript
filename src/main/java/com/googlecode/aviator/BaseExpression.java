@@ -145,8 +145,12 @@ public abstract class BaseExpression implements Expression {
   }
 
   protected Env genTopEnv(final Map<String, Object> map) {
+    if (map instanceof Env) {
+      ((Env) map).setInstance(this.instance);
+    }
     Env env =
         newEnv(map, this.instance.getOptionValue(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY).bool);
+
     if (this.compileEnv != null && !this.compileEnv.isEmpty()) {
       env.putAll(this.compileEnv);
     }
