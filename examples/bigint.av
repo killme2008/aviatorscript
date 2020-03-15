@@ -1,0 +1,16 @@
+## examples/bigint.av
+
+let a = 10223372036854774807;  ## Literal BigInteger
+let b = 1000N;  ## BigInteger
+let c = 1000; ## long type
+
+println(a);
+
+println(a + a);
+
+println(a * a);
+
+println(a + b + c);
+
+
+

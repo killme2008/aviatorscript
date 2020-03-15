@@ -1,0 +1,7 @@
+## examples/double.av
+
+let a = 1;
+let b = 2;
+
+println("a/b is " + a/b);
+println("a/double(b) is " + a/double(b));
