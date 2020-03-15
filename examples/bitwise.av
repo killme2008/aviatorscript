@@ -1,0 +1,17 @@
+## examples/bitwise.av
+let OPEN = 0x01;
+
+let flag = 0;
+
+flag = flag | OPEN;
+
+(flag  & OPEN) == OPEN ? println("open") : println("close");
+
+flag = flag &~ OPEN;
+
+(flag  & OPEN) == OPEN ? println("open") : println("close");
+
+println("flag is " + flag);
+
+
+

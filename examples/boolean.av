@@ -1,0 +1,17 @@
+## examples/boolean.av
+
+
+println("3 > 1 is " + (3 > 1));
+println("3 >= 1 is " + (3 >= 1));
+println("3 >= 3 is " + (3 >= 3));
+println("3 < 1 is " + (3 < 1));
+println("3 <= 1 is " + (3 <= 1));
+println("3 <= 3 is " + (3 <= 3));
+println("3 == 1 is " + (3 == 1));
+println("3 != 1 is " + (3 != 1));
+
+let result = false && println('not reachable');
+println(result);
+
+let result = true || println('not reachable');
+println(result);

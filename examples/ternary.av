@@ -1,0 +1,12 @@
+## examples/ternary.av
+
+let a = 3;
+let b = 1;
+
+let c = a > b ? println("a > b") : println("a <= b");
+
+println(c);
+
+let c = a > b ? "a > b" : 999;
+
+println(c);
