@@ -123,6 +123,18 @@ public class AviatorJavaType extends AviatorObject {
     }
   }
 
+
+
+  @Override
+  public AviatorObject match(final AviatorObject other, final Map<String, Object> env) {
+    Object val = getValue(env);
+    if (val instanceof Pattern) {
+      return new AviatorPattern((Pattern) val).match(other, env);
+    } else {
+      return super.match(other, env);
+    }
+  }
+
   @Override
   public AviatorObject bitAnd(final AviatorObject other, final Map<String, Object> env) {
     final Object value = getValue(env);

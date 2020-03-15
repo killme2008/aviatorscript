@@ -43,6 +43,12 @@ public class AviatorPattern extends AviatorObject {
   }
 
 
+  public AviatorPattern(final Pattern pattern) {
+    super();
+    this.pattern = pattern;
+  }
+
+
   public Pattern getPattern() {
     return this.pattern;
   }
