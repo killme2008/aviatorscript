@@ -35,32 +35,32 @@ public class AviatorPatternUnitTest {
   public void testComparePattern() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
     AviatorPattern p2 = new AviatorPattern("[a-zA-Z]+");
-    assertEquals(0, p1.compare(p2, null));
-    assertEquals(0, p2.compare(p1, null));
+    assertEquals(0, p1.innerCompare(p2, null));
+    assertEquals(0, p2.innerCompare(p1, null));
 
     AviatorPattern p3 = new AviatorPattern("[b-cW]+");
-    assertTrue(p1.compare(p3, null) < 0);
+    assertTrue(p1.innerCompare(p3, null) < 0);
   }
 
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testCompareBoolean() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
-    p1.compare(AviatorBoolean.TRUE, null);
+    p1.innerCompare(AviatorBoolean.TRUE, null);
   }
 
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testCompareString() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
-    p1.compare(new AviatorString("hello"), null);
+    p1.innerCompare(new AviatorString("hello"), null);
   }
 
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testCompareNumber() {
     AviatorPattern p1 = new AviatorPattern("[a-zA-Z]+");
-    p1.compare(AviatorNumber.valueOf(400), null);
+    p1.innerCompare(AviatorNumber.valueOf(400), null);
   }
 
 
@@ -230,19 +230,19 @@ public class AviatorPatternUnitTest {
     env.put("a", 1);
     env.put("s", "hello");
     try {
-      new AviatorPattern("\\d+").compare(new AviatorJavaType("a"), env);
+      new AviatorPattern("\\d+").innerCompare(new AviatorJavaType("a"), env);
       Assert.fail();
     } catch (ExpressionRuntimeException e) {
 
     }
     try {
-      new AviatorPattern("\\d+").compare(new AviatorJavaType("s"), env);
+      new AviatorPattern("\\d+").innerCompare(new AviatorJavaType("s"), env);
       Assert.fail();
     } catch (ExpressionRuntimeException e) {
 
     }
 
-    assertEquals(1, new AviatorPattern("\\d+").compare(new AviatorJavaType("unknow"), env));
+    assertEquals(1, new AviatorPattern("\\d+").innerCompare(new AviatorJavaType("unknow"), env));
 
   }
 

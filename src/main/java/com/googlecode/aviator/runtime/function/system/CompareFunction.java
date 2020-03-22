@@ -22,7 +22,7 @@ public class CompareFunction extends AbstractFunction {
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {
-    return AviatorLong.valueOf(arg1.compare(arg2, env));
+    return AviatorLong.valueOf(arg1.innerCompare(arg2, env));
   }
 
 }

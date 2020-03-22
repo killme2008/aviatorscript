@@ -27,7 +27,7 @@ public class AviatorNilUnitTest {
   // Any object is greater than nil except nil
   @Test
   public void testCompare() {
-    assertEquals(0, AviatorNil.NIL.compare(AviatorNil.NIL, null));
+    assertEquals(0, AviatorNil.NIL.innerCompare(AviatorNil.NIL, null));
 
     Map<String, Object> env = new HashMap<String, Object>();
     env.put("a", null);
@@ -36,45 +36,45 @@ public class AviatorNilUnitTest {
     env.put("d", -100.0);
     env.put("ch", 'a');
     env.put("s", "hello");
-    assertEquals(0, AviatorNil.NIL.compare(AviatorNil.NIL, null));
-    assertEquals(0, AviatorNil.NIL.compare(new AviatorJavaType("a"), env));
-    assertEquals(0, new AviatorJavaType("a").compare(AviatorNil.NIL, env));
+    assertEquals(0, AviatorNil.NIL.innerCompare(AviatorNil.NIL, null));
+    assertEquals(0, AviatorNil.NIL.innerCompare(new AviatorJavaType("a"), env));
+    assertEquals(0, new AviatorJavaType("a").innerCompare(AviatorNil.NIL, env));
 
-    assertEquals(1, AviatorNumber.valueOf(1).compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(AviatorNumber.valueOf(1), env));
-    assertEquals(1, AviatorNumber.valueOf(-1000).compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(AviatorNumber.valueOf(-1000), env));
-    assertEquals(1, AviatorBoolean.TRUE.compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(AviatorBoolean.TRUE, env));
-    assertEquals(1, AviatorBoolean.FALSE.compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(AviatorBoolean.FALSE, env));
-    assertEquals(1, new AviatorString("").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorString(""), env));
-    assertEquals(1, new AviatorString(" ").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorString(" "), env));
-    assertEquals(1, new AviatorString("hello").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorString("hello"), env));
-    assertEquals(1, new AviatorString("-100").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorString("-100"), env));
-    assertEquals(1, new AviatorPattern("\\d+").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorPattern("\\d+"), env));
-    assertEquals(1, new AviatorPattern("[\\w_]+\\.[\\w_]").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorPattern("[\\w_]+\\.[\\w_]"), env));
+    assertEquals(1, AviatorNumber.valueOf(1).innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(AviatorNumber.valueOf(1), env));
+    assertEquals(1, AviatorNumber.valueOf(-1000).innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(AviatorNumber.valueOf(-1000), env));
+    assertEquals(1, AviatorBoolean.TRUE.innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(AviatorBoolean.TRUE, env));
+    assertEquals(1, AviatorBoolean.FALSE.innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(AviatorBoolean.FALSE, env));
+    assertEquals(1, new AviatorString("").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorString(""), env));
+    assertEquals(1, new AviatorString(" ").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorString(" "), env));
+    assertEquals(1, new AviatorString("hello").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorString("hello"), env));
+    assertEquals(1, new AviatorString("-100").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorString("-100"), env));
+    assertEquals(1, new AviatorPattern("\\d+").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorPattern("\\d+"), env));
+    assertEquals(1, new AviatorPattern("[\\w_]+\\.[\\w_]").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorPattern("[\\w_]+\\.[\\w_]"), env));
 
-    assertEquals(1, new AviatorJavaType("i").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorJavaType("i"), env));
+    assertEquals(1, new AviatorJavaType("i").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorJavaType("i"), env));
 
-    assertEquals(1, new AviatorJavaType("f").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorJavaType("f"), env));
+    assertEquals(1, new AviatorJavaType("f").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorJavaType("f"), env));
 
-    assertEquals(1, new AviatorJavaType("d").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorJavaType("d"), env));
+    assertEquals(1, new AviatorJavaType("d").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorJavaType("d"), env));
 
-    assertEquals(1, new AviatorJavaType("ch").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorJavaType("ch"), env));
+    assertEquals(1, new AviatorJavaType("ch").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorJavaType("ch"), env));
 
-    assertEquals(1, new AviatorJavaType("s").compare(AviatorNil.NIL, env));
-    assertEquals(-1, AviatorNil.NIL.compare(new AviatorJavaType("s"), env));
+    assertEquals(1, new AviatorJavaType("s").innerCompare(AviatorNil.NIL, env));
+    assertEquals(-1, AviatorNil.NIL.innerCompare(new AviatorJavaType("s"), env));
   }
 
 

@@ -33,24 +33,24 @@ public class AviatorNumberUnitTest {
   public void testCompareWithNumber() {
     AviatorNumber a = AviatorNumber.valueOf(1000);
     AviatorNumber b = AviatorNumber.valueOf(2000);
-    assertTrue(a.compare(b, null) < 0);
-    assertTrue(b.compare(a, null) > 0);
+    assertTrue(a.innerCompare(b, null) < 0);
+    assertTrue(b.innerCompare(a, null) > 0);
 
     AviatorNumber c = AviatorNumber.valueOf(3.2f);
     AviatorNumber d = AviatorNumber.valueOf(-0.3d);
-    assertTrue(c.compare(d, null) > 0);
-    assertTrue(d.compare(c, null) < 0);
+    assertTrue(c.innerCompare(d, null) > 0);
+    assertTrue(d.innerCompare(c, null) < 0);
 
     a = AviatorNumber.valueOf(1000);
     b = AviatorNumber.valueOf(1000);
 
-    assertEquals(0, a.compare(b, null));
-    assertEquals(0, b.compare(a, null));
-    assertTrue(a.compare(c, null) > 0);
-    assertTrue(b.compare(d, null) > 0);
-    assertTrue(d.compare(c, null) < 0);
-    assertTrue(d.compare(a, null) < 0);
-    assertTrue(d.compare(b, null) < 0);
+    assertEquals(0, a.innerCompare(b, null));
+    assertEquals(0, b.innerCompare(a, null));
+    assertTrue(a.innerCompare(c, null) > 0);
+    assertTrue(b.innerCompare(d, null) > 0);
+    assertTrue(d.innerCompare(c, null) < 0);
+    assertTrue(d.innerCompare(a, null) < 0);
+    assertTrue(d.innerCompare(b, null) < 0);
   }
 
 
@@ -68,19 +68,19 @@ public class AviatorNumberUnitTest {
     env.put("intType", 500);
     env.put("longType", (long) 2000);
 
-    assertTrue(a.compare(longType, env) < 0);
-    assertTrue(a.compare(byteType, env) > 0);
-    assertEquals(0, a.compare(shortType, env));
-    assertTrue(a.compare(intType, env) > 0);
+    assertTrue(a.innerCompare(longType, env) < 0);
+    assertTrue(a.innerCompare(byteType, env) > 0);
+    assertEquals(0, a.innerCompare(shortType, env));
+    assertTrue(a.innerCompare(intType, env) > 0);
 
     AviatorJavaType floatType = new AviatorJavaType("floatType");
     AviatorJavaType doubleType = new AviatorJavaType("doubleType");
     env.put("floatType", 1000.1f);
     env.put("doubleType", 999.9d);
-    assertTrue(a.compare(floatType, env) < 0);
+    assertTrue(a.innerCompare(floatType, env) < 0);
 
-    assertTrue(a.compare(doubleType, env) > 0);
-    assertEquals(1, a.compare(new AviatorJavaType("unknow"), env));
+    assertTrue(a.innerCompare(doubleType, env) > 0);
+    assertEquals(1, a.innerCompare(new AviatorJavaType("unknow"), env));
   }
 
 
@@ -99,7 +99,7 @@ public class AviatorNumberUnitTest {
   public void testCompareWithJavaString() {
     AviatorNumber a = AviatorNumber.valueOf(1000);
     AviatorJavaType s = new AviatorJavaType("s");
-    a.compare(s, this.createEnvWith("s", "hello"));
+    a.innerCompare(s, this.createEnvWith("s", "hello"));
 
   }
 
@@ -108,7 +108,7 @@ public class AviatorNumberUnitTest {
   public void testCompareWithString() {
     AviatorNumber a = AviatorNumber.valueOf(1000);
     AviatorString s = new AviatorString("hello");
-    a.compare(s, null);
+    a.innerCompare(s, null);
 
   }
 

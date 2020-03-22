@@ -468,7 +468,7 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   @SuppressWarnings("unchecked")
-  public int compare(final AviatorObject other, final Map<String, Object> env) {
+  public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
     if (this == other) {
       return 0;
     }
@@ -478,33 +478,33 @@ public class AviatorJavaType extends AviatorObject {
       case Long:
       case Double:
         AviatorNumber aviatorNumber = (AviatorNumber) other;
-        return -aviatorNumber.compare(this, env);
+        return -aviatorNumber.innerCompare(this, env);
       case String:
         AviatorString aviatorString = (AviatorString) other;
-        return -aviatorString.compare(this, env);
+        return -aviatorString.innerCompare(this, env);
       case Boolean:
         AviatorBoolean aviatorBoolean = (AviatorBoolean) other;
-        return -aviatorBoolean.compare(this, env);
+        return -aviatorBoolean.innerCompare(this, env);
       case JavaType:
 
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object thisValue = getValue(env);
         final Object otherValue = otherJavaType.getValue(env);
         if (thisValue == null) {
-          return AviatorNil.NIL.compare(other, env);
+          return AviatorNil.NIL.innerCompare(other, env);
         }
         if (thisValue.equals(otherValue)) {
           return 0;
         } else {
           if (thisValue instanceof Number) {
             AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(thisValue);
-            return thisAviatorNumber.compare(other, env);
+            return thisAviatorNumber.innerCompare(other, env);
           } else if (TypeUtils.isString(thisValue)) {
             AviatorString thisAviatorString = new AviatorString(String.valueOf(thisValue));
-            return thisAviatorString.compare(other, env);
+            return thisAviatorString.innerCompare(other, env);
           } else if (thisValue instanceof Boolean) {
             AviatorBoolean thisAviatorBoolean = AviatorBoolean.valueOf((Boolean) thisValue);
-            return thisAviatorBoolean.compare(other, env);
+            return thisAviatorBoolean.innerCompare(other, env);
           } else if (thisValue instanceof Date && otherValue instanceof String) {
             // This is date,other is string
             return tryCompareDate(thisValue, otherValue);

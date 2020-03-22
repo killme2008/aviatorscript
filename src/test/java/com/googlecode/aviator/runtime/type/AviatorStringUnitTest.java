@@ -88,36 +88,36 @@ public class AviatorStringUnitTest {
   public void testCompareString() {
     final AviatorString s = new AviatorString("hello ");
     AviatorString n = new AviatorString("world");
-    assertTrue(s.compare(n, null) < 0);
-    assertEquals(0, s.compare(s, null));
+    assertTrue(s.innerCompare(n, null) < 0);
+    assertEquals(0, s.innerCompare(s, null));
 
     n = new AviatorString("awt");
-    assertFalse(s.compare(n, null) < 0);
+    assertFalse(s.innerCompare(n, null) < 0);
   }
 
   @Test
   public void testCompareNullString() {
     final AviatorString s = new AviatorString(null);
     AviatorString n = new AviatorString("world");
-    assertTrue(s.compare(n, null) < 0);
-    assertEquals(0, s.compare(s, null));
+    assertTrue(s.innerCompare(n, null) < 0);
+    assertEquals(0, s.innerCompare(s, null));
 
     n = new AviatorString("awt");
-    assertTrue(s.compare(n, null) < 0);
+    assertTrue(s.innerCompare(n, null) < 0);
 
     AviatorJavaType js = new AviatorJavaType("a");
     Map<String, Object> env = new HashMap<String, Object>();
     env.put("a", "null");
-    assertTrue(s.compare(js, env) < 0);
-    assertTrue(js.compare(s, env) > 0);
+    assertTrue(s.innerCompare(js, env) < 0);
+    assertTrue(js.innerCompare(s, env) > 0);
 
     AviatorObject jr = AviatorRuntimeJavaType.valueOf("a");
-    assertTrue(s.compare(jr, env) < 0);
-    assertTrue(jr.compare(s, env) > 0);
+    assertTrue(s.innerCompare(jr, env) < 0);
+    assertTrue(jr.innerCompare(s, env) > 0);
 
     // both null
-    assertTrue(s.compare(js, null) == 0);
-    assertTrue(s.compare(AviatorRuntimeJavaType.valueOf(null), null) == 0);
+    assertTrue(s.innerCompare(js, null) == 0);
+    assertTrue(s.innerCompare(AviatorRuntimeJavaType.valueOf(null), null) == 0);
   }
 
   @Test
@@ -125,50 +125,50 @@ public class AviatorStringUnitTest {
     final AviatorString s = new AviatorString("hello ");
     assertEquals("hello ", s.getLexeme());
     AviatorJavaType n = new AviatorJavaType("s");
-    assertTrue(s.compare(n, createEnvWith("s", "world")) < 0);
-    assertEquals(0, s.compare(s, createEnvWith("s", "world")));
+    assertTrue(s.innerCompare(n, createEnvWith("s", "world")) < 0);
+    assertEquals(0, s.innerCompare(s, createEnvWith("s", "world")));
 
     n = new AviatorJavaType("s");
-    assertFalse(s.compare(n, createEnvWith("s", "awt")) < 0);
+    assertFalse(s.innerCompare(n, createEnvWith("s", "awt")) < 0);
   }
 
   @Test
   public void testCompareJavaChar() {
     final AviatorString s = new AviatorString("hello ");
     AviatorJavaType n = new AviatorJavaType("s");
-    assertTrue(s.compare(n, createEnvWith("s", 'w')) < 0);
-    assertEquals(0, s.compare(s, createEnvWith("s", 'w')));
+    assertTrue(s.innerCompare(n, createEnvWith("s", 'w')) < 0);
+    assertEquals(0, s.innerCompare(s, createEnvWith("s", 'w')));
 
     n = new AviatorJavaType("s");
-    assertFalse(s.compare(n, createEnvWith("s", 'a')) < 0);
+    assertFalse(s.innerCompare(n, createEnvWith("s", 'a')) < 0);
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testCompareBoolean() {
     final AviatorString s = new AviatorString("hello ");
     final AviatorBoolean n = AviatorBoolean.TRUE;
-    s.compare(n, null);
+    s.innerCompare(n, null);
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testComparePattern() {
     final AviatorString s = new AviatorString("hello ");
     final AviatorPattern n = new AviatorPattern("\\d+");
-    s.compare(n, null);
+    s.innerCompare(n, null);
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testCompareNumber() {
     final AviatorString s = new AviatorString("hello ");
     final AviatorNumber n = AviatorNumber.valueOf(3.4f);
-    s.compare(n, null);
+    s.innerCompare(n, null);
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testCompareJavaNumber() {
     final AviatorString s = new AviatorString("hello ");
     final AviatorJavaType n = new AviatorJavaType("f");
-    s.compare(n, createEnvWith("f", 3.4f));
+    s.innerCompare(n, createEnvWith("f", 3.4f));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
@@ -185,9 +185,9 @@ public class AviatorStringUnitTest {
 
   @Test
   public void testCompareJavaNull() {
-    assertEquals(1, new AviatorString("").compare(new AviatorJavaType("a"), null));
-    assertEquals(1, new AviatorString(" ").compare(new AviatorJavaType("a"), null));
-    assertEquals(1, new AviatorString("hello").compare(new AviatorJavaType("a"), null));
+    assertEquals(1, new AviatorString("").innerCompare(new AviatorJavaType("a"), null));
+    assertEquals(1, new AviatorString(" ").innerCompare(new AviatorJavaType("a"), null));
+    assertEquals(1, new AviatorString("hello").innerCompare(new AviatorJavaType("a"), null));
   }
 
   @Test
@@ -203,10 +203,10 @@ public class AviatorStringUnitTest {
     final Date oldDate = new Date();
     oldDate.setYear(20);
     env.put("old", oldDate);
-    assertEquals(0, new AviatorString(dateStr).compare(new AviatorJavaType("date"), env));
-    assertEquals(0, new AviatorString(dateStr).compare(new AviatorJavaType("dateStr"), env));
-    assertEquals(-1, new AviatorString(dateStr).compare(new AviatorJavaType("future"), env));
-    assertEquals(1, new AviatorString(dateStr).compare(new AviatorJavaType("old"), env));
+    assertEquals(0, new AviatorString(dateStr).innerCompare(new AviatorJavaType("date"), env));
+    assertEquals(0, new AviatorString(dateStr).innerCompare(new AviatorJavaType("dateStr"), env));
+    assertEquals(-1, new AviatorString(dateStr).innerCompare(new AviatorJavaType("future"), env));
+    assertEquals(1, new AviatorString(dateStr).innerCompare(new AviatorJavaType("old"), env));
   }
 
   @Test

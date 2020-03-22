@@ -17,6 +17,7 @@ package com.googlecode.aviator.runtime.function;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
@@ -28,6 +29,7 @@ import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorNumber;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorPattern;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorString;
 import com.googlecode.aviator.runtime.type.AviatorType;
@@ -170,9 +172,11 @@ public class FunctionUtils {
   public static AviatorObject wrapReturn(final Object ret) {
     if (ret == null) {
       return AviatorNil.NIL;
+    } else if (ret instanceof Pattern) {
+      return new AviatorPattern((Pattern) ret);
     } else if (ret instanceof Number) {
       return AviatorNumber.valueOf(ret);
-    } else if (ret instanceof CharSequence) {
+    } else if (ret instanceof CharSequence || ret instanceof Character) {
       return new AviatorString(ret.toString());
     } else if (ret instanceof Boolean) {
       return AviatorBoolean.valueOf((boolean) ret);

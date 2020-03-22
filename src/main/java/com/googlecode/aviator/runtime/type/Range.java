@@ -11,7 +11,7 @@ import com.googlecode.aviator.utils.Env;
  * @author dennis(killme2008@gmail.com)
  * @since 5.0.0
  */
-public final class Range extends AviatorObject implements Iterable<AviatorNumber> {
+public final class Range extends AviatorObject implements Sequence<AviatorNumber> {
 
   private static final AviatorLong ZERO = AviatorLong.valueOf(0L);
   public static final Range LOOP = new Range(ZERO, ZERO, ZERO);
@@ -36,7 +36,7 @@ public final class Range extends AviatorObject implements Iterable<AviatorNumber
 
 
   @Override
-  public int compare(final AviatorObject other, final Map<String, Object> env) {
+  public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
     throw new UnsupportedOperationException();
   }
 
@@ -71,10 +71,10 @@ public final class Range extends AviatorObject implements Iterable<AviatorNumber
 
       @Override
       public boolean hasNext() {
-        if (Range.this.step.compare(ZERO, Env.EMPTY_ENV) >= 0) {
-          return this.current.compare(Range.this.end, Env.EMPTY_ENV) < 0;
+        if (Range.this.step.innerCompare(ZERO, Env.EMPTY_ENV) >= 0) {
+          return this.current.innerCompare(Range.this.end, Env.EMPTY_ENV) < 0;
         } else {
-          return this.current.compare(Range.this.end, Env.EMPTY_ENV) > 0;
+          return this.current.innerCompare(Range.this.end, Env.EMPTY_ENV) > 0;
         }
       }
 

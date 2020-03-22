@@ -81,10 +81,10 @@ public class AviatorBooleanUnitTest {
     AviatorBoolean aviatorBoolean3 = AviatorBoolean.valueOf(Boolean.FALSE);
     AviatorBoolean aviatorBoolean4 = AviatorBoolean.valueOf(Boolean.FALSE);
 
-    assertEquals(0, aviatorBoolean1.compare(aviatorBoolean2, null));
-    assertEquals(1, aviatorBoolean1.compare(aviatorBoolean3, null));
-    assertEquals(-1, aviatorBoolean3.compare(aviatorBoolean2, null));
-    assertEquals(0, aviatorBoolean3.compare(aviatorBoolean4, null));
+    assertEquals(0, aviatorBoolean1.innerCompare(aviatorBoolean2, null));
+    assertEquals(1, aviatorBoolean1.innerCompare(aviatorBoolean3, null));
+    assertEquals(-1, aviatorBoolean3.innerCompare(aviatorBoolean2, null));
+    assertEquals(0, aviatorBoolean3.innerCompare(aviatorBoolean4, null));
 
   }
 
@@ -108,24 +108,24 @@ public class AviatorBooleanUnitTest {
     AviatorBoolean f = AviatorBoolean.valueOf(Boolean.FALSE);
 
     AviatorJavaType javaType = new AviatorJavaType("true");
-    assertEquals(0, t.compare(javaType, createEnvWith("true", Boolean.TRUE)));
-    assertEquals(-1, f.compare(javaType, createEnvWith("true", Boolean.TRUE)));
+    assertEquals(0, t.innerCompare(javaType, createEnvWith("true", Boolean.TRUE)));
+    assertEquals(-1, f.innerCompare(javaType, createEnvWith("true", Boolean.TRUE)));
     // compre to null value
-    assertEquals(1, t.compare(new AviatorJavaType("a"), null));
-    assertEquals(1, f.compare(new AviatorJavaType("a"), null));
+    assertEquals(1, t.innerCompare(new AviatorJavaType("a"), null));
+    assertEquals(1, f.innerCompare(new AviatorJavaType("a"), null));
   }
 
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testCompareNumber() {
     AviatorBoolean aviatorBoolean = AviatorBoolean.valueOf(Boolean.TRUE);
-    aviatorBoolean.compare(AviatorNumber.valueOf(1), null);
+    aviatorBoolean.innerCompare(AviatorNumber.valueOf(1), null);
   }
 
 
   @Test(expected = ExpressionRuntimeException.class)
   public void testCompareJavaType() {
     AviatorBoolean aviatorBoolean = AviatorBoolean.valueOf(Boolean.TRUE);
-    aviatorBoolean.compare(new AviatorJavaType("a"), createEnvWith("a", 4.6));
+    aviatorBoolean.innerCompare(new AviatorJavaType("a"), createEnvWith("a", 4.6));
   }
 }

@@ -28,7 +28,14 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public abstract class AviatorObject {
-  public abstract int compare(AviatorObject other, Map<String, Object> env);
+  public int compare(final AviatorObject other, final Map<String, Object> env) {
+    if (this == other) {
+      return 0;
+    }
+    return innerCompare(other, env);
+  }
+
+  public abstract int innerCompare(AviatorObject other, Map<String, Object> env);
 
 
   public abstract AviatorType getAviatorType();

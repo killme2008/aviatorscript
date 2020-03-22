@@ -20,7 +20,7 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
 
 
   @Override
-  public int compare(final AviatorObject other, final Map<String, Object> env) {
+  public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
     throw new UnsupportedOperationException("Lambda function can't be compared.");
   }
 

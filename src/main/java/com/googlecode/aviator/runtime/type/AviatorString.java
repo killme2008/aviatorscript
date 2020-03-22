@@ -79,7 +79,7 @@ public class AviatorString extends AviatorObject {
   }
 
   @Override
-  public int compare(final AviatorObject other, final Map<String, Object> env) {
+  public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
     if (this == other) {
       return 0;
     }

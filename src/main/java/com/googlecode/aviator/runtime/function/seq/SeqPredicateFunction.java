@@ -63,17 +63,17 @@ public class SeqPredicateFunction extends AbstractFunction {
     }
     switch (this.opType) {
       case EQ:
-        return arg1.compare(this.value, env) == 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.innerCompare(this.value, env) == 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case NEQ:
-        return arg1.compare(this.value, env) != 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.innerCompare(this.value, env) != 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case LT:
-        return arg1.compare(this.value, env) < 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.innerCompare(this.value, env) < 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case LE:
-        return arg1.compare(this.value, env) <= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.innerCompare(this.value, env) <= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case GE:
-        return arg1.compare(this.value, env) >= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.innerCompare(this.value, env) >= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case GT:
-        return arg1.compare(this.value, env) > 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.innerCompare(this.value, env) > 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       default:
         throw new ExpressionRuntimeException(this.getName() + " is not a relation operator");
     }

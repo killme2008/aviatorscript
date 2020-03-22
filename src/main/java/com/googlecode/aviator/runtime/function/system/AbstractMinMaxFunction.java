@@ -62,7 +62,7 @@ public abstract class AbstractMinMaxFunction extends AbstractVariadicFunction {
   }
 
   private boolean compare(Map<String, Object> env, AviatorObject result, AviatorObject obj) {
-    int c = obj.compare(result, env);
+    int c = obj.innerCompare(result, env);
     switch (getOp()) {
       case Min:
         return c < 0;
