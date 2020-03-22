@@ -478,33 +478,33 @@ public class AviatorJavaType extends AviatorObject {
       case Long:
       case Double:
         AviatorNumber aviatorNumber = (AviatorNumber) other;
-        return -aviatorNumber.innerCompare(this, env);
+        return -aviatorNumber.compare(this, env);
       case String:
         AviatorString aviatorString = (AviatorString) other;
-        return -aviatorString.innerCompare(this, env);
+        return -aviatorString.compare(this, env);
       case Boolean:
         AviatorBoolean aviatorBoolean = (AviatorBoolean) other;
-        return -aviatorBoolean.innerCompare(this, env);
+        return -aviatorBoolean.compare(this, env);
       case JavaType:
 
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object thisValue = getValue(env);
         final Object otherValue = otherJavaType.getValue(env);
         if (thisValue == null) {
-          return AviatorNil.NIL.innerCompare(other, env);
+          return AviatorNil.NIL.compare(other, env);
         }
         if (thisValue.equals(otherValue)) {
           return 0;
         } else {
           if (thisValue instanceof Number) {
             AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(thisValue);
-            return thisAviatorNumber.innerCompare(other, env);
+            return thisAviatorNumber.compare(other, env);
           } else if (TypeUtils.isString(thisValue)) {
             AviatorString thisAviatorString = new AviatorString(String.valueOf(thisValue));
-            return thisAviatorString.innerCompare(other, env);
+            return thisAviatorString.compare(other, env);
           } else if (thisValue instanceof Boolean) {
             AviatorBoolean thisAviatorBoolean = AviatorBoolean.valueOf((Boolean) thisValue);
-            return thisAviatorBoolean.innerCompare(other, env);
+            return thisAviatorBoolean.compare(other, env);
           } else if (thisValue instanceof Date && otherValue instanceof String) {
             // This is date,other is string
             return tryCompareDate(thisValue, otherValue);

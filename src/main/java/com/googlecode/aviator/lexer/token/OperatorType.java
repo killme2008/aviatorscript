@@ -121,22 +121,22 @@ public enum OperatorType {
       case MULT:
         return args[0].mult(args[1], env);
       case EQ:
-        int result = args[0].innerCompare(args[1], env);
+        int result = args[0].compare(args[1], env);
         return AviatorBoolean.valueOf(result == 0);
       case NEQ:
-        result = args[0].innerCompare(args[1], env);
+        result = args[0].compare(args[1], env);
         return AviatorBoolean.valueOf(result != 0);
       case LT:
-        result = args[0].innerCompare(args[1], env);
+        result = args[0].compare(args[1], env);
         return AviatorBoolean.valueOf(result < 0);
       case LE:
-        result = args[0].innerCompare(args[1], env);
+        result = args[0].compare(args[1], env);
         return AviatorBoolean.valueOf(result <= 0);
       case GT:
-        result = args[0].innerCompare(args[1], env);
+        result = args[0].compare(args[1], env);
         return AviatorBoolean.valueOf(result > 0);
       case GE:
-        result = args[0].innerCompare(args[1], env);
+        result = args[0].compare(args[1], env);
         return AviatorBoolean.valueOf(result >= 0);
       case NOT:
         return args[0].not(env);

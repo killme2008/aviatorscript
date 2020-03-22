@@ -15,19 +15,17 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.runtime.type.Collector;
+import com.googlecode.aviator.runtime.type.Sequence;
 
 
 /**
@@ -39,8 +37,9 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 public class SeqFilterFunction extends AbstractFunction {
 
   @Override
-  @SuppressWarnings("unchecked")
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
     Object first = arg1.getValue(env);
     AviatorFunction fun = FunctionUtils.getFunction(arg2, env, 1);
     if (fun == null) {
@@ -50,52 +49,16 @@ public class SeqFilterFunction extends AbstractFunction {
     if (first == null) {
       throw new NullPointerException("null seq");
     }
-    Class<?> clazz = first.getClass();
 
-    if (Collection.class.isAssignableFrom(clazz)) {
-      Collection<Object> result = null;
-      try {
-        result = (Collection<Object>) clazz.newInstance();
-      } catch (Throwable t) {
-        // ignore
-        result = new ArrayList<Object>();
+    Sequence seq = RuntimeUtils.seq(first);
+    Collector collector = seq.newCollector(0);
+
+    for (Object obj : seq) {
+      if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
+        collector.add(obj);
       }
-      for (Object obj : (Collection<?>) first) {
-        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
-          result.add(obj);
-        }
-      }
-      return AviatorRuntimeJavaType.valueOf(result);
-    } else if (Map.class.isAssignableFrom(clazz)) {
-      Map<Object, Object> result;
-      try {
-        result = (Map<Object, Object>) clazz.newInstance();
-      } catch (Throwable t) {
-        // ignore
-        result = new HashMap<Object, Object>();
-      }
-      Map<?, ?> map = (Map<?, ?>) first;
-      for (Map.Entry<?, ?> entry : map.entrySet()) {
-        if (fun.call(env, AviatorRuntimeJavaType.valueOf(entry)).booleanValue(env)) {
-          result.put(entry.getKey(), entry.getValue());
-        }
-      }
-      return AviatorRuntimeJavaType.valueOf(result);
-    } else if (clazz.isArray()) {
-      // Object[] seq = (Object[]) first;
-      List<Object> result = new ArrayList<Object>();
-      int length = Array.getLength(first);
-      for (int i = 0; i < length; i++) {
-        Object obj = Array.get(first, i);
-        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
-          result.add(obj);
-        }
-      }
-      return AviatorRuntimeJavaType.valueOf(result.toArray());
-    } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
     }
-
+    return AviatorRuntimeJavaType.valueOf(collector.getRawContainer());
   }
 
 

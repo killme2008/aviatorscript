@@ -15,18 +15,17 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
-import com.googlecode.aviator.runtime.type.Range;
+import com.googlecode.aviator.runtime.type.Collector;
+import com.googlecode.aviator.runtime.type.Sequence;
 
 
 /**
@@ -38,7 +37,7 @@ import com.googlecode.aviator.runtime.type.Range;
 public class SeqMapFunction extends AbstractFunction {
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {
 
@@ -51,45 +50,12 @@ public class SeqMapFunction extends AbstractFunction {
     if (first == null) {
       throw new NullPointerException("null seq");
     }
-    Class<?> clazz = first.getClass();
-
-    if (Iterable.class.isAssignableFrom(clazz)) {
-      Collection<Object> result = null;
-      if (clazz == Range.class) {
-        result = new ArrayList<>();
-      } else {
-        try {
-          result = (Collection<Object>) clazz.newInstance();
-        } catch (Throwable t) {
-          // ignore
-          result = new ArrayList<Object>();
-        }
-      }
-
-      for (Object obj : (Iterable<?>) first) {
-        result.add(fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).getValue(env));
-      }
-      return AviatorRuntimeJavaType.valueOf(result);
-    } else if (Map.class.isAssignableFrom(clazz)) {
-      Collection<Object> result = new ArrayList<Object>();
-      for (Object obj : ((Map<?, ?>) first).entrySet()) {
-        result.add(fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).getValue(env));
-      }
-      return AviatorRuntimeJavaType.valueOf(result);
-    } else if (clazz.isArray()) {
-      int length = Array.getLength(first);
-      Object result = Array.newInstance(Object.class, length);
-      int index = 0;
-      for (int i = 0; i < length; i++) {
-        Object obj = Array.get(first, i);
-        Array.set(result, index++,
-            fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).getValue(env));
-      }
-      return AviatorRuntimeJavaType.valueOf(result);
-    } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
+    Sequence seq = RuntimeUtils.seq(first);
+    Collector collector = seq.newCollector(seq.hintSize());
+    for (Object obj : seq) {
+      collector.add(fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).getValue(env));
     }
-
+    return AviatorRuntimeJavaType.valueOf(collector.getRawContainer());
   }
 
 

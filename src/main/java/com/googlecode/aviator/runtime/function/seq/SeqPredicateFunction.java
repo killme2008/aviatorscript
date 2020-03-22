@@ -14,15 +14,15 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import org.apache.commons.beanutils.PropertyUtils;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
-import org.apache.commons.beanutils.PropertyUtils;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 
 /**
@@ -36,12 +36,13 @@ public class SeqPredicateFunction extends AbstractFunction {
   private final AviatorObject value;
   private final AviatorObject propertyName;
 
-  public SeqPredicateFunction(String name, OperatorType opType, AviatorObject value) {
+  public SeqPredicateFunction(final String name, final OperatorType opType,
+      final AviatorObject value) {
     this(name, opType, value, null);
   }
 
-  public SeqPredicateFunction(String name, OperatorType opType, AviatorObject value,
-      AviatorObject propertyName) {
+  public SeqPredicateFunction(final String name, final OperatorType opType,
+      final AviatorObject value, final AviatorObject propertyName) {
     this.name = name;
     this.opType = opType;
     this.value = value;
@@ -49,9 +50,9 @@ public class SeqPredicateFunction extends AbstractFunction {
   }
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
-    if (propertyName != null) {
-      String propertyNameStr = propertyName.stringValue(env);
+  public AviatorObject call(final Map<String, Object> env, AviatorObject arg1) {
+    if (this.propertyName != null) {
+      String propertyNameStr = this.propertyName.stringValue(env);
       Object target = arg1.getValue(env);
       try {
         Object property = PropertyUtils.getNestedProperty(target, propertyNameStr);
@@ -63,19 +64,19 @@ public class SeqPredicateFunction extends AbstractFunction {
     }
     switch (this.opType) {
       case EQ:
-        return arg1.innerCompare(this.value, env) == 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.compare(this.value, env) == 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case NEQ:
-        return arg1.innerCompare(this.value, env) != 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.compare(this.value, env) != 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case LT:
-        return arg1.innerCompare(this.value, env) < 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.compare(this.value, env) < 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case LE:
-        return arg1.innerCompare(this.value, env) <= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.compare(this.value, env) <= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case GE:
-        return arg1.innerCompare(this.value, env) >= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.compare(this.value, env) >= 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       case GT:
-        return arg1.innerCompare(this.value, env) > 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
+        return arg1.compare(this.value, env) > 0 ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
       default:
-        throw new ExpressionRuntimeException(this.getName() + " is not a relation operator");
+        throw new ExpressionRuntimeException(getName() + " is not a relation operator");
     }
   }
 

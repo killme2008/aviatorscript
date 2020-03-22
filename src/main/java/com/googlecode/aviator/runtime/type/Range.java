@@ -1,6 +1,9 @@
 package com.googlecode.aviator.runtime.type;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import com.googlecode.aviator.utils.Env;
@@ -64,6 +67,55 @@ public final class Range extends AviatorObject implements Sequence<AviatorNumber
     return this.end;
   }
 
+
+  @Override
+  public int hintSize() {
+    try {
+      return size();
+    } catch (Throwable t) {
+      return 10;
+    }
+  }
+
+  public int size() {
+    return ((Number) this.end.sub(this.start, null).add(AviatorNumber.valueOf(1), null)
+        .div(this.step, null).getValue(null)).intValue();
+  }
+
+  @Override
+  public Collector newCollector(final int size) {
+    if (size <= 0) {
+      return new Collector() {
+        List<Object> list = new ArrayList<>();
+
+        @Override
+        public void add(final Object e) {
+          this.list.add(e);
+        }
+
+        @Override
+        public Object getRawContainer() {
+          return this.list;
+        }
+      };
+    } else {
+      return new Collector() {
+        Object array = Array.newInstance(Object.class, size);
+        int i = 0;
+
+        @Override
+        public void add(final Object e) {
+          Array.set(this.array, this.i++, e);
+        }
+
+        @Override
+        public Object getRawContainer() {
+          return this.array;
+        }
+      };
+    }
+  }
+
   @Override
   public Iterator<AviatorNumber> iterator() {
     return new Iterator<AviatorNumber>() {
@@ -71,10 +123,10 @@ public final class Range extends AviatorObject implements Sequence<AviatorNumber
 
       @Override
       public boolean hasNext() {
-        if (Range.this.step.innerCompare(ZERO, Env.EMPTY_ENV) >= 0) {
-          return this.current.innerCompare(Range.this.end, Env.EMPTY_ENV) < 0;
+        if (Range.this.step.compare(ZERO, Env.EMPTY_ENV) >= 0) {
+          return this.current.compare(Range.this.end, Env.EMPTY_ENV) < 0;
         } else {
-          return this.current.innerCompare(Range.this.end, Env.EMPTY_ENV) > 0;
+          return this.current.compare(Range.this.end, Env.EMPTY_ENV) > 0;
         }
       }
 

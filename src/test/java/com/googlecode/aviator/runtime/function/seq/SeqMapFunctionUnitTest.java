@@ -50,13 +50,18 @@ public class SeqMapFunctionUnitTest {
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testMap_String() {
     Env env = TestUtils.getTestEnv();
     SeqMapFunction fun = new SeqMapFunction();
 
     AviatorObject result = fun.call(env, AviatorRuntimeJavaType.valueOf("hello"),
         new AviatorJavaType("string.length"));
+    List list = (List) result.getValue(null);
+    assertEquals(5, list.size());
+    for (Object val : list) {
+      assertEquals(val, 1);
+    }
   }
 
   @Test

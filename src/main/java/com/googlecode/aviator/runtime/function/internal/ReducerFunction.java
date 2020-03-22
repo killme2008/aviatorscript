@@ -1,8 +1,8 @@
 package com.googlecode.aviator.runtime.function.internal;
 
-import java.lang.reflect.Array;
 import java.util.Map;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -55,79 +55,35 @@ public class ReducerFunction extends AbstractFunction {
         if (!(result instanceof ReducerResult)) {
           continue;
         }
-        ReducerResult intermediateResult = (ReducerResult) result;
-        if (intermediateResult.state == ReducerState.Cont) {
-          result = intermediateResult.obj;
+        ReducerResult midResult = (ReducerResult) result;
+        if (midResult.state == ReducerState.Cont) {
+          result = midResult.obj;
           continue;
-        } else if (intermediateResult.state == ReducerState.Break) {
-          result = intermediateResult.obj;
+        } else if (midResult.state == ReducerState.Break) {
+          result = midResult.obj;
           break;
         } else {
-          return intermediateResult;
+          return midResult;
         }
       }
     } else {
       // for..in loop
-      Class<?> clazz = coll.getClass();
-
-      if (Iterable.class.isAssignableFrom(clazz)) {
-        for (Object obj : (Iterable<?>) coll) {
-          result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
-          if (!(result instanceof ReducerResult)) {
-            continue;
-          }
-
-          ReducerResult intermediateResult = (ReducerResult) result;
-          if (intermediateResult.state == ReducerState.Cont) {
-            result = intermediateResult.obj;
-            continue;
-          } else if (intermediateResult.state == ReducerState.Break) {
-            result = intermediateResult.obj;
-            break;
-          } else {
-            return intermediateResult;
-          }
+      for (Object obj : RuntimeUtils.seq(coll)) {
+        result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
+        if (!(result instanceof ReducerResult)) {
+          continue;
         }
-      } else if (Map.class.isAssignableFrom(clazz)) {
-        for (Object obj : ((Map<?, ?>) coll).entrySet()) {
-          result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
-          if (result.isNull(env) || !(result instanceof ReducerResult)) {
-            continue;
-          }
 
-          ReducerResult intermediateResult = (ReducerResult) result;
-          if (intermediateResult.state == ReducerState.Cont) {
-            result = intermediateResult.obj;
-            continue;
-          } else if (intermediateResult.state == ReducerState.Break) {
-            result = intermediateResult.obj;
-            break;
-          } else {
-            return intermediateResult;
-          }
+        ReducerResult midResult = (ReducerResult) result;
+        if (midResult.state == ReducerState.Cont) {
+          result = midResult.obj;
+          continue;
+        } else if (midResult.state == ReducerState.Break) {
+          result = midResult.obj;
+          break;
+        } else {
+          return midResult;
         }
-      } else if (clazz.isArray()) {
-        int length = Array.getLength(coll);
-        for (int i = 0; i < length; i++) {
-          Object obj = Array.get(coll, i);
-          result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
-          if (result.isNull(env) || !(result instanceof ReducerResult)) {
-            continue;
-          }
-
-          ReducerResult intermediateResult = (ReducerResult) result;
-          if (intermediateResult.state == ReducerState.Cont) {
-            result = intermediateResult.obj;
-            continue;
-          } else if (intermediateResult.state == ReducerState.Break) {
-            result = intermediateResult.obj;
-            break;
-          } else {
-            return intermediateResult;
-          }
-        }
-      } else {
-        throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
       }
     }
 

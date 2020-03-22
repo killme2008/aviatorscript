@@ -9,6 +9,11 @@ import com.googlecode.aviator.Options;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.Sequence;
+import com.googlecode.aviator.runtime.type.seq.ArraySequence;
+import com.googlecode.aviator.runtime.type.seq.CharSeqSequence;
+import com.googlecode.aviator.runtime.type.seq.IterableSequence;
+import com.googlecode.aviator.runtime.type.seq.MapSequence;
 import com.googlecode.aviator.utils.Env;
 
 /**
@@ -34,6 +39,29 @@ public final class RuntimeUtils {
     }
     return AviatorEvaluator.getInstance();
 
+  }
+
+  /**
+   * Cast an object into sequence if possible, otherwise throw an exception.
+   *
+   * @param o
+   * @return
+   */
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  public static Sequence seq(final Object o) {
+    if (o instanceof Sequence) {
+      return (Sequence) o;
+    } else if (o instanceof CharSequence) {
+      return new CharSeqSequence((CharSequence) o);
+    } else if (o instanceof Iterable) {
+      return new IterableSequence((Iterable) o);
+    } else if (o.getClass().isArray()) {
+      return new ArraySequence(o);
+    } else if (o instanceof Map) {
+      return new MapSequence((Map) o);
+    } else {
+      throw new IllegalArgumentException(o + " is not a sequence");
+    }
   }
 
   /**

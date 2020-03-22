@@ -1,7 +1,10 @@
 package com.googlecode.aviator.runtime.type.seq;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import com.googlecode.aviator.runtime.type.Collector;
 import com.googlecode.aviator.runtime.type.Sequence;
 
 /**
@@ -13,6 +16,50 @@ import com.googlecode.aviator.runtime.type.Sequence;
 public class ArraySequence implements Sequence<Object> {
   private final Object a;
   private final int len;
+
+
+
+  @Override
+  public int hintSize() {
+    return this.len;
+  }
+
+
+
+  @Override
+  public Collector newCollector(final int size) {
+
+    if (size <= 0) {
+      return new Collector() {
+        List<Object> list = new ArrayList<>();
+
+        @Override
+        public void add(final Object e) {
+          this.list.add(e);
+        }
+
+        @Override
+        public Object getRawContainer() {
+          return this.list.toArray();
+        }
+      };
+    } else {
+      return new Collector() {
+        Object array = Array.newInstance(Object.class, size);
+        int i = 0;
+
+        @Override
+        public void add(final Object e) {
+          Array.set(this.array, this.i++, e);
+        }
+
+        @Override
+        public Object getRawContainer() {
+          return this.array;
+        }
+      };
+    }
+  }
 
 
 
@@ -31,7 +78,7 @@ public class ArraySequence implements Sequence<Object> {
 
       @Override
       public boolean hasNext() {
-        return this.i < ArraySequence.this.len - 1;
+        return this.i < ArraySequence.this.len;
       }
 
       @Override

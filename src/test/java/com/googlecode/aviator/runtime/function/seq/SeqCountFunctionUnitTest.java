@@ -1,6 +1,6 @@
 package com.googlecode.aviator.runtime.function.seq;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import java.util.HashSet;
 import org.junit.Test;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -40,10 +40,11 @@ public class SeqCountFunctionUnitTest {
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCount_String() {
     SeqCountFunction fun = new SeqCountFunction();
     AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
+    assertEquals(5, result.getValue(null));
   }
 
 }

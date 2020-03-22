@@ -1,8 +1,8 @@
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.Array;
 import java.util.Map;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -32,27 +32,13 @@ public class SeqSomeFunction extends AbstractFunction {
     if (first == null) {
       return AviatorNil.NIL;
     }
-    Class<?> clazz = first.getClass();
-
-    if (Iterable.class.isAssignableFrom(clazz)) {
-      for (Object obj : (Iterable<?>) first) {
-        // return first fun returns true element.
-        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
-          return AviatorRuntimeJavaType.valueOf(obj);
-        }
+    for (Object obj : RuntimeUtils.seq(first)) {
+      // return first fun returns true element.
+      if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
+        return AviatorRuntimeJavaType.valueOf(obj);
       }
-    } else if (clazz.isArray()) {
-      int length = Array.getLength(first);
-      for (int i = 0; i < length; i++) {
-        Object obj = Array.get(first, i);
-        // return first fun returns true element.
-        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
-          return AviatorRuntimeJavaType.valueOf(obj);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
     }
+
     // else return nil
     return AviatorNil.NIL;
   }

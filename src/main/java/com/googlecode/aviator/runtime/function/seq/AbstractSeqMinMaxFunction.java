@@ -1,13 +1,13 @@
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.runtime.type.Sequence;
 
 /**
  * Base class for min/max function.
@@ -21,54 +21,31 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
     Min, Max
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
     Object first = arg1.getValue(env);
     if (first == null) {
       return AviatorNil.NIL;
     }
-    Class<?> clazz = first.getClass();
+
+
+    Sequence seq = RuntimeUtils.seq(first);
 
     boolean wasFirst = true;
 
-    if (Iterable.class.isAssignableFrom(clazz)) {
-      Iterable<?> list = (Collection<?>) first;
-
-      Object result = null;
-      for (Object obj : list) {
-        result = compareObjects(result, obj, wasFirst);
-        if (wasFirst) {
-          wasFirst = false;
-        }
-        if (getOp() == Op.Min && result == null) {
-          break;
-        }
+    Object result = null;
+    for (Object obj : seq) {
+      result = compareObjects(result, obj, wasFirst);
+      if (wasFirst) {
+        wasFirst = false;
       }
-
-      return AviatorRuntimeJavaType.valueOf(result);
-    } else if (clazz.isArray()) {
-      int length = Array.getLength(first);
-
-      if (length == 0) {
-        return AviatorNil.NIL;
+      if (getOp() == Op.Min && result == null) {
+        break;
       }
-
-
-      Object result = null;
-      for (int i = 0; i < length; i++) {
-        Object obj = Array.get(first, i);
-        result = compareObjects(result, obj, wasFirst);
-        if (wasFirst) {
-          wasFirst = false;
-        }
-        if (getOp() == Op.Min && result == null) {
-          break;
-        }
-      }
-      return AviatorRuntimeJavaType.valueOf(result);
-    } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
     }
+
+    return AviatorRuntimeJavaType.valueOf(result);
   }
 
   protected abstract Op getOp();

@@ -8,5 +8,7 @@ package com.googlecode.aviator.runtime.type;
  * @param <T>
  */
 public interface Sequence<T> extends Iterable<T> {
+  Collector newCollector(int size);
 
+  int hintSize();
 }

@@ -45,7 +45,7 @@ public class ReducerResult extends AviatorRuntimeJavaType {
 
   @Override
   public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
-    return this.obj.innerCompare(other, env);
+    return this.obj.compare(other, env);
   }
 
   @Override

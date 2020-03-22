@@ -1,8 +1,8 @@
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.Array;
 import java.util.Map;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -30,24 +30,11 @@ public class SeqNotAnyFunction extends AbstractFunction {
     if (first == null) {
       return AviatorNil.NIL;
     }
-    Class<?> clazz = first.getClass();
 
-    if (Iterable.class.isAssignableFrom(clazz)) {
-      for (Object obj : (Iterable<?>) first) {
-        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
-          return AviatorBoolean.FALSE;
-        }
+    for (Object obj : RuntimeUtils.seq(first)) {
+      if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
+        return AviatorBoolean.FALSE;
       }
-    } else if (clazz.isArray()) {
-      int length = Array.getLength(first);
-      for (int i = 0; i < length; i++) {
-        Object obj = Array.get(first, i);
-        if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
-          return AviatorBoolean.FALSE;
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
     }
     return AviatorBoolean.TRUE;
   }

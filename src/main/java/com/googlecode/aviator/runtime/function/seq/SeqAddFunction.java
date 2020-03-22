@@ -1,5 +1,6 @@
 package com.googlecode.aviator.runtime.function.seq;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -21,7 +22,8 @@ public class SeqAddFunction extends AbstractFunction {
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
 
     Object coll = arg1.getValue(env);
     Object element = arg2.getValue(env);
@@ -43,8 +45,8 @@ public class SeqAddFunction extends AbstractFunction {
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2,
-      AviatorObject arg3) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3) {
 
     Object coll = arg1.getValue(env);
     Object key = arg2.getValue(env);
@@ -59,8 +61,12 @@ public class SeqAddFunction extends AbstractFunction {
       ((Map) coll).put(key, value);
 
       return arg1;
+    } else if (clazz.isArray()) {
+      int index = ((Number) key).intValue();
+      Array.set(coll, index, value);
+      return arg1;
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a map.");
+      throw new IllegalArgumentException(arg1.desc(env) + " is not a map or array.");
     }
 
   }

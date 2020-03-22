@@ -11,7 +11,7 @@ import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
- * seq.array function to create a new array.
+ * seq.array(class, ...elements) function to create a new array of special type and elements.
  *
  * @author dennis(killme2008@gmail.com)
  * @since 4.2.4

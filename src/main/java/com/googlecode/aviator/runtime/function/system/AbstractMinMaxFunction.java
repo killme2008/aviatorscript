@@ -19,7 +19,7 @@ public abstract class AbstractMinMaxFunction extends AbstractVariadicFunction {
 
 
   @Override
-  public AviatorObject variadicCall(Map<String, Object> env, AviatorObject... args) {
+  public AviatorObject variadicCall(final Map<String, Object> env, final AviatorObject... args) {
 
     if (args == null || args.length == 0) {
       return AviatorNil.NIL;
@@ -45,8 +45,8 @@ public abstract class AbstractMinMaxFunction extends AbstractVariadicFunction {
 
 
 
-  private AviatorObject compareObjects(Map<String, Object> env, AviatorObject result,
-      AviatorObject obj, boolean wasFirst) {
+  private AviatorObject compareObjects(final Map<String, Object> env, AviatorObject result,
+      final AviatorObject obj, final boolean wasFirst) {
     if (obj.isNull(env)) {
       switch (getOp()) {
         case Min:
@@ -61,8 +61,9 @@ public abstract class AbstractMinMaxFunction extends AbstractVariadicFunction {
     return result;
   }
 
-  private boolean compare(Map<String, Object> env, AviatorObject result, AviatorObject obj) {
-    int c = obj.innerCompare(result, env);
+  private boolean compare(final Map<String, Object> env, final AviatorObject result,
+      final AviatorObject obj) {
+    int c = obj.compare(result, env);
     switch (getOp()) {
       case Min:
         return c < 0;

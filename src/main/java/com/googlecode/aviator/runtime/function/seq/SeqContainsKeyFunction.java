@@ -15,9 +15,11 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
+import java.lang.reflect.Array;
 import java.util.Map;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -47,8 +49,11 @@ public class SeqContainsKeyFunction extends AbstractFunction {
         RuntimeUtils.printStackTrace(env, e);
         return AviatorBoolean.FALSE;
       }
+    } else if (clazz.isArray()) {
+      int index = FunctionUtils.getNumberValue(arg2, env).intValue();
+      return AviatorBoolean.valueOf(index >= 0 && index < Array.getLength(first));
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a map.");
+      throw new IllegalArgumentException(arg1.desc(env) + " is not a map or array.");
     }
   }
 

@@ -12,7 +12,7 @@ import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
- * seq.array_of function to create a new array of special type and size.
+ * seq.array_of(class, len) function to create a new array of special type and size.
  *
  * @author dennis(killme2008@gmail.com)
  * @since 4.2.4

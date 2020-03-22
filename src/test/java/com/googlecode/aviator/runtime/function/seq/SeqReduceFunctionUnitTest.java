@@ -100,13 +100,14 @@ public class SeqReduceFunctionUnitTest {
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testReduce_String() {
 
     SeqReduceFunction fun = new SeqReduceFunction();
     AviatorObject result =
         fun.call(AviatorEvaluator.FUNC_MAP, AviatorRuntimeJavaType.valueOf("hello"),
             new AviatorJavaType("+"), AviatorRuntimeJavaType.valueOf(0));
+    assertEquals("0hello", result.getValue(null));
   }
 
 }

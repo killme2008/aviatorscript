@@ -18,21 +18,23 @@ package com.googlecode.aviator.runtime.function.seq;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.Range;
 
 
 /**
  * count(seq) to get seq's size
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class SeqCountFunction extends AbstractFunction {
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
     Object value = arg1.getValue(env);
     if (value == null) {
       throw new NullPointerException("null seq");
@@ -43,10 +45,19 @@ public class SeqCountFunction extends AbstractFunction {
     if (Collection.class.isAssignableFrom(clazz)) {
       Collection<?> col = (Collection<?>) value;
       size = col.size();
+    } else if (Map.class.isAssignableFrom(clazz)) {
+      size = ((Map) value).size();
+    } else if (CharSequence.class.isAssignableFrom(clazz)) {
+      size = ((CharSequence) value).length();
     } else if (clazz.isArray()) {
       size = Array.getLength(value);
+    } else if (Range.class.isAssignableFrom(clazz)) {
+      size = ((Range) value).size();
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
+      size = 0;
+      for (Object e : RuntimeUtils.seq(value)) {
+        size++;
+      }
     }
     return AviatorLong.valueOf(size);
   }
