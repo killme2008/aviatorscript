@@ -14,7 +14,6 @@ import static com.googlecode.aviator.asm.Opcodes.ALOAD;
 import static com.googlecode.aviator.asm.Opcodes.ARETURN;
 import static com.googlecode.aviator.asm.Opcodes.ASTORE;
 import static com.googlecode.aviator.asm.Opcodes.GETFIELD;
-import static com.googlecode.aviator.asm.Opcodes.INVOKEINTERFACE;
 import static com.googlecode.aviator.asm.Opcodes.INVOKESPECIAL;
 import static com.googlecode.aviator.asm.Opcodes.INVOKESTATIC;
 import static com.googlecode.aviator.asm.Opcodes.INVOKEVIRTUAL;
@@ -161,7 +160,7 @@ public class LambdaGenerator implements CodeGenerator {
       // load expression field
       this.mv.visitIntInsn(ALOAD, 0);
       this.mv.visitFieldInsn(GETFIELD, this.className, "expression",
-          "Lcom/googlecode/aviator/Expression;");
+          "Lcom/googlecode/aviator/BaseExpression;");
       // this pointer
       this.mv.visitIntInsn(ALOAD, 0);
       // load env
@@ -182,8 +181,8 @@ public class LambdaGenerator implements CodeGenerator {
           "com/googlecode/aviator/runtime/function/LambdaFunction", "newEnv",
           "(Ljava/util/Map;[Lcom/googlecode/aviator/runtime/type/AviatorObject;)Ljava/util/Map;");
       // execute body expression
-      this.mv.visitMethodInsn(INVOKEINTERFACE, "com/googlecode/aviator/Expression", "execute",
-          "(Ljava/util/Map;)Ljava/lang/Object;");
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/BaseExpression",
+          "executeDirectly", "(Ljava/util/Map;)Ljava/lang/Object;");
       // get the result
       this.mv.visitMethodInsn(INVOKESTATIC,
           "com/googlecode/aviator/runtime/type/AviatorRuntimeJavaType", "valueOf",

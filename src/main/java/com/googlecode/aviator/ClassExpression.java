@@ -15,7 +15,6 @@
  **/
 package com.googlecode.aviator;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
@@ -60,19 +59,10 @@ public abstract class ClassExpression extends BaseExpression {
     return bootstrap.newInstance(env);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.googlecode.aviator.IExpression#execute(java.util.Map)
-   */
   @Override
-  public Object execute(Map<String, Object> map) {
-    if (map == null) {
-      map = Collections.emptyMap();
-    }
-    Env env = genTopEnv(map);
+  public Object executeDirectly(final Map<String, Object> env) {
     try {
-      Object result = execute0(env);
+      Object result = execute0((Env) env);
       if (RuntimeUtils.isTracedEval(env)) {
         RuntimeUtils.printlnTrace(env, "Result : " + result);
       }

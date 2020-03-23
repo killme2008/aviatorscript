@@ -213,12 +213,6 @@ public class Env implements Map<String, Object> {
   public Object override(final String key, final Object value) {
     Object prior;
     Map<String, Object> overrides = getmOverrides(false);
-    if (overrides == this.mDefaults) {
-      // USE_USER_ENV_AS_TOP_ENV_DIRECTLY option is true, and we should create a new mOverrides for
-      // let.
-      this.mOverrides = new HashMap<>();
-      overrides = getmOverrides(false);
-    }
     if (overrides.containsKey(key)) {
       prior = overrides.put(key, value);
     } else {

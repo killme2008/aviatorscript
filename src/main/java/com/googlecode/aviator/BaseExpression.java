@@ -65,6 +65,18 @@ public abstract class BaseExpression implements Expression {
     return env;
   }
 
+  public abstract Object executeDirectly(final Map<String, Object> env);
+
+  @Override
+  public Object execute(Map<String, Object> map) {
+    if (map == null) {
+      map = Collections.emptyMap();
+    }
+    Env env = genTopEnv(map);
+    return executeDirectly(env);
+  }
+
+
   public void setFuncsArgs(final Map<Integer, List<FunctionArgument>> funcsArgs) {
     if (funcsArgs != null) {
       this.funcsArgs = Collections.unmodifiableMap(funcsArgs);

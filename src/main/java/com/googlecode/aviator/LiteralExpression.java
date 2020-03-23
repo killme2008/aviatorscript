@@ -18,7 +18,6 @@ package com.googlecode.aviator;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.runtime.RuntimeUtils;
-import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -38,15 +37,12 @@ public class LiteralExpression extends BaseExpression {
     this.result = result;
   }
 
-
   @Override
-  public Object execute(final Map<String, Object> map) {
-    Env env = genTopEnv(map);
+  public Object executeDirectly(final Map<String, Object> env) {
     if (RuntimeUtils.isTracedEval(env)) {
       RuntimeUtils.printlnTrace(env, "Tracing: " + getExpression());
       RuntimeUtils.printlnTrace(env, "Result : " + getExpression());
     }
     return this.result;
   }
-
 }

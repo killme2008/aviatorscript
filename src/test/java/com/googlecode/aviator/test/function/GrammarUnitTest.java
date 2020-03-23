@@ -62,6 +62,17 @@ public class GrammarUnitTest {
   }
 
   @Test
+  public void testIfElseVar() {
+    String r1 = "result=true;v1='test1';if(!result) {return 'ok';} v2='test2'; result";
+    Map<String, Object> env = new HashMap<>();
+    Assert.assertTrue((boolean) AviatorEvaluator.execute(r1, env));
+    assertEquals(3, env.size());
+    assertEquals(true, env.get("result"));
+    assertEquals("test1", env.get("v1"));
+    assertEquals("test2", env.get("v2"));
+  }
+
+  @Test
   public void testIssue200() {
     AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, true);
     try {

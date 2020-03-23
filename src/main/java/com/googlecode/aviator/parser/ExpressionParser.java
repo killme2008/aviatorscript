@@ -1343,7 +1343,7 @@ public class ExpressionParser implements Parser {
         // Load ReducerEmptyVal directly.
         getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
       } else {
-        // create a lambda function wraps statements after loop statement (statements)
+        // create a lambda function wraps statements after if statement (statements)
         {
           getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken //
               .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
@@ -1393,7 +1393,7 @@ public class ExpressionParser implements Parser {
         if (expectChar('{')) {
           this.scope.enterBrace();
           move(true);
-          hasReturn = elseBody();
+          hasReturn = elseBody(false);
           if (expectChar('}')) {
             this.scope.leaveBrace();
             move(true);
@@ -1407,7 +1407,7 @@ public class ExpressionParser implements Parser {
         hasReturn = ifStatement(false, true);
         getCodeGenerator().onTernaryRight(this.lookhead);
       } else if (ifBodyHasReturn) {
-        hasReturn = elseBody();
+        hasReturn = elseBody(true);
       } else {
         return withoutElse();
       }
@@ -1426,9 +1426,11 @@ public class ExpressionParser implements Parser {
     return false;
   }
 
-  private boolean elseBody() {
-    getCodeGeneratorWithTimes().onLambdaDefineStart(
-        this.lookhead.withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
+  private boolean elseBody(final boolean inheritEnv) {
+    getCodeGeneratorWithTimes().onLambdaDefineStart(this.lookhead //
+        .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
+        .withMeta(Constants.INHERIT_ENV_META, inheritEnv) //
+    );
     getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
     boolean hasReturn = statements() == StatementType.Return;
     getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);

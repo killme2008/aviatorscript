@@ -2,6 +2,7 @@ package com.googlecode.aviator.runtime.function;
 
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
@@ -18,7 +19,7 @@ public abstract class LambdaFunction extends AbstractFunction {
   protected List<String> arguments;
 
   // the compiled lambda body expression
-  protected Expression expression;
+  protected BaseExpression expression;
 
   // closure context
   protected Env context;
@@ -35,7 +36,7 @@ public abstract class LambdaFunction extends AbstractFunction {
     super();
     this.arguments = arguments;
     this.context = context;
-    this.expression = expression;
+    this.expression = (BaseExpression) expression;
   }
 
   protected Map<String, Object> newEnv(final Map<String, Object> parentEnv,
