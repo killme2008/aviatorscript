@@ -129,6 +129,7 @@ import com.googlecode.aviator.runtime.function.system.SysDateFunction;
 import com.googlecode.aviator.runtime.function.system.TupleFunction;
 import com.googlecode.aviator.runtime.function.system.TypeFunction;
 import com.googlecode.aviator.runtime.function.system.UndefFunction;
+import com.googlecode.aviator.runtime.module.IoModule;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -207,17 +208,34 @@ public final class AviatorEvaluatorInstance {
     if (file.exists()) {
       return new FileInputStream(file);
     }
-    InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+    // 2. from context classloader
+    ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+    InputStream ins = tryFindFileStreamFromClassLoader(path, contextLoader);
+    if (ins != null) {
+      return ins;
+    }
+    // 3. from current class loader
+    contextLoader = getClass().getClassLoader();
+    ins = tryFindFileStreamFromClassLoader(path, contextLoader);
+    if (ins != null) {
+      return ins;
+    }
+    throw new FileNotFoundException("File not found: " + path);
+  }
+
+  private InputStream tryFindFileStreamFromClassLoader(final String path,
+      final ClassLoader contextLoader) {
+    InputStream stream = contextLoader.getResourceAsStream(path);
     if (stream != null) {
       return stream;
     }
     if (!path.startsWith("/")) {
-      stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("/" + path);
+      stream = contextLoader.getResourceAsStream("/" + path);
       if (stream != null) {
         return stream;
       }
     }
-    throw new FileNotFoundException("File not found: " + path);
+    return null;
   }
 
   /**
@@ -230,7 +248,8 @@ public final class AviatorEvaluatorInstance {
   public Env loadScript(final String path) throws IOException {
     Expression exp = this.compileScript(path);
     final Env exports = new Env();
-    Map<String, Object> env = exp.newEnv("exports", exports);
+    final Map<String, Object> module = exp.newEnv("exports", exports, "path", path);
+    Map<String, Object> env = exp.newEnv("__MODULE__", module, "exports", exports);
     exp.execute(env);
     exports.setInstance(this);
     return exports;
@@ -245,27 +264,76 @@ public final class AviatorEvaluatorInstance {
    * @throws Exception
    */
   public Env requireScript(final String path) throws IOException {
-    Env exports = (Env) this.exportNamespaces.get(path);
+    Env exports = (Env) this.moduleCache.get(path);
     if (exports != null) {
       return exports;
     } else {
       // TODO better lock
       synchronized (path.intern()) {
-        exports = (Env) this.exportNamespaces.get(path);
+        exports = (Env) this.moduleCache.get(path);
         if (exports != null) {
           return exports;
         }
         exports = loadScript(path);
-        this.exportNamespaces.put(path, exports);
+        this.moduleCache.put(path, exports);
         return exports;
       }
     }
   }
 
+  /**
+   * Adds a module clazz and import it's public static methods as module's exports into module,
+   * return the exports env. cache.
+   *
+   * @param moduleClazz
+   * @return
+   */
+  public Env addModule(final Class<?> moduleClazz)
+      throws NoSuchMethodException, IllegalAccessException {
+    String namespace = moduleClazz.getSimpleName();
 
+    Import importAnt = moduleClazz.getAnnotation(Import.class);
 
-  public Map<String, Object> getExportNamespaces() {
-    return this.exportNamespaces;
+    if (importAnt != null) {
+      namespace = importAnt.ns();
+      if (namespace == null || namespace.isEmpty()
+          || !ExpressionParser.isJavaIdentifier(namespace)) {
+        throw new IllegalArgumentException("Invalid namespace in Import annotation: " + namespace);
+      }
+    }
+
+    Env exports = null;
+    synchronized (namespace.intern()) {
+      exports = (Env) this.moduleCache.get(namespace);
+      if (exports != null) {
+        return exports;
+      }
+      exports = loadModule(moduleClazz);
+      this.moduleCache.put(namespace, exports);
+      return exports;
+    }
+  }
+
+  private Env loadModule(final Class<?> moduleClazz)
+      throws IllegalAccessException, NoSuchMethodException {
+    Map<String, List<Method>> methodMap = findMethodsFromClass(true, moduleClazz);
+
+    if (methodMap == null || methodMap.isEmpty()) {
+      throw new IllegalArgumentException("Empty module");
+    }
+
+    Env exports = new Env();
+
+    for (Map.Entry<String, List<Method>> entry : methodMap.entrySet()) {
+      exports.put(entry.getKey(), new ClassMethodFunction(moduleClazz, true, entry.getKey(),
+          entry.getKey(), entry.getValue()));
+    }
+    exports.setInstance(this);
+    return exports;
+  }
+
+  public Map<String, Object> getModuleCache() {
+    return this.moduleCache;
   }
 
   /**
@@ -322,6 +390,21 @@ public final class AviatorEvaluatorInstance {
   public List<String> addInstanceFunctions(final String namespace, final Class<?> clazz)
       throws IllegalAccessException, NoSuchMethodException {
     return addMethodFunctions(namespace, false, clazz);
+  }
+
+  private List<String> addMethodFunctions(final String namespace, final boolean isStatic,
+      final Class<?> clazz) throws IllegalAccessException, NoSuchMethodException {
+    Map<String, List<Method>> methodMap = findMethodsFromClass(isStatic, clazz);
+    List<String> added = new ArrayList<>();
+
+    for (Map.Entry<String, List<Method>> entry : methodMap.entrySet()) {
+      String methodName = entry.getKey();
+      String name = namespace + "." + methodName;
+      this.addFunction(
+          new ClassMethodFunction(clazz, isStatic, name, methodName, entry.getValue()));
+      added.add(name);
+    }
+    return added;
   }
 
   /**
@@ -390,8 +473,8 @@ public final class AviatorEvaluatorInstance {
     return result;
   }
 
-  private List<String> addMethodFunctions(final String namespace, final boolean isStatic,
-      final Class<?> clazz) throws IllegalAccessException, NoSuchMethodException {
+  private Map<String, List<Method>> findMethodsFromClass(final boolean isStatic,
+      final Class<?> clazz) {
     Map<String, List<Method>> methodMap = new HashMap<>();
 
     for (Method method : clazz.getMethods()) {
@@ -434,16 +517,7 @@ public final class AviatorEvaluatorInstance {
       }
     }
 
-    List<String> added = new ArrayList<>();
-
-    for (Map.Entry<String, List<Method>> entry : methodMap.entrySet()) {
-      String methodName = entry.getKey();
-      String name = namespace + "." + methodName;
-      this.addFunction(
-          new ClassMethodFunction(clazz, isStatic, name, methodName, entry.getValue()));
-      added.add(name);
-    }
-    return added;
+    return methodMap;
   }
 
   /**
@@ -611,11 +685,20 @@ public final class AviatorEvaluatorInstance {
 
   private final Map<String, Object> funcMap = new HashMap<String, Object>();
 
-  private final ConcurrentHashMap<String/* namespace */, Object /* exports */> exportNamespaces =
+  private final ConcurrentHashMap<String/* namespace */, Object /* exports */> moduleCache =
       new ConcurrentHashMap<>();
 
   private final Map<OperatorType, AviatorFunction> opsMap =
       new IdentityHashMap<OperatorType, AviatorFunction>();
+
+  private void loadModule() {
+    try {
+      addModule(IoModule.class);
+    } catch (Exception e) {
+      System.err.println("Fail to load internal modules.");
+      System.exit(1);
+    }
+  }
 
 
   private void loadLib() {
@@ -744,6 +827,7 @@ public final class AviatorEvaluatorInstance {
    */
   AviatorEvaluatorInstance() {
     loadLib();
+    loadModule();
     addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
     for (Options opt : Options.values()) {
       this.options.put(opt, opt.getDefaultValueObject());

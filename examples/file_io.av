@@ -1,0 +1,14 @@
+## examples/file_io.av
+
+let io = require('io');
+
+## create a file instance from path
+let f = io.file("/tmp/aviator_test");
+
+## write a string into file by spit
+io.spit(f, "hello world");
+
+## read a file as a string by slurp
+let content = io.slurp(f);
+
+println(content);
