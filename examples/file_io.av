@@ -5,10 +5,13 @@ let io = require('io');
 ## create a file instance from path
 let f = io.file("/tmp/aviator_test");
 
-## write a string into file by spit
+## write a string into a file by spit
 io.spit(f, "hello world");
 
-## read a file as a string by slurp
+## read from a file as a string by slurp
 let content = io.slurp(f);
 
 println(content);
+
+## finally, delete the file.
+io.delete(file);
