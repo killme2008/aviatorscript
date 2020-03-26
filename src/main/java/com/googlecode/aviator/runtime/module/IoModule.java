@@ -39,6 +39,10 @@ public class IoModule {
     return new File(path);
   }
 
+  public static boolean exists(final File file) {
+    return file.exists();
+  }
+
   public static final URL resource(final String name) {
     return Thread.currentThread().getContextClassLoader().getResource(name);
   }
@@ -183,7 +187,7 @@ public class IoModule {
 
   /**
    * cast a file into a sequence of text lines in file.
-   * 
+   *
    * @param file
    * @return
    * @throws IOException

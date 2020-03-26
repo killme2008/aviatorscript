@@ -2,27 +2,25 @@
 
 let io = require('io');
 
-## create a file instance from path
+## Create a file instance from path
 let file = io.file("/tmp/aviator_test");
 
-## write a string into a file by spit
+## Write a string into file by spit
 io.spit(file, "Hello world\r\nAviator is great!");
 
-## read from a file as a string by slurp
+## Read fully from file by slurp
 let content = io.slurp(file);
-
 println("Content in file: "+ content);
 
 ## Make text lines in file as a sequence
 let lines = io.seq(file);
 
-## print lines by for-loop
-
+## Print lines by for-loop
 for line in lines {
   println(line);
 }
 
-## manipulate lines like a collection
+## Manipulate lines like a collection
 let lines = io.seq(file);
 
 lines = map(lines, lambda(line) ->
@@ -35,9 +33,10 @@ for line in lines {
   println(line);
 }
 
-
 ## finally, delete the file.
 io.delete(file);
+println("exists: "+ io.exists(file));
+
 
 
 
