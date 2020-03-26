@@ -16,7 +16,7 @@ public class RunScriptExample {
     // Enable require and load functions.
     AviatorEvaluator.getInstance().setOption(Options.ENABLE_REQUIRE_LOAD_SCRIPTS, true);
     // You can trry to test every script in examples folder by changing the file name.
-    Expression exp = AviatorEvaluator.getInstance().compileScript("examples/file_io.av");
+    Expression exp = AviatorEvaluator.getInstance().compileScript("examples/test_qsort.av");
 
     exp.execute();
 

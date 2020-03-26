@@ -43,21 +43,26 @@ public class IoModule {
     return file.exists();
   }
 
+  @Function(rename = "list_files")
+  public static File[] files(final File file) {
+    return file.listFiles();
+  }
+
   public static final URL resource(final String name) {
     return Thread.currentThread().getContextClassLoader().getResource(name);
   }
 
-  @Function(rename = "instream")
+  @Function(rename = "input_stream")
   public static InputStream inputStream(final File file) throws IOException {
     return new FileInputStream(file);
   }
 
-  @Function(rename = "instream")
+  @Function(rename = "input_stream")
   public static InputStream inputStream(final URL url) throws IOException {
     return url.openStream();
   }
 
-  @Function(rename = "outstream")
+  @Function(rename = "output_stream")
   public static FileOutputStream outputStream(final File file) throws FileNotFoundException {
     return new FileOutputStream(file);
   }
@@ -192,10 +197,12 @@ public class IoModule {
    * @return
    * @throws IOException
    */
+  @Function(rename = "line_seq")
   public static LineSequence seq(final File file) throws IOException {
     return new LineSequence(reader(file));
   }
 
+  @Function(rename = "line_seq")
   public static LineSequence seq(final BufferedReader reader) {
     return new LineSequence(reader);
   }

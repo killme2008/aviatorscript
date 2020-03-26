@@ -13,7 +13,7 @@ let content = io.slurp(file);
 println("Content in file: "+ content);
 
 ## Make text lines in file as a sequence
-let lines = io.seq(file);
+let lines = io.line_seq(file);
 
 ## Print lines by for-loop
 for line in lines {
@@ -21,7 +21,7 @@ for line in lines {
 }
 
 ## Manipulate lines like a collection
-let lines = io.seq(file);
+let lines = io.line_seq(file);
 
 lines = map(lines, lambda(line) ->
    n = count(line);
@@ -36,6 +36,13 @@ for line in lines {
 ## finally, delete the file.
 io.delete(file);
 println("exists: "+ io.exists(file));
+
+## list files
+println("Files in /tmp:");
+
+for file in io.list_files(io.file("/tmp")) {
+  println(file);
+}
 
 
 
