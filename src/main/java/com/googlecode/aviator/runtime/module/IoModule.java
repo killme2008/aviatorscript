@@ -13,12 +13,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Iterator;
 import com.googlecode.aviator.annotation.Function;
 import com.googlecode.aviator.annotation.Import;
 import com.googlecode.aviator.annotation.ImportScope;
-import com.googlecode.aviator.runtime.type.Collector;
-import com.googlecode.aviator.runtime.type.Sequence;
 
 /**
  * A simple io module for aviator
@@ -28,33 +25,6 @@ import com.googlecode.aviator.runtime.type.Sequence;
  */
 @Import(scopes = {ImportScope.Static}, ns = "io")
 public class IoModule {
-
-  private static class LineSequence implements Sequence<String> {
-    private final File file;
-
-    public LineSequence(final File file) {
-      super();
-      this.file = file;
-    }
-
-    @Override
-    public Iterator<String> iterator() {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override
-    public Collector newCollector(final int size) {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override
-    public int hintSize() {
-      // TODO Auto-generated method stub
-      return 0;
-    }
-  }
 
   private static final int INIT_BUFFER_SIZE = 32 * 1024;
   private static final int BUFFER_SIZE = 8096;
@@ -209,5 +179,20 @@ public class IoModule {
     try (OutputStream out = outputStream(file)) {
       out.write(data);
     }
+  }
+
+  /**
+   * cast a file into a sequence of text lines in file.
+   * 
+   * @param file
+   * @return
+   * @throws IOException
+   */
+  public static LineSequence seq(final File file) throws IOException {
+    return new LineSequence(reader(file));
+  }
+
+  public static LineSequence seq(final BufferedReader reader) {
+    return new LineSequence(reader);
   }
 }
