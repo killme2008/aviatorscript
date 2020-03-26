@@ -9,7 +9,7 @@
 
 	<groupId>com.googlecode.aviator</groupId>
 	<artifactId>aviator</artifactId>
-	<version>5.0.0-beta2</version>
+	<version>5.0.0-beta3-SNAPSHOT</version>
 	<name>aviator</name>
 	<description>A lightweight, high performance expression evaluator for java</description>
 	<url>https://github.com/killme2008/aviator</url>
