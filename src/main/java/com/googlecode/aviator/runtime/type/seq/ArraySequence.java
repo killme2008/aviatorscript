@@ -1,9 +1,7 @@
 package com.googlecode.aviator.runtime.type.seq;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import com.googlecode.aviator.runtime.type.Collector;
 import com.googlecode.aviator.runtime.type.Sequence;
 
@@ -28,36 +26,10 @@ public class ArraySequence implements Sequence<Object> {
 
   @Override
   public Collector newCollector(final int size) {
-
     if (size <= 0) {
-      return new Collector() {
-        List<Object> list = new ArrayList<>();
-
-        @Override
-        public void add(final Object e) {
-          this.list.add(e);
-        }
-
-        @Override
-        public Object getRawContainer() {
-          return this.list.toArray();
-        }
-      };
+      return new ListCollector(true);
     } else {
-      return new Collector() {
-        Object array = Array.newInstance(Object.class, size);
-        int i = 0;
-
-        @Override
-        public void add(final Object e) {
-          Array.set(this.array, this.i++, e);
-        }
-
-        @Override
-        public Object getRawContainer() {
-          return this.array;
-        }
-      };
+      return new ArrayCollector(size);
     }
   }
 

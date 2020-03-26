@@ -1,9 +1,7 @@
 package com.googlecode.aviator.runtime.type.seq;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import com.googlecode.aviator.runtime.type.Collector;
@@ -32,21 +30,7 @@ public class MapSequence implements Sequence<Map.Entry> {
   @Override
   public Collector newCollector(final int size) {
     if (size > 0) {
-      final List container = new ArrayList<>(size);
-      return new Collector() {
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void add(final Object e) {
-          container.add(e);
-        }
-
-        @Override
-        public Object getRawContainer() {
-          return container;
-        }
-
-      };
+      return new ListCollector(size, false);
     } else {
       Map coll;
       try {

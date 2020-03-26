@@ -18,6 +18,7 @@ package com.googlecode.aviator.runtime.function.seq;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -33,6 +34,7 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SeqIncludeFunction extends AbstractFunction {
 
+  @SuppressWarnings("rawtypes")
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {
@@ -42,7 +44,9 @@ public class SeqIncludeFunction extends AbstractFunction {
     }
     Class<?> clazz = first.getClass();
     boolean contains = false;
-    if (Iterable.class.isAssignableFrom(clazz)) {
+    if (Set.class.isAssignableFrom(clazz)) {
+      contains = ((Set) first).contains(arg2.getValue(env));
+    } else if (Iterable.class.isAssignableFrom(clazz)) {
       Iterable<?> seq = (Collection<?>) first;
       try {
         for (Object obj : seq) {

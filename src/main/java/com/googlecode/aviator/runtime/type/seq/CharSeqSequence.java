@@ -1,8 +1,6 @@
 package com.googlecode.aviator.runtime.type.seq;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import com.googlecode.aviator.runtime.type.Collector;
 import com.googlecode.aviator.runtime.type.Sequence;
 
@@ -30,20 +28,7 @@ public class CharSeqSequence implements Sequence<String> {
 
   @Override
   public Collector newCollector(final int size) {
-    final List list = new ArrayList(size > 0 ? size : 10);
-    return new Collector() {
-
-      @Override
-      public void add(final Object e) {
-        list.add(e);
-      }
-
-      @Override
-      public Object getRawContainer() {
-        return list;
-      }
-
-    };
+    return new ListCollector(size, false);
   }
 
 
