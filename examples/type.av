@@ -1,0 +1,20 @@
+## examples/type.av
+
+a = 1;
+println(type(a));
+
+s = "Hello AviatorScript";
+println(type(s));
+
+let p = /(?i)hello\s+(.*)/;
+println(type(p));
+
+if s =~ p {
+  println($1);
+}
+
+s = 99;
+println(type(s));
+
+println(a + s);
+

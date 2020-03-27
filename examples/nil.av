@@ -1,0 +1,28 @@
+## examples/nil.av
+
+a = nil;
+b = 99;
+
+if a == nil {
+  println("a is " + type(x));
+}
+
+a = 3;
+
+if a !=nil {
+  println(a + b);
+}
+
+println("a > nil: " + (a > nil));
+println("nil >= a: " + (nil >= a));
+println("\"\" >= nil: "+ ("" >= nil));
+println("nil > \"\": " + (niil > ""));
+println("0.0 > nil: " + (0.0 > nil));
+println("nil >= 0.0: " + (nil >= 0.0));
+println("/\\s/ > nil: " + (/\s/ > nil));
+println("nil <= /\\s/: " + (nil <= /\s/));
+
+c + 3;
+
+
+
