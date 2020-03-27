@@ -59,11 +59,11 @@ public class SeqIncludeFunctionUnitTest {
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
   public void testInclude_String() {
     SeqIncludeFunction fun = new SeqIncludeFunction();
     AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"),
         AviatorRuntimeJavaType.valueOf("h"));
+    assertTrue(result.booleanValue(null));
   }
 
 }

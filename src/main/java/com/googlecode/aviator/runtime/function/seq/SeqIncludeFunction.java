@@ -15,8 +15,6 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.runtime.RuntimeUtils;
@@ -46,39 +44,21 @@ public class SeqIncludeFunction extends AbstractFunction {
     boolean contains = false;
     if (Set.class.isAssignableFrom(clazz)) {
       contains = ((Set) first).contains(arg2.getValue(env));
-    } else if (Iterable.class.isAssignableFrom(clazz)) {
-      Iterable<?> seq = (Collection<?>) first;
-      try {
-        for (Object obj : seq) {
-          if (AviatorRuntimeJavaType.valueOf(obj).compare(arg2, env) == 0) {
-            contains = true;
-            break;
-          }
-        }
-      } catch (Exception e) {
-        RuntimeUtils.printStackTrace(env, e);
-        return AviatorBoolean.FALSE;
-      }
-    } else if (clazz.isArray()) {
-      // Object[] seq = (Object[]) first;
-      try {
-        int length = Array.getLength(first);
-        for (int i = 0; i < length; i++) {
-          Object obj = Array.get(first, i);
-          if (AviatorRuntimeJavaType.valueOf(obj).compare(arg2, env) == 0) {
-            contains = true;
-            break;
-          }
-        }
-      } catch (Exception e) {
-        RuntimeUtils.printStackTrace(env, e);
-        return AviatorBoolean.FALSE;
-      }
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq collection");
+      try {
+        for (Object obj : RuntimeUtils.seq(first, env)) {
+          if (AviatorRuntimeJavaType.valueOf(obj).compare(arg2, env) == 0) {
+            contains = true;
+            break;
+          }
+        }
+      } catch (Exception e) {
+        RuntimeUtils.printStackTrace(env, e);
+        return AviatorBoolean.FALSE;
+      }
     }
-
     return AviatorBoolean.valueOf(contains);
+
   }
 
 
