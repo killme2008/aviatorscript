@@ -1148,7 +1148,7 @@ public final class AviatorEvaluatorInstance {
   }
 
   private int getOptimizeLevel() {
-    return getOptionValue(Options.OPTIMIZE_LEVEL).level;
+    return getOptionValue(Options.OPTIMIZE_LEVEL).number;
   }
 
 

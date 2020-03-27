@@ -55,7 +55,7 @@ public class SeqCountFunction extends AbstractFunction {
       size = ((Range) value).size();
     } else {
       size = 0;
-      for (Object e : RuntimeUtils.seq(value)) {
+      for (Object e : RuntimeUtils.seq(value, env)) {
         size++;
       }
     }

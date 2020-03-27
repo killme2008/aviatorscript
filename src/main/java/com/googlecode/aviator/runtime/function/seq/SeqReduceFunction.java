@@ -48,7 +48,7 @@ public class SeqReduceFunction extends AbstractFunction {
     }
     AviatorObject result = arg3;
 
-    for (Object obj : RuntimeUtils.seq(first)) {
+    for (Object obj : RuntimeUtils.seq(first, env)) {
       result = fun.call(env, result, AviatorRuntimeJavaType.valueOf(obj));
     }
 

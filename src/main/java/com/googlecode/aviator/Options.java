@@ -109,7 +109,13 @@ public enum Options {
   /**
    * Whether to enable load(script) and require(script) in scripts. Default is false(disabled).
    */
-  ENABLE_REQUIRE_LOAD_SCRIPTS;
+  ENABLE_REQUIRE_LOAD_SCRIPTS,
+
+  /**
+   * Max loop count to prevent too much CPU consumption. If it's value is zero or negative, it means
+   * no limitation on loop count.Default is zero.
+   */
+  MAX_LOOP_COUNT;
 
   private static final boolean TRACE_DEFAULT_VAL =
       Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
@@ -125,7 +131,7 @@ public enum Options {
   public static class Value {
     public boolean bool;
     public MathContext mathContext;
-    public int level;
+    public int number;
 
     public Value(final boolean bool) {
       super();
@@ -137,15 +143,15 @@ public enum Options {
       this.mathContext = mathContext;
     }
 
-    public Value(final int level) {
+    public Value(final int n) {
       super();
-      this.level = level;
+      this.number = n;
     }
 
     @Override
     public String toString() {
-      return "Value [bool=" + this.bool + ", mathContext=" + this.mathContext + ", level="
-          + this.level + "]";
+      return "Value [bool=" + this.bool + ", mathContext=" + this.mathContext + ", number="
+          + this.number + "]";
     }
 
 
@@ -173,9 +179,9 @@ public enum Options {
       case DISABLE_ASSIGNMENT:
       case CAPTURE_FUNCTION_ARGS:
         return val.bool;
-      case OPTIMIZE_LEVEL: {
-        return val.level;
-      }
+      case MAX_LOOP_COUNT:
+      case OPTIMIZE_LEVEL:
+        return val.number;
       case MATH_CONTEXT:
         return val.mathContext;
     }
@@ -212,6 +218,8 @@ public enum Options {
           return COMPILE_VALUE;
         }
       }
+      case MAX_LOOP_COUNT:
+        return new Value(((Number) val).intValue());
       case MATH_CONTEXT:
         return new Value((MathContext) val);
     }
@@ -237,6 +245,8 @@ public enum Options {
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
             || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
+      case MAX_LOOP_COUNT:
+        return val instanceof Long || val instanceof Integer;
       case MATH_CONTEXT:
         return val instanceof MathContext;
     }
@@ -246,6 +256,8 @@ public enum Options {
   public static final Value FALSE_VALUE = new Value(false);
 
   public static final Value TRUE_VALUE = new Value(true);
+
+  public static final Value ZERO_VALUE = new Value(0);
 
   public static final Value DEFAULT_MATH_CONTEXT = new Value(MathContext.DECIMAL128);
 
@@ -298,6 +310,8 @@ public enum Options {
         return FALSE_VALUE;
       case ENABLE_INTERNAL_VARS:
         return TRUE_VALUE;
+      case MAX_LOOP_COUNT:
+        return ZERO_VALUE;
     }
     return null;
   }

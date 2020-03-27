@@ -1,6 +1,8 @@
 package com.googlecode.aviator.runtime.function.internal;
 
 import java.util.Map;
+import com.googlecode.aviator.Options;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -45,12 +47,16 @@ public class ReducerFunction extends AbstractFunction {
     }
 
 
-
+    int maxLoopCount = RuntimeUtils.getInstance(env).getOptionValue(Options.MAX_LOOP_COUNT).number;
     AviatorObject result = null;
+    int c = 0;
 
     if (coll == Range.LOOP) {
       // while statement
       while (true) {
+        if (maxLoopCount > 0 && ++c >= maxLoopCount) {
+          throw new ExpressionRuntimeException("Overflow max loop count: " + maxLoopCount);
+        }
         result = iteratorFn.call(env);
         if (!(result instanceof ReducerResult)) {
           continue;
@@ -68,7 +74,7 @@ public class ReducerFunction extends AbstractFunction {
       }
     } else {
       // for..in loop
-      for (Object obj : RuntimeUtils.seq(coll)) {
+      for (Object obj : RuntimeUtils.seq(coll, env)) {
         result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
         if (!(result instanceof ReducerResult)) {
           continue;

@@ -50,7 +50,7 @@ public class SeqMapFunction extends AbstractFunction {
     if (first == null) {
       throw new NullPointerException("null seq");
     }
-    Sequence seq = RuntimeUtils.seq(first);
+    Sequence seq = RuntimeUtils.seq(first, env);
     Collector collector = seq.newCollector(seq.hintSize());
     for (Object obj : seq) {
       collector.add(fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).getValue(env));

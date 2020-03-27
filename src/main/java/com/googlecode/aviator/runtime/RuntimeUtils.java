@@ -13,6 +13,7 @@ import com.googlecode.aviator.runtime.type.Sequence;
 import com.googlecode.aviator.runtime.type.seq.ArraySequence;
 import com.googlecode.aviator.runtime.type.seq.CharSeqSequence;
 import com.googlecode.aviator.runtime.type.seq.IterableSequence;
+import com.googlecode.aviator.runtime.type.seq.LimitedSequence;
 import com.googlecode.aviator.runtime.type.seq.MapSequence;
 import com.googlecode.aviator.utils.Env;
 
@@ -48,20 +49,32 @@ public final class RuntimeUtils {
    * @return
    */
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public static Sequence seq(final Object o) {
+  public static Sequence seq(final Object o, final Map<String, Object> env) {
+    Sequence seq = null;
+
     if (o instanceof Sequence) {
-      return (Sequence) o;
+      seq = (Sequence) o;
     } else if (o instanceof CharSequence) {
-      return new CharSeqSequence((CharSequence) o);
+      seq = new CharSeqSequence((CharSequence) o);
     } else if (o instanceof Iterable) {
-      return new IterableSequence((Iterable) o);
+      seq = new IterableSequence((Iterable) o);
     } else if (o.getClass().isArray()) {
-      return new ArraySequence(o);
+      seq = new ArraySequence(o);
     } else if (o instanceof Map) {
-      return new MapSequence((Map) o);
+      seq = new MapSequence((Map) o);
     } else {
       throw new IllegalArgumentException(o + " is not a sequence");
     }
+
+    if (env instanceof Env) {
+      int maxLoopCount =
+          RuntimeUtils.getInstance(env).getOptionValue(Options.MAX_LOOP_COUNT).number;
+      if (maxLoopCount > 0) {
+        return new LimitedSequence<>(seq, maxLoopCount);
+      }
+    }
+
+    return seq;
   }
 
   /**

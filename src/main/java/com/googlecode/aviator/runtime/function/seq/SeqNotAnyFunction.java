@@ -31,7 +31,7 @@ public class SeqNotAnyFunction extends AbstractFunction {
       return AviatorNil.NIL;
     }
 
-    for (Object obj : RuntimeUtils.seq(first)) {
+    for (Object obj : RuntimeUtils.seq(first, env)) {
       if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
         return AviatorBoolean.FALSE;
       }

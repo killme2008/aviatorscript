@@ -30,7 +30,7 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
     }
 
 
-    Sequence seq = RuntimeUtils.seq(first);
+    Sequence seq = RuntimeUtils.seq(first, env);
 
     boolean wasFirst = true;
 

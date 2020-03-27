@@ -32,7 +32,7 @@ public class SeqSomeFunction extends AbstractFunction {
     if (first == null) {
       return AviatorNil.NIL;
     }
-    for (Object obj : RuntimeUtils.seq(first)) {
+    for (Object obj : RuntimeUtils.seq(first, env)) {
       // return first fun returns true element.
       if (fun.call(env, AviatorRuntimeJavaType.valueOf(obj)).booleanValue(env)) {
         return AviatorRuntimeJavaType.valueOf(obj);

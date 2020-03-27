@@ -50,7 +50,7 @@ public class SeqFilterFunction extends AbstractFunction {
       throw new NullPointerException("null seq");
     }
 
-    Sequence seq = RuntimeUtils.seq(first);
+    Sequence seq = RuntimeUtils.seq(first, env);
     Collector collector = seq.newCollector(0);
 
     for (Object obj : seq) {
