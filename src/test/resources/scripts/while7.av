@@ -1,0 +1,20 @@
+let i = 0;
+let c = 0;
+while true {
+  let j = 0;
+  while(true) {
+    j = j + 1;
+    if j >= 10 {
+      break;
+    }
+  }
+  j.assertEquals(j, 10);
+  i = i + j;
+  c = c + 1;
+  if c>= 3 {
+    break;
+  }
+}
+
+j.assertEquals(c, 3);
+j.assertEquals(i, 30);

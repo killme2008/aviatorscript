@@ -165,6 +165,7 @@ public class TestScripts {
       System.out.println("rand_int(10)=" + r);
       assertTrue(r >= 5);
     }
+    testScript("while7.av");
   }
 
   @Test
