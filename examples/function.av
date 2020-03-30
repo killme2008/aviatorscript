@@ -1,0 +1,12 @@
+## examples/function.av
+
+fn add(x, y) {
+  return x + y;
+}
+
+three = add(1, 2);
+println(three);
+
+s = add('hello', ' world');
+println(s);
+

@@ -1,0 +1,11 @@
+## examples/function_return.av
+
+fn add(x, y) {
+  if type(x) != 'long' || type(y) != 'long' {
+    return;
+  }
+  x + y
+}
+
+println(add(1, 2));
+println(add('hello', ' world'));
