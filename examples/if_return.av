@@ -1,0 +1,7 @@
+## examples/if_return.av
+
+if a < b {
+  return "a is less than b.";
+}
+
+return a - b;

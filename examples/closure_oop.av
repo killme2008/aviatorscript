@@ -37,3 +37,4 @@ println(s2.x);
 println(s2.y);
 println(s2.area());
 println(s2.circum());
+println(s2);

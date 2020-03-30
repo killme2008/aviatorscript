@@ -1,0 +1,5 @@
+## examples/statements_result.av
+
+let a = 1;
+let b = 2;
+c = a + b
