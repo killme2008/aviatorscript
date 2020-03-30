@@ -1,0 +1,28 @@
+## examples/function_first_class.av
+
+fn square(x) {
+  return x * 2;
+}
+
+let add = lambda(x, y, f) ->
+  f(x) + f(y)
+end;
+
+let add_n = lambda(x) ->
+  lambda(y) -> 
+    x + y
+  end
+end;
+
+println(type(square));
+println(type(add));
+println(type(add_n));
+
+let s = add(1, 2, square);
+println(s);
+
+let add_3 = add_n(3);
+println(type(add_3));
+println(add_3(1));
+println(add_3(99));
+println(add_3(' test'));

@@ -1,0 +1,25 @@
+## examples/closure.av
+
+let counter = lambda() ->
+  let c = 0;
+  lambda() ->
+    let result = c;
+    c = c + 1;
+    return result;
+  end
+end;
+
+let c1 = counter();
+let c2 = counter();
+
+println("test c1...");
+for i in range(0, 10) {
+  x = c1();
+  println(x);
+}
+
+println("test c2...");
+for i in range(0, 10) {
+  x = c2();
+  println(x);
+}

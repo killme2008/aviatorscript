@@ -1,0 +1,39 @@
+## examples/closure_oop.av
+
+## a function to return a rectangle instance.
+fn rectangle(x, y) {
+  let r = seq.map("x", x, "y", y);
+  
+  r.area = lambda() -> 
+    return r.x * r.y;
+  end;
+  r.circum = lambda() ->
+    return 2 * (r.x + r.y);
+  end;
+  
+  return r;
+}
+
+let s1 = rectangle(3, 4);
+
+println("s1 info:");
+println(s1.x);
+println(s1.y);
+println(s1.area());
+println(s1.circum());
+
+let s2 = rectangle(9, 10);
+
+println("s2 info:");
+println(s2.x);
+println(s2.y);
+println(s2.area());
+println(s2.circum());
+
+s2.x = 100;
+s2.y = 200;
+println("s2 info after setting:");
+println(s2.x);
+println(s2.y);
+println(s2.area());
+println(s2.circum());
