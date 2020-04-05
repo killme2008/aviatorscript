@@ -1,0 +1,11 @@
+## examples/map.fn
+
+let a = tuple(1, 2, 3);
+
+map(a, println);
+
+println("after map:");
+
+a = map(a, lambda(x) -> x + 1 end);
+
+map(a, println);

@@ -1,6 +1,7 @@
-## examples/test_qsort.av
+## examples/load_qsort.av
 
-let q = require('examples/qsort.av');
+let q = load('examples/qsort.av');
+let q = load('examples/qsort.av');
 
 fn rand_list(n) {
   let a = seq.list();
