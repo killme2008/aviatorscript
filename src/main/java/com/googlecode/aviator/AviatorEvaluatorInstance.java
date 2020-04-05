@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -190,8 +191,9 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Expression compileScript(final String path, final boolean cached) throws IOException {
-    InputStream file = tryFindFileStream(path);
-    try (Reader fr = new InputStreamReader(file, Charset.forName("utf-8"));
+    File file = tryFindScriptFile(path);
+    try (InputStream in = new FileInputStream(file);
+        Reader fr = new InputStreamReader(in, Charset.forName("utf-8"));
         BufferedReader reader = new BufferedReader(fr)) {
       StringBuilder script = new StringBuilder();
       String line = null;
@@ -202,38 +204,34 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
-  private InputStream tryFindFileStream(final String path) throws IOException {
+  private File tryFindScriptFile(final String path) throws IOException {
     // 1. absolute path
-    final File file = new File(path);
+    File file = new File(path);
     if (file.exists()) {
-      return new FileInputStream(file);
+      return file;
     }
     // 2. from context classloader
     ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
-    InputStream ins = tryFindFileStreamFromClassLoader(path, contextLoader);
-    if (ins != null) {
-      return ins;
+    file = tryFindFileFromClassLoader(path, contextLoader);
+    if (file != null) {
+      return file;
     }
     // 3. from current class loader
     contextLoader = getClass().getClassLoader();
-    ins = tryFindFileStreamFromClassLoader(path, contextLoader);
-    if (ins != null) {
-      return ins;
+    file = tryFindFileFromClassLoader(path, contextLoader);
+    if (file != null) {
+      return file;
     }
     throw new FileNotFoundException("File not found: " + path);
   }
 
-  private InputStream tryFindFileStreamFromClassLoader(final String path,
-      final ClassLoader contextLoader) {
-    InputStream stream = contextLoader.getResourceAsStream(path);
-    if (stream != null) {
-      return stream;
+  private File tryFindFileFromClassLoader(final String path, final ClassLoader contextLoader) {
+    URL url = contextLoader.getResource(path);
+    if (url != null) {
+      return new File(url.getPath());
     }
     if (!path.startsWith("/")) {
-      stream = contextLoader.getResourceAsStream("/" + path);
-      if (stream != null) {
-        return stream;
-      }
+      url = contextLoader.getResource("/" + path);
     }
     return null;
   }
@@ -245,11 +243,17 @@ public final class AviatorEvaluatorInstance {
    * @param args arguments to execute the script.
    * @throws Exception
    */
-  @SuppressWarnings("unchecked")
   public Map<String, Object> loadScript(final String path) throws IOException {
-    Expression exp = this.compileScript(path);
+    final File file = tryFindScriptFile(path);
+    final String abPath = file.getAbsolutePath();
+    return loadScript0(abPath);
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> loadScript0(final String abPath) throws IOException {
+    Expression exp = this.compileScript(abPath);
     final Env exports = new Env();
-    final Map<String, Object> module = exp.newEnv("exports", exports, "path", path);
+    final Map<String, Object> module = exp.newEnv("exports", exports, "path", abPath);
     Map<String, Object> env = exp.newEnv("__MODULE__", module, "exports", exports);
     exp.execute(env);
     exports.setInstance(this);
@@ -265,18 +269,20 @@ public final class AviatorEvaluatorInstance {
    * @throws Exception
    */
   public Map<String, Object> requireScript(final String path) throws IOException {
-    Map<String, Object> exports = (Env) this.moduleCache.get(path);
+    File file = tryFindScriptFile(path);
+    final String abPath = file.getAbsolutePath();
+    Map<String, Object> exports = (Env) this.moduleCache.get(abPath);
     if (exports != null) {
       return exports;
     } else {
       // TODO better lock
-      synchronized (path.intern()) {
-        exports = (Env) this.moduleCache.get(path);
+      synchronized (abPath.intern()) {
+        exports = (Env) this.moduleCache.get(abPath);
         if (exports != null) {
           return exports;
         }
-        exports = loadScript(path);
-        this.moduleCache.put(path, exports);
+        exports = loadScript0(abPath);
+        this.moduleCache.put(abPath, exports);
         return exports;
       }
     }
