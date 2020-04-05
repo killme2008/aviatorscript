@@ -72,6 +72,15 @@ public class ExpressionLexerUnitTest {
     assertEquals(0, token.getStartIndex());
   }
 
+  @Test
+  public void testOverflowLong() {
+    String digit = "27670116110564327423"; // 2E63 + 2E64 - 1
+    this.lexer = new ExpressionLexer(this.instance, digit);
+    Token<?> token = this.lexer.scan();
+    assertEquals(TokenType.Number, token.getType());
+    assertEquals(new BigInteger(digit), token.getValue(null));
+    assertEquals(new BigInteger(digit).toString(), token.getValue(null).toString());
+  }
 
   @Test
   public void testParseHexNumber() {
