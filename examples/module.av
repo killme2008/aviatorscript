@@ -1,0 +1,16 @@
+## examples/module.av
+
+## a test module
+
+let m = seq.map();
+
+m.add = lambda(x, y) ->
+  x + y
+end;
+m.sub = lambda(x, y) ->
+  x - y
+end;
+
+println("module path: " + __MODULE__.path);
+
+__MODULE__.exports = m;

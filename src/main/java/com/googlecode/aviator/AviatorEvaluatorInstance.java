@@ -245,14 +245,15 @@ public final class AviatorEvaluatorInstance {
    * @param args arguments to execute the script.
    * @throws Exception
    */
-  public Env loadScript(final String path) throws IOException {
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> loadScript(final String path) throws IOException {
     Expression exp = this.compileScript(path);
     final Env exports = new Env();
     final Map<String, Object> module = exp.newEnv("exports", exports, "path", path);
     Map<String, Object> env = exp.newEnv("__MODULE__", module, "exports", exports);
     exp.execute(env);
     exports.setInstance(this);
-    return exports;
+    return (Map<String, Object>) module.get("exports");
   }
 
 
@@ -263,8 +264,8 @@ public final class AviatorEvaluatorInstance {
    * @param args arguments to execute the script.
    * @throws Exception
    */
-  public Env requireScript(final String path) throws IOException {
-    Env exports = (Env) this.moduleCache.get(path);
+  public Map<String, Object> requireScript(final String path) throws IOException {
+    Map<String, Object> exports = (Env) this.moduleCache.get(path);
     if (exports != null) {
       return exports;
     } else {
