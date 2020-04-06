@@ -1,0 +1,16 @@
+## examples/hash_map.av
+
+let m = seq.map("a", 1, "b", 2, "c", 3, 4, 5);
+
+println(m);
+println("m.a = " + m.a);
+println("m.b = " + m.b);
+println("m.c = " + m.c);
+println("m.4 = " + seq.get(m, 4));
+
+m.a = 100;
+println("m.a = " + m.a);
+
+seq.put(m, 4, 99);
+println("m.4 = " + seq.get(m, 4));
+

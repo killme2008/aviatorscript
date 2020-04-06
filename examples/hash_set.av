@@ -1,0 +1,9 @@
+## examples/hash_set.av
+
+let s = seq.set(1, 2, 2, "hello", 3.3, "hello");
+println(s);
+println("type(s) is: " + type(s));
+
+println(include(s, 1));
+println(include(s, "hello"));	
+println(include(s, 100));	

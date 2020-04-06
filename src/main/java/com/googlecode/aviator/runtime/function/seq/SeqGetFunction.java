@@ -3,7 +3,9 @@ package com.googlecode.aviator.runtime.function.seq;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.utils.TypeUtils;
@@ -25,7 +27,8 @@ public class SeqGetFunction extends AbstractFunction {
 
   @SuppressWarnings("rawtypes")
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
 
     Object coll = arg1.getValue(env);
     Object key = arg2.getValue(env);
@@ -42,6 +45,12 @@ public class SeqGetFunction extends AbstractFunction {
 
       Object value = ((List) coll).get(((Number) key).intValue());
       return AviatorRuntimeJavaType.valueOf(value);
+    } else if (Set.class.isAssignableFrom(clazz)) {
+      if (((Set) coll).contains(key)) {
+        return AviatorRuntimeJavaType.valueOf(key);
+      } else {
+        return AviatorNil.NIL;
+      }
     } else if (Map.class.isAssignableFrom(clazz)) {
       Object value = ((Map) coll).get(key);
       return AviatorRuntimeJavaType.valueOf(value);

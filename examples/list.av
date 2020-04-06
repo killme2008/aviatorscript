@@ -1,0 +1,12 @@
+## examples/list.av
+
+let list = seq.list(1, 2, 3);
+
+list[0] = 4;
+list[1] = 5;
+list[2] = 6;
+
+
+println(list); 
+
+list[3] = 7;

@@ -1,0 +1,16 @@
+## examples/tuple.av
+
+let t = tuple(1, 2, "hello", 3.14);
+
+println("type of t: " + type(t));
+
+for x in t {
+  println(x);
+}
+
+println("count of t: "+ count(t));
+
+println("t[0] = " + t[0]);
+
+t[0] = 100;
+println("t[0] = " + t[0]);

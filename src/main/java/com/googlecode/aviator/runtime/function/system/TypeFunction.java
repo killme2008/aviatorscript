@@ -59,7 +59,7 @@ public class TypeFunction extends AbstractFunction {
           return STRING_TYPE;
         case JavaType:
           if (retry) {
-            return new AviatorString(arg1.getValue(env).getClass().getSimpleName());
+            return new AviatorString(arg1.getValue(env).getClass().getCanonicalName());
           }
           arg1 = FunctionUtils.wrapReturn(arg1.getValue(env));
           retry = true;

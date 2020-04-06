@@ -1,0 +1,64 @@
+## examples/collections.av
+
+let list = seq.list();
+let set = seq.set();
+let map = seq.map();
+
+## add elements by seq.add
+for i in range(0, 3) {
+  seq.add(list, i);
+  seq.add(set, i);
+  seq.add(map, i, i);
+}
+
+println("list: " + list);
+println("set: " + set);
+println("map: " + map);
+
+## retrieve elements by seq.get
+for i in range(0, 3) {
+  assert(i == seq.get(list, i));
+  assert(i == seq.get(set, i));
+  assert(i == seq.get(map, i));
+}
+println("seq.get(set, 3) is: " + seq.get(set, 3)); ## nil
+
+## whether contain elements
+for i in range(0, 3) {
+  assert(include(list, i));
+  assert(include(set, i));
+}
+assert(!include(list, 5));
+assert(!include(set, 5));
+
+for i in range(0, 3) {
+  assert(seq.contains_key(map, i));
+}
+assert(!seq.contains_key(map, 5));
+
+## Iterate the collection by for..in loop
+println("list elements:");
+for x in list {
+  println(x);
+}
+
+println("set elements:");
+for x in set {
+  println(x);
+}
+
+println("map elements:");
+for x in map {
+  println(x.key + "=" + x.value);
+}
+
+## remove elements
+assert(list == seq.remove(list, 2));
+assert(list == seq.remove(list, 4));
+assert(set == seq.remove(set, 1));
+assert(map == seq.remove(map, 0));
+println("list: " + list);
+println("set: " + set);
+println("map: " + map);
+
+
