@@ -180,6 +180,8 @@ public class ExpressionLexer {
       StringBuffer sb = new StringBuffer();
       int startIndex = this.iterator.getIndex();
       long lval = 0L;
+      long overflowFlag = Long.MAX_VALUE / 10;
+      long overflowSingle = Long.MAX_VALUE % 10;
       double dval = 0d;
       boolean hasDot = false;
       double d = 10.0;
@@ -251,6 +253,9 @@ public class ExpressionLexer {
             d = d * 10;
             nextChar();
           } else {
+            if (!isOverflow && (lval > overflowFlag || (lval == overflowFlag && digit > overflowSingle))) {
+              isOverflow = true;
+            }
             lval = 10 * lval + digit;
             dval = 10 * dval + digit;
             nextChar();
@@ -258,13 +263,8 @@ public class ExpressionLexer {
 
         }
 
-        if (lval < 0) {
-          isOverflow = true;
-        }
-
       } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'E'
           || this.peek == 'e' || this.peek == 'M' || this.peek == 'N');
-
 
       Number value;
       if (isBigDecimal) {
