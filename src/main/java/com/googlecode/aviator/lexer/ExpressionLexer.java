@@ -39,6 +39,8 @@ import com.googlecode.aviator.lexer.token.Variable;
  *
  */
 public class ExpressionLexer {
+  private static final long OVERFLOW_FLAG = Long.MAX_VALUE / 10;
+  private static final long OVERFLOW_SINGLE = Long.MAX_VALUE % 10;
   // current char
   private char peek;
   // Char iterator for string
@@ -180,8 +182,7 @@ public class ExpressionLexer {
       StringBuffer sb = new StringBuffer();
       int startIndex = this.iterator.getIndex();
       long lval = 0L;
-      long overflowFlag = Long.MAX_VALUE / 10;
-      long overflowSingle = Long.MAX_VALUE % 10;
+
       double dval = 0d;
       boolean hasDot = false;
       double d = 10.0;
@@ -253,7 +254,8 @@ public class ExpressionLexer {
             d = d * 10;
             nextChar();
           } else {
-            if (!isOverflow && (lval > overflowFlag || (lval == overflowFlag && digit > overflowSingle))) {
+            if (!isOverflow
+                && (lval > OVERFLOW_FLAG || (lval == OVERFLOW_FLAG && digit > OVERFLOW_SINGLE))) {
               isOverflow = true;
             }
             lval = 10 * lval + digit;
