@@ -3,6 +3,7 @@ package com.googlecode.aviator.runtime.type;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
@@ -22,8 +23,9 @@ public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
   }
 
   public AviatorRuntimeJavaElementType(final ContainerType containerType, final Object container,
-      final int index, final Object object) {
-    super(object);
+      final int index, final Callable<Object> callable) {
+    super(null);
+    this.setCallable(callable);
     this.container = container;
     this.index = index;
     this.containerType = containerType;

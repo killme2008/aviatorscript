@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 import org.apache.commons.beanutils.PropertyUtils;
 import com.googlecode.aviator.Options;
@@ -596,7 +597,7 @@ public class AviatorJavaType extends AviatorObject {
    */
   @Override
   public AviatorObject getElement(final Map<String, Object> env, final AviatorObject indexObject) {
-    Object thisValue = getValue(env);
+    final Object thisValue = getValue(env);
     if (!thisValue.getClass().isArray() && !(thisValue instanceof List)) {
       throw new ExpressionRuntimeException(
           desc(env) + " is not an array or list,could not use [] to get element");
@@ -605,13 +606,25 @@ public class AviatorJavaType extends AviatorObject {
     if (!isInteger(indexValue)) {
       throw new IllegalArgumentException("Illegal index: " + indexObject.desc(env));
     }
-    int index = ((Number) indexValue).intValue();
+    final int index = ((Number) indexValue).intValue();
     if (thisValue.getClass().isArray()) {
       return new AviatorRuntimeJavaElementType(ContainerType.Array, thisValue, index,
-          Array.get(thisValue, index));
+          new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+              return Array.get(thisValue, index);
+            }
+          });
     } else {
       return new AviatorRuntimeJavaElementType(ContainerType.List, thisValue, index,
-          ((List<?>) thisValue).get(index));
+          new Callable<Object>() {
+
+            @Override
+            public Object call() throws Exception {
+              return ((List<?>) thisValue).get(index);
+            }
+
+          });
     }
   }
 

@@ -16,6 +16,8 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
+import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.VarNameGenerator;
 
 
@@ -40,7 +42,8 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
 
       };
 
-  protected final Object object;
+  protected Object object;
+  protected Callable<Object> callable;
 
   public static AviatorObject valueOf(final Object object) {
     if (object == null) {
@@ -64,13 +67,30 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
     this.object = object;
   }
 
+
+
+  public Callable<Object> getCallable() {
+    return this.callable;
+  }
+
+  public void setCallable(final Callable<Object> callable) {
+    this.callable = callable;
+  }
+
   public static String genName() {
     return TEMP_VAR_GEN.get().gen();
   }
 
-
   @Override
   public Object getValue(final Map<String, Object> env) {
+    if (this.callable != null) {
+      try {
+        this.object = this.callable.call();
+        this.callable = null;
+      } catch (Exception e) {
+        throw Reflector.sneakyThrow(e);
+      }
+    }
     return this.object;
   }
 
