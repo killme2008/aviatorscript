@@ -136,6 +136,7 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
+import com.googlecode.aviator.utils.LRUMap;
 import com.googlecode.aviator.utils.Reflector;
 
 
@@ -188,7 +189,8 @@ public final class AviatorEvaluatorInstance {
    *
    * @param file the script file path
    * @param cached whether to cached the compiled result with key=path.
-   * @return
+   * @since 5.0.0
+   * @return the compiled expression instance.
    */
   public Expression compileScript(final String path, final boolean cached) throws IOException {
     File file = tryFindScriptFile(path);
@@ -245,7 +247,9 @@ public final class AviatorEvaluatorInstance {
    *
    * @param path
    * @param args arguments to execute the script.
-   * @throws Exception
+   * @throws IOException
+   * @return the exports map.
+   * @since 5.0.0
    */
   public Map<String, Object> loadScript(final String path) throws IOException {
     final File file = tryFindScriptFile(path);
@@ -266,11 +270,13 @@ public final class AviatorEvaluatorInstance {
 
 
   /**
-   * Loads a script from path and return it's exports.
+   * Loads a script from path and return it's exports with module caching.
    *
    * @param path
    * @param args arguments to execute the script.
-   * @throws Exception
+   * @throws IOException
+   * @return the exports map
+   * @since 5.0.0
    */
   public Map<String, Object> requireScript(final String path) throws IOException {
     File file = tryFindScriptFile(path);
@@ -293,11 +299,12 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
-   * Adds a module clazz and import it's public static methods as module's exports into module,
-   * return the exports env. cache.
+   * Adds a module class and import it's public static methods as module's exports into module
+   * cache, return the exports map.
    *
    * @param moduleClazz
-   * @return
+   * @return the exports map
+   * @since 5.0.0
    */
   public Env addModule(final Class<?> moduleClazz)
       throws NoSuchMethodException, IllegalAccessException {
@@ -824,11 +831,13 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                      * Compiled
-                                                                                      * expression
-                                                                                      * task
-                                                                                      */> cacheExpressions =
-      new ConcurrentHashMap<String, FutureTask<Expression>>();
+   * Compiled
+   * expression
+   * task
+   */> expressionCache =
+   new ConcurrentHashMap<String, FutureTask<Expression>>();
+
+  private LRUMap<String, FutureTask<Expression>> expressionLRUCache;
 
 
 
@@ -845,11 +854,39 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
+   * Use {@link LRUMap} as expression caching.
+   *
+   * @since 5.0.0
+   * @param capacity
+   * @return the evaluator instance itself.
+   */
+  public AviatorEvaluatorInstance useLRUExpressionCache(final int capacity) {
+    this.expressionLRUCache = new LRUMap<>(capacity);
+    return this;
+  }
+
+
+  /**
    * Clear all cached compiled expression
    */
   public void clearExpressionCache() {
+    resetClassLoader();
+    if (this.expressionLRUCache != null) {
+      synchronized (this.expressionLRUCache) {
+        this.expressionLRUCache.clear();
+      }
+    } else {
+      this.expressionCache.clear();
+    }
+  }
+
+  /**
+   * Reset the classloader to a new instance.
+   *
+   * @since 5.0.0
+   */
+  public void resetClassLoader() {
     this.aviatorClassLoader = initAviatorClassLoader();
-    this.cacheExpressions.clear();
   }
 
 
@@ -1047,7 +1084,14 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Expression getCachedExpressionByKey(final String cacheKey) {
-    FutureTask<Expression> task = this.cacheExpressions.get(cacheKey);
+    FutureTask<Expression> task = null;
+    if (this.expressionLRUCache != null) {
+      synchronized (this.expressionLRUCache) {
+        task = this.expressionLRUCache.get(cacheKey);
+      }
+    } else {
+      task = this.expressionCache.get(cacheKey);
+    }
     if (task != null) {
       return getCompiledExpression(cacheKey, task);
     } else {
@@ -1073,7 +1117,12 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public int getExpressionCacheSize() {
-    return this.cacheExpressions.size();
+    if (this.expressionLRUCache != null) {
+      synchronized (this.expressionLRUCache) {
+        return this.expressionLRUCache.size();
+      }
+    }
+    return this.expressionCache.size();
   }
 
 
@@ -1105,21 +1154,31 @@ public final class AviatorEvaluatorInstance {
     }
 
     if (cached) {
-      FutureTask<Expression> task = this.cacheExpressions.get(cacheKey);
-      if (task != null) {
-        return getCompiledExpression(expression, task);
-      }
-      task = new FutureTask<Expression>(new Callable<Expression>() {
-        @Override
-        public Expression call() throws Exception {
-          return innerCompile(expression, cached);
+      FutureTask<Expression> existedTask = null;
+      if (this.expressionLRUCache != null) {
+        boolean runTask = false;
+        synchronized (this.expressionLRUCache) {
+          existedTask = this.expressionLRUCache.get(cacheKey);
+          if (existedTask == null) {
+            existedTask = newCompileTask(expression, cached);
+            runTask = true;
+            this.expressionLRUCache.put(cacheKey, existedTask);
+          }
         }
-
-      });
-      FutureTask<Expression> existedTask = this.cacheExpressions.putIfAbsent(cacheKey, task);
-      if (existedTask == null) {
-        existedTask = task;
-        existedTask.run();
+        if (runTask) {
+          existedTask.run();
+        }
+      } else {
+        FutureTask<Expression> task = this.expressionCache.get(cacheKey);
+        if (task != null) {
+          return getCompiledExpression(expression, task);
+        }
+        task = newCompileTask(expression, cached);
+        existedTask = this.expressionCache.putIfAbsent(cacheKey, task);
+        if (existedTask == null) {
+          existedTask = task;
+          existedTask.run();
+        }
       }
       return getCompiledExpression(cacheKey, existedTask);
 
@@ -1129,13 +1188,23 @@ public final class AviatorEvaluatorInstance {
 
   }
 
+  private FutureTask<Expression> newCompileTask(final String expression, final boolean cached) {
+    return new FutureTask<>(new Callable<Expression>() {
+      @Override
+      public Expression call() throws Exception {
+        return innerCompile(expression, cached);
+      }
+
+    });
+  }
+
 
   private Expression getCompiledExpression(final String cacheKey,
       final FutureTask<Expression> task) {
     try {
       return task.get();
     } catch (Throwable t) {
-      this.cacheExpressions.remove(cacheKey);
+      invalidateCacheByKey(cacheKey);
       final Throwable cause = t.getCause();
       if (cause instanceof ExpressionSyntaxErrorException
           || cause instanceof CompileExpressionErrorException) {
@@ -1278,7 +1347,13 @@ public final class AviatorEvaluatorInstance {
    * @param cacheKey
    */
   public void invalidateCacheByKey(final String cacheKey) {
-    this.cacheExpressions.remove(cacheKey);
+    if (this.expressionLRUCache != null) {
+      synchronized (this.expressionLRUCache) {
+        this.expressionLRUCache.remove(cacheKey);
+      }
+    } else {
+      this.expressionCache.remove(cacheKey);
+    }
   }
 
 
