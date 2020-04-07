@@ -16,6 +16,10 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
  */
 public class AviatorDecimal extends AviatorNumber {
 
+
+  private static final long serialVersionUID = 7084583813460322882L;
+
+
   public AviatorDecimal(final Number number) {
     super(number);
   }

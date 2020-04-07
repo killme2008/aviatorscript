@@ -16,6 +16,9 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SeqNewSetFunction extends AbstractVariadicFunction {
 
+
+  private static final long serialVersionUID = -8247803628833006273L;
+
   @Override
   public String getName() {
     return "seq.set";

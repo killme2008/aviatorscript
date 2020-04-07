@@ -18,6 +18,10 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class String2DateFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -1899407811376304410L;
+
+
   @Override
   public String getName() {
     return "string_to_date";

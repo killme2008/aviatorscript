@@ -30,6 +30,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class StringContainsFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -441004511913761937L;
+
+
   @Override
   public String getName() {
     return "string.contains";

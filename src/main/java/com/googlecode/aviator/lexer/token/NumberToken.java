@@ -26,6 +26,8 @@ import java.util.Map;
  */
 public class NumberToken extends AbstractToken<Number> {
 
+
+  private static final long serialVersionUID = 3787410200228564680L;
   private Number value;
 
 

@@ -31,6 +31,8 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  * @author dennis
  */
 public class SeqPredicateFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = 478017115680743291L;
   private final String name;
   private final OperatorType opType;
   private final AviatorObject value;

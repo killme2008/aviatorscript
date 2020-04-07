@@ -20,6 +20,9 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class SeqGetFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -8707187642296260032L;
+
   @Override
   public String getName() {
     return "seq.get";

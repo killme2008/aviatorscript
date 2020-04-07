@@ -9,6 +9,8 @@ import java.util.Map;
  *
  */
 public class AviatorStringBuilder extends AviatorString {
+
+  private static final long serialVersionUID = 1958289382573221857L;
   private final StringBuilder sb;
 
   public AviatorStringBuilder(final StringBuilder sb) {

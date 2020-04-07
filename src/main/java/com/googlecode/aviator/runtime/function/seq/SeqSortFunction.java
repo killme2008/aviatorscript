@@ -32,6 +32,10 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SeqSortFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 8105967959099656098L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
 

@@ -20,6 +20,10 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SeqSomeFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -4070559519252562470L;
+
+
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {

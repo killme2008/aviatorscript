@@ -33,6 +33,8 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class RandomFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -8635075532485359687L;
   private static ThreadLocal<Random> randomLocal = new ThreadLocal<Random>() {
 
     @Override

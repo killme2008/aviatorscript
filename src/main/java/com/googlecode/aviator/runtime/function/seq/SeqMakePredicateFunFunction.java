@@ -29,6 +29,8 @@ import java.util.Map;
  * 
  */
 public class SeqMakePredicateFunFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = 5914895306808850530L;
   private final String name;
   private final OperatorType opType;
   private final AviatorObject value;

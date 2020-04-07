@@ -15,6 +15,7 @@
  **/
 package com.googlecode.aviator.runtime.type;
 
+import java.io.Serializable;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.utils.Env;
@@ -27,7 +28,9 @@ import com.googlecode.aviator.utils.TypeUtils;
  * @author dennis
  *
  */
-public abstract class AviatorObject {
+public abstract class AviatorObject implements Serializable {
+  private static final long serialVersionUID = -6006961429175160001L;
+
   public int compare(final AviatorObject other, final Map<String, Object> env) {
     if (this == other) {
       return 0;

@@ -29,6 +29,10 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  * 
  */
 public class StringSubStringFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = -5815382413034383204L;
+
+
   @Override
   public String getName() {
     return "string.substring";

@@ -22,11 +22,16 @@ import com.googlecode.aviator.utils.TypeUtils;
 
 /**
  * Aviator boolean type
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class AviatorBoolean extends AviatorObject {
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = -685795150869373183L;
 
   Boolean value;
 
@@ -36,19 +41,19 @@ public class AviatorBoolean extends AviatorObject {
 
 
   @Override
-  public AviatorObject not(Map<String, Object> env) {
+  public AviatorObject not(final Map<String, Object> env) {
     return this.value.booleanValue() ? FALSE : TRUE;
   }
 
 
   @Override
-  public final boolean booleanValue(Map<String, Object> env) {
-    return value.booleanValue();
+  public final boolean booleanValue(final Map<String, Object> env) {
+    return this.value.booleanValue();
   }
 
 
   @Override
-  public AviatorObject add(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
         return new AviatorString(this.value.toString() + ((AviatorString) other).getLexeme());
@@ -74,26 +79,27 @@ public class AviatorBoolean extends AviatorObject {
 
 
   @Override
-  public final Object getValue(Map<String, Object> env) {
+  public final Object getValue(final Map<String, Object> env) {
     return this.value;
   }
 
 
-  private AviatorBoolean(Boolean value) {
+  private AviatorBoolean(final Boolean value) {
     super();
     this.value = value;
   }
 
 
-  public static AviatorBoolean valueOf(boolean b) {
+  public static AviatorBoolean valueOf(final boolean b) {
     return b ? AviatorBoolean.TRUE : AviatorBoolean.FALSE;
   }
 
 
   @Override
-  public int innerCompare(AviatorObject other, Map<String, Object> env) {
-    if (this == other)
+  public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
+    if (this == other) {
       return 0;
+    }
     switch (other.getAviatorType()) {
       case Boolean:
         AviatorBoolean otherBoolean = (AviatorBoolean) other;
@@ -114,7 +120,7 @@ public class AviatorBoolean extends AviatorObject {
         return 1;
       default:
         throw new ExpressionRuntimeException(
-            "Could not compare " + this.desc(env) + " with " + other.desc(env));
+            "Could not compare " + desc(env) + " with " + other.desc(env));
     }
 
   }

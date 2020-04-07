@@ -14,6 +14,9 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class SeqRemoveFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -8263329813393510288L;
+
   @Override
   public String getName() {
     return "seq.remove";

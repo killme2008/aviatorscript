@@ -23,6 +23,10 @@ package com.googlecode.aviator.lexer.token;
  */
 public class PatternToken extends StringToken {
 
+
+  private static final long serialVersionUID = 727969490471907456L;
+
+
   public PatternToken(String lexeme, int startIndex) {
     super(lexeme, startIndex);
   }

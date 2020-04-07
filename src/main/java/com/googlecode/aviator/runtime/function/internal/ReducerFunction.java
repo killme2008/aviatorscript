@@ -23,6 +23,9 @@ import com.googlecode.aviator.utils.Constants;
  */
 public class ReducerFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -6117602709327741955L;
+
   @Override
   public String getName() {
     return "__reducer_callcc";

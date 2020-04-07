@@ -21,11 +21,12 @@ import com.googlecode.aviator.utils.TypeUtils;
 
 /**
  * Aviator nil object
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class AviatorNil extends AviatorObject {
+  private static final long serialVersionUID = 5030890238879926682L;
   public static final AviatorNil NIL = new AviatorNil();
 
 
@@ -35,7 +36,7 @@ public class AviatorNil extends AviatorObject {
 
 
   @Override
-  public AviatorObject add(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
         return new AviatorString("null" + other.getValue(env));
@@ -53,9 +54,10 @@ public class AviatorNil extends AviatorObject {
 
 
   @Override
-  public int innerCompare(AviatorObject other, Map<String, Object> env) {
-    if (this == other)
+  public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
+    if (this == other) {
       return 0;
+    }
     switch (other.getAviatorType()) {
       case Nil:
         return 0;
@@ -76,7 +78,7 @@ public class AviatorNil extends AviatorObject {
 
 
   @Override
-  public Object getValue(Map<String, Object> env) {
+  public Object getValue(final Map<String, Object> env) {
     return null;
   }
 

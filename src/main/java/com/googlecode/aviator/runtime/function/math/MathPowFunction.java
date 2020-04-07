@@ -35,6 +35,9 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class MathPowFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 5909888819672336251L;
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
     Number left = FunctionUtils.getNumberValue(arg1, env);

@@ -12,6 +12,9 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class IdentityFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -7049623828555613407L;
+
   @Override
   public String getName() {
     return "identity";

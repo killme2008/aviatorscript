@@ -15,6 +15,8 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  */
 public class TypeFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 501798543495705123L;
   private static final AviatorString STRING_TYPE = new AviatorString("string");
   private static final AviatorString PATTERN_TYPE = new AviatorString("pattern");
   private static final AviatorString RANGE_TYPE = new AviatorString("range");

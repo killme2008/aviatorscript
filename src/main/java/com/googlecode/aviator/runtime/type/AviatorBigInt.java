@@ -14,6 +14,10 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
  */
 public class AviatorBigInt extends AviatorLong {
 
+
+  private static final long serialVersionUID = 2208761926142343652L;
+
+
   private static class BigIntCache {
     private BigIntCache() {}
 

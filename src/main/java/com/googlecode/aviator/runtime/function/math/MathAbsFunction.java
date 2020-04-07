@@ -37,6 +37,10 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class MathAbsFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -862700689914934548L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     Number number = FunctionUtils.getNumberValue(arg1, env);

@@ -29,6 +29,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * 
  */
 public class StringEndsWithFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = 3341588177105896074L;
+
+
   @Override
   public String getName() {
     return "string.endsWith";

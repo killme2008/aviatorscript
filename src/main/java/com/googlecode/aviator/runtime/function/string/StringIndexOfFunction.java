@@ -16,6 +16,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class StringIndexOfFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 4497808043956407590L;
+
+
   @Override
   public String getName() {
     return "string.indexOf";

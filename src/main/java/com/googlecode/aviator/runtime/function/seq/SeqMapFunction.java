@@ -36,6 +36,10 @@ import com.googlecode.aviator.runtime.type.Sequence;
  */
 public class SeqMapFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -4781893293207344881L;
+
+
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,

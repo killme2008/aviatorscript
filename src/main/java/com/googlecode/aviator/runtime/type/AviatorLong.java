@@ -29,6 +29,10 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class AviatorLong extends AviatorNumber {
 
+
+  private static final long serialVersionUID = 7414561190099820442L;
+
+
   private static class LongCache {
     private LongCache() {}
 

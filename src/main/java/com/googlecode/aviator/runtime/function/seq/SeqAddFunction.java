@@ -15,6 +15,9 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class SeqAddFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -4406740199823615336L;
+
   @Override
   public String getName() {
     return "seq.add";

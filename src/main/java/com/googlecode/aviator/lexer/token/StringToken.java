@@ -26,6 +26,10 @@ import java.util.Map;
  */
 public class StringToken extends AbstractToken<java.lang.String> {
 
+
+  private static final long serialVersionUID = -8305143945358948254L;
+
+
   public StringToken(String lexeme, int startIndex) {
     super(startIndex, lexeme);
   }

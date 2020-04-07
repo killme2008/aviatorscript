@@ -188,12 +188,27 @@ public final class AviatorEvaluatorInstance {
    * Compile a script file into expression.
    *
    * @param file the script file path
-   * @param cached whether to cached the compiled result with key=path.
+   * @param cached whether to cached the compiled result with key is script file's absolute path.
    * @since 5.0.0
    * @return the compiled expression instance.
    */
   public Expression compileScript(final String path, final boolean cached) throws IOException {
     File file = tryFindScriptFile(path);
+    return compileScript(file.getAbsolutePath(), file, cached);
+  }
+
+  /**
+   * Compile a script into expression.
+   *
+   * @param cacheKey caching key when cached is true.
+   * @param file the script file
+   * @param cached whether to cache the expression instance by cacheKey.
+   * @return the compiled expression instance.
+   * @since 5.0.0
+   * @throws IOException
+   */
+  public Expression compileScript(final String cacheKey, final File file, final boolean cached)
+      throws IOException {
     try (InputStream in = new FileInputStream(file);
         Reader fr = new InputStreamReader(in, Charset.forName("utf-8"));
         BufferedReader reader = new BufferedReader(fr)) {
@@ -202,7 +217,7 @@ public final class AviatorEvaluatorInstance {
       while ((line = reader.readLine()) != null) {
         script.append(line).append(Constants.NEWLINE);
       }
-      return compile(path, script.toString(), cached);
+      return compile(cacheKey, script.toString(), cached);
     }
   }
 
@@ -227,6 +242,12 @@ public final class AviatorEvaluatorInstance {
     throw new FileNotFoundException("File not found: " + path);
   }
 
+  /**
+   * Set a custom aviator class loader
+   *
+   * @since 5.0.0
+   * @param aviatorClassLoader
+   */
   public void setAviatorClassLoader(final AviatorClassLoader aviatorClassLoader) {
     this.aviatorClassLoader = aviatorClassLoader;
   }

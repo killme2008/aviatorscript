@@ -31,6 +31,10 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public abstract class AviatorNumber extends AviatorObject {
   /**
+   *
+   */
+  private static final long serialVersionUID = 6775726371182360535L;
+  /**
    * Number union
    */
   // Only for bigint/decimal

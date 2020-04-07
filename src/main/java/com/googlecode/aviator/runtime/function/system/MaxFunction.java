@@ -8,6 +8,9 @@ package com.googlecode.aviator.runtime.function.system;
  */
 public class MaxFunction extends AbstractMinMaxFunction {
 
+
+  private static final long serialVersionUID = -2638341290892443991L;
+
   @Override
   public String getName() {
     return "max";

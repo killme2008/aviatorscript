@@ -15,6 +15,9 @@ import com.googlecode.aviator.utils.Env;
  */
 public abstract class LambdaFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -4388339706945053452L;
+
   // the arguments.
   protected List<String> arguments;
 

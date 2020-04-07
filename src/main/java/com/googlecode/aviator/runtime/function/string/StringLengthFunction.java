@@ -30,6 +30,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class StringLengthFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 4330275006337010966L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     String value = FunctionUtils.getStringValue(arg1, env);

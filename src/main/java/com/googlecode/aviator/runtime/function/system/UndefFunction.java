@@ -16,6 +16,9 @@ import com.googlecode.aviator.utils.Env;
  */
 public class UndefFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -1301889134837125717L;
+
   @Override
   public String getName() {
     return "undef";

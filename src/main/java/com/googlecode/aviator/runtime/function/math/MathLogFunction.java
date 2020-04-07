@@ -34,6 +34,10 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class MathLogFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -3726921342776002687L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
 

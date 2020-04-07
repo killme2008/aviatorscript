@@ -12,6 +12,8 @@ import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
  */
 public class DelegateToken extends AbstractToken<Token<?>> {
 
+
+  private static final long serialVersionUID = -1564600597069979843L;
   private final Token<?> token;
   private final DelegateTokenType delegateTokenType;
   private LambdaFunctionBootstrap lambdaFunctionBootstrap;

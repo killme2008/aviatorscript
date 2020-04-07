@@ -15,6 +15,9 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SeqNewMapFunction extends AbstractVariadicFunction {
 
+
+  private static final long serialVersionUID = -2581715177871593829L;
+
   @Override
   public String getName() {
     return "seq.map";

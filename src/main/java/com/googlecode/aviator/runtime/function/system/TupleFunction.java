@@ -14,6 +14,9 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class TupleFunction extends AbstractVariadicFunction {
 
+
+  private static final long serialVersionUID = -7377110880312266008L;
+
   @Override
   public String getName() {
     return "tuple";

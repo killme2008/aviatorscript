@@ -27,6 +27,9 @@ import com.googlecode.aviator.utils.VarNameGenerator;
  */
 public class AviatorRuntimeJavaType extends AviatorJavaType {
 
+
+  private static final long serialVersionUID = 3107203976124904223L;
+
   public static final ThreadLocal<VarNameGenerator> TEMP_VAR_GEN =
       new ThreadLocal<VarNameGenerator>() {
 

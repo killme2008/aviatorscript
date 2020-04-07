@@ -16,6 +16,8 @@ import com.googlecode.aviator.utils.Env;
  */
 public final class Range extends AviatorObject implements Sequence<AviatorNumber> {
 
+
+  private static final long serialVersionUID = 1463899968843425932L;
   private static final AviatorLong ZERO = AviatorLong.valueOf(0L);
   public static final Range LOOP = new Range(ZERO, ZERO, ZERO);
 

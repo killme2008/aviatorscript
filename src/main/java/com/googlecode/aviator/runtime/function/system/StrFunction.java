@@ -16,6 +16,9 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  */
 public class StrFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 8649875989830820633L;
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     final Object value = arg1.getValue(env);

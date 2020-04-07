@@ -28,6 +28,8 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public class AviatorString extends AviatorObject {
+
+  private static final long serialVersionUID = -7430694306919959899L;
   private final String lexeme;
 
   @Override

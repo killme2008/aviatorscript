@@ -1,7 +1,6 @@
 package com.googlecode.aviator.runtime.function.string;
 
 import java.util.Map;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -15,6 +14,10 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  * 
  */
 public class StringReplaceFirstFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = 1563485375844407804L;
+
+
   @Override
   public String getName() {
     return "string.replace_first";

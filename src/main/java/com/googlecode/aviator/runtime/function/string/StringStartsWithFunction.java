@@ -29,6 +29,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * 
  */
 public class StringStartsWithFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = 1529665864351661711L;
+
+
   @Override
   public String getName() {
     return "string.startsWith";

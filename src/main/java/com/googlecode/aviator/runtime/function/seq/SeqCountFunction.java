@@ -33,6 +33,10 @@ import com.googlecode.aviator.runtime.type.Range;
  */
 public class SeqCountFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 4640528586873392060L;
+
+
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
     Object value = arg1.getValue(env);

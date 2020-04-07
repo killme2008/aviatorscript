@@ -15,6 +15,7 @@
  **/
 package com.googlecode.aviator.lexer;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import com.googlecode.aviator.lexer.token.Token;
@@ -27,7 +28,9 @@ import com.googlecode.aviator.lexer.token.Variable;
  * @author dennis
  *
  */
-public class SymbolTable {
+public class SymbolTable implements Serializable {
+
+  private static final long serialVersionUID = -9019014977807517193L;
 
   private final Map<String, Variable> table = new HashMap<>();
 

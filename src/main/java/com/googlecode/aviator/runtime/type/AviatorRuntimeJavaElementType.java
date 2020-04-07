@@ -10,6 +10,8 @@ import com.googlecode.aviator.utils.Reflector;
 
 public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
 
+
+  private static final long serialVersionUID = -955529214730255727L;
   private final int index;
   private final Object container;
 

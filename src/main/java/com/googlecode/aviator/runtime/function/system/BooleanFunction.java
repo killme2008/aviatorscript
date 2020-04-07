@@ -16,6 +16,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class BooleanFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -2549798338853017229L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     switch (arg1.getAviatorType()) {

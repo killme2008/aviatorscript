@@ -26,6 +26,8 @@ import java.util.Map;
  */
 public class OperatorToken extends AbstractToken<OperatorType> {
 
+
+  private static final long serialVersionUID = -7479302090612995384L;
   private final OperatorType operatorType;
 
   public OperatorType getOperatorType() {

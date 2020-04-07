@@ -12,6 +12,8 @@ import com.googlecode.aviator.runtime.type.AviatorType;
  * @since 5.0.0
  */
 public class ReducerResult extends AviatorRuntimeJavaType {
+
+  private static final long serialVersionUID = 8804868778622599851L;
   public final ReducerState state;
   public AviatorObject obj;
 

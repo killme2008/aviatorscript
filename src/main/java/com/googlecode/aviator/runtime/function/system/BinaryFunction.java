@@ -30,6 +30,8 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  *
  */
 public class BinaryFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = -7543895978170666671L;
   private final OperatorType opType;
 
 

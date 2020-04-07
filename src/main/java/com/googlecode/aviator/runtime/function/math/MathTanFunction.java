@@ -30,6 +30,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class MathTanFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -4187660146211829531L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     Number num = FunctionUtils.getNumberValue(arg1, env);

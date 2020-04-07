@@ -30,6 +30,10 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SysDateFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -2866091423749189359L;
+
+
   @Override
   public String getName() {
     return "sysdate";

@@ -15,6 +15,9 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class AssertFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -1089556474491684233L;
+
   /**
    * Assertion failiure.
    *

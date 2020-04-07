@@ -15,12 +15,14 @@
  **/
 package com.googlecode.aviator.runtime.type;
 
+import java.io.Serializable;
+
 /**
  * Aviator types
  *
  * @author dennis
  *
  */
-public enum AviatorType {
+public enum AviatorType implements Serializable {
   Long, Double, String, JavaType, Boolean, Pattern, Nil, Method, BigInt, Decimal, Lambda, Range;
 }

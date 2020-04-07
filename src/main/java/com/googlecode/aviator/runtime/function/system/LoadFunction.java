@@ -19,6 +19,9 @@ import com.googlecode.aviator.utils.Constants;
  */
 public class LoadFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -6860446850416005514L;
+
   @Override
   public String getName() {
     return Constants.LOAD_FN;

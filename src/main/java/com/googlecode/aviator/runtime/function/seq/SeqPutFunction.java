@@ -18,6 +18,9 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class SeqPutFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -3135895014660784340L;
+
   @Override
   public String getName() {
     return "seq.put";

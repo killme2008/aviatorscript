@@ -14,6 +14,9 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class ReducerContFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 7517333105872722540L;
+
   @Override
   public String getName() {
     return "__reducer_cont";

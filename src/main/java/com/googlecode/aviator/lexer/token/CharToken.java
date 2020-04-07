@@ -25,6 +25,8 @@ import java.util.Map;
  * 
  */
 public class CharToken extends AbstractToken<Character> {
+
+  private static final long serialVersionUID = -4529035977875919777L;
   private final char ch;
   private int startIndex;
 

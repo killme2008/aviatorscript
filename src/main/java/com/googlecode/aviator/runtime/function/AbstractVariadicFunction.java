@@ -16,6 +16,10 @@ import com.googlecode.aviator.runtime.type.AviatorType;
  */
 public abstract class AbstractVariadicFunction extends AviatorObject implements AviatorFunction {
 
+
+  private static final long serialVersionUID = -5939898720859638046L;
+
+
   @Override
   public AviatorType getAviatorType() {
     return AviatorType.Lambda;

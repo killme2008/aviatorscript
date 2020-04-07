@@ -18,6 +18,10 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SeqCompsitePredFunFunction extends AbstractVariadicFunction {
 
+
+  private static final long serialVersionUID = 2728893801192387893L;
+
+
   public static enum LogicOp {
     AND, OR
   }
@@ -51,6 +55,10 @@ public class SeqCompsitePredFunFunction extends AbstractVariadicFunction {
   private static AviatorFunction createFunction(final Map<String, Object> env,
       final AviatorObject[] args, final LogicOp op) {
     return new AbstractFunction() {
+
+
+      private static final long serialVersionUID = -3935448162130773442L;
+
 
       @Override
       public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {

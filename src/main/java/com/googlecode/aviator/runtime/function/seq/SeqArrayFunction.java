@@ -18,6 +18,9 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public class SeqArrayFunction extends AbstractVariadicFunction {
+
+  private static final long serialVersionUID = 2012324452539443834L;
+
   @Override
   public String getName() {
     return "seq.array";

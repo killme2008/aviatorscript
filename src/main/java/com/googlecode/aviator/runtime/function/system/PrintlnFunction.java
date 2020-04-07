@@ -32,6 +32,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class PrintlnFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -1592661531857237654L;
+
+
   @Override
   public String getName() {
     return "println";

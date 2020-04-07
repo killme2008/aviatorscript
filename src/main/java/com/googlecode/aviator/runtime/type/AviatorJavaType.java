@@ -38,7 +38,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public class AviatorJavaType extends AviatorObject {
-
+  private static final long serialVersionUID = -4353225521490659987L;
   private String name;
   private final boolean containsDot;
 

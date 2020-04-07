@@ -15,6 +15,10 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  * 
  */
 public class StringReplaceAllFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = -3302888022156167811L;
+
+
   @Override
   public String getName() {
     return "string.replace_all";

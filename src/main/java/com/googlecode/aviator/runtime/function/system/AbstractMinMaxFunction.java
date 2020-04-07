@@ -12,6 +12,9 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  *
  */
 public abstract class AbstractMinMaxFunction extends AbstractVariadicFunction {
+
+  private static final long serialVersionUID = -2554658421948407347L;
+
   static enum Op {
     Min, Max
   }

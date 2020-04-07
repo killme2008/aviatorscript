@@ -27,6 +27,10 @@ import java.util.Map;
 public class AviatorDouble extends AviatorNumber {
 
 
+
+  private static final long serialVersionUID = 829573884607069307L;
+
+
   public AviatorDouble(double d) {
     super(d);
   }

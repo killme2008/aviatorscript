@@ -14,6 +14,9 @@ import com.googlecode.aviator.runtime.type.AviatorType;
  *
  */
 public abstract class AbstractFunction extends AviatorObject implements AviatorFunction {
+  private static final long serialVersionUID = -2391067902827877479L;
+
+
   public AviatorObject throwArity(final int n) {
     String name = getName();
     throw new IllegalArgumentException("Wrong number of args (" + n + ") passed to: " + name);

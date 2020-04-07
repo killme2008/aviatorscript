@@ -32,6 +32,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class SeqContainsKeyFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 1543232112837279691L;
+
+
   @SuppressWarnings("rawtypes")
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,

@@ -29,6 +29,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class NowFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 4288316673236996427L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env) {
     return AviatorLong.valueOf(System.currentTimeMillis());

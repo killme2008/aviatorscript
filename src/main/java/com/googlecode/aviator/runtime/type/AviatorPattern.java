@@ -34,6 +34,8 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class AviatorPattern extends AviatorObject {
 
+
+  private static final long serialVersionUID = -6667072156431636239L;
   final Pattern pattern;
 
 

@@ -17,6 +17,9 @@ import com.googlecode.aviator.runtime.type.Sequence;
  */
 public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 1236238221132010289L;
+
   static enum Op {
     Min, Max
   }

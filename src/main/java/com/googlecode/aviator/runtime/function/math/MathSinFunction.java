@@ -30,6 +30,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class MathSinFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 5265228513226163825L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     Number num = FunctionUtils.getNumberValue(arg1, env);

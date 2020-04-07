@@ -14,6 +14,9 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class CompareFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 6748727841901719306L;
+
   @Override
   public String getName() {
     return "cmp";

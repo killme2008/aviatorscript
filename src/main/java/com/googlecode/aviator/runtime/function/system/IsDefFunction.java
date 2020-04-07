@@ -15,6 +15,9 @@ import com.googlecode.aviator.runtime.type.AviatorType;
  */
 public class IsDefFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 8641929538658275527L;
+
   @Override
   public String getName() {
     return "is_def";

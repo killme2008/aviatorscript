@@ -9,6 +9,9 @@ package com.googlecode.aviator.runtime.function.seq;
  */
 public class SeqMinFunction extends AbstractSeqMinMaxFunction {
 
+
+  private static final long serialVersionUID = -9115254931251817546L;
+
   @Override
   public String getName() {
     return "seq.min";

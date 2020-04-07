@@ -34,6 +34,10 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SeqReduceFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 3647565344441046668L;
+
+
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2, final AviatorObject arg3) {

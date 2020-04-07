@@ -15,6 +15,7 @@
  **/
 package com.googlecode.aviator.lexer.token;
 
+import java.io.Serializable;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -25,7 +26,9 @@ import java.util.Map;
  *
  * @param <T>
  */
-public abstract class AbstractToken<T> implements Token<T> {
+public abstract class AbstractToken<T> implements Token<T>, Serializable {
+
+  private static final long serialVersionUID = 4498841242745542399L;
 
   private final int startIndex;
 

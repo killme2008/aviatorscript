@@ -17,6 +17,10 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  *
  */
 public class StringJoinFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = 8857093154788638443L;
+
+
   @Override
   public String getName() {
     return "string.join";

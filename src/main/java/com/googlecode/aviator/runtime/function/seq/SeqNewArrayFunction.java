@@ -19,6 +19,11 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public class SeqNewArrayFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = -6837670921285947159L;
+
+
+
   @Override
   public String getName() {
     return "seq.array_of";

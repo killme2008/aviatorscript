@@ -16,6 +16,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class DoubleFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 7418978804691784744L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     switch (arg1.getAviatorType()) {

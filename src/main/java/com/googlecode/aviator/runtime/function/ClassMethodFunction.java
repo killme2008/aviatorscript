@@ -16,6 +16,8 @@ import com.googlecode.aviator.utils.Reflector;
  *
  */
 public class ClassMethodFunction extends AbstractVariadicFunction {
+
+  private static final long serialVersionUID = 5946505010078966461L;
   private MethodHandle handle; // Only for one-arity function.
   private Class<?>[] pTypes;
   private final String name;

@@ -15,6 +15,9 @@ import com.googlecode.aviator.runtime.type.Range;
  */
 public class RangeFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -8074216928792719019L;
+
   @Override
   public String getName() {
     return "range";

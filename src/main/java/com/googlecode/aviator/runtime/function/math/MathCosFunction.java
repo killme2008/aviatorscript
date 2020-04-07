@@ -30,6 +30,10 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class MathCosFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -8964262110030240875L;
+
+
   @Override
   public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
     Number num = FunctionUtils.getNumberValue(arg1, env);

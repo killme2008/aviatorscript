@@ -14,6 +14,9 @@ import com.googlecode.aviator.utils.Constants;
  */
 public class IfCallccFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 3511688119189694245L;
+
   @Override
   public String getName() {
     return "__if_callcc";

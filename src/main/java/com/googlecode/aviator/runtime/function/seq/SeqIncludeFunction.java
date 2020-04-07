@@ -32,6 +32,10 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class SeqIncludeFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = 2484898649434036343L;
+
+
   @SuppressWarnings("rawtypes")
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,

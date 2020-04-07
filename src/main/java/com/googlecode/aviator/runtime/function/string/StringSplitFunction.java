@@ -15,6 +15,10 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  * 
  */
 public class StringSplitFunction extends AbstractFunction {
+
+  private static final long serialVersionUID = -8513586590310490323L;
+
+
   @Override
   public String getName() {
     return "string.split";

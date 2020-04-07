@@ -14,6 +14,9 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class ReducerBreakFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -542526309712482544L;
+
   @Override
   public String getName() {
     return "__reducer_break";

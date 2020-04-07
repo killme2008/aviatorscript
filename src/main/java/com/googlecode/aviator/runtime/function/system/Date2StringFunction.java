@@ -17,6 +17,10 @@ import com.googlecode.aviator.runtime.type.AviatorString;
  */
 public class Date2StringFunction extends AbstractFunction {
 
+
+  private static final long serialVersionUID = -774515438944931814L;
+
+
   @Override
   public String getName() {
     return "date_to_string";
