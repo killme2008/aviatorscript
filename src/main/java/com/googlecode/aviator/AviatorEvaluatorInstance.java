@@ -148,7 +148,7 @@ import com.googlecode.aviator.utils.Reflector;
  */
 public final class AviatorEvaluatorInstance {
 
-  private AviatorClassLoader aviatorClassLoader;
+  private volatile AviatorClassLoader aviatorClassLoader = initAviatorClassLoader();
 
   private OutputStream traceOutputStream = System.out;
 
@@ -223,6 +223,10 @@ public final class AviatorEvaluatorInstance {
       return file;
     }
     throw new FileNotFoundException("File not found: " + path);
+  }
+
+  public void setAviatorClassLoader(final AviatorClassLoader aviatorClassLoader) {
+    this.aviatorClassLoader = aviatorClassLoader;
   }
 
   private File tryFindFileFromClassLoader(final String path, final ClassLoader contextLoader) {
@@ -678,16 +682,15 @@ public final class AviatorEvaluatorInstance {
     this.traceOutputStream = traceOutputStream;
   }
 
-  {
-    this.aviatorClassLoader =
-        AccessController.doPrivileged(new PrivilegedAction<AviatorClassLoader>() {
+  private AviatorClassLoader initAviatorClassLoader() {
+    return AccessController.doPrivileged(new PrivilegedAction<AviatorClassLoader>() {
 
-          @Override
-          public AviatorClassLoader run() {
-            return new AviatorClassLoader(AviatorEvaluatorInstance.class.getClassLoader());
-          }
+      @Override
+      public AviatorClassLoader run() {
+        return new AviatorClassLoader(AviatorEvaluatorInstance.class.getClassLoader());
+      }
 
-        });
+    });
   }
 
   private final Map<String, Object> funcMap = new HashMap<String, Object>();
@@ -845,6 +848,7 @@ public final class AviatorEvaluatorInstance {
    * Clear all cached compiled expression
    */
   public void clearExpressionCache() {
+    this.aviatorClassLoader = initAviatorClassLoader();
     this.cacheExpressions.clear();
   }
 
