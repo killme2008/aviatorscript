@@ -831,11 +831,11 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-   * Compiled
-   * expression
-   * task
-   */> expressionCache =
-   new ConcurrentHashMap<String, FutureTask<Expression>>();
+                                                                                      * Compiled
+                                                                                      * expression
+                                                                                      * task
+                                                                                      */> expressionCache =
+      new ConcurrentHashMap<String, FutureTask<Expression>>();
 
   private LRUMap<String, FutureTask<Expression>> expressionLRUCache;
 
@@ -854,7 +854,8 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
-   * Use {@link LRUMap} as expression caching.
+   * Use {@link LRUMap} as expression caching.It should be called when initializing the evaluator
+   * instance.
    *
    * @since 5.0.0
    * @param capacity
