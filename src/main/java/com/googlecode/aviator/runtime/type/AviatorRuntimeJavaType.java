@@ -67,8 +67,6 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
     this.object = object;
   }
 
-
-
   public Callable<Object> getCallable() {
     return this.callable;
   }
@@ -85,8 +83,7 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
   public Object getValue(final Map<String, Object> env) {
     if (this.callable != null) {
       try {
-        this.object = this.callable.call();
-        this.callable = null;
+        return this.callable.call();
       } catch (Exception e) {
         throw Reflector.sneakyThrow(e);
       }
