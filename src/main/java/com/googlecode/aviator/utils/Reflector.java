@@ -14,6 +14,7 @@ package com.googlecode.aviator.utils;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 /**
  * Some code is copied from
@@ -344,5 +346,54 @@ public class Reflector {
       }
     }
     return ret;
+  }
+
+  private static final ReferenceQueue<BeanUtilsBean> RQ = new ReferenceQueue<>();
+  private static final ConcurrentHashMap<ClassLoader, WeakReference<BeanUtilsBean>> BEANS_BY_CLASSLOADER =
+      new ConcurrentHashMap<>();
+
+  private static void clearBeanCache() {
+    if (RQ.poll() != null) {
+      while (RQ.poll() != null) {
+        ;
+      }
+      for (Map.Entry<ClassLoader, WeakReference<BeanUtilsBean>> e : BEANS_BY_CLASSLOADER
+          .entrySet()) {
+        Reference<BeanUtilsBean> val = e.getValue();
+        if (val != null && val.get() == null) {
+          BEANS_BY_CLASSLOADER.remove(e.getKey(), val);
+        }
+      }
+    }
+  }
+
+  public static BeanUtilsBean getBeanUtilsBean() {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    BeanUtilsBean instance = null;
+    WeakReference<BeanUtilsBean> ref = BEANS_BY_CLASSLOADER.get(classLoader);
+    if (ref == null) {
+      // cleanup any dead entries
+      clearBeanCache();
+      instance = new BeanUtilsBean();
+      ref = BEANS_BY_CLASSLOADER.putIfAbsent(classLoader,
+          new WeakReference<BeanUtilsBean>(instance, RQ));
+      if (ref == null) {
+        // insert a new one, return the instance directly.
+        return instance;
+      }
+    }
+    instance = ref.get();
+    if (instance != null) {
+      return instance;
+    }
+    // Already be GC, remove it from cache, and try again.
+    BEANS_BY_CLASSLOADER.remove(classLoader, ref);
+    return getBeanUtilsBean();
+  }
+
+  public static Object getProperty(final String name, final Map<String, Object> env)
+      throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    return getBeanUtilsBean().getPropertyUtils().getProperty(env, name);
+    // return PropertyUtils.getProperty(env, name);
   }
 }

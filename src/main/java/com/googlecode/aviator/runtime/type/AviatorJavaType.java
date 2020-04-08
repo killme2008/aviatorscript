@@ -30,6 +30,7 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
+import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -394,12 +395,12 @@ public class AviatorJavaType extends AviatorObject {
 
         // fallback to property utils
         if (!(val instanceof Map)) {
-          return PropertyUtils.getProperty(env, name);
+          return Reflector.getProperty(name, env);
         }
 
         innerEnv = (Map<String, Object>) val;
       }
-      return PropertyUtils.getProperty(env, name);
+      return Reflector.getProperty(name, env);
 
     } catch (Throwable t) {
       if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
