@@ -391,7 +391,7 @@ public class Reflector {
     return getBeanUtilsBean();
   }
 
-  public static Object getProperty(final String name, final Map<String, Object> env)
+  public static Object getProperty(final Map<String, Object> env, final String name)
       throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
     return getBeanUtilsBean().getPropertyUtils().getProperty(env, name);
     // return PropertyUtils.getProperty(env, name);

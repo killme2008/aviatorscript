@@ -395,12 +395,12 @@ public class AviatorJavaType extends AviatorObject {
 
         // fallback to property utils
         if (!(val instanceof Map)) {
-          return Reflector.getProperty(name, env);
+          return Reflector.getProperty(env, name);
         }
 
         innerEnv = (Map<String, Object>) val;
       }
-      return Reflector.getProperty(name, env);
+      return Reflector.getProperty(env, name);
 
     } catch (Throwable t) {
       if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
