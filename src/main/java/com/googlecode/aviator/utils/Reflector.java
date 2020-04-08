@@ -136,7 +136,7 @@ public class Reflector {
     return ret;
   }
 
-  static <K, V> void clearCache(final ReferenceQueue rq,
+  static <K, V> void clearCache(final ReferenceQueue<V> rq,
       final ConcurrentHashMap<K, Reference<V>> cache) {
     // cleanup any dead entries
     if (rq.poll() != null) {
@@ -348,35 +348,21 @@ public class Reflector {
     return ret;
   }
 
-  private static final ReferenceQueue<BeanUtilsBean> RQ = new ReferenceQueue<>();
-  private static final ConcurrentHashMap<ClassLoader, WeakReference<BeanUtilsBean>> BEANS_BY_CLASSLOADER =
+  private static final ReferenceQueue<BeanUtilsBean> beansRq = new ReferenceQueue<>();
+  private static final ConcurrentHashMap<ClassLoader, Reference<BeanUtilsBean>> beansByClassLoader =
       new ConcurrentHashMap<>();
 
-  private static void clearBeanCache() {
-    if (RQ.poll() != null) {
-      while (RQ.poll() != null) {
-        ;
-      }
-      for (Map.Entry<ClassLoader, WeakReference<BeanUtilsBean>> e : BEANS_BY_CLASSLOADER
-          .entrySet()) {
-        Reference<BeanUtilsBean> val = e.getValue();
-        if (val != null && val.get() == null) {
-          BEANS_BY_CLASSLOADER.remove(e.getKey(), val);
-        }
-      }
-    }
-  }
 
   public static BeanUtilsBean getBeanUtilsBean() {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     BeanUtilsBean instance = null;
-    WeakReference<BeanUtilsBean> ref = BEANS_BY_CLASSLOADER.get(classLoader);
+    Reference<BeanUtilsBean> ref = beansByClassLoader.get(classLoader);
     if (ref == null) {
       // cleanup any dead entries
-      clearBeanCache();
+      clearCache(beansRq, beansByClassLoader);
       instance = new BeanUtilsBean();
-      ref = BEANS_BY_CLASSLOADER.putIfAbsent(classLoader,
-          new WeakReference<BeanUtilsBean>(instance, RQ));
+      ref = beansByClassLoader.putIfAbsent(classLoader,
+          new WeakReference<BeanUtilsBean>(instance, beansRq));
       if (ref == null) {
         // insert a new one, return the instance directly.
         return instance;
@@ -387,7 +373,7 @@ public class Reflector {
       return instance;
     }
     // Already be GC, remove it from cache, and try again.
-    BEANS_BY_CLASSLOADER.remove(classLoader, ref);
+    beansByClassLoader.remove(classLoader, ref);
     return getBeanUtilsBean();
   }
 
