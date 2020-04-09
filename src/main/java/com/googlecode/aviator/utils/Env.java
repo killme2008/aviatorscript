@@ -91,6 +91,10 @@ public class Env implements Map<String, Object> {
     this.mOverrides = overrides;
   }
 
+  public void setmOverrides(final Map<String, Object> mOverrides) {
+    this.mOverrides = mOverrides;
+  }
+
   /**
    * Clear all override key-value pairs. This only effects the overrides, not the defaults.
    */

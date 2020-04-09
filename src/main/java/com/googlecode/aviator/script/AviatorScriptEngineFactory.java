@@ -27,13 +27,12 @@ public class AviatorScriptEngineFactory implements ScriptEngineFactory {
   private static final List<String> names = Collections
       .unmodifiableList(Arrays.asList("Aviator", "aviator", "aviatorscript", "AviatorScript"));
 
-  private static final Map<String, String> parameterMap = new HashMap<String, String>();
+  private static final Map<String, String> PARAM_MAP = new HashMap<String, String>();
   static {
-    parameterMap.put(ScriptEngine.ENGINE, "Aviator");
-    parameterMap.put(ScriptEngine.ENGINE_VERSION, AviatorEvaluator.VERSION);
-    parameterMap.put(ScriptEngine.LANGUAGE,
-        "A high performance scripting language hosted on the JVM");
-    parameterMap.put(ScriptEngine.LANGUAGE_VERSION, AviatorEvaluator.VERSION);
+    PARAM_MAP.put(ScriptEngine.ENGINE, "Aviator");
+    PARAM_MAP.put(ScriptEngine.ENGINE_VERSION, AviatorEvaluator.VERSION);
+    PARAM_MAP.put(ScriptEngine.LANGUAGE, "A high performance scripting language hosted on the JVM");
+    PARAM_MAP.put(ScriptEngine.LANGUAGE_VERSION, AviatorEvaluator.VERSION);
   }
 
 
@@ -44,13 +43,13 @@ public class AviatorScriptEngineFactory implements ScriptEngineFactory {
 
   @Override
   public String getEngineName() {
-    return parameterMap.get(ScriptEngine.ENGINE);
+    return PARAM_MAP.get(ScriptEngine.ENGINE);
   }
 
 
   @Override
   public String getEngineVersion() {
-    return parameterMap.get(ScriptEngine.ENGINE_VERSION);
+    return PARAM_MAP.get(ScriptEngine.ENGINE_VERSION);
   }
 
 
@@ -62,13 +61,13 @@ public class AviatorScriptEngineFactory implements ScriptEngineFactory {
 
   @Override
   public String getLanguageName() {
-    return parameterMap.get(ScriptEngine.LANGUAGE);
+    return PARAM_MAP.get(ScriptEngine.LANGUAGE);
   }
 
 
   @Override
   public String getLanguageVersion() {
-    return parameterMap.get(ScriptEngine.LANGUAGE_VERSION);
+    return PARAM_MAP.get(ScriptEngine.LANGUAGE_VERSION);
   }
 
 
@@ -107,7 +106,7 @@ public class AviatorScriptEngineFactory implements ScriptEngineFactory {
 
   @Override
   public Object getParameter(final String key) {
-    return parameterMap.get(key);
+    return PARAM_MAP.get(key);
   }
 
 

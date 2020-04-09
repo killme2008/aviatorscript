@@ -1,5 +1,4 @@
 ## examples/function.av
-
 fn add(x, y) {
   return x + y;
 }

@@ -1037,7 +1037,15 @@ public class ExpressionParser implements Parser {
       reportSyntaxError("expect '(' after function name");
     }
     lambda(true);
-    getCodeGeneratorWithTimes().onAssignment(this.lookhead.withMeta(Constants.DEFINE_META, true));
+    getCodeGeneratorWithTimes().onAssignment(currentToken().withMeta(Constants.DEFINE_META, true));
+  }
+
+  private Token<?> currentToken() {
+    Token<?> token = this.lookhead;
+    if (token == null) {
+      token = new CharToken((char) -1, this.lexer.getCurrentIndex());
+    }
+    return token;
   }
 
 
