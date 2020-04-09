@@ -11,6 +11,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 
 
 /**
+ * Aviator script engine factory.
  * 
  * @author libinsong1204@gmail.com
  * @author dennis
@@ -19,19 +20,24 @@ import com.googlecode.aviator.AviatorEvaluator;
  */
 public class AviatorScriptEngineFactory implements ScriptEngineFactory {
 
-  private static final List<String> extensions =
-      Collections.unmodifiableList(Arrays.asList(new String[] {}));
+  private static final List<String> extensions = Collections.unmodifiableList(Arrays.asList(".av"));
   private static final List<String> mimeTypes =
-      Collections.unmodifiableList(Arrays.asList(new String[] {"text/aviator"}));
-  private static final List<String> names =
-      Collections.unmodifiableList(Arrays.asList(new String[] {"Aviator", "aviator"}));
+      Collections.unmodifiableList(Arrays.asList("text/aviator"));
+  private static final List<String> names = Collections
+      .unmodifiableList(Arrays.asList("Aviator", "aviator", "aviatorscript", "AviatorScript"));
 
   private static final Map<String, String> parameterMap = new HashMap<String, String>();
   static {
     parameterMap.put(ScriptEngine.ENGINE, "Aviator");
     parameterMap.put(ScriptEngine.ENGINE_VERSION, AviatorEvaluator.VERSION);
-    parameterMap.put(ScriptEngine.LANGUAGE, "A high performance expression evaluator for java");
+    parameterMap.put(ScriptEngine.LANGUAGE,
+        "A high performance scripting language hosted on the JVM");
     parameterMap.put(ScriptEngine.LANGUAGE_VERSION, AviatorEvaluator.VERSION);
+  }
+
+
+  public static final AviatorScriptEngineFactory newInstance() {
+    return new AviatorScriptEngineFactory();
   }
 
 
@@ -66,7 +72,7 @@ public class AviatorScriptEngineFactory implements ScriptEngineFactory {
 
 
   @Override
-  public String getMethodCallSyntax(String obj, String m, String... args) {
+  public String getMethodCallSyntax(final String obj, final String m, final String... args) {
     StringBuilder sb = new StringBuilder(m);
     sb.append("(").append(obj);
     if (args != null) {
@@ -93,20 +99,24 @@ public class AviatorScriptEngineFactory implements ScriptEngineFactory {
 
 
   @Override
-  public String getOutputStatement(String toDisplay) {
+  public String getOutputStatement(final String toDisplay) {
     return "print(+" + toDisplay + ")";
   }
 
 
   @Override
-  public Object getParameter(String key) {
+  public Object getParameter(final String key) {
     return parameterMap.get(key);
   }
 
 
   @Override
-  public String getProgram(String... statements) {
-    return null;
+  public String getProgram(final String... statements) {
+    StringBuilder sb = new StringBuilder();
+    for (String stmt : statements) {
+      sb.append(stmt).append(";");
+    }
+    return sb.toString();
   }
 
 

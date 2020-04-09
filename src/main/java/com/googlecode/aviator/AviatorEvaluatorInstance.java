@@ -17,7 +17,6 @@
 package com.googlecode.aviator;
 
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -138,6 +137,7 @@ import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.LRUMap;
 import com.googlecode.aviator.utils.Reflector;
+import com.googlecode.aviator.utils.Utils;
 
 
 /**
@@ -210,14 +210,9 @@ public final class AviatorEvaluatorInstance {
   public Expression compileScript(final String cacheKey, final File file, final boolean cached)
       throws IOException {
     try (InputStream in = new FileInputStream(file);
-        Reader fr = new InputStreamReader(in, Charset.forName("utf-8"));
-        BufferedReader reader = new BufferedReader(fr)) {
-      StringBuilder script = new StringBuilder();
-      String line = null;
-      while ((line = reader.readLine()) != null) {
-        script.append(line).append(Constants.NEWLINE);
-      }
-      return compile(cacheKey, script.toString(), cached);
+        Reader reader = new InputStreamReader(in, Charset.forName("utf-8"));) {
+
+      return compile(cacheKey, Utils.readFully(reader), cached);
     }
   }
 

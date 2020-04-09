@@ -46,19 +46,35 @@ public abstract class BaseExpression implements Expression {
     this.varNames = new ArrayList<String>(tmp);
   }
 
+  private class SymbolHashMap extends HashMap<String, Object> {
+
+    private static final long serialVersionUID = 5951510458689965590L;
+
+    public SymbolHashMap(final int initialCapacity) {
+      super(initialCapacity);
+    }
+
+    @Override
+    public Object put(String key, final Object value) {
+      Variable var = null;
+      if (BaseExpression.this.symbolTable != null
+          && (var = BaseExpression.this.symbolTable.getVariable(key)) != null) {
+        key = var.getLexeme();
+      }
+      return super.put(key, value);
+    }
+
+  }
+
   @Override
   public Map<String, Object> newEnv(final Object... args) {
     if (args != null && args.length % 2 != 0) {
       throw new IllegalArgumentException("Expect arguments number is even.");
     }
-    Map<String, Object> env = new HashMap<>(args != null ? args.length : 10);
+    Map<String, Object> env = new SymbolHashMap(args != null ? args.length : 10);
     if (args != null) {
       for (int i = 0; i < args.length; i += 2) {
         String key = (String) args[i];
-        Variable var = null;
-        if (this.symbolTable != null && (var = this.symbolTable.getVariable(key)) != null) {
-          key = var.getLexeme();
-        }
         env.put(key, args[i + 1]);
       }
     }
