@@ -99,7 +99,7 @@ public class AviatorScriptEngine extends AbstractScriptEngine implements Compila
 
 
   /**
-   * Setting whether to cache the compiled exprssion, defualt is true(caching).
+   * Setting whether to cache the compiled script, default is true(caching).
    *
    * @param cached true means enable caching.
    */

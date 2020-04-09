@@ -12,7 +12,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 
 /**
  * Aviator script engine factory.
- * 
+ *
  * @author libinsong1204@gmail.com
  * @author dennis
  * @date 2011-1-18 上午11:03:34
@@ -20,9 +20,10 @@ import com.googlecode.aviator.AviatorEvaluator;
  */
 public class AviatorScriptEngineFactory implements ScriptEngineFactory {
 
-  private static final List<String> extensions = Collections.unmodifiableList(Arrays.asList(".av"));
+  private static final List<String> extensions =
+      Collections.unmodifiableList(Arrays.asList("av", "aviator"));
   private static final List<String> mimeTypes =
-      Collections.unmodifiableList(Arrays.asList("text/aviator"));
+      Collections.unmodifiableList(Arrays.asList("text/aviator", "text/aviatorscript"));
   private static final List<String> names = Collections
       .unmodifiableList(Arrays.asList("Aviator", "aviator", "aviatorscript", "AviatorScript"));
 
