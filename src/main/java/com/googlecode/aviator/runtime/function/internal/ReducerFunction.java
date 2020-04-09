@@ -3,12 +3,9 @@ package com.googlecode.aviator.runtime.function.internal;
 import java.util.Map;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
-import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
-import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
-import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.Range;
@@ -36,15 +33,8 @@ public class ReducerFunction extends AbstractFunction {
       final AviatorObject arg2, final AviatorObject arg3) {
 
     Object coll = arg1.getValue(env);
-    AviatorFunction iteratorFn = FunctionUtils.getFunction(arg2, env, 2);
-    AviatorFunction continuationFn = FunctionUtils.getFunction(arg3, env, 0);
-    if (iteratorFn == null) {
-      throw new FunctionNotFoundException(
-          "There is no function named " + ((AviatorJavaType) arg2).getName());
-    }
-    if (continuationFn == null) {
-      throw new FunctionNotFoundException("remainingFn not found, Shoud not happen");
-    }
+    AviatorFunction iteratorFn = (AviatorFunction) arg2;
+    AviatorFunction continuationFn = (AviatorFunction) arg3;
     if (coll == null) {
       throw new NullPointerException("null seq");
     }
@@ -52,9 +42,33 @@ public class ReducerFunction extends AbstractFunction {
 
     int maxLoopCount = RuntimeUtils.getInstance(env).getOptionValue(Options.MAX_LOOP_COUNT).number;
     AviatorObject result = null;
-    int c = 0;
+    long c = 0;
 
-    if (coll == Range.LOOP) {
+    if (coll != Range.LOOP) {
+      // for..in loop
+      for (Object obj : RuntimeUtils.seq(coll, env)) {
+        result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
+        if (!(result instanceof ReducerResult)) {
+          continue;
+        }
+
+        boolean breakOut = false;
+        ReducerResult midResult = (ReducerResult) result;
+        result = midResult.obj;
+        switch (midResult.state) {
+          case Break:
+            breakOut = true;
+            break;
+          case Return:
+            return midResult;
+          default:
+            break;
+        }
+        if (breakOut) {
+          break;
+        }
+      }
+    } else {
       // while statement
       while (true) {
         if (maxLoopCount > 0 && ++c >= maxLoopCount) {
@@ -64,34 +78,20 @@ public class ReducerFunction extends AbstractFunction {
         if (!(result instanceof ReducerResult)) {
           continue;
         }
+        boolean breakOut = false;
         ReducerResult midResult = (ReducerResult) result;
-        if (midResult.state == ReducerState.Cont) {
-          result = midResult.obj;
-          continue;
-        } else if (midResult.state == ReducerState.Break) {
-          result = midResult.obj;
-          break;
-        } else {
-          return midResult;
+        result = midResult.obj;
+        switch (midResult.state) {
+          case Break:
+            breakOut = true;
+            break;
+          case Return:
+            return midResult;
+          default:
+            break;
         }
-      }
-    } else {
-      // for..in loop
-      for (Object obj : RuntimeUtils.seq(coll, env)) {
-        result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
-        if (!(result instanceof ReducerResult)) {
-          continue;
-        }
-
-        ReducerResult midResult = (ReducerResult) result;
-        if (midResult.state == ReducerState.Cont) {
-          result = midResult.obj;
-          continue;
-        } else if (midResult.state == ReducerState.Break) {
-          result = midResult.obj;
+        if (breakOut) {
           break;
-        } else {
-          return midResult;
         }
       }
     }

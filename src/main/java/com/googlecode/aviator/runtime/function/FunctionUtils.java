@@ -120,13 +120,15 @@ public class FunctionUtils {
     }
     // Runtime type.
     Object val = null;
+    if (arg instanceof AviatorFunction) {
+      return (AviatorFunction) arg;
+    }
+
     if (arg instanceof AviatorRuntimeJavaType
         && (val = arg.getValue(env)) instanceof AviatorFunction) {
       return (AviatorFunction) val;
     }
-    if (arg instanceof AviatorFunction) {
-      return (AviatorFunction) arg;
-    }
+
     // resolve by name.
     // special processing for "-" operator
     String name = ((AviatorJavaType) arg).getName();

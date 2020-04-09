@@ -46,10 +46,10 @@ fn rand_list(n) {
 }
 
 
-let n = 10000;
+let n = 20000;
 {
   ## warm up
-  for i in range(0, n) {
+  for i in range(0, 10000) {
     let a = rand_list(5);
     qsort(a);
   }
