@@ -41,7 +41,7 @@ public class SeqMapFunction extends AbstractFunction {
 
 
   @Override
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"rawtypes"})
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {
 

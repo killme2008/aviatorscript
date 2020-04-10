@@ -10,6 +10,10 @@ public class ListCollector implements Collector {
   List list;
   boolean returnArray;
 
+  public ListCollector() {
+    this(INIT_CAP, false);
+  }
+
   public ListCollector(final boolean returnArray) {
     this(INIT_CAP, returnArray);
   }

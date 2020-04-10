@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
-import org.apache.commons.beanutils.PropertyUtils;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
@@ -362,7 +361,7 @@ public class AviatorJavaType extends AviatorObject {
     if (RuntimeUtils.getInstance(env).getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
       Object v = value.getValue(env);
       try {
-        PropertyUtils.setProperty(env, this.name, value.getValue(env));
+        Reflector.setProperty(env, this.name, value.getValue(env));
       } catch (Throwable t) {
         if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
           t.printStackTrace();

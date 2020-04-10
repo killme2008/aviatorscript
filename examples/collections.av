@@ -35,6 +35,9 @@ for i in range(0, 3) {
   assert(seq.contains_key(map, i));
 }
 assert(!seq.contains_key(map, 5));
+for i in range(0, 3) {
+  assert(include(map, seq.entry(i, i)));
+}
 
 ## Iterate the collection by for..in loop
 println("list elements:");

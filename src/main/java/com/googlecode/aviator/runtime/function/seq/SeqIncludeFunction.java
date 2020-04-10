@@ -16,6 +16,7 @@
 package com.googlecode.aviator.runtime.function.seq;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -45,13 +46,14 @@ public class SeqIncludeFunction extends AbstractFunction {
       throw new NullPointerException("null seq");
     }
     Class<?> clazz = first.getClass();
+    Object element = arg2.getValue(env);
     boolean contains = false;
     if (Set.class.isAssignableFrom(clazz)) {
       contains = ((Set) first).contains(arg2.getValue(env));
     } else {
       try {
         for (Object obj : RuntimeUtils.seq(first, env)) {
-          if (AviatorRuntimeJavaType.valueOf(obj).compare(arg2, env) == 0) {
+          if (isEqual(env, arg2, obj, element)) {
             contains = true;
             break;
           }
@@ -63,6 +65,18 @@ public class SeqIncludeFunction extends AbstractFunction {
     }
     return AviatorBoolean.valueOf(contains);
 
+  }
+
+
+  private boolean isEqual(final Map<String, Object> env, final AviatorObject arg2, final Object obj,
+      final Object element) {
+    try {
+      return AviatorRuntimeJavaType.valueOf(obj).compare(arg2, env) == 0;
+    } catch (Exception e) {
+      RuntimeUtils.printStackTrace(env, e);
+      // fallback to Objects.equals
+      return Objects.equals(element, obj);
+    }
   }
 
 

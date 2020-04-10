@@ -14,7 +14,7 @@ import com.googlecode.aviator.utils.Env;
  * @author dennis(killme2008@gmail.com)
  * @since 5.0.0
  */
-public final class Range extends AviatorObject implements Sequence<AviatorNumber> {
+public final class Range extends AviatorObject implements Sequence<Number> {
 
 
   private static final long serialVersionUID = 1463899968843425932L;
@@ -80,8 +80,7 @@ public final class Range extends AviatorObject implements Sequence<AviatorNumber
   }
 
   public int size() {
-    return ((Number) this.end.sub(this.start, null).add(AviatorNumber.valueOf(1), null)
-        .div(this.step, null).getValue(null)).intValue();
+    return ((Number) this.end.sub(this.start, null).div(this.step, null).getValue(null)).intValue();
   }
 
   @Override
@@ -119,8 +118,8 @@ public final class Range extends AviatorObject implements Sequence<AviatorNumber
   }
 
   @Override
-  public Iterator<AviatorNumber> iterator() {
-    return new Iterator<AviatorNumber>() {
+  public Iterator<Number> iterator() {
+    return new Iterator<Number>() {
       AviatorNumber current = Range.this.start;
 
       @Override
@@ -138,13 +137,13 @@ public final class Range extends AviatorObject implements Sequence<AviatorNumber
       }
 
       @Override
-      public AviatorNumber next() {
+      public Number next() {
         if (!hasNext()) {
           throw new NoSuchElementException();
         }
         AviatorNumber result = this.current;
         this.current = (AviatorNumber) this.current.add(Range.this.step, Env.EMPTY_ENV);
-        return result;
+        return (Number) result.getValue(Env.EMPTY_ENV);
       }
 
     };

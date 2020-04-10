@@ -1,0 +1,12 @@
+## examples/result_set_seq.av
+
+let users = into(seq.list(), results);
+
+println("User names: "
+  + map(users, lambda(u) -> u.username end));
+
+println("users that age is greater than 30: "
+  + filter(users, lambda(u) -> u.age > 30 end));
+
+println("Total age: "
+  + reduce(users, lambda(n, u) -> n + u.age end, 0));

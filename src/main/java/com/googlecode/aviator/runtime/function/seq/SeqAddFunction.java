@@ -36,12 +36,14 @@ public class SeqAddFunction extends AbstractFunction {
     Class<?> clazz = coll.getClass();
 
     if (Collection.class.isAssignableFrom(clazz)) {
-
       ((Collection) coll).add(element);
-
+      return arg1;
+    } else if (Map.class.isAssignableFrom(clazz) && element instanceof Map.Entry) {
+      Map.Entry entry = (Map.Entry) element;
+      ((Map) coll).put(entry.getKey(), entry.getValue());
       return arg1;
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a collection.");
+      throw new IllegalArgumentException(arg1.desc(env) + " is not a collection or map.");
     }
 
   }

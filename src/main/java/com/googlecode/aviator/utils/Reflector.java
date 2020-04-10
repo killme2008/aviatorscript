@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.FluentPropertyBeanIntrospector;
 
 /**
  * Some code is copied from
@@ -33,6 +34,10 @@ import org.apache.commons.beanutils.BeanUtilsBean;
  *
  */
 public class Reflector {
+
+  private static final FluentPropertyBeanIntrospector INTROSPECTOR =
+      new FluentPropertyBeanIntrospector();
+
 
   /**
    * Throw even checked exceptions without being required to declare them or catch them. Suggested
@@ -361,6 +366,7 @@ public class Reflector {
       // cleanup any dead entries
       clearCache(beansRq, beansByClassLoader);
       instance = new BeanUtilsBean();
+      instance.getPropertyUtils().addBeanIntrospector(INTROSPECTOR);
       ref = beansByClassLoader.putIfAbsent(classLoader,
           new WeakReference<BeanUtilsBean>(instance, beansRq));
       if (ref == null) {
@@ -380,6 +386,10 @@ public class Reflector {
   public static Object getProperty(final Map<String, Object> env, final String name)
       throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
     return getBeanUtilsBean().getPropertyUtils().getProperty(env, name);
-    // return PropertyUtils.getProperty(env, name);
+  }
+
+  public static void setProperty(final Object bean, final String name, final Object value)
+      throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    getBeanUtilsBean().getPropertyUtils().setProperty(bean, name, value);
   }
 }

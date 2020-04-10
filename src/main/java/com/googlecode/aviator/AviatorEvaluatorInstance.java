@@ -81,7 +81,9 @@ import com.googlecode.aviator.runtime.function.seq.SeqEveryFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqGetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqIntoFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqMapEntryFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMaxFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMinFunction;
@@ -806,6 +808,8 @@ public final class AviatorEvaluatorInstance {
     addFunction(new SeqNewListFunction());
     addFunction(new SeqNewMapFunction());
     addFunction(new SeqNewSetFunction());
+    addFunction(new SeqMapEntryFunction());
+    addFunction(new SeqIntoFunction());
     addFunction(new SeqAddFunction());
     addFunction(new SeqRemoveFunction());
     addFunction(new SeqGetFunction());

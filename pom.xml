@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
@@ -45,6 +47,12 @@
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.9.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.10.19</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
 		<dependency>
@@ -164,17 +172,13 @@
 			<activation>
 				<activeByDefault>false</activeByDefault>
 				<property>
-					<!--
-						where property `performRelease` comes from?
-						- maven-release-plugin
-						  Whether to use the release profile that adds sources and javadocs to the released artifact,
-						  if appropriate. If set to true, the release plugin sets the property "performRelease" to true,
-						  which activates the profile "release-profile", which is inherited from the super pom.
-						  Default value is: true.
-						  https://maven.apache.org/plugins-archives/maven-release-plugin-2.2.2/perform-mojo.html
-						- All models implicitly inherit from a super-POM which added maven-source-plugin and maven-javadoc-plugin
-						  https://maven.apache.org/ref/3.0.4/maven-model-builder/super-pom.html
-					-->
+					<!-- where property `performRelease` comes from? - maven-release-plugin 
+						Whether to use the release profile that adds sources and javadocs to the 
+						released artifact, if appropriate. If set to true, the release plugin sets 
+						the property "performRelease" to true, which activates the profile "release-profile", 
+						which is inherited from the super pom. Default value is: true. https://maven.apache.org/plugins-archives/maven-release-plugin-2.2.2/perform-mojo.html 
+						- All models implicitly inherit from a super-POM which added maven-source-plugin 
+						and maven-javadoc-plugin https://maven.apache.org/ref/3.0.4/maven-model-builder/super-pom.html -->
 					<name>performRelease</name>
 					<value>true</value>
 				</property>
@@ -194,11 +198,9 @@
 							</execution>
 						</executions>
 					</plugin>
-					<!--
-						Maven plugin which includes build-time git repository information into an POJO / *.properties).
-						Make your apps tell you which version exactly they were built from! Priceless in large distributed deployments.
-							https://github.com/ktoso/maven-git-commit-id-plugin
-					-->
+					<!-- Maven plugin which includes build-time git repository information 
+						into an POJO / *.properties). Make your apps tell you which version exactly 
+						they were built from! Priceless in large distributed deployments. https://github.com/ktoso/maven-git-commit-id-plugin -->
 					<plugin>
 						<groupId>pl.project13.maven</groupId>
 						<artifactId>git-commit-id-plugin</artifactId>
