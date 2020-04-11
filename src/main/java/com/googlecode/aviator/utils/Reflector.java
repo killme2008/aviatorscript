@@ -390,6 +390,6 @@ public class Reflector {
 
   public static void setProperty(final Object bean, final String name, final Object value)
       throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    getBeanUtilsBean().getPropertyUtils().setProperty(bean, name, value);
+    getBeanUtilsBean().setProperty(bean, name, value);
   }
 }

@@ -1,0 +1,10 @@
+## examples/for_return.av
+
+for i in range(0, 10) {
+  if i > 5 {
+    return;
+  }
+  println(i);
+}
+
+println("Can't reach here");
