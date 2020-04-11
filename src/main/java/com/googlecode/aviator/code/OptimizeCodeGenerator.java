@@ -87,10 +87,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   public OptimizeCodeGenerator(final AviatorEvaluatorInstance instance,
-      final ClassLoader classLoader, final OutputStream traceOutStream, final boolean trace) {
+      final ClassLoader classLoader, final OutputStream traceOutStream) {
     this.instance = instance;
-    this.codeGen =
-        new ASMCodeGenerator(instance, (AviatorClassLoader) classLoader, traceOutStream, trace);
+    this.codeGen = new ASMCodeGenerator(instance, (AviatorClassLoader) classLoader, traceOutStream);
     this.trace = trace;
   }
 

@@ -144,17 +144,6 @@ public final class AviatorEvaluator {
   }
 
   /**
-   * Configure whether to trace code generation
-   *
-   * @deprecated please use {@link #setOption(Options, Object)}
-   * @param t true is to trace,default is false.
-   */
-  @Deprecated
-  public static void setTrace(final boolean t) {
-    getInstance().setOption(Options.TRACE, t);
-  }
-
-  /**
    * @see AviatorEvaluatorInstance#setFunctionMissing(FunctionMissing)
    * @param functionMissing
    */

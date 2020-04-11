@@ -588,12 +588,41 @@ public final class AviatorEvaluatorInstance {
     newOpts.put(opt, opt.intoValue(val));
     this.options = newOpts;
 
-    if (opt == Options.ENABLE_REQUIRE_LOAD_SCRIPTS) {
-      if (getOptionValue(opt).bool) {
+    if (opt == Options.FEATURE_SET) {
+      if (!getOptionValue(opt).featureSet.contains(Feature.Module)) {
         addLoadAndRequireFunction();
       } else {
         removeLoadAndRequireFunction();
       }
+    }
+  }
+
+  /**
+   * Enable a script engine feature.
+   *
+   * @see Feature
+   * @since 5.0.0
+   * @param feature
+   */
+  public void enableFeature(final Feature feature) {
+    this.options.get(Options.FEATURE_SET).featureSet.add(feature);
+    if (feature == Feature.Module) {
+      addLoadAndRequireFunction();
+    }
+  }
+
+
+  /**
+   * Disable a script engine feature.
+   *
+   * @see Feature
+   * @since 5.0.0
+   * @param feature
+   */
+  public void disableFeature(final Feature feature) {
+    this.options.get(Options.FEATURE_SET).featureSet.remove(feature);
+    if (feature == Feature.Module) {
+      removeLoadAndRequireFunction();
     }
   }
 
@@ -870,6 +899,9 @@ public final class AviatorEvaluatorInstance {
     addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
     for (Options opt : Options.values()) {
       this.options.put(opt, opt.getDefaultValueObject());
+    }
+    if (this.options.get(Options.FEATURE_SET).featureSet.contains(Feature.Module)) {
+      addLoadAndRequireFunction();
     }
   }
 
@@ -1262,13 +1294,12 @@ public final class AviatorEvaluatorInstance {
   public CodeGenerator newCodeGenerator(final AviatorClassLoader classLoader) {
     switch (getOptimizeLevel()) {
       case AviatorEvaluator.COMPILE:
-        ASMCodeGenerator asmCodeGenerator = new ASMCodeGenerator(this, classLoader,
-            this.traceOutputStream, getOptionValue(Options.TRACE).bool);
+        ASMCodeGenerator asmCodeGenerator =
+            new ASMCodeGenerator(this, classLoader, this.traceOutputStream);
         asmCodeGenerator.start();
         return asmCodeGenerator;
       case AviatorEvaluator.EVAL:
-        return new OptimizeCodeGenerator(this, classLoader, this.traceOutputStream,
-            getOptionValue(Options.TRACE).bool);
+        return new OptimizeCodeGenerator(this, classLoader, this.traceOutputStream);
       default:
         throw new IllegalArgumentException("Unknow option " + getOptimizeLevel());
     }

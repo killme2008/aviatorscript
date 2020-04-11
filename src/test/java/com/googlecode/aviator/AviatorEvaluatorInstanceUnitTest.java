@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.springframework.util.StringUtils;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -247,9 +248,8 @@ public class AviatorEvaluatorInstanceUnitTest {
 
   @Test
   public void testDefaultOptionValues() {
-    assertEquals(this.instance.getOption(Options.TRACE), false);
     assertEquals(this.instance.getOption(Options.TRACE_EVAL), false);
-    assertEquals(this.instance.getOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL), false);
+    assertEquals(this.instance.getOption(Options.FEATURE_SET), Feature.getFullFeatures());
     assertEquals(this.instance.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL),
         false);
     assertEquals(this.instance.getOption(Options.OPTIMIZE_LEVEL), AviatorEvaluator.EVAL);
@@ -260,12 +260,12 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Test
   public void testSetOptions() {
     try {
-      this.instance.setOption(Options.TRACE, true);
-      assertEquals(this.instance.getOption(Options.TRACE), true);
+      this.instance.setOption(Options.FEATURE_SET, Feature.getCompatibleFeatures());
+      assertEquals(this.instance.getOption(Options.FEATURE_SET), Feature.getCompatibleFeatures());
       this.instance.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
       assertEquals(this.instance.getOption(Options.OPTIMIZE_LEVEL), AviatorEvaluator.COMPILE);
     } finally {
-      this.instance.setOption(Options.TRACE, false);
+      this.instance.setOption(Options.FEATURE_SET, Feature.getFullFeatures());
       this.instance.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.EVAL);
     }
   }
@@ -365,13 +365,13 @@ public class AviatorEvaluatorInstanceUnitTest {
   }
 
 
-  @Test(expected = ExpressionRuntimeException.class)
+  @Test(expected = UnsupportedFeatureException.class)
   public void testDisableAssignment() {
-    this.instance.setOption(Options.DISABLE_ASSIGNMENT, true);
+    this.instance.disableFeature(Feature.Assignment);
     try {
       this.instance.execute("a=3");
     } finally {
-      this.instance.setOption(Options.DISABLE_ASSIGNMENT, false);
+      this.instance.enableFeature(Feature.Assignment);
     }
   }
 

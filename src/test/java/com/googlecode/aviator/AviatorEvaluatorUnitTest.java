@@ -69,9 +69,8 @@ public class AviatorEvaluatorUnitTest {
 
   @Test
   public void testDefaultOptionValues() {
-    assertEquals(AviatorEvaluator.getOption(Options.TRACE), false);
     assertEquals(AviatorEvaluator.getOption(Options.TRACE_EVAL), false);
-    assertEquals(AviatorEvaluator.getOption(Options.ALWAYS_USE_DOUBLE_AS_DECIMAL), false);
+    assertEquals(AviatorEvaluator.getOption(Options.FEATURE_SET), Feature.getFullFeatures());
     assertEquals(
         AviatorEvaluator.getOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL), false);
     assertEquals(AviatorEvaluator.getOption(Options.OPTIMIZE_LEVEL), AviatorEvaluator.EVAL);
@@ -82,15 +81,17 @@ public class AviatorEvaluatorUnitTest {
   @Test
   public void testSetOptions() {
     try {
-      AviatorEvaluator.setOption(Options.TRACE, true);
-      assertEquals(AviatorEvaluator.getOption(Options.TRACE), true);
+      AviatorEvaluator.setOption(Options.FEATURE_SET, Feature.getCompatibleFeatures());
+      assertEquals(AviatorEvaluator.getOption(Options.FEATURE_SET),
+          Feature.getCompatibleFeatures());
       AviatorEvaluator.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
       assertEquals(AviatorEvaluator.getOption(Options.OPTIMIZE_LEVEL), AviatorEvaluator.COMPILE);
     } finally {
-      AviatorEvaluator.setOption(Options.TRACE, false);
+      AviatorEvaluator.setOption(Options.FEATURE_SET, Feature.getFullFeatures());
       AviatorEvaluator.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.EVAL);
     }
   }
+
 
 
   @Test

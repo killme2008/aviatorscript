@@ -323,9 +323,6 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public AviatorObject defineValue(final AviatorObject value, final Map<String, Object> env) {
-    if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
-      throw new ExpressionRuntimeException("Disabled variable assignment.");
-    }
     if (this.containsDot) {
       return setProperty(value, env);
     }
@@ -345,9 +342,6 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public AviatorObject setValue(final AviatorObject value, final Map<String, Object> env) {
-    if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
-      throw new ExpressionRuntimeException("Disabled variable assignment.");
-    }
     if (this.containsDot) {
       return setProperty(value, env);
     }

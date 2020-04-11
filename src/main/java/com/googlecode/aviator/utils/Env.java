@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.Range;
@@ -164,7 +165,8 @@ public class Env implements Map<String, Object> {
       return Constants.REDUCER_EMPTY;
     }
 
-    if (this.instance.getOptionValue(Options.ENABLE_INTERNAL_VARS).bool) {
+    if (this.instance.getOptionValue(Options.FEATURE_SET).featureSet
+        .contains(Feature.InternalVars)) {
       if (Constants.ENV_VAR == key) {
         return this;
       }

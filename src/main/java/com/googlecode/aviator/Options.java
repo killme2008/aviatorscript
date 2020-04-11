@@ -1,6 +1,7 @@
 package com.googlecode.aviator;
 
 import java.math.MathContext;
+import java.util.Set;
 
 
 /**
@@ -10,14 +11,6 @@ import java.math.MathContext;
  *
  */
 public enum Options {
-  /**
-   * Always use double as BigDecimal, default is false.
-   *
-   * @deprecated This is a name typo option, please use
-   *             {@link #ALWAYS_USE_DECIMAL_AS_FLOATING_POINT_NUMBER} instead.
-   * @since 2.3.4
-   */
-  ALWAYS_USE_DOUBLE_AS_DECIMAL,
 
   /**
    * Optimize level, default is {@link AviatorEvaluator#EVAL}
@@ -34,12 +27,6 @@ public enum Options {
    */
   MATH_CONTEXT,
 
-  /**
-   * Whether to trace code generation,default is false.
-   *
-   * @deprecated
-   */
-  TRACE,
   /**
    * When true, always parsing floating-point number into BigDecial, default is false.It replaces
    * {@link #ALWAYS_USE_DOUBLE_AS_DECIMAL} option.
@@ -92,35 +79,20 @@ public enum Options {
    */
   USE_USER_ENV_AS_TOP_ENV_DIRECTLY,
 
-  /**
-   * Disable variable assignment when true, default is false. You may want to disable variable
-   * assignment for security reason.
-   *
-   * @since 4.1.2
-   */
-  DISABLE_ASSIGNMENT,
-  /**
-   * Whether to enable internal vars such as __env__, __instance__, __args__ etc.in scripts.Default
-   * is true(enable).
-   *
-   * @since 5.0.0
-   */
-  ENABLE_INTERNAL_VARS,
-  /**
-   * Whether to enable load(script) and require(script) in scripts. Default is false(disabled).
-   */
-  ENABLE_REQUIRE_LOAD_SCRIPTS,
 
   /**
    * Max loop count to prevent too much CPU consumption. If it's value is zero or negative, it means
    * no limitation on loop count.Default is zero.
    */
-  MAX_LOOP_COUNT;
+  MAX_LOOP_COUNT,
+  /**
+   * AviatorScript engine feature set, see {@link Feature}
+   */
+  FEATURE_SET;
 
-  private static final boolean TRACE_DEFAULT_VAL =
-      Boolean.valueOf(System.getProperty("aviator.asm.trace", "false"));
+  private static final Value FULL_FEATURE_SET = new Value(Feature.getFullFeatures());
   private static final boolean TRACE_EVAL_DEFAULT_VAL =
-      Boolean.valueOf(System.getProperty("aviator.trace_eval", "false"));
+      Boolean.parseBoolean(System.getProperty("aviator.trace_eval", "false"));
 
   /**
    * The option's value union
@@ -132,6 +104,14 @@ public enum Options {
     public boolean bool;
     public MathContext mathContext;
     public int number;
+    public Set<Feature> featureSet;
+
+
+
+    public Value(final Set<Feature> featureSet) {
+      super();
+      this.featureSet = featureSet;
+    }
 
     public Value(final boolean bool) {
       super();
@@ -165,23 +145,20 @@ public enum Options {
    */
   public Object intoObject(final Value val) {
     switch (this) {
-      case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
-      case TRACE:
-      case ENABLE_REQUIRE_LOAD_SCRIPTS:
-      case ENABLE_INTERNAL_VARS:
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
-      case DISABLE_ASSIGNMENT:
       case CAPTURE_FUNCTION_ARGS:
         return val.bool;
       case MAX_LOOP_COUNT:
       case OPTIMIZE_LEVEL:
         return val.number;
+      case FEATURE_SET:
+        return val.featureSet;
       case MATH_CONTEXT:
         return val.mathContext;
     }
@@ -194,22 +171,18 @@ public enum Options {
    * @param val
    * @return
    */
+  @SuppressWarnings("unchecked")
   public Value intoValue(final Object val) {
     switch (this) {
-      case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
-      case TRACE:
-      case ENABLE_REQUIRE_LOAD_SCRIPTS:
-      case ENABLE_INTERNAL_VARS:
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
       case CAPTURE_FUNCTION_ARGS:
-      case DISABLE_ASSIGNMENT:
-        return ((boolean) val) ? TRUE_VALUE : FALSE_VALUE;
+        return new Value((boolean) val);
       case OPTIMIZE_LEVEL: {
         int level = (int) val;
         if (level == AviatorEvaluator.EVAL) {
@@ -220,6 +193,8 @@ public enum Options {
       }
       case MAX_LOOP_COUNT:
         return new Value(((Number) val).intValue());
+      case FEATURE_SET:
+        return new Value((Set<Feature>) val);
       case MATH_CONTEXT:
         return new Value((MathContext) val);
     }
@@ -228,20 +203,17 @@ public enum Options {
 
   public boolean isValidValue(final Object val) {
     switch (this) {
-      case ALWAYS_USE_DOUBLE_AS_DECIMAL:
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
       case TRACE_EVAL:
       case PUT_CAPTURING_GROUPS_INTO_ENV:
-      case TRACE:
-      case ENABLE_REQUIRE_LOAD_SCRIPTS:
-      case ENABLE_INTERNAL_VARS:
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
-      case DISABLE_ASSIGNMENT:
       case CAPTURE_FUNCTION_ARGS:
         return val instanceof Boolean;
+      case FEATURE_SET:
+        return val instanceof Set;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
             || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
@@ -285,8 +257,6 @@ public enum Options {
     switch (this) {
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
-      case ALWAYS_USE_DOUBLE_AS_DECIMAL:
-      case ENABLE_REQUIRE_LOAD_SCRIPTS:
         return FALSE_VALUE;
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
         return TRUE_VALUE;
@@ -298,20 +268,16 @@ public enum Options {
         return DEFAULT_MATH_CONTEXT;
       case TRACE_EVAL:
         return TRACE_EVAL_DEFAULT_VAL ? TRUE_VALUE : FALSE_VALUE;
-      case TRACE:
-        return TRACE_DEFAULT_VAL ? TRUE_VALUE : FALSE_VALUE;
       case PUT_CAPTURING_GROUPS_INTO_ENV:
         return TRUE_VALUE;
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
         return TRUE_VALUE;
       case CAPTURE_FUNCTION_ARGS:
         return FALSE_VALUE;
-      case DISABLE_ASSIGNMENT:
-        return FALSE_VALUE;
-      case ENABLE_INTERNAL_VARS:
-        return TRUE_VALUE;
       case MAX_LOOP_COUNT:
         return ZERO_VALUE;
+      case FEATURE_SET:
+        return FULL_FEATURE_SET;
     }
     return null;
   }

@@ -4,9 +4,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
-import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.Reflector;
 
 public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
@@ -25,7 +23,7 @@ public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
   public AviatorRuntimeJavaElementType(final ContainerType containerType, final Object container,
       final int index, final Callable<Object> callable) {
     super(null);
-    this.setCallable(callable);
+    setCallable(callable);
     this.container = container;
     this.index = index;
     this.containerType = containerType;
@@ -34,9 +32,6 @@ public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
   @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public AviatorObject setValue(final AviatorObject value, final Map<String, Object> env) {
-    if (RuntimeUtils.getInstance(env).getOptionValue(Options.DISABLE_ASSIGNMENT).bool) {
-      throw new ExpressionRuntimeException("Disabled variable assignment.");
-    }
     Object val = value.getValue(env);
     switch (this.containerType) {
       case Array:

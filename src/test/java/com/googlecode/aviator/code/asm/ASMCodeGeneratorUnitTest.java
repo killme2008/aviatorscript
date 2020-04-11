@@ -60,7 +60,7 @@ public class ASMCodeGeneratorUnitTest {
         });
 
     this.codeGenerator =
-        new ASMCodeGenerator(AviatorEvaluator.newInstance(), classloader, System.out, true);
+        new ASMCodeGenerator(AviatorEvaluator.newInstance(), classloader, System.out);
     this.codeGenerator.start();
   }
 

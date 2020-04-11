@@ -193,7 +193,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
   public ASMCodeGenerator(final AviatorEvaluatorInstance instance,
-      final AviatorClassLoader classLoader, final OutputStream traceOut, final boolean trace) {
+      final AviatorClassLoader classLoader, final OutputStream traceOut) {
     this.classLoader = classLoader;
     this.instance = instance;
     this.compileEnv = new Env();
