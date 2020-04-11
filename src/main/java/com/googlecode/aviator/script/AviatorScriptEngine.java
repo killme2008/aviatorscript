@@ -16,6 +16,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.runtime.JavaMethodReflectionFunctionMissing;
 import com.googlecode.aviator.utils.Utils;
 import com.googlecode.aviator.utils.VarNameGenerator;
 
@@ -45,11 +46,11 @@ public class AviatorScriptEngine extends AbstractScriptEngine implements Compila
 
       };
 
-
   public AviatorScriptEngine() {
     super();
     this.factory = AviatorScriptEngineFactory.newInstance();
     this.engine = AviatorEvaluator.newInstance();
+    this.engine.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());
   }
 
 
@@ -61,8 +62,13 @@ public class AviatorScriptEngine extends AbstractScriptEngine implements Compila
     final AviatorBindings bindings =
         (AviatorBindings) createBindings(this.context.getBindings(ScriptContext.ENGINE_SCOPE));
     bindings.setmOverrides((Map<String, Object>) thiz);
-
     return invokeFunction(name, createBindings(bindings), args);
+  }
+
+
+
+  public AviatorEvaluatorInstance getEngine() {
+    return this.engine;
   }
 
 
@@ -164,6 +170,7 @@ public class AviatorScriptEngine extends AbstractScriptEngine implements Compila
   public AviatorScriptEngine(final AviatorScriptEngineFactory factory) {
     this.factory = factory;
     this.engine = AviatorEvaluator.newInstance();
+    this.engine.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());
   }
 
 
