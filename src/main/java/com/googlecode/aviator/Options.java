@@ -182,7 +182,7 @@ public enum Options {
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
       case CAPTURE_FUNCTION_ARGS:
-        return new Value((boolean) val);
+        return ((boolean) val) ? TRUE_VALUE : FALSE_VALUE;
       case OPTIMIZE_LEVEL: {
         int level = (int) val;
         if (level == AviatorEvaluator.EVAL) {

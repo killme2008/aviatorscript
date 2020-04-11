@@ -136,7 +136,6 @@ import com.googlecode.aviator.runtime.module.IoModule;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
-import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.LRUMap;
 import com.googlecode.aviator.utils.Reflector;
@@ -271,6 +270,7 @@ public final class AviatorEvaluatorInstance {
    * @since 5.0.0
    */
   public Map<String, Object> loadScript(final String path) throws IOException {
+    ensureFeatureEnabled(Feature.Module);
     final File file = tryFindScriptFile(path);
     final String abPath = file.getAbsolutePath();
     return loadScript0(abPath);
@@ -298,6 +298,7 @@ public final class AviatorEvaluatorInstance {
    * @since 5.0.0
    */
   public Map<String, Object> requireScript(final String path) throws IOException {
+    ensureFeatureEnabled(Feature.Module);
     File file = tryFindScriptFile(path);
     final String abPath = file.getAbsolutePath();
     Map<String, Object> exports = (Env) this.moduleCache.get(abPath);
@@ -588,14 +589,6 @@ public final class AviatorEvaluatorInstance {
     Map<Options, Value> newOpts = new IdentityHashMap<>(this.options);
     newOpts.put(opt, opt.intoValue(val));
     this.options = newOpts;
-
-    if (opt == Options.FEATURE_SET) {
-      if (!getOptionValue(opt).featureSet.contains(Feature.Module)) {
-        addLoadAndRequireFunction();
-      } else {
-        removeLoadAndRequireFunction();
-      }
-    }
   }
 
   /**
@@ -607,9 +600,6 @@ public final class AviatorEvaluatorInstance {
    */
   public void enableFeature(final Feature feature) {
     this.options.get(Options.FEATURE_SET).featureSet.add(feature);
-    if (feature == Feature.Module) {
-      addLoadAndRequireFunction();
-    }
   }
 
 
@@ -622,14 +612,6 @@ public final class AviatorEvaluatorInstance {
    */
   public void disableFeature(final Feature feature) {
     this.options.get(Options.FEATURE_SET).featureSet.remove(feature);
-    if (feature == Feature.Module) {
-      removeLoadAndRequireFunction();
-    }
-  }
-
-  private void removeLoadAndRequireFunction() {
-    this.removeFunction(Constants.LOAD_FN);
-    this.removeFunction(Constants.REQUIRE_FN);
   }
 
 
@@ -802,6 +784,11 @@ public final class AviatorEvaluatorInstance {
     addFunction(new UndefFunction());
     addFunction(new TypeFunction());
 
+    // module
+    // load and require
+    addFunction(new RequireFunction());
+    addFunction(new LoadFunction());
+
     // for-loop and if statement supporting
     addFunction(new ReducerFunction());
     addFunction(new ReducerReturnFunction());
@@ -871,16 +858,6 @@ public final class AviatorEvaluatorInstance {
     addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
   }
 
-  private void addLoadAndRequireFunction() {
-    // load and require
-    if (!this.funcMap.containsKey("require")) {
-      addFunction(new RequireFunction());
-    }
-    if (!this.funcMap.containsKey("load")) {
-      addFunction(new LoadFunction());
-    }
-  }
-
   /**
    * Compiled Expression cache
    */
@@ -904,9 +881,6 @@ public final class AviatorEvaluatorInstance {
     addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
     for (Options opt : Options.values()) {
       this.options.put(opt, opt.getDefaultValueObject());
-    }
-    if (this.options.get(Options.FEATURE_SET).featureSet.contains(Feature.Module)) {
-      addLoadAndRequireFunction();
     }
   }
 
