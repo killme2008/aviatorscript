@@ -299,6 +299,13 @@ public final class AviatorEvaluatorInstance {
    */
   public Map<String, Object> requireScript(final String path) throws IOException {
     ensureFeatureEnabled(Feature.Module);
+    if (!path.endsWith(".av")) {
+      // internal modules
+      Map<String, Object> exports = (Env) this.moduleCache.get(path);
+      if (exports != null) {
+        return exports;
+      }
+    }
     File file = tryFindScriptFile(path);
     final String abPath = file.getAbsolutePath();
     Map<String, Object> exports = (Env) this.moduleCache.get(abPath);
