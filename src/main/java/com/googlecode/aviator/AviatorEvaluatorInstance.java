@@ -51,6 +51,7 @@ import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
+import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.OperatorType;
@@ -872,8 +873,12 @@ public final class AviatorEvaluatorInstance {
 
   private void addLoadAndRequireFunction() {
     // load and require
-    addFunction(new RequireFunction());
-    addFunction(new LoadFunction());
+    if (!this.funcMap.containsKey("require")) {
+      addFunction(new RequireFunction());
+    }
+    if (!this.funcMap.containsKey("load")) {
+      addFunction(new LoadFunction());
+    }
   }
 
   /**
@@ -1417,5 +1422,11 @@ public final class AviatorEvaluatorInstance {
    */
   public Object execute(final String expression) {
     return execute(expression, (Map<String, Object>) null);
+  }
+
+  public void ensureFeatureEnabled(final Feature feature) {
+    if (!getOptionValue(Options.FEATURE_SET).featureSet.contains(feature)) {
+      throw new UnsupportedFeatureException(feature);
+    }
   }
 }

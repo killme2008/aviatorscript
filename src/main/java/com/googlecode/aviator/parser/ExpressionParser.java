@@ -133,7 +133,7 @@ public class ExpressionParser implements Parser {
     getCodeGeneratorWithTimes().setParser(this);
   }
 
-  private void ensureEnable(final Feature feature) {
+  private void ensureFeatureEnabled(final Feature feature) {
     if (!this.featureSet.contains(feature)) {
       throw new UnsupportedFeatureException(feature);
     }
@@ -330,7 +330,7 @@ public class ExpressionParser implements Parser {
           // this.back();
           // assignment
           statement();
-          ensureEnable(Feature.Assignment);
+          ensureFeatureEnabled(Feature.Assignment);
           getCodeGeneratorWithTimes().onAssignment(this.lookhead);
         }
       } else if (expectChar('!')) {
@@ -647,6 +647,7 @@ public class ExpressionParser implements Parser {
 
 
   private void lambda(final boolean fn) {
+    ensureFeatureEnabled(Feature.Lambda);
     this.scope.enterLambda();
     getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken);
     this.scope.enterParen();
@@ -1033,7 +1034,7 @@ public class ExpressionParser implements Parser {
     if (!ternary()) {
       reportSyntaxError("invalid value to define");
     }
-    ensureEnable(Feature.Assignment);
+    ensureFeatureEnabled(Feature.Assignment);
     getCodeGeneratorWithTimes().onAssignment(this.lookhead.withMeta(Constants.DEFINE_META, true));
     if (!expectChar(';')) {
       reportSyntaxError("missing ';' for let statement");
@@ -1051,7 +1052,7 @@ public class ExpressionParser implements Parser {
       reportSyntaxError("expect '(' after function name");
     }
     lambda(true);
-    ensureEnable(Feature.Assignment);
+    ensureFeatureEnabled(Feature.Assignment);
     getCodeGeneratorWithTimes().onAssignment(currentToken().withMeta(Constants.DEFINE_META, true));
   }
 
@@ -1130,18 +1131,18 @@ public class ExpressionParser implements Parser {
 
   private StatementType statement() {
     if (this.lookhead == Variable.IF) {
-      ensureEnable(Feature.If);
+      ensureFeatureEnabled(Feature.If);
       if (ifStatement(false, false)) {
         return StatementType.Return;
       } else {
         return StatementType.Other;
       }
     } else if (this.lookhead == Variable.FOR) {
-      ensureEnable(Feature.ForLoop);
+      ensureFeatureEnabled(Feature.ForLoop);
       forStatement();
       return StatementType.Other;
     } else if (this.lookhead == Variable.RETURN) {
-      ensureEnable(Feature.Return);
+      ensureFeatureEnabled(Feature.Return);
       returnStatement();
       return StatementType.Return;
     } else if (this.lookhead == Variable.BREAK) {
@@ -1151,19 +1152,19 @@ public class ExpressionParser implements Parser {
       continueStatement();
       return StatementType.Return;
     } else if (this.lookhead == Variable.LET) {
-      ensureEnable(Feature.LexicalScope);
+      ensureFeatureEnabled(Feature.Let);
       letStatement();
       return StatementType.Other;
     } else if (this.lookhead == Variable.WHILE) {
-      ensureEnable(Feature.WhileLoop);
+      ensureFeatureEnabled(Feature.WhileLoop);
       whileStatement();
       return StatementType.Other;
     } else if (this.lookhead == Variable.FN) {
-      ensureEnable(Feature.Fn);
+      ensureFeatureEnabled(Feature.Fn);
       fnStatement();
       return StatementType.Other;
     } else if (expectChar('{')) {
-      ensureEnable(Feature.LexicalScope);
+      ensureFeatureEnabled(Feature.LexicalScope);
       if (scopeStatement()) {
         return StatementType.Return;
       } else {

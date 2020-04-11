@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Feature;
-import com.googlecode.aviator.Options;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.Range;
 
@@ -165,18 +164,19 @@ public class Env implements Map<String, Object> {
       return Constants.REDUCER_EMPTY;
     }
 
-    if (this.instance.getOptionValue(Options.FEATURE_SET).featureSet
-        .contains(Feature.InternalVars)) {
-      if (Constants.ENV_VAR == key) {
-        return this;
-      }
-      if (Constants.FUNC_ARGS_VAR == key) {
-        return FunctionUtils.getFunctionArguments(this);
-      }
-      if (Constants.INSTANCE_VAR == key) {
-        return this.instance;
-      }
+    if (Constants.ENV_VAR == key) {
+      instance.ensureFeatureEnabled(Feature.InternalVars);
+      return this;
     }
+    if (Constants.FUNC_ARGS_VAR == key) {
+      instance.ensureFeatureEnabled(Feature.InternalVars);
+      return FunctionUtils.getFunctionArguments(this);
+    }
+    if (Constants.INSTANCE_VAR == key) {
+      instance.ensureFeatureEnabled(Feature.InternalVars);
+      return this.instance;
+    }
+
     Map<String, Object> overrides = getmOverrides(true);
     Object ret = null;
     if (overrides.containsKey(key)) {

@@ -42,7 +42,7 @@ import com.googlecode.aviator.utils.TestUtils;
 
 public class AviatorEvaluatorInstanceUnitTest {
 
-  private AviatorEvaluatorInstance instance;
+  protected AviatorEvaluatorInstance instance;
 
   @Before
   public void setup() {
@@ -53,6 +53,18 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Test
   public void testNewInstance() {
     assertNotSame(this.instance, AviatorEvaluator.newInstance());
+  }
+
+  @Test
+  public void testEnableDisableFeature() {
+    assertTrue(
+        this.instance.getOptionValue(Options.FEATURE_SET).featureSet.contains(Feature.Assignment));
+    this.instance.disableFeature(Feature.Assignment);
+    assertFalse(
+        this.instance.getOptionValue(Options.FEATURE_SET).featureSet.contains(Feature.Assignment));
+    this.instance.enableFeature(Feature.Assignment);
+    assertTrue(
+        this.instance.getOptionValue(Options.FEATURE_SET).featureSet.contains(Feature.Assignment));
   }
 
   @Test
@@ -423,5 +435,38 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Test(expected = CompileExpressionErrorException.class)
   public void executeBlankExpression2() {
     this.instance.execute("    ");
+  }
+
+  @Test
+  public void testIf() {
+    assertEquals(3, this.instance.execute("if(true) { 3 } else { 4} "));
+  }
+
+  @Test
+  public void testReturn() {
+    assertEquals("hello", this.instance.execute("return 'hello';"));
+  }
+
+
+  @Test
+  public void testFor() {
+    assertEquals(45,
+        this.instance.execute("sum = 0; for x in range(0, 10) { sum = sum + x ;} return sum;"));
+  }
+
+  @Test
+  public void testWhile() {
+    assertEquals(45, this.instance
+        .execute("sum = 0; x = 0; while(x < 10) { sum = sum + x ; x = x + 1;} return sum;"));
+  }
+
+  @Test
+  public void testLet() {
+    assertEquals(1, this.instance.execute("let x =1 ; { let x = 2 ; } return x;"));
+  }
+
+  @Test
+  public void testFn() {
+    assertEquals(6, this.instance.execute("fn square(x) { x * 2 }  square(3)"));
   }
 }

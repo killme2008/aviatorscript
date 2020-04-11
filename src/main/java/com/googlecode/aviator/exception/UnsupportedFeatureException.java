@@ -6,7 +6,7 @@ public class UnsupportedFeatureException extends ExpressionSyntaxErrorException 
   private static final long serialVersionUID = 6543462982851212129L;
 
   public UnsupportedFeatureException(final Feature feature) {
-    super("Feature " + feature + " is not enabled");
+    super("Feature." + feature + " is not enabled");
   }
 
   public UnsupportedFeatureException() {

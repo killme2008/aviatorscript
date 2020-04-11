@@ -1,5 +1,6 @@
 package com.googlecode.aviator;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,17 +32,21 @@ public enum Feature {
    */
   WhileLoop,
   /**
+   * let statement
+   */
+  Let(asSet(Feature.Assignment)),
+  /**
    * Lexical scope
    */
   LexicalScope,
   /**
-   * fn to define named function
-   */
-  Fn,
-  /**
    * lambda to define function
    */
   Lambda,
+  /**
+   * fn to define named function
+   */
+  Fn(asSet(Feature.Assignment, Feature.Lambda)),
   /**
    * Internal vars such as __env__, __instance__
    */
@@ -51,6 +56,18 @@ public enum Feature {
    */
   Module;
 
+  /**
+   * Require feature sets for this feature.
+   */
+  private Set<Feature> prequires = Collections.emptySet();
+
+  private Feature() {
+
+  }
+
+  private Feature(final Set<Feature> prequires) {
+    this.prequires = prequires;
+  }
 
   /**
    * Create a feature set from arguments.
@@ -61,6 +78,7 @@ public enum Feature {
   public static Set<Feature> asSet(final Feature... args) {
     Set<Feature> set = new HashSet<>();
     for (Feature f : args) {
+      set.addAll(f.prequires);
       set.add(f);
     }
     return set;
@@ -83,6 +101,5 @@ public enum Feature {
   public static Set<Feature> getCompatibleFeatures() {
     return asSet(Feature.Assignment, Feature.Lambda, Feature.InternalVars);
   }
-
 
 }
