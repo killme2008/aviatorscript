@@ -8,32 +8,24 @@
 
 ----------------------------------------
 
-`Aviator` is a lightweight, high performance expression evaluator for `java`.
-It compiles expression to byte code and evaluate it on the fly.
+`Aviator` is a lightweight, high performance scripting language hosted on the JVM.
+It compiles script to java byte code and evaluate it on the fly.
 
 # Feature Intro
 
-1. Support almost all operators, including arithmetic operators, relational operators, logical operators, bitwise operators, regular expression matching operators(`=~`), ternary expressions(`?:`).
-2. Support operator precedence, or use parentheses to specify precedence explicitly.
-3. Support [assignment](https://github.com/killme2008/aviator/wiki/4.0-%E5%8A%9F%E8%83%BD%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90#%E8%B5%8B%E5%80%BC).
-4. Logical operators support short-circuit.
-5. Support for rich types such as `nil`, integers and floats, strings, regular expressions, dates, variables, etc.; Supports automatic type conversion and promotion.
-6. [Support `lambda` anonymous functions and closures](https://github.com/killme2008/aviator/wiki/4.0-%E5%8A%9F%E8%83%BD%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90#lambda-%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0).
-7. A powerful set of commonly used [function libraries](https://github.com/killme2008/aviator/wiki/%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0) is built-in.
-8. Support [user-customized function](https://github.com/killme2008/aviator/wiki#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0), easy to extend,  support function call point [parameter list capture](https://github.com/killme2008/aviator/wiki/%E5%AE%8C%E6%95%B4%E9%80%89%E9%A1%B9%E5%88%97%E8%A1%A8%E8%AF%B4%E6%98%8E#capture_function_args) and [import java class methods as custom functions](https://github.com/killme2008/aviator/wiki#%E4%BD%BF%E7%94%A8Java%E7%B1%BB%E6%96%B9%E6%B3%95%E4%BD%9C%E4%B8%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0).
-9. Support [operator overload](https://github.com/killme2008/aviator/wiki#%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E7%AC%A6).
-10. Support [big numbers(`BigInteger`) and high precision(`BigDecimal`) operations](https://github.com/killme2008/aviator/wiki#%E5%A4%A7%E6%95%B0%E8%AE%A1%E7%AE%97%E5%92%8C%E7%B2%BE%E5%BA%A6).
-11. Support [multi-line expression and customized evaluator instance](https://github.com/killme2008/aviator/wiki/4.0-%E5%8A%9F%E8%83%BD%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90).
-12. Lightweight and high performance, offer a wide range of [customization options](https://github.com/killme2008/aviator/wiki/%E5%AE%8C%E6%95%B4%E9%80%89%E9%A1%B9%E5%88%97%E8%A1%A8%E8%AF%B4%E6%98%8E).
-13. Function missing mechanism just like ruby's method msising.
-
-See [home page](http://fnil.net/aviator) for details.
+1. Suppport number,string, boolean and regular expression etc. [basic types](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw)，support all java operators and their priorities.
+2. [Function](https://www.yuque.com/boyan-avfmj/aviatorscript/gl2p0q) is first-class, supports closure and functional programming.
+2. Supports bigint/decmal for big integer and big decimal operations, using normal arithmetic operators `+-*/` by [operator overloading](https://www.yuque.com/boyan-avfmj/aviatorscript/ydllav#5hq4k).
+3. Full-featured scripting language syntax, such as multi statements, conditional statement ,`for/while` loop  and lexical scope.
+4. Processing collections/array conveniently by [sequence abstract](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93) and [functional programming](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc).
+5. Lightweight [module system](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81)。
+6. [Call Java methods](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2) conveniently，supports Java [Scripting API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b)。
+7. A wide range of customization options to be used as a secure runtime scripting sandbox or full-featured scripting language.
+8. Lightweight and high performance.
 
 # News
 
-* [4.2.9](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.9),  Some bug fixes(#184, #186) and supports list/array elements assignment.
-* [4.2.8](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.8),  Fixed #181  and wraps function returned value to ensure it's not null (replaced by AviatorNil).
-* [4.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.7),  Fixed parser bug #177
+* [5.0.0-RC1](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0-RC1), almost production-ready version before releasing 5.0
 
 # Dependency
 

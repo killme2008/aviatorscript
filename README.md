@@ -1,41 +1,30 @@
-# Aviator
+# AviatorScript
 
 [![Build Status](https://travis-ci.org/killme2008/aviator.svg?branch=master)](https://travis-ci.org/killme2008/aviator)
-[![Code Quality: Java](https://img.shields.io/lgtm/grade/java/g/killme2008/aviator.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/killme2008/aviator/context:java)
 [![Maven Central](https://img.shields.io/maven-central/v/com.googlecode.aviator/aviator.svg?label=maven%20central)](https://search.maven.org/search?q=g:com.googlecode.aviator%20AND%20aviator)
 
 [📖 English Documentation](README-EN.md) | 📖 中文文档
 
 ----------------------------------------
 
-`Aviator`是一个轻量级、高性能的`Java`表达式执行引擎，它动态地将表达式编译成字节码并运行。
-
+`AviatorScript` 是一门高性能、轻量级寄宿于 JVM 之上的脚本语言。
 
 # 特性介绍
 
-1. 支持绝大多数运算操作符，包括算术操作符、关系运算符、逻辑操作符、位运算符、正则匹配操作符（`=~`）、三元表达式（`?:`）。
-2. 支持操作符优先级和括号强制设定优先级。
-3. 支持[赋值](https://github.com/killme2008/aviator/wiki/4.0-%E5%8A%9F%E8%83%BD%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90#%E8%B5%8B%E5%80%BC)。
-4. 逻辑运算符支持短路运算。
-5. 支持丰富类型，例如`nil`、整数和浮点数、字符串、正则表达式、日期、变量等，支持自动类型转换和提升。
-6. [支持`lambda`匿名函数和闭包](https://github.com/killme2008/aviator/wiki/4.0-%E5%8A%9F%E8%83%BD%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90#lambda-%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0)。
-7. 内置一套强大的常用[函数库](https://github.com/killme2008/aviator/wiki/%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0)。
-8. 可[自定义函数](https://github.com/killme2008/aviator/wiki#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0)，易于扩展，支持函数调用点[参数列表捕获](https://github.com/killme2008/aviator/wiki/%E5%AE%8C%E6%95%B4%E9%80%89%E9%A1%B9%E5%88%97%E8%A1%A8%E8%AF%B4%E6%98%8E#capture_function_args)和 [Java 方法批量导入](https://github.com/killme2008/aviator/wiki#%E4%BD%BF%E7%94%A8Java%E7%B1%BB%E6%96%B9%E6%B3%95%E4%BD%9C%E4%B8%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0)。
-9. 可[重载运算符](https://github.com/killme2008/aviator/wiki#%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E7%AC%A6)。
-10. 支持[大数运算（`BigInteger`）和高精度运算（`BigDecimal`）](https://github.com/killme2008/aviator/wiki#%E5%A4%A7%E6%95%B0%E8%AE%A1%E7%AE%97%E5%92%8C%E7%B2%BE%E5%BA%A6)。
-11. 支持[多行表达式以及定制化求值器实例](https://github.com/killme2008/aviator/wiki/4.0-%E5%8A%9F%E8%83%BD%E8%AF%A6%E7%BB%86%E8%A7%A3%E6%9E%90)。
-12. 小巧并性能优秀，提供大量的定制[选项](https://github.com/killme2008/aviator/wiki/%E5%AE%8C%E6%95%B4%E9%80%89%E9%A1%B9%E5%88%97%E8%A1%A8%E8%AF%B4%E6%98%8E)。
-13. [Function missing 机制](https://github.com/killme2008/aviator/wiki/%E8%B0%83%E7%94%A8-Java-%E6%96%B9%E6%B3%95%E5%92%8C-Function-Missing)，类似 Ruby 的 method missing。
-
-更多详情，请访问[主页](http://fnil.net/aviator)。
+1. 支持数字、字符串、正则表达式、布尔值、正则表达式等[基本类型](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw)，完整支持所有 Java 运算符及优先级等。
+2. [函数](https://www.yuque.com/boyan-avfmj/aviatorscript/gl2p0q)是一等公民，支持闭包和函数式编程。
+2. 内置 bigint/decmal 类型用于大整数和高精度运算，支持[运算符重载](https://www.yuque.com/boyan-avfmj/aviatorscript/ydllav#5hq4k)得以让这些类型使用普通的算术运算符 `+-*/ `参与运算。
+3. 完整的脚本语法支持，包括多行数据、条件语句和循环等。
+4. [函数式编程](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc)结合 [Sequence 抽象](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93)，便捷处理任何集合。
+5. 轻量化的[模块系统](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81)。
+6. 多种方式，方便地[调用 Java 方法](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2)，完整支持 Java [脚本 API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b)。
+7. 丰富的定制选项，可作为安全的语言沙箱和全功能语言使用。
+8. 轻量化，高性能，通过直接将脚本翻译成 JVM 字节码，AviatorScript 的基础性能较好。
 
 # News
 
 
-* [4.2.10](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.10), some bug fixes and new features #191
-* [4.2.9](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.9),  Some bug fixes(#184, #186) and supports list/array elements assignment.
-* [4.2.8](https://github.com/killme2008/aviator/releases/tag/aviator-4.2.8),  Fixed #181  and wraps function returned value to ensure it's not null (replaced by AviatorNil).
-
+* [5.0.0-RC1](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0-RC1), almost production-ready version before releasing 5.0
 
 # Dependency
 
