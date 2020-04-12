@@ -64,6 +64,32 @@ public class FunctionTest {
   }
 
   @Test
+  public void testBigint() {
+    assertEquals(BigInteger.ONE, AviatorEvaluator.execute("bigint(true)"));
+    assertEquals(BigInteger.ZERO, AviatorEvaluator.execute("bigint(false)"));
+    assertEquals("bigint", AviatorEvaluator.execute("type(1N)"));
+    assertEquals("bigint", AviatorEvaluator.execute("type(bigint(1))"));
+    assertEquals("bigint", AviatorEvaluator.execute("type(bigint(1.1))"));
+    assertEquals("bigint", AviatorEvaluator.execute("type(bigint(1M))"));
+    assertEquals("bigint", AviatorEvaluator.execute("type(bigint('1'))"));
+    assertEquals("bigint",
+        AviatorEvaluator.execute("type(bigint(a))", AviatorEvaluator.newEnv("a", "100")));
+  }
+
+  @Test
+  public void testDecimal() {
+    assertEquals(BigDecimal.ONE, AviatorEvaluator.execute("decimal(true)"));
+    assertEquals(BigDecimal.ZERO, AviatorEvaluator.execute("decimal(false)"));
+    assertEquals("decimal", AviatorEvaluator.execute("type(1M)"));
+    assertEquals("decimal", AviatorEvaluator.execute("type(decimal(1))"));
+    assertEquals("decimal", AviatorEvaluator.execute("type(decimal(1.1))"));
+    assertEquals("decimal", AviatorEvaluator.execute("type(decimal(1N))"));
+    assertEquals("decimal", AviatorEvaluator.execute("type(decimal('1'))"));
+    assertEquals("decimal",
+        AviatorEvaluator.execute("type(decimal(a))", AviatorEvaluator.newEnv("a", "100")));
+  }
+
+  @Test
   public void testIsDefUndef() {
     assertFalse((boolean) AviatorEvaluator.execute("is_def(x)"));
     assertTrue((boolean) AviatorEvaluator.execute("let x=1; is_def(x)"));
