@@ -47,14 +47,12 @@ public class LimitedSequence<T> implements Sequence<T> {
 
   @Override
   public Collector newCollector(final int size) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.seq.newCollector(size);
   }
 
   @Override
   public int hintSize() {
-    // TODO Auto-generated method stub
-    return 0;
+    return this.seq.hintSize();
   }
 
 }
