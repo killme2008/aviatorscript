@@ -17,9 +17,16 @@
 3. 完整的脚本语法支持，包括多行数据、条件语句、循环语句和词法作用域等。
 4. [函数式编程](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc)结合 [Sequence 抽象](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93)，便捷处理任何集合。
 5. 轻量化的[模块系统](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81)。
-6. 多种方式，方便地[调用 Java 方法](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2)，完整支持 Java [脚本 API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b)。
+6. 多种方式，方便地[调用 Java 方法](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2)，完整支持 Java [脚本 API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b)（方便从 Java 调用脚本）。
 7. 丰富的定制选项，可作为安全的语言沙箱和全功能语言使用。
 8. 轻量化，高性能，通过直接将脚本翻译成 JVM 字节码，AviatorScript 的基础性能较好。
+
+使用场景包括：
+1. 规则判断及规则引擎
+2. 公式计算
+3. 动态脚本控制
+4. 集合数据 ELT 等
+……
 
 # News
 
