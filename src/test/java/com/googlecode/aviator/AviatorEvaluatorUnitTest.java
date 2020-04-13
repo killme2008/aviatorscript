@@ -24,6 +24,9 @@ import static org.junit.Assert.fail;
 import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.googlecode.aviator.processor.ValueProcessor;
+import org.junit.Assert;
 import org.junit.Test;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 
@@ -181,6 +184,30 @@ public class AviatorEvaluatorUnitTest {
   @Test(expected = CompileExpressionErrorException.class)
   public void compileBlankExpression1() {
     AviatorEvaluator.compile("");
+  }
+
+  @Test
+  public void testValueProcessor() {
+    String expressionStr = "age == 12";
+    Expression expression = AviatorEvaluator.compile(expressionStr, true);
+    Map<String, Object> env = new HashMap<>();
+    env.put("age", 11);
+    // 1.
+    Assert.assertEquals(Boolean.FALSE, expression.execute(env));
+
+    // 2.
+    AviatorEvaluator.addValueProcessor(new ValueProcessor() {
+      @Override
+      public void process(Map<String, Object> env) {
+        for (Map.Entry<String, Object> entry : env.entrySet()) {
+          if (entry.getKey().equals("age")) {
+            int result = (int) entry.getValue() + 1;
+            env.put(entry.getKey(), result);
+          }
+        }
+      }
+    });
+    Assert.assertEquals(Boolean.TRUE, expression.execute(env));
   }
 
 

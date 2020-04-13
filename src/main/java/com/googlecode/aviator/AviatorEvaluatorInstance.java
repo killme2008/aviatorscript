@@ -57,6 +57,7 @@ import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
+import com.googlecode.aviator.processor.ValueProcessor;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
 import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
@@ -698,6 +699,15 @@ public final class AviatorEvaluatorInstance {
     return this.funcMap;
   }
 
+  /**
+   * Returns the value processors
+   *
+   * @return
+   */
+  public List<ValueProcessor> getValueProcessors() {
+    return this.valueProcessors;
+  }
+
 
   /**
    * Returns the operators map.
@@ -740,6 +750,8 @@ public final class AviatorEvaluatorInstance {
   }
 
   private final Map<String, Object> funcMap = new HashMap<String, Object>();
+
+  private final List<ValueProcessor> valueProcessors = new ArrayList<>();
 
   private final ConcurrentHashMap<String/* namespace */, Object /* exports */> moduleCache =
       new ConcurrentHashMap<>();
@@ -965,6 +977,15 @@ public final class AviatorEvaluatorInstance {
   public void addFunction(final AviatorFunction function) {
     final String name = function.getName();
     addFunction(name, function);
+  }
+
+  /**
+   * Add an aviator value processor, it's not thread-safe
+   *
+   * @param processor
+   */
+  public void addValueProcessor(final ValueProcessor processor) {
+    this.valueProcessors.add(processor);
   }
 
   /**

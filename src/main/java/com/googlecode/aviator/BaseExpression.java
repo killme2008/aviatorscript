@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
+import com.googlecode.aviator.processor.ValueProcessor;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.utils.Env;
+import org.apache.commons.collections.CollectionUtils;
 
 
 /**
@@ -88,6 +90,7 @@ public abstract class BaseExpression implements Expression {
     if (map == null) {
       map = Collections.emptyMap();
     }
+    handleValueProcessors(map);
     Env env = genTopEnv(map);
     return executeDirectly(env);
   }
@@ -192,4 +195,12 @@ public abstract class BaseExpression implements Expression {
     return newEnv(map, false);
   }
 
+  private void handleValueProcessors(final Map<String, Object> map) {
+    if (CollectionUtils.isEmpty(this.instance.getValueProcessors())) {
+      return;
+    }
+    for (ValueProcessor processor : this.instance.getValueProcessors()) {
+      processor.process(map);
+    }
+  }
 }

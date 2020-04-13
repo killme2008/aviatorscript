@@ -23,6 +23,7 @@ import java.util.Map;
 import com.googlecode.aviator.Options.Value;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
+import com.googlecode.aviator.processor.ValueProcessor;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 
 
@@ -330,6 +331,14 @@ public final class AviatorEvaluator {
    */
   public static void addFunction(final AviatorFunction function) {
     getInstance().addFunction(function);
+  }
+
+  /**
+   * Add an aviator value process, it's not thread-safe
+   * @param processor
+   */
+  public static void addValueProcessor(final ValueProcessor processor) {
+    getInstance().addValueProcessor(processor);
   }
 
   /**
