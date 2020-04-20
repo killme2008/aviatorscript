@@ -47,6 +47,9 @@ public class SeqArrayFunction extends AbstractVariadicFunction {
       if (TypeUtils.PRIMITIVE_TYPES.containsKey(name)) {
         clazz = TypeUtils.PRIMITIVE_TYPES.get(name);
       } else {
+        if (!name.contains(".")) {
+          name = "java.lang." + name;
+        }
         clazz = Class.forName(name);
       }
       Object ret = Array.newInstance(clazz, args.length - 1);

@@ -1,0 +1,15 @@
+let i = 0;
+let a = while( i < 10) {
+  i = i + 1;
+};
+i = 0;
+let b = while(true) {
+  i = i + 1;
+  if(i>=10) {
+     return i;
+  }
+};
+
+j.assertNull(a);
+j.assertEquals(b, 10);
+return i;

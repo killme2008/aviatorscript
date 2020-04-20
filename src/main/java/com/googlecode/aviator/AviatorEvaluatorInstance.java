@@ -58,11 +58,13 @@ import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
+import com.googlecode.aviator.runtime.function.internal.CatchHandlerFunction;
 import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
+import com.googlecode.aviator.runtime.function.internal.TryCatchFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -406,18 +408,14 @@ public final class AviatorEvaluatorInstance {
 
 
   /**
-   * Configure a function missing handler.
+   * Configure a function missing handler.the handler can be null.
    *
    * @since 4.2.5
    * @param functionMissing
    */
   public void setFunctionMissing(final FunctionMissing functionMissing) {
-    if (this.functionMissing != null) {
-      throw new IllegalArgumentException("functionMissing already set:" + this.functionMissing);
-    }
     this.functionMissing = functionMissing;
   }
-
 
 
   /**
@@ -806,6 +804,9 @@ public final class AviatorEvaluatorInstance {
     addFunction(new ReducerContFunction());
     addFunction(new ReducerBreakFunction());
     addFunction(new IfCallccFunction());
+    // try..catch
+    addFunction(new TryCatchFunction());
+    addFunction(new CatchHandlerFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());

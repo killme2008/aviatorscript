@@ -54,7 +54,11 @@ public enum Feature {
   /**
    * module system such as exports/require/load function supporting.
    */
-  Module;
+  Module,
+  /**
+   * try..catch..finally statement to handle errors.
+   */
+  TryCatchFinally;
 
   /**
    * Require feature sets for this feature.

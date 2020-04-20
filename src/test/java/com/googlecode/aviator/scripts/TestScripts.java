@@ -37,6 +37,12 @@ public class TestScripts {
   }
 
   @Test
+  public void testScopes() {
+    assertEquals(2, testScript("scope1.av"));
+    assertEquals(199, testScript("scope2.av"));
+  }
+
+  @Test
   public void testComments() {
     assertEquals(6, testScript("comments.av"));
   }
@@ -71,6 +77,7 @@ public class TestScripts {
     assertEquals(7, testScript("if_else7.av"));
     assertEquals(8, testScript("if_else8.av"));
     assertEquals(null, testScript("if_else9.av"));
+    assertEquals(10, testScript("if_else10.av"));
 
     assertEquals("b is greater than 100.", testScript("if_else_scope.av", "b", 101));
     assertEquals("b is greater than 10.", testScript("if_else_scope.av", "b", 11));
@@ -148,6 +155,11 @@ public class TestScripts {
       assertEquals(56, testScript("for_return3.av"));
       assertEquals(6, testScript("for_return4.av"));
     }
+
+    {
+      // for statement values
+      assertEquals(9, testScript("for5.av"));
+    }
   }
 
   @Test
@@ -166,6 +178,7 @@ public class TestScripts {
       assertTrue(r >= 5);
     }
     testScript("while7.av");
+    assertEquals(10, testScript("while8.av"));
   }
 
   @Test
@@ -219,5 +232,11 @@ public class TestScripts {
     assertEquals(55, testScript("fibonacci.av", "n", 10));
     assertEquals(610, testScript("fibonacci.av", "n", 15));
     assertEquals(6765, testScript("fibonacci.av", "n", 20));
+  }
+
+  @Test
+  public void testTryCatch() {
+    Exception e = (Exception) testScript("try_catch1.av");
+    assertTrue(e instanceof IllegalArgumentException);
   }
 }

@@ -1,0 +1,8 @@
+a= try {
+ return map(1, +);
+}catch(IllegalArgumentException e) {
+ return e;
+};
+
+return a;
+

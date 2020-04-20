@@ -42,6 +42,7 @@ import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.function.system.AssertFunction.AssertFailed;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
@@ -1140,9 +1141,19 @@ public class FunctionTest {
     assertEquals(Boolean.FALSE, AviatorEvaluator.execute("seq.contains_key(m, -1)", env));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testSeqContainsKeyWrongType() {
-    AviatorEvaluator.execute("seq.contains_key(seq.list(), 'hello')");
+  @Test
+  public void testSeqContainsKeyListArray() {
+    assertEquals(false, AviatorEvaluator.execute("seq.contains_key(seq.list(), 0)"));
+    assertEquals(false, AviatorEvaluator.execute("seq.contains_key(seq.list(), 2)"));
+    assertEquals(true, AviatorEvaluator.execute("seq.contains_key(seq.list(1,2), 0)"));
+    assertEquals(true, AviatorEvaluator.execute("seq.contains_key(seq.list(1,2), 1)"));
+    assertEquals(false, AviatorEvaluator.execute("seq.contains_key(seq.list(1,2), 2)"));
+
+    assertEquals(false, AviatorEvaluator.execute("seq.contains_key(tuple(), 0)"));
+    assertEquals(false, AviatorEvaluator.execute("seq.contains_key(tuple(), 2)"));
+    assertEquals(true, AviatorEvaluator.execute("seq.contains_key(tuple(1,2), 0)"));
+    assertEquals(true, AviatorEvaluator.execute("seq.contains_key(tuple(1,2), 1)"));
+    assertEquals(false, AviatorEvaluator.execute("seq.contains_key(tuple(1,2), 2)"));
   }
 
   @Test
@@ -1265,6 +1276,37 @@ public class FunctionTest {
           e.getMessage());
     }
   }
+
+  @Test
+  public void testTypeFunctions() {
+    assertEquals("long", AviatorEvaluator.execute("type(1)"));
+    assertEquals("double", AviatorEvaluator.execute("type(1.1)"));
+    assertEquals("decimal", AviatorEvaluator.execute("type(1.1M)"));
+    assertEquals("bigint", AviatorEvaluator.execute("type(1N)"));
+    assertEquals("pattern", AviatorEvaluator.execute("type(/\\d+/)"));
+    assertEquals("string", AviatorEvaluator.execute("type('world')"));
+    assertEquals("java.util.ArrayList", AviatorEvaluator.execute("type(seq.list())"));
+    assertEquals("java.lang.Object[]", AviatorEvaluator.execute("type(tuple(1,2))"));
+  }
+
+  @Test
+  public void testAssert() {
+    AviatorEvaluator.execute("assert(true)");
+    try {
+      AviatorEvaluator.execute("assert(false)");
+      fail();
+    } catch (AssertFailed e) {
+
+    }
+    try {
+      AviatorEvaluator.execute("assert(false, 'test')");
+      fail();
+    } catch (AssertFailed e) {
+      assertEquals("test", e.getMessage());
+    }
+  }
+
+
 
   public static class User {
     private Long id;
