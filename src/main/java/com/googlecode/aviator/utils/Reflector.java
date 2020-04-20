@@ -336,7 +336,7 @@ public class Reflector {
     return false;
   }
 
-  static boolean isCongruent(final Class[] params, final Object[] args) {
+  public static boolean isCongruent(final Class[] params, final Object[] args) {
     boolean ret = false;
     if (args == null) {
       return params.length == 0;

@@ -56,9 +56,13 @@ public enum Feature {
    */
   Module,
   /**
-   * try..catch..finally statement to handle errors.
+   * try..catch..finally and throw statement to handle exceptions.
    */
-  TryCatchFinally;
+  ExceptionHandle,
+  /**
+   * new Class(arguments) to create an instance of special class with arguments.
+   */
+  NewInstance;
 
   /**
    * Require feature sets for this feature.

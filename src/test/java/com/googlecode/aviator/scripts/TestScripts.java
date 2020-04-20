@@ -12,6 +12,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
+import com.googlecode.aviator.exception.StandardError;
 import com.googlecode.aviator.utils.Reflector;
 
 public class TestScripts {
@@ -237,6 +238,6 @@ public class TestScripts {
   @Test
   public void testTryCatch() {
     Exception e = (Exception) testScript("try_catch1.av");
-    assertTrue(e instanceof IllegalArgumentException);
+    assertTrue(e instanceof StandardError);
   }
 }

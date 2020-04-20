@@ -181,6 +181,12 @@ public class ExpressionParser implements Parser {
 
   public boolean ternary() {
     int gcTimes = this.getCGTimes;
+
+    if (this.lookhead == Variable.NEW) {
+      newStatement();
+      return true;
+    }
+
     join();
     if (this.lookhead == null || expectChar(':') || expectChar(',')) {
       return gcTimes < this.getCGTimes;
@@ -1137,7 +1143,7 @@ public class ExpressionParser implements Parser {
   }
 
   private void tryStatement() {
-    getCodeGeneratorWithTimes().onMethodName(new Variable("__try", -1));
+    getCodeGeneratorWithTimes().onMethodName(Constants.TRY_VAR);
     move(true);
     if (!expectChar('{')) {
       reportSyntaxError("expect '{' after try");
@@ -1169,7 +1175,7 @@ public class ExpressionParser implements Parser {
     while (this.lookhead == Variable.CATCH) {
       if (!hasCatch) {
         // create a handler list.
-        getCodeGeneratorWithTimes().onMethodName(new Variable("seq.list", -1));
+        getCodeGeneratorWithTimes().onMethodName(Constants.SEQ_LIST_VAR);
         hasCatch = true;
       }
 
@@ -1185,12 +1191,19 @@ public class ExpressionParser implements Parser {
       checkVariableName();
       Token<?> exceptionClass = this.lookhead;
       move(true);
-      if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
-        reportSyntaxError("invalid bound variable name for exception");
+
+      Token<?> boundVar = null;
+      if (expectChar(')')) {
+        boundVar = exceptionClass;
+        exceptionClass = Constants.THROWABLE_VAR;
+      } else {
+        if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
+          reportSyntaxError("invalid bound variable name for exception");
+        }
+        checkVariableName();
+        boundVar = this.lookhead;
+        move(true);
       }
-      checkVariableName();
-      Token<?> boundVar = this.lookhead;
-      move(true);
 
       if (!expectChar(')')) {
         reportSyntaxError("missing ')' for catch caluse");
@@ -1203,7 +1216,7 @@ public class ExpressionParser implements Parser {
       move(true);
       {
         // create a catch handler
-        getCodeGeneratorWithTimes().onMethodName(new Variable("__catch_handler", -1));
+        getCodeGeneratorWithTimes().onMethodName(Constants.CATCH_HANDLER_VAR);
         getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken //
             .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
         getCodeGeneratorWithTimes().onLambdaArgument(boundVar);
@@ -1275,6 +1288,55 @@ public class ExpressionParser implements Parser {
     getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
   }
 
+  private void throwStatement() {
+    getCodeGeneratorWithTimes().onMethodName(Constants.THROW_VAR);
+    move(true);
+    statement();
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    if (!expectChar(';')) {
+      reportSyntaxError("missing ';' for throw statement");
+    }
+  }
+
+  private void newStatement() {
+    ensureFeatureEnabled(Feature.NewInstance);
+    getCodeGeneratorWithTimes().onMethodName(Constants.NEW_VAR);
+    move(true);
+
+    if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
+      reportSyntaxError("invalid class name");
+    }
+    checkVariableName();
+    getCodeGeneratorWithTimes().onConstant(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    move(true);
+
+    if (!expectChar('(')) {
+      reportSyntaxError("missing '(' after class name");
+    }
+
+    this.scope.enterParen();
+    move(true);
+    if (!expectChar(')')) {
+      ternary();
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      while (expectChar(',')) {
+        move(true);
+        if (!ternary()) {
+          reportSyntaxError("invalid argument");
+        }
+        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      }
+    }
+    if (!expectChar(')')) {
+      reportSyntaxError("missing ')' for new statement");
+    }
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    move(true);
+    this.scope.leaveParen();
+  }
+
   private StatementType statement() {
     if (this.lookhead == Variable.IF) {
       ensureFeatureEnabled(Feature.If);
@@ -1310,7 +1372,12 @@ public class ExpressionParser implements Parser {
       fnStatement();
       return StatementType.Other;
     } else if (this.lookhead == Variable.TRY) {
+      ensureFeatureEnabled(Feature.ExceptionHandle);
       tryStatement();
+      return StatementType.Other;
+    } else if (this.lookhead == Variable.THROW) {
+      ensureFeatureEnabled(Feature.ExceptionHandle);
+      throwStatement();
       return StatementType.Other;
     } else if (expectChar('{')) {
       ensureFeatureEnabled(Feature.LexicalScope);

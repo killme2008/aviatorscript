@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorType;
 import com.googlecode.aviator.utils.Env;
 
 /**
@@ -56,7 +59,12 @@ public abstract class LambdaFunction extends AbstractFunction {
     }
     int i = 0;
     for (String name : this.arguments) {
-      env.override(name, args[i++].getValue(parentEnv));
+      final AviatorObject arg = args[i++];
+      Object value = arg.getValue(parentEnv);
+      if (arg.getAviatorType() == AviatorType.JavaType && value == null) {
+        value = RuntimeUtils.getInstance(env).getFunction(((AviatorJavaType) arg).getName());
+      }
+      env.override(name, value);
     }
 
     return env;

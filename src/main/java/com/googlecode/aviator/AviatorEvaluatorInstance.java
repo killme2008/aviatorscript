@@ -60,10 +60,12 @@ import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
 import com.googlecode.aviator.runtime.function.internal.CatchHandlerFunction;
 import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
+import com.googlecode.aviator.runtime.function.internal.NewInstanceFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
+import com.googlecode.aviator.runtime.function.internal.ThrowFunction;
 import com.googlecode.aviator.runtime.function.internal.TryCatchFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
@@ -804,9 +806,14 @@ public final class AviatorEvaluatorInstance {
     addFunction(new ReducerContFunction());
     addFunction(new ReducerBreakFunction());
     addFunction(new IfCallccFunction());
+
     // try..catch
     addFunction(new TryCatchFunction());
     addFunction(new CatchHandlerFunction());
+    addFunction(new ThrowFunction());
+
+    // new instance
+    addFunction(new NewInstanceFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());
