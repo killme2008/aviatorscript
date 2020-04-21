@@ -213,7 +213,7 @@ public class LambdaGenerator implements CodeGenerator {
     try {
 
       Class<?> defineClass = null;
-      if (ClassDefiner.isJDK7()) {
+      if (ClassDefiner.IS_JDK7 || ClassDefiner.IS_IBM_SDK) {
         defineClass =
             ClassDefiner.defineClassByClassLoader(this.className, bytes, this.classLoader);
       } else {

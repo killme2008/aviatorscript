@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 import org.junit.Before;
@@ -35,6 +36,11 @@ public class TestScripts {
       Reflector.sneakyThrow(t);
     }
     return null;
+  }
+
+  @Test
+  public void testNew() {
+    assertEquals(99, testScript("new.av"));
   }
 
   @Test
@@ -239,5 +245,12 @@ public class TestScripts {
   public void testTryCatch() {
     Exception e = (Exception) testScript("try_catch1.av");
     assertTrue(e instanceof StandardError);
+    assertEquals("1", ((Throwable) e).getMessage());
+
+    assertEquals(1, testScript("try_catch2.av"));
+    e = (Exception) testScript("try_catch3.av");
+    assertTrue(e instanceof ClassCastException);
+    e = (Exception) testScript("try_catch4.av");
+    assertTrue(e instanceof IOException);
   }
 }

@@ -1,0 +1,10 @@
+try {
+  map(1, 3);
+}catch(ClassCastException e) {
+  pst(e);
+  return 1; 
+}catch(java.io.IOException e) {
+  return 2;
+}catch(e) {
+  return 3;
+}

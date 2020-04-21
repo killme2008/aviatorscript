@@ -1,8 +1,6 @@
 a= try {
- let s = new String("test");
  throw 1;
 }catch(e) {
- println(e);
  return e;
 };
 

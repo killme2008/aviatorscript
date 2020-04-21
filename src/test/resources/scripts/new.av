@@ -1,0 +1,13 @@
+let a = new java.math.BigDecimal("100");
+j.assertEquals(type(a), 'decimal');
+assert(a == 100M);
+
+let a = new IllegalArgumentException("100");
+j.assertEquals(type(a), 'java.lang.IllegalArgumentException');
+
+let a = new Long(1);
+let b = new Long(99);
+
+assert(a + b == 100);
+
+return a*b;

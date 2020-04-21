@@ -1,0 +1,15 @@
+let e = nil;
+try {
+  map(1, 3);
+}catch(ClassCastException ex) {
+  e = ex;
+  return 1; 
+}catch(java.io.IOException ex) {
+  e = ex;
+  return 2;
+}catch(ex) {
+  e = ex;
+  return 3;
+}finally{
+  return e;
+}
