@@ -119,8 +119,7 @@ public class Env implements Map<String, Object> {
   public boolean containsKey(final Object key) {
     Map<String, Object> overrides = getmOverrides(true);
     return overrides.containsKey(key)
-        || (this.mDefaults != overrides && this.mDefaults != this ? this.mDefaults.containsKey(key)
-            : false);
+        || (this.mDefaults != overrides ? this.mDefaults.containsKey(key) : false);
   }
 
   /**
@@ -165,15 +164,15 @@ public class Env implements Map<String, Object> {
     }
 
     if (Constants.ENV_VAR == key) {
-      instance.ensureFeatureEnabled(Feature.InternalVars);
+      this.instance.ensureFeatureEnabled(Feature.InternalVars);
       return this;
     }
     if (Constants.FUNC_ARGS_VAR == key) {
-      instance.ensureFeatureEnabled(Feature.InternalVars);
+      this.instance.ensureFeatureEnabled(Feature.InternalVars);
       return FunctionUtils.getFunctionArguments(this);
     }
     if (Constants.INSTANCE_VAR == key) {
-      instance.ensureFeatureEnabled(Feature.InternalVars);
+      this.instance.ensureFeatureEnabled(Feature.InternalVars);
       return this.instance;
     }
 
