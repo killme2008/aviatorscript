@@ -49,6 +49,27 @@ public class AviatorEvaluatorInstanceUnitTest {
     this.instance = AviatorEvaluator.newInstance();
   }
 
+  @Test
+  public void testMaxLoopCount() {
+    this.instance.setOption(Options.MAX_LOOP_COUNT, 3);
+    assertEquals(6,
+        this.instance.execute("let sum = 0; for x in range(1, 4) { sum = sum + x; } return sum;"));
+    try {
+      assertEquals(10, this.instance
+          .execute("let sum = 0; for x in range(1, 5) { sum = sum + x; } return sum;"));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Overflow max loop count: 3", e.getMessage());
+    }
+
+    assertEquals(6, this.instance.execute("reduce(range(1, 4), +, 0)"));
+    try {
+      assertEquals(10, this.instance.execute("reduce(range(1, 5), +, 0)"));
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Overflow max loop count: 3", e.getMessage());
+    }
+  }
 
   @Test
   public void testNewInstance() {

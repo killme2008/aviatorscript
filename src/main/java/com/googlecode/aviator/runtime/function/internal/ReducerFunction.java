@@ -70,7 +70,7 @@ public class ReducerFunction extends AbstractFunction {
     } else {
       // while statement
       while (true) {
-        if (maxLoopCount > 0 && ++c >= maxLoopCount) {
+        if (maxLoopCount > 0 && ++c > maxLoopCount) {
           throw new ExpressionRuntimeException("Overflow max loop count: " + maxLoopCount);
         }
         result = iteratorFn.call(env);

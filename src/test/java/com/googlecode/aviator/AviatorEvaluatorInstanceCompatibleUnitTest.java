@@ -18,6 +18,12 @@ public class AviatorEvaluatorInstanceCompatibleUnitTest extends AviatorEvaluator
   }
 
   @Override
+  @Test(expected = UnsupportedFeatureException.class)
+  public void testMaxLoopCount() {
+    super.testMaxLoopCount();
+  }
+
+  @Override
   @Test
   public void testDefaultOptionValues() {
     assertEquals(this.instance.getOption(Options.TRACE_EVAL), false);

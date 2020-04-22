@@ -30,7 +30,7 @@ public class LimitedSequence<T> implements Sequence<T> {
 
       @Override
       public T next() {
-        if (++this.c >= LimitedSequence.this.maxLoopCount) {
+        if (++this.c > LimitedSequence.this.maxLoopCount) {
           throw new ExpressionRuntimeException(
               "Overflow max loop count: " + LimitedSequence.this.maxLoopCount);
         }
