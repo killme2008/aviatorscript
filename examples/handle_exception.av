@@ -1,0 +1,9 @@
+ ## examples/handle_exception.av
+ 
+ try {
+	throw "an exception";
+ } catch(e) {
+	pst(e);
+ } finally {
+    p("finally");
+ }
