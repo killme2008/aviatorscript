@@ -885,9 +885,10 @@ public class ExpressionParser implements Parser {
     StackTraceElement[] traces = e.getStackTrace();
     List<StackTraceElement> filteredTraces = new ArrayList<>();
     for (StackTraceElement t : traces) {
-      // if (t.getClassName().equals(this.getClass().getName())) {
-      // continue;
-      // }
+      if (!this.instance.getOptionValue(Options.TRACE_EVAL).bool
+          && t.getClassName().equals(this.getClass().getName())) {
+        continue;
+      }
       filteredTraces.add(t);
     }
     e.setStackTrace(filteredTraces.toArray(new StackTraceElement[filteredTraces.size()]));

@@ -97,7 +97,6 @@ public class ReducerFunction extends AbstractFunction {
 
     Object contObj = arg3.getValue(env);
     if (contObj == Constants.REDUCER_EMPTY) {
-      System.out.println(result);
       return result;
     }
 
