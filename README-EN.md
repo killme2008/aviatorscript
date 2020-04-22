@@ -16,7 +16,7 @@ It compiles script to java byte code and evaluate it on the fly.
 1. Suppport number,string, boolean and regular expression etc. [basic types](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw)，support all java operators and their priorities.
 2. [Function](https://www.yuque.com/boyan-avfmj/aviatorscript/gl2p0q) is first-class, supports closure and functional programming.
 2. Supports bigint/decmal for big integer and big decimal operations, using normal arithmetic operators `+-*/` by [operator overloading](https://www.yuque.com/boyan-avfmj/aviatorscript/ydllav#5hq4k).
-3. Full-featured scripting language syntax, such as multi statements, conditional statement ,`for/while` loop  and lexical scope.
+3. Full-featured scripting language syntax, such as multi statements, conditional statement ,`for/while` loop, lexical scope and exception handling.
 4. Processing collections/array conveniently by [sequence abstract](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93) and [functional programming](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc).
 5. Lightweight [module system](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81)。
 6. [Call Java methods](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2) conveniently，supports Java [Scripting API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b)。
@@ -25,6 +25,7 @@ It compiles script to java byte code and evaluate it on the fly.
 
 # News
 
+* [5.0.0-RC2](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0-RC2), try/catch/finally/throw statement and new stament etc.
 * [5.0.0-RC1](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0-RC1), almost production-ready version before releasing 5.0
 
 # Dependency
