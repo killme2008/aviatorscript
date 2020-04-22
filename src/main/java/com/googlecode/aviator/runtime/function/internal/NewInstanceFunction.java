@@ -48,8 +48,8 @@ public class NewInstanceFunction extends AbstractVariadicFunction {
       }
       Constructor<?> bestMatch = null;
       for (Constructor<?> constructor : constructors) {
-        if (constructor.getParameters().length == constructArgs.length) {
-          final Class<?>[] pTypes = constructor.getParameterTypes();
+        final Class<?>[] pTypes = constructor.getParameterTypes();
+        if (pTypes.length == constructArgs.length) {
           if (Reflector.isCongruent(pTypes, constructArgs)) {
             bestMatch = constructor;
             for (int i = 0; i < constructArgs.length; i++) {
