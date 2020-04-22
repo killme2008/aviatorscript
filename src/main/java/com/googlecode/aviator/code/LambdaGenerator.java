@@ -212,14 +212,9 @@ public class LambdaGenerator implements CodeGenerator {
     byte[] bytes = this.classWriter.toByteArray();
     try {
 
-      Class<?> defineClass = null;
-      if (ClassDefiner.IS_JDK7 || ClassDefiner.IS_IBM_SDK) {
-        defineClass =
-            ClassDefiner.defineClassByClassLoader(this.className, bytes, this.classLoader);
-      } else {
-        defineClass =
-            ClassDefiner.defineClass(this.className, LambdaFunction.class, bytes, this.classLoader);
-      }
+      Class<?> defineClass =
+          ClassDefiner.defineClass(this.className, LambdaFunction.class, bytes, this.classLoader);
+
       Constructor<?> constructor =
           defineClass.getConstructor(List.class, Expression.class, Env.class);
       MethodHandle methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);

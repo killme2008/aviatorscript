@@ -6,7 +6,6 @@ import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
-import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -26,7 +25,7 @@ public class SeqPutFunction extends AbstractFunction {
     return "seq.put";
   }
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2, final AviatorObject arg3) {
@@ -41,25 +40,18 @@ public class SeqPutFunction extends AbstractFunction {
 
     Object previousVal = null;
 
-    int index = ((Number) key).intValue();
-    if (List.class.isAssignableFrom(clazz)) {
-      if (!TypeUtils.isLong(key)) {
-        throw new IllegalArgumentException(
-            "Invalid index `" + key + "` for list,it's not a integer.");
-      }
 
+    if (List.class.isAssignableFrom(clazz)) {
+      int index = ((Number) key).intValue();
       previousVal = ((List) coll).set(index, val);
     } else if (Map.class.isAssignableFrom(clazz)) {
       previousVal = ((Map) coll).put(key, val);
     } else if (clazz.isArray()) {
-      if (!TypeUtils.isLong(key)) {
-        throw new IllegalArgumentException(
-            "Invalid index `" + key + "` for array,it's not a integer.");
-      }
+      int index = ((Number) key).intValue();
       previousVal = Array.get(coll, index);
       Array.set(coll, index, val);
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a collection.");
+      throw new IllegalArgumentException(arg1.desc(env) + " can't put elements.");
     }
     return AviatorRuntimeJavaType.valueOf(previousVal);
   }

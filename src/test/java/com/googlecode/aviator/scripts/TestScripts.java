@@ -14,6 +14,7 @@ import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.StandardError;
+import com.googlecode.aviator.runtime.type.Range;
 import com.googlecode.aviator.utils.Reflector;
 
 public class TestScripts {
@@ -36,6 +37,22 @@ public class TestScripts {
       Reflector.sneakyThrow(t);
     }
     return null;
+  }
+
+  @Test
+  public void testRange() {
+    assertTrue(testScript("range.av") instanceof Range);
+  }
+
+
+  @Test
+  public void testStringSeq() {
+    assertEquals("hello world", testScript("string_seq.av"));
+  }
+
+  @Test
+  public void testSeqEntry() {
+    assertEquals(3, testScript("seq_entry.av"));
   }
 
   @Test

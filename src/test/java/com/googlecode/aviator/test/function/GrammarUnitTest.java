@@ -608,21 +608,10 @@ public class GrammarUnitTest {
       Assert.fail();
     } catch (ExpressionRuntimeException e) {
     }
-    try {
-      AviatorEvaluator.execute("'abc'!=/abc/");
-      Assert.fail();
-    } catch (ExpressionRuntimeException e) {
-    }
-    try {
-      AviatorEvaluator.execute("3.999==p1", env);
-      Assert.fail();
-    } catch (ExpressionRuntimeException e) {
-    }
-    try {
-      AviatorEvaluator.execute("false==p1", env);
-      Assert.fail();
-    } catch (ExpressionRuntimeException e) {
-    }
+    assertTrue((boolean) AviatorEvaluator.execute("'abc'!=/abc/"));
+    assertFalse((boolean) AviatorEvaluator.execute("3.999==p1", env));
+    assertFalse((boolean) AviatorEvaluator.execute("false==p1", env));
+
     try {
       AviatorEvaluator.execute("p2<=bool", env);
       Assert.fail();
@@ -666,26 +655,15 @@ public class GrammarUnitTest {
       Assert.fail();
     } catch (ExpressionRuntimeException e) {
     }
-    try {
-      AviatorEvaluator.execute("100=='hello'");
-      Assert.fail();
-    } catch (ExpressionRuntimeException e) {
-    }
-    try {
-      AviatorEvaluator.execute("s!=d", env);
-      Assert.fail();
-    } catch (ExpressionRuntimeException e) {
-    }
+    assertFalse((boolean) AviatorEvaluator.execute("100=='hello'"));
+    assertTrue((boolean) AviatorEvaluator.execute("s!=d", env));
+
     try {
       AviatorEvaluator.execute("/\\d+/<=s", env);
       Assert.fail();
     } catch (ExpressionRuntimeException e) {
     }
-    try {
-      AviatorEvaluator.execute("'hello'==/[a-zA-Z]/");
-      Assert.fail();
-    } catch (ExpressionRuntimeException e) {
-    }
+    assertFalse((boolean) AviatorEvaluator.execute("'hello'==/[a-zA-Z]/"));
   }
 
   @Test
@@ -728,11 +706,7 @@ public class GrammarUnitTest {
       Assert.fail();
     } catch (ExpressionRuntimeException e) {
     }
-    try {
-      AviatorEvaluator.execute("100=='hello'");
-      Assert.fail();
-    } catch (ExpressionRuntimeException e) {
-    }
+    assertFalse((boolean) AviatorEvaluator.execute("100=='hello'"));
     try {
       AviatorEvaluator.execute("'good'>a", env);
       Assert.fail();
@@ -743,11 +717,7 @@ public class GrammarUnitTest {
       Assert.fail();
     } catch (ExpressionRuntimeException e) {
     }
-    try {
-      AviatorEvaluator.execute("4.9==/[a-zA-Z]/");
-      Assert.fail();
-    } catch (ExpressionRuntimeException e) {
-    }
+    assertFalse((boolean) AviatorEvaluator.execute("4.9==/[a-zA-Z]/"));
   }
 
   @Test

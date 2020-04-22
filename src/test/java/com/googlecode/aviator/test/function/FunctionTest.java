@@ -1148,12 +1148,14 @@ public class FunctionTest {
     assertEquals(true, AviatorEvaluator.execute("seq.contains_key(seq.list(1,2), 0)"));
     assertEquals(true, AviatorEvaluator.execute("seq.contains_key(seq.list(1,2), 1)"));
     assertEquals(false, AviatorEvaluator.execute("seq.contains_key(seq.list(1,2), 2)"));
+    assertEquals(false, AviatorEvaluator.execute("seq.contains_key(seq.list(1,2), -1)"));
 
     assertEquals(false, AviatorEvaluator.execute("seq.contains_key(tuple(), 0)"));
     assertEquals(false, AviatorEvaluator.execute("seq.contains_key(tuple(), 2)"));
     assertEquals(true, AviatorEvaluator.execute("seq.contains_key(tuple(1,2), 0)"));
     assertEquals(true, AviatorEvaluator.execute("seq.contains_key(tuple(1,2), 1)"));
     assertEquals(false, AviatorEvaluator.execute("seq.contains_key(tuple(1,2), 2)"));
+    assertEquals(false, AviatorEvaluator.execute("seq.contains_key(tuple(1,2), -1)"));
   }
 
   @Test
@@ -1219,6 +1221,11 @@ public class FunctionTest {
     assertEquals(newSet(1L, 2L, 3L), AviatorEvaluator.execute("seq.set(1,1,2,3)"));
 
     assertEquals(3, AviatorEvaluator.execute("count(seq.set(1,1,2,3))"));
+    assertEquals(1, AviatorEvaluator.execute("seq.get(seq.set(1, 99 ,3), 1)"));
+    assertEquals(1, AviatorEvaluator.execute("seq.get(seq.set(1, 99 ,3), 1)"));
+    assertEquals(99, AviatorEvaluator.execute("seq.get(seq.set(1, 99 ,3),99)"));
+    assertEquals(null, AviatorEvaluator.execute("seq.get(seq.set(1, 99 ,3), 100)"));
+    assertEquals(null, AviatorEvaluator.execute("seq.get(seq.set(1, 99 ,3), 'hello')"));
   }
 
   @Test

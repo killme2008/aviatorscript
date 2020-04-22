@@ -1,0 +1,21 @@
+let r = range(0, 10);
+
+assert(count(r) == 10);
+
+let i = 0;
+for x in r {
+  assert(x == i);
+  i = i + 1;
+}
+
+let even = filter(r, lambda(x) -> x % 2 == 0 end);
+
+assert(count(even) == 5);
+
+let i = 0;
+for x in even {
+  assert(x == i);
+  i = i + 2;
+}
+
+return r;

@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.utils.Env;
+import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.TypeUtils;
 
 
@@ -32,10 +33,26 @@ public abstract class AviatorObject implements Serializable {
   private static final long serialVersionUID = -6006961429175160001L;
 
   public int compare(final AviatorObject other, final Map<String, Object> env) {
+    return compare(other, env, false);
+  }
+
+  public int compareEq(final AviatorObject other, final Map<String, Object> env) {
+    return compare(other, env, true);
+  }
+
+  private int compare(final AviatorObject other, final Map<String, Object> env,
+      final boolean isEq) {
     if (this == other) {
       return 0;
     }
-    return innerCompare(other, env);
+    try {
+      return innerCompare(other, env);
+    } catch (Throwable t) {
+      if (isEq) {
+        return 1;
+      }
+      throw Reflector.sneakyThrow(t);
+    }
   }
 
   public abstract int innerCompare(AviatorObject other, Map<String, Object> env);

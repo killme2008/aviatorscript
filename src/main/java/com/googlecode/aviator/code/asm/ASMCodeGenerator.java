@@ -651,9 +651,13 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+  private boolean isEqNe(final int ints) {
+    return ints == IFEQ || ints == IFNE;
+  }
+
   private void visitCompare(final int ints, final OperatorType opType) {
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
-      this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "compare",
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, isEqNe(ints) ? "compareEq" : "compare",
           "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)I");
       Label l0 = makeLabel();
       Label l1 = makeLabel();

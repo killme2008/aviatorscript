@@ -61,8 +61,8 @@ public class ClassDefiner {
   public static final boolean IS_JDK7 = isJDK7();
   public static final boolean IS_IBM_SDK = isIBMJdk();
 
-  private static boolean preferClassLoader =
-      Boolean.valueOf(System.getProperty("aviator.preferClassloaderDefiner", "false"));
+  private static boolean preferClassLoader = Boolean.valueOf(System
+      .getProperty("aviator.preferClassloaderDefiner", String.valueOf(IS_JDK7 || IS_IBM_SDK)));
 
 
   private static int errorTimes = 0;
