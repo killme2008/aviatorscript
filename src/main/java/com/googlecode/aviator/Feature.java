@@ -54,7 +54,15 @@ public enum Feature {
   /**
    * module system such as exports/require/load function supporting.
    */
-  Module;
+  Module,
+  /**
+   * try..catch..finally and throw statement to handle exceptions.
+   */
+  ExceptionHandle,
+  /**
+   * new Class(arguments) to create an instance of special class with arguments.
+   */
+  NewInstance;
 
   /**
    * Require feature sets for this feature.

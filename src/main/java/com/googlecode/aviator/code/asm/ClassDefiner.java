@@ -40,7 +40,16 @@ public class ClassDefiner {
     }
   }
 
-  public static boolean isJDK7() {
+  private static boolean isIBMJdk() {
+    String vendor = (System.getProperty("java.vendor"));
+    try {
+      return vendor != null && vendor.toLowerCase().contains("ibm corporation");
+    } catch (Throwable e) {
+      return false;
+    }
+  }
+
+  private static boolean isJDK7() {
     String version = (System.getProperty("java.version"));
     try {
       return version != null && version.startsWith("1.7");
@@ -49,14 +58,18 @@ public class ClassDefiner {
     }
   }
 
-  private static boolean preferClassLoader =
-      Boolean.valueOf(System.getProperty("aviator.preferClassloaderDefiner", "false"));
+  public static final boolean IS_JDK7 = isJDK7();
+  public static final boolean IS_IBM_SDK = isIBMJdk();
+
+  private static boolean preferClassLoader = Boolean.valueOf(System
+      .getProperty("aviator.preferClassloaderDefiner", String.valueOf(IS_JDK7 || IS_IBM_SDK)));
 
 
   private static int errorTimes = 0;
 
-  public static final Class<?> defineClass(String className, Class<?> clazz, byte[] bytes,
-      AviatorClassLoader classLoader) throws NoSuchFieldException, IllegalAccessException {
+  public static final Class<?> defineClass(final String className, final Class<?> clazz,
+      final byte[] bytes, final AviatorClassLoader classLoader)
+      throws NoSuchFieldException, IllegalAccessException {
     if (!preferClassLoader && DEFINE_CLASS_HANDLE != null) {
       try {
         Class<?> defineClass = (Class<?>) DEFINE_CLASS_HANDLE.invokeExact(clazz, bytes, EMPTY_OBJS);
@@ -73,8 +86,8 @@ public class ClassDefiner {
     }
   }
 
-  public static Class<?> defineClassByClassLoader(String className, byte[] bytes,
-      AviatorClassLoader classLoader) {
+  public static Class<?> defineClassByClassLoader(final String className, final byte[] bytes,
+      final AviatorClassLoader classLoader) {
     return classLoader.defineClass(className, bytes);
   }
 }

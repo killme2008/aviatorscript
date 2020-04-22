@@ -2,7 +2,7 @@
 
 fn add(x, y) {
   if type(x) != 'long' || type(y) != 'long' {
-    return;
+    throw "unsupported type";
   }
   x + y
 }

@@ -75,22 +75,22 @@ public class SeqMapEntryFunction extends AbstractFunction {
       if (obj == null) {
         return false;
       }
-      if (getClass() != obj.getClass()) {
+      if (!(obj instanceof Map.Entry)) {
         return false;
       }
-      MapEntry other = (MapEntry) obj;
+      Map.Entry other = (Map.Entry) obj;
       if (this.key == null) {
-        if (other.key != null) {
+        if (other.getKey() != null) {
           return false;
         }
-      } else if (!this.key.equals(other.key)) {
+      } else if (!this.key.equals(other.getKey())) {
         return false;
       }
       if (this.value == null) {
-        if (other.value != null) {
+        if (other.getValue() != null) {
           return false;
         }
-      } else if (!this.value.equals(other.value)) {
+      } else if (!this.value.equals(other.getValue())) {
         return false;
       }
       return true;

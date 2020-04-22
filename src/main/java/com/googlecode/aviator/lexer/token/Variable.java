@@ -282,6 +282,65 @@ public class Variable extends AbstractToken<Object> {
 
   };
 
+  /**
+   * elsif keyword
+   */
+  public static final Variable TRY = new Variable("try", -1) {
+
+    private static final long serialVersionUID = -5941442994484723465L;
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  public static final Variable CATCH = new Variable("catch", -1) {
+
+    private static final long serialVersionUID = 5648899950149965053L;
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  public static final Variable FINALLY = new Variable("finally", -1) {
+
+    private static final long serialVersionUID = 4620910964773812463L;
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+  public static final Variable THROW = new Variable("throw", -1) {
+
+    private static final long serialVersionUID = 113057346952612067L;
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
+
+  public static final Variable NEW = new Variable("new", -1) {
+
+    private static final long serialVersionUID = 113057346952612067L;
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
   @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
     return TokenType.Variable;

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 import org.junit.Before;
@@ -12,6 +13,8 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
+import com.googlecode.aviator.exception.StandardError;
+import com.googlecode.aviator.runtime.type.Range;
 import com.googlecode.aviator.utils.Reflector;
 
 public class TestScripts {
@@ -34,6 +37,33 @@ public class TestScripts {
       Reflector.sneakyThrow(t);
     }
     return null;
+  }
+
+  @Test
+  public void testRange() {
+    assertTrue(testScript("range.av") instanceof Range);
+  }
+
+
+  @Test
+  public void testStringSeq() {
+    assertEquals("hello world", testScript("string_seq.av"));
+  }
+
+  @Test
+  public void testSeqEntry() {
+    assertEquals(3, testScript("seq_entry.av"));
+  }
+
+  @Test
+  public void testNew() {
+    assertEquals(99, testScript("new.av"));
+  }
+
+  @Test
+  public void testScopes() {
+    assertEquals(2, testScript("scope1.av"));
+    assertEquals(199, testScript("scope2.av"));
   }
 
   @Test
@@ -71,6 +101,7 @@ public class TestScripts {
     assertEquals(7, testScript("if_else7.av"));
     assertEquals(8, testScript("if_else8.av"));
     assertEquals(null, testScript("if_else9.av"));
+    assertEquals(10, testScript("if_else10.av"));
 
     assertEquals("b is greater than 100.", testScript("if_else_scope.av", "b", 101));
     assertEquals("b is greater than 10.", testScript("if_else_scope.av", "b", 11));
@@ -148,6 +179,11 @@ public class TestScripts {
       assertEquals(56, testScript("for_return3.av"));
       assertEquals(6, testScript("for_return4.av"));
     }
+
+    {
+      // for statement values
+      assertEquals(9, testScript("for5.av"));
+    }
   }
 
   @Test
@@ -166,6 +202,7 @@ public class TestScripts {
       assertTrue(r >= 5);
     }
     testScript("while7.av");
+    assertEquals(10, testScript("while8.av"));
   }
 
   @Test
@@ -219,5 +256,18 @@ public class TestScripts {
     assertEquals(55, testScript("fibonacci.av", "n", 10));
     assertEquals(610, testScript("fibonacci.av", "n", 15));
     assertEquals(6765, testScript("fibonacci.av", "n", 20));
+  }
+
+  @Test
+  public void testTryCatch() {
+    Exception e = (Exception) testScript("try_catch1.av");
+    assertTrue(e instanceof StandardError);
+    assertEquals("1", ((Throwable) e).getMessage());
+
+    assertEquals(1, testScript("try_catch2.av"));
+    e = (Exception) testScript("try_catch3.av");
+    assertTrue(e instanceof ClassCastException);
+    e = (Exception) testScript("try_catch4.av");
+    assertTrue(e instanceof IOException);
   }
 }

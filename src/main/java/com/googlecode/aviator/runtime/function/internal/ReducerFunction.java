@@ -34,7 +34,6 @@ public class ReducerFunction extends AbstractFunction {
 
     Object coll = arg1.getValue(env);
     AviatorFunction iteratorFn = (AviatorFunction) arg2;
-    AviatorFunction continuationFn = (AviatorFunction) arg3;
     if (coll == null) {
       throw new NullPointerException("null seq");
     }
@@ -96,8 +95,12 @@ public class ReducerFunction extends AbstractFunction {
       }
     }
 
+    Object contObj = arg3.getValue(env);
+    if (contObj == Constants.REDUCER_EMPTY) {
+      return result;
+    }
 
-    AviatorObject contResult = continuationFn.call(env);
+    AviatorObject contResult = ((AviatorFunction) contObj).call(env);
     if (contResult == Constants.REDUCER_EMPTY) {
       // empty continuation, return current result.
       return result;

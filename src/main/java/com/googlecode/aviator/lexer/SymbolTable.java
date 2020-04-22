@@ -57,6 +57,11 @@ public class SymbolTable implements Serializable {
     reserveKeyword(Variable.LET);
     reserveKeyword(Variable.WHILE);
     reserveKeyword(Variable.ELSIF);
+    reserveKeyword(Variable.TRY);
+    reserveKeyword(Variable.CATCH);
+    reserveKeyword(Variable.FINALLY);
+    reserveKeyword(Variable.THROW);
+    reserveKeyword(Variable.NEW);
   }
 
   public static boolean isReservedKeyword(final String name) {

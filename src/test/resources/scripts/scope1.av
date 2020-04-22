@@ -1,0 +1,25 @@
+## examples/scope3.av
+
+let a = 1;
+{
+  a = 2;
+  let a = 3;
+  b = 4;
+  {
+    a = 5;
+    b = 6;
+    let c = 7;
+    j.assertEquals(a, 5);
+    j.assertEquals(b, 6);
+    j.assertEquals(c, 7);
+  }
+  j.assertEquals(a, 5);
+  j.assertEquals(b, 6);
+  j.assertEquals(c, nil);
+  a = 10;
+}
+j.assertEquals(a, 2);
+j.assertEquals(b, nil);
+j.assertEquals(c, nil);
+  
+return a;

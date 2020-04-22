@@ -58,11 +58,15 @@ import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
+import com.googlecode.aviator.runtime.function.internal.CatchHandlerFunction;
 import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
+import com.googlecode.aviator.runtime.function.internal.NewInstanceFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
+import com.googlecode.aviator.runtime.function.internal.ThrowFunction;
+import com.googlecode.aviator.runtime.function.internal.TryCatchFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -125,6 +129,7 @@ import com.googlecode.aviator.runtime.function.system.MinFunction;
 import com.googlecode.aviator.runtime.function.system.NowFunction;
 import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
+import com.googlecode.aviator.runtime.function.system.PstFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
 import com.googlecode.aviator.runtime.function.system.RangeFunction;
 import com.googlecode.aviator.runtime.function.system.RequireFunction;
@@ -406,18 +411,14 @@ public final class AviatorEvaluatorInstance {
 
 
   /**
-   * Configure a function missing handler.
+   * Configure a function missing handler.the handler can be null.
    *
    * @since 4.2.5
    * @param functionMissing
    */
   public void setFunctionMissing(final FunctionMissing functionMissing) {
-    if (this.functionMissing != null) {
-      throw new IllegalArgumentException("functionMissing already set:" + this.functionMissing);
-    }
     this.functionMissing = functionMissing;
   }
-
 
 
   /**
@@ -756,6 +757,16 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
+  /**
+   * Set a alias name for function specified by name
+   *
+   * @param name the origin function name
+   * @param aliasName the alias function name
+   * @since 5.0.0
+   */
+  public void aliasFunction(final String name, final String aliasName) {
+    this.addFunction(aliasName, getFunction(name));
+  }
 
   private void loadLib() {
     // Load internal functions
@@ -764,6 +775,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new SysDateFunction());
     addFunction(new PrintlnFunction());
     addFunction(new PrintFunction());
+    addFunction(new PstFunction());
     addFunction(new RandomFunction());
     addFunction(new NowFunction());
     addFunction(new LongFunction());
@@ -806,6 +818,14 @@ public final class AviatorEvaluatorInstance {
     addFunction(new ReducerContFunction());
     addFunction(new ReducerBreakFunction());
     addFunction(new IfCallccFunction());
+
+    // try..catch
+    addFunction(new TryCatchFunction());
+    addFunction(new CatchHandlerFunction());
+    addFunction(new ThrowFunction());
+
+    // new instance
+    addFunction(new NewInstanceFunction());
 
     // load string lib
     addFunction(new StringContainsFunction());
@@ -867,6 +887,10 @@ public final class AviatorEvaluatorInstance {
         new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
     addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
     addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
+
+    // alias
+    aliasFunction("println", "p");
+    aliasFunction("pst", "printStackTrace");
   }
 
   /**
@@ -974,6 +998,9 @@ public final class AviatorEvaluatorInstance {
    * @param function
    */
   public void addFunction(final String name, final AviatorFunction function) {
+    if (function == null) {
+      throw new IllegalArgumentException("Null function");
+    }
     if ("lambda".equals(name)) {
       throw new IllegalArgumentException("Invalid function name, lambda is a keyword.");
     }

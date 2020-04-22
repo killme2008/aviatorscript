@@ -1,0 +1,34 @@
+let m = seq.map('a', 1, 'b', 2, 'c', 3);
+
+let c = 0;
+for x in m {
+  j.assertEquals(type(x), 'java.util.HashMap.Node');
+  if x.key == 'a' {
+     j.assertEquals(x.value, 1);
+  }elsif x.key == 'b' {
+     j.assertEquals(x.value, 2);
+  }else {
+     j.assertEquals(x.value, 3);
+  }
+  c = c + 1;
+}
+
+j.assertEquals(c, 3);
+
+let e = filter(m, lambda(e) -> e == seq.entry('b', 2) end);
+j.assertEquals(1, count(e));
+j.assertEquals(seq.get(e, 'b'), 2);
+
+let e = seq.some(m, lambda(e) -> e == seq.entry('c', 3) end);
+j.assertNotNull(e);
+j.assertEquals(e.key, 'c');
+j.assertEquals(e.value, 3);
+
+j.assertTrue(seq.every(m, lambda(e) -> e.value > 0 end));
+
+let e = seq.entry(1, 2);
+assert(e == e);
+assert(e == seq.entry(1, 2));
+
+return count(m);
+

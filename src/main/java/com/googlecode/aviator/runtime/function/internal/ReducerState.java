@@ -6,5 +6,5 @@ package com.googlecode.aviator.runtime.function.internal;
  * @since 5.0.0
  */
 public enum ReducerState {
-  Cont, Break, Return, Empty
+  Empty, Cont, Break, Return
 }

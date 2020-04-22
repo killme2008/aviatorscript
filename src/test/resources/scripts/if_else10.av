@@ -1,0 +1,35 @@
+let a = if(true) {
+  1
+};
+
+let b = if(true) {
+  2
+} else{
+  3
+};
+
+let c = if(false) {
+  2
+}else {
+  3
+};
+
+let d = if(c > 10) {
+  10
+}elsif(c > 2) {
+  4
+} else {
+  5
+};
+
+let e = if(true) {
+  return 10;
+};
+
+j.assertEquals(a, 1);
+j.assertEquals(b, 2);
+j.assertEquals(c, 3);
+j.assertEquals(d, 4);
+j.assertEquals(e, 10);
+
+return e;

@@ -1,0 +1,38 @@
+let a = {
+  1
+};
+
+let b = {
+  a + 1
+};
+
+let c = {
+  return b + 1;
+};
+
+let d = {
+  if(true) {
+    c +1
+  }else {
+    c + 2
+  }
+};
+
+let e = {
+  let a = 99;
+  let b = 100;
+  {
+     a + b
+  }
+};
+
+j.assertEquals(a, 1);
+j.assertEquals(b, 2);
+j.assertEquals(c, 3);
+j.assertEquals(d, 4);
+j.assertEquals(e, 199);
+
+return e;
+
+
+

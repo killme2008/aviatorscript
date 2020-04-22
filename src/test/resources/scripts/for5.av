@@ -1,0 +1,26 @@
+let a = for x in range(0, 10) {
+  x
+};
+
+let b = for x in range(0, 10) {
+  continue;
+};
+
+let c = for x in range(0, 10) {
+  break;
+};
+
+let d = for x in range(0, 10) {
+  return x;
+};
+
+
+j.assertEquals(9, a);
+j.assertNull(b);
+j.assertNull(c);
+j.assertEquals(0, d);
+return a;
+
+
+
+

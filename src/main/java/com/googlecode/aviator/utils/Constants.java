@@ -26,6 +26,12 @@ public class Constants {
   public static final ReducerResult REDUCER_EMPTY = ReducerResult.withEmpty(AviatorNil.NIL);
   public static final String REQUIRE_FN = "require";
   public static final String LOAD_FN = "load";
+  public static final Variable CATCH_HANDLER_VAR = new Variable("__catch_handler", -1);
+  public static final Variable SEQ_LIST_VAR = new Variable("seq.list", -1);
+  public static final Variable TRY_VAR = new Variable("__try", -1);
+  public static final Variable THROW_VAR = new Variable("__throw", -1);
+  public static final Variable NEW_VAR = new Variable("__new", -1);
+  public static final Variable THROWABLE_VAR = new Variable("Throwable", -1);
 
   private Constants() {
 
