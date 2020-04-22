@@ -2,7 +2,6 @@ let m = seq.map('a', 1, 'b', 2, 'c', 3);
 
 let c = 0;
 for x in m {
-  j.assertEquals(type(x), 'java.util.HashMap.Node');
   if x.key == 'a' {
      j.assertEquals(x.value, 1);
   }elsif x.key == 'b' {
