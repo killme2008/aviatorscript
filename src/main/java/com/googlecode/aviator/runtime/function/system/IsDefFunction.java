@@ -1,6 +1,7 @@
 package com.googlecode.aviator.runtime.function.system;
 
 import java.util.Map;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -29,7 +30,9 @@ public class IsDefFunction extends AbstractFunction {
       throw new IllegalArgumentException(
           "Invalid argument type for is_def: " + arg1.getAviatorType());
     }
-    return AviatorBoolean.valueOf(env.containsKey(((AviatorJavaType) arg1).getName()));
+    final String varName = ((AviatorJavaType) arg1).getName();
+    return AviatorBoolean.valueOf(
+        env.containsKey(varName) || RuntimeUtils.getInstance(env).containsFunction(varName));
   }
 
 }

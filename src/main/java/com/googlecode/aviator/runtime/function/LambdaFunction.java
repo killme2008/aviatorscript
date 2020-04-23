@@ -61,8 +61,9 @@ public abstract class LambdaFunction extends AbstractFunction {
     for (String name : this.arguments) {
       final AviatorObject arg = args[i++];
       Object value = arg.getValue(parentEnv);
-      if (arg.getAviatorType() == AviatorType.JavaType && value == null) {
-        value = RuntimeUtils.getInstance(env).getFunction(((AviatorJavaType) arg).getName());
+      if (value == null && arg.getAviatorType() == AviatorType.JavaType
+          && !parentEnv.containsKey(((AviatorJavaType) arg).getName())) {
+        value = RuntimeUtils.getInstance(parentEnv).getFunction(((AviatorJavaType) arg).getName());
       }
       env.override(name, value);
     }
