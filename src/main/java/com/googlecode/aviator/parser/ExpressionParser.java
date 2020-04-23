@@ -538,7 +538,7 @@ public class ExpressionParser implements Parser {
           }
         }
         if (expectChar(')')) {
-          cg.onMethodInvoke(this.lookhead.withMeta(Constants.PARAMS_META, params));
+          cg.onMethodInvoke(currentToken().withMeta(Constants.PARAMS_META, params));
           this.scope.leaveParen();
           move(true);
         }
@@ -800,7 +800,7 @@ public class ExpressionParser implements Parser {
       }
       if (expectChar(')')) {
         getCodeGeneratorWithTimes()
-            .onMethodInvoke(this.lookhead.withMeta(Constants.PARAMS_META, params));
+            .onMethodInvoke(currentToken().withMeta(Constants.PARAMS_META, params));
         move(true);
         this.scope.leaveParen();
       }
