@@ -48,9 +48,36 @@ public class AviatorBindings implements Bindings {
     this.env.clear();
   }
 
+
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.env == null) ? 0 : this.env.hashCode());
+    return result;
+  }
+
   @Override
   public boolean equals(final Object obj) {
-    return this.env.equals(obj);
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    AviatorBindings other = (AviatorBindings) obj;
+    if (this.env == null) {
+      if (other.env != null) {
+        return false;
+      }
+    } else if (!this.env.equals(other.env)) {
+      return false;
+    }
+    return true;
   }
 
   @Override

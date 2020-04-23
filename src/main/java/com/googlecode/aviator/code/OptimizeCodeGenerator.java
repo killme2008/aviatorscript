@@ -73,7 +73,6 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   private CodeGenerator parentCodeGenerator;
 
-  private boolean trace = false;
   private final AviatorEvaluatorInstance instance;
   // the expression parser
   private Parser parser;
@@ -90,7 +89,6 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       final ClassLoader classLoader, final OutputStream traceOutStream) {
     this.instance = instance;
     this.codeGen = new ASMCodeGenerator(instance, (AviatorClassLoader) classLoader, traceOutStream);
-    this.trace = trace;
   }
 
   private Env getCompileEnv() {
@@ -572,12 +570,12 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   private void printTokenList() {
-    if (this.trace) {
-      for (Token<?> t : this.tokenList) {
-        System.out.print(t.getLexeme() + " ");
-      }
-      System.out.println();
-    }
+    // if (this.instance) {
+    // for (Token<?> t : this.tokenList) {
+    // System.out.print(t.getLexeme() + " ");
+    // }
+    // System.out.println();
+    // }
   }
 
 
