@@ -1,0 +1,67 @@
+## examples/statement_value.av
+
+## Conditional statement's value
+let a = if (true) {
+ 	1
+};
+
+p("a is :" + type(a) +", " + a);
+
+let a = if (false) {
+ 	1
+};
+
+p("a is :" + type(a) +", " + a);
+
+let a = if (false) {
+ 	1
+} else {
+    2
+};
+
+p("a is :" + type(a) +", " + a);
+
+## Loop statement's value
+let b = for x in range(0, 10) {
+   x
+};
+p("b is :" + type(b) +", " + b);
+
+
+let b = for x in range(0, 10) {
+   if x  == 2 {
+      break;
+   }
+};
+p("b is :" + type(b) +", " + b);
+
+let b = for x in range(0, 10) {
+   if x  == 2 {
+      return x;
+   }
+};
+p("b is :" + type(b) +", " + b);
+
+## Block's value
+let c = {
+  let a = 1;
+  let b = 2;
+  a + b
+};
+
+p("c is :" + type(c) +", " + c);
+
+let c = {
+  let a = 1;
+  let b = 2;
+  
+  if a > b {
+    return a;
+  } else {
+    return b;
+  }
+};
+
+p("c is :" + type(c) +", " + c);
+
+

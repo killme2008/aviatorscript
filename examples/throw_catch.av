@@ -1,0 +1,11 @@
+## examples/throw_catch.av
+
+try {
+  throw new IllegalArgumentException("test");
+}catch(IllegalArgumentException e) {
+  p("catch IllegalArgumentException.");
+  pst(e);
+}catch(e) {
+  p("catch all throwable.");
+  pst(e);
+}

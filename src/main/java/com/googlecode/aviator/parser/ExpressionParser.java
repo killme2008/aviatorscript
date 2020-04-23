@@ -1046,7 +1046,7 @@ public class ExpressionParser implements Parser {
       reportSyntaxError("invalid value to define");
     }
     ensureFeatureEnabled(Feature.Assignment);
-    getCodeGeneratorWithTimes().onAssignment(this.lookhead.withMeta(Constants.DEFINE_META, true));
+    getCodeGeneratorWithTimes().onAssignment(currentToken().withMeta(Constants.DEFINE_META, true));
     if (!expectChar(';')) {
       reportSyntaxError("missing ';' for let statement");
     }
