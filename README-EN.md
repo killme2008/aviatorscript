@@ -42,44 +42,47 @@ Check available versions at [search.maven.org](https://search.maven.org/search?q
 
 # Quick Start
 
-```java
-int[] a = ...;
-Map<String, Object> env = new HashMap<String, Object>();
-env.put("a", a);
+1. Download [aviator](https://raw.githubusercontent.com/killme2008/aviator/master/bin/aviator)  shell script to a directory in system `PATH` environment variable，such as  `~/bin/aviator`:
 
-AviatorEvaluator.execute("1 + 2 + 3");
-AviatorEvaluator.execute("a[1] + 100", env);
-AviatorEvaluator.execute("'a[1]=' + a[1]", env);
+```sh
+$ wget https://raw.githubusercontent.com/killme2008/aviator/master/bin/aviator
+$ chmod u+x aviator
+```
 
-// get the length of the array
-AviatorEvaluator.execute("count(a)", env);
+2. Execute  `aviator`   command，it will download the latest aviator jar to  `~/.aviatorscript`  directory：
 
-// compute the sum of the array
-AviatorEvaluator.execute("reduce(a, +, 0)", env);
+```sh
+$ aviator
+Downloading AviatorScript now...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   153  100   153    0     0    111      0  0:00:01  0:00:01 --:--:--   111
+100 1373k  100 1373k    0     0   689k      0  0:00:01  0:00:01 --:--:--  689k
+Useage: java com.googlecode.aviator.Main [file] [args]
+```
 
-// check each element of array is between 0 <= e < 10.
-AviatorEvaluator.execute("seq.every(a, seq.and(seq.ge(0), seq.lt(10)))", env);
+3. Save the script below in file `hello.av`:
 
-// compute the sum by Lambda
-AviatorEvaluator.execute("reduce(a, lambda(x,y) -> x + y end, 0)", env);
+```js
+p("Hello, AviatorScript!");
 
-// import string instance methods
-AviatorEvaluator.addInstanceFunctions("s", String.class);
-AviatorEvaluator.execute("s.indexOf('hello', 'l')");
-AviatorEvaluator.execute("s.replaceAll('hello', 'l', 'x')");
+let a = tuple(1, 2, 3, 4, 5);
 
-// import static methods
-AviatorEvaluator.addStaticFunctions("sutil", StringUtils.class);
-AviatorEvaluator.execute("sutil.isBlank('hello')");
+p("sum of a is: " + reduce(a, +, 0));
 
-// Call any public instance methods by reflection
-AviatorEvaluator.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());
-// Calling String#indexOf by reflection
-System.out.println(AviatorEvaluator.execute("indexOf('hello world', 'w')"));
-// Calling Long#floatValue by reflection
-System.out.println(AviatorEvaluator.execute("floatValue(3)"));
-// Calling BigDecimal#add by reflection
-System.out.println(AviatorEvaluator.execute("add(3M, 4M)"));
+let date = new java.util.Date();
+p("The year is: "+ getYear(date));
+p("The month is: "+ getMonth(date));
+```
+
+4. Execute the script with `aviator`  command：
+
+```sh
+$ aviator hello.av
+Hello, AviatorScript!
+sum of a is: 15
+The year is: 120
+The month is: 3
 ```
 
 See [user guide](https://www.yuque.com/boyan-avfmj/aviatorscript) for details.

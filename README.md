@@ -48,45 +48,49 @@
 
 # 快速开始
 
-```java
-int[] a = ...;
-Map<String, Object> env = new HashMap<String, Object>();
-env.put("a", a);
+1. 下载 [aviator](https://raw.githubusercontent.com/killme2008/aviator/master/bin/aviator) shell 到某个目录（最好是在系统的 `PATH` 环境变量内），比如 `~/bin/aviator`:
 
-AviatorEvaluator.execute("1 + 2 + 3");
-AviatorEvaluator.execute("a[1] + 100", env);
-AviatorEvaluator.execute("'a[1]=' + a[1]", env);
-
-// 求数组长度
-AviatorEvaluator.execute("count(a)", env);
-
-// 求数组总和
-AviatorEvaluator.execute("reduce(a, +, 0)", env);
-
-// 检测数组每个元素都在 0 <= e < 10 之间
-AviatorEvaluator.execute("seq.every(a, seq.and(seq.ge(0), seq.lt(10)))", env);
-
-// Lambda 求和
-AviatorEvaluator.execute("reduce(a, lambda(x,y) -> x + y end, 0)", env);
-
-// 导入 String 类实例方法作为自定义函数
-AviatorEvaluator.addInstanceFunctions("s", String.class);
-AviatorEvaluator.execute("s.indexOf('hello', 'l')");
-AviatorEvaluator.execute("s.replaceAll('hello', 'l', 'x')");
-
-// 导入静态方法作为自定义函数
-AviatorEvaluator.addStaticFunctions("sutil", StringUtils.class);
-AviatorEvaluator.execute("sutil.isBlank('hello')");
-
-// 启用基于反射的 function missing 机制，调用任意 public 实例方法，无需导入
-AviatorEvaluator.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());
-// 调用 String#indexOf
-System.out.println(AviatorEvaluator.execute("indexOf('hello world', 'w')"));
-// 调用 Long#floatValue
-System.out.println(AviatorEvaluator.execute("floatValue(3)"));
-// 调用 BigDecimal#add
-System.out.println(AviatorEvaluator.execute("add(3M, 4M)"));
+```sh
+$ wget https://raw.githubusercontent.com/killme2008/aviator/master/bin/aviator
+$ chmod u+x aviator
 ```
+
+2. 执行  `aviator`  命令，将自动下载最新文档版本 aviator jar 到  `~/.aviatorscript`  下的安装目录并运行：
+
+```sh
+$ aviator
+Downloading AviatorScript now...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   153  100   153    0     0    111      0  0:00:01  0:00:01 --:--:--   111
+100 1373k  100 1373k    0     0   689k      0  0:00:01  0:00:01 --:--:--  689k
+Useage: java com.googlecode.aviator.Main [file] [args]
+```
+
+3. 将下面这个脚本保存为文件  `hello.av`:
+
+```js
+p("Hello, AviatorScript!");
+
+let a = tuple(1, 2, 3, 4, 5);
+
+p("sum of a is: " + reduce(a, +, 0));
+
+let date = new java.util.Date();
+p("The year is: "+ getYear(date));
+p("The month is: "+ getMonth(date));
+```
+
+4. 执行脚本：
+
+```sh
+$ aviator hello.av
+Hello, AviatorScript!
+sum of a is: 15
+The year is: 120
+The month is: 3
+```
+
 
 更详细的请阅读[用户指南](https://www.yuque.com/boyan-avfmj/aviatorscript)。
 
