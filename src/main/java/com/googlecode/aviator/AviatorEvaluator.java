@@ -24,6 +24,7 @@ import com.googlecode.aviator.Options.Value;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.utils.Utils;
 
 
 /**
@@ -47,7 +48,7 @@ public final class AviatorEvaluator {
   /**
    * Aviator version
    */
-  public static final String VERSION = "5.0.0";
+  public static final String VERSION = Utils.getAviatorScriptVersion();
 
   /**
    * The global evaluator's functions map.
