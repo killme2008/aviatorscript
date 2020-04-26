@@ -8,7 +8,6 @@ fn process_conn(socket) {
   try{
     let out = getOutputStream(socket);
     reader = new java.io.BufferedReader(new java.io.InputStreamReader(getInputStream(socket)));
-    let line = nil;
     while (line = readLine(reader)) != nil {
       if line == "exit" {
         println(out, 'bye ^_^');
