@@ -1,6 +1,5 @@
 ## examples/echo_server.av
 ## A simple echo server in aviatorscript
-let io = require('io');
 
 fn process_conn(socket) {
   let client_addr = getRemoteSocketAddress(socket);
@@ -8,8 +7,9 @@ fn process_conn(socket) {
   let reader = nil;
   try{
     let out = getOutputStream(socket);
-    reader = io.reader(getInputStream(socket));
-    for line in io.line_seq(reader) {
+    reader = new java.io.BufferedReader(new java.io.InputStreamReader(getInputStream(socket)));
+    let line = nil;
+    while (line = readLine(reader)) != nil {
       if line == "exit" {
         println(out, 'bye ^_^');
         break;
