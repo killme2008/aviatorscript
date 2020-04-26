@@ -1167,9 +1167,6 @@ public class ExpressionParser implements Parser {
       reportSyntaxError("missing '}' for try body");
     }
     move(true);
-    if (this.lookhead != Variable.CATCH) {
-      reportSyntaxError("expect catch clauses after try body");
-    }
     boolean hasCatch = false;
     boolean hasFinally = false;
 
@@ -1239,6 +1236,9 @@ public class ExpressionParser implements Parser {
     if (hasCatch) {
       // Invoke seq.list to create handler list
       getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    } else {
+      getCodeGeneratorWithTimes().onConstant(Variable.NIL);
       getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
     }
 

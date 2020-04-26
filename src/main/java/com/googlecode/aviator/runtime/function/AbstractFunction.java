@@ -4,6 +4,7 @@ import java.util.Map;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
+import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -16,6 +17,15 @@ import com.googlecode.aviator.runtime.type.AviatorType;
 public abstract class AbstractFunction extends AviatorObject implements AviatorFunction {
   private static final long serialVersionUID = -2391067902827877479L;
 
+  @Override
+  public AviatorObject call() throws Exception {
+    return this.call(Env.EMPTY_ENV);
+  }
+
+  @Override
+  public void run() {
+    this.call(Env.EMPTY_ENV);
+  }
 
   public AviatorObject throwArity(final int n) {
     String name = getName();

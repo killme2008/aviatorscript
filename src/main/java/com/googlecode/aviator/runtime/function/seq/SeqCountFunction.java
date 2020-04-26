@@ -41,7 +41,7 @@ public class SeqCountFunction extends AbstractFunction {
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
     Object value = arg1.getValue(env);
     if (value == null) {
-      throw new NullPointerException("null seq");
+      return AviatorLong.valueOf(0);
     }
     Class<?> clazz = value.getClass();
 

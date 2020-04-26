@@ -4,6 +4,7 @@ import java.util.Map;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
+import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -18,6 +19,16 @@ public abstract class AbstractVariadicFunction extends AviatorObject implements 
 
 
   private static final long serialVersionUID = -5939898720859638046L;
+
+  @Override
+  public AviatorObject call() throws Exception {
+    return this.call(Env.EMPTY_ENV);
+  }
+
+  @Override
+  public void run() {
+    this.call(Env.EMPTY_ENV);
+  }
 
 
   @Override

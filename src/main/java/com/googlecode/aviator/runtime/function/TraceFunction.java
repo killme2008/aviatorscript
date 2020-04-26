@@ -4,6 +4,7 @@ import java.util.Map;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.Env;
 
 /**
  * Trace eval function.
@@ -12,6 +13,16 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  *
  */
 public class TraceFunction implements AviatorFunction {
+
+  @Override
+  public AviatorObject call() throws Exception {
+    return this.call(Env.EMPTY_ENV);
+  }
+
+  @Override
+  public void run() {
+    this.call(Env.EMPTY_ENV);
+  }
 
   private final AviatorFunction rawFunc;
 

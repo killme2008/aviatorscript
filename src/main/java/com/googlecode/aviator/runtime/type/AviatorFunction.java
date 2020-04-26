@@ -16,6 +16,7 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 
 /**
@@ -24,7 +25,7 @@ import java.util.Map;
  * @author dennis
  *
  */
-public interface AviatorFunction {
+public interface AviatorFunction extends Callable<AviatorObject>, Runnable {
   /**
    * Get the function name
    *

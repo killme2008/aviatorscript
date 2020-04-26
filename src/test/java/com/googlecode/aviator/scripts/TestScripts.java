@@ -269,5 +269,7 @@ public class TestScripts {
     assertTrue(e instanceof ClassCastException);
     e = (Exception) testScript("try_catch4.av");
     assertTrue(e instanceof IOException);
+
+    assertEquals(3, testScript("try_catch5.av"));
   }
 }

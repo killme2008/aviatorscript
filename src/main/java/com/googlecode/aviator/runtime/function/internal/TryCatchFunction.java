@@ -41,12 +41,14 @@ public class TryCatchFunction extends AbstractFunction {
       result = tryBody.call(env);
     } catch (Throwable t) {
       boolean handle = false;
-      for (CatchHandler handler : catchHandlers) {
-        if (handler.getExceptionClass().isAssignableFrom(t.getClass())) {
-          AviatorObject ret = handler.getFunc().call(env, AviatorRuntimeJavaType.valueOf(t));
-          result = chooseResult(result, ret);
-          handle = true;
-          break;
+      if (catchHandlers != null) {
+        for (CatchHandler handler : catchHandlers) {
+          if (handler.getExceptionClass().isAssignableFrom(t.getClass())) {
+            AviatorObject ret = handler.getFunc().call(env, AviatorRuntimeJavaType.valueOf(t));
+            result = chooseResult(result, ret);
+            handle = true;
+            break;
+          }
         }
       }
       if (!handle) {

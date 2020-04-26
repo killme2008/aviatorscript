@@ -8,6 +8,7 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
+import com.googlecode.aviator.utils.Env;
 
 /**
  * Runtime function delegator
@@ -17,6 +18,15 @@ import com.googlecode.aviator.runtime.type.AviatorType;
  */
 final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFunction {
 
+  @Override
+  public AviatorObject call() throws Exception {
+    return this.call(Env.EMPTY_ENV);
+  }
+
+  @Override
+  public void run() {
+    this.call(Env.EMPTY_ENV);
+  }
 
 
   private static final long serialVersionUID = 718191165717789044L;

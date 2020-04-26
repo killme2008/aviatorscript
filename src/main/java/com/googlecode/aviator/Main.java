@@ -34,12 +34,12 @@ public class Main {
       String script = args[1];
       String[] remainArgs = getRemainArgs(args, 2);
       Expression exp = AviatorEvaluator.getInstance().compile(script);
-      System.out.println(exp.execute(exp.newEnv("ARGS", remainArgs)));
+      System.out.println(exp.execute(exp.newEnv("ARGV", remainArgs)));
     } else {
       String[] remainArgs = getRemainArgs(args, 1);
       Expression exp = AviatorEvaluator.getInstance().compileScript(cmdOrPath);
 
-      exp.execute(exp.newEnv("ARGS", remainArgs));
+      exp.execute(exp.newEnv("ARGV", remainArgs));
     }
 
   }
