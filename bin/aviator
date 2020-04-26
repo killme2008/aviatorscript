@@ -1,0 +1,160 @@
+#!/bin/bash
+#Aviator script.
+#Modified from leiningen:https://raw.github.com/technomancy/leiningen/preview/bin/lein
+#License: Eclipse Public License,same as leiningen and clojure.
+
+export AVIATOR_VERSION="0.4.1"
+
+case $AVIATOR_VERSION in
+    *SNAPSHOT) SNAPSHOT="YES" ;;
+    *) SNAPSHOT="NO" ;;
+esac
+
+if [ `id -u` -eq 0 ] && [ "$AVIATOR_ROOT" = "" ]; then
+    echo "WARNING: You're currently running as root; probably by accident."
+    echo "Press control-C to abort or Enter to continue as root."
+    echo "Set AVIATOR_ROOT to disable this warning."
+    read _
+fi
+
+ORIGINAL_PWD="$PWD"
+
+export AVIATOR_HOME=${AVIATOR_HOME:-"$HOME/.aviatorscript"}
+
+if [ "$OSTYPE" = "cygwin" ]; then
+    export AVIATOR_HOME=`cygpath -w $AVIATOR_HOME`
+fi
+
+AVIATOR_JAR="$AVIATOR_HOME/self-installs/aviator-$AVIATOR_VERSION.jar"
+
+# normalize $0 on certain BSDs
+if [ "$(dirname "$0")" = "." ]; then
+    SCRIPT="$(which $(basename "$0"))"
+else
+    SCRIPT="$0"
+fi
+
+# resolve symlinks to the script itself portably
+while [ -h "$SCRIPT" ] ; do
+    ls=`ls -ld "$SCRIPT"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+        SCRIPT="$link"
+    else
+        SCRIPT="$(dirname "$SCRIPT"$)/$link"
+    fi
+done
+
+BIN_DIR="$(dirname "$SCRIPT")"
+
+# Not running from a checkout
+CLASSPATH="$CLASSPATH:$AVIATOR_JAR"
+
+if [ ! -r "$AVIATOR_JAR" -a "$1" != "self-install" ]; then
+    "$0" self-install
+fi
+
+
+HTTP_CLIENT=${HTTP_CLIENT:-"wget -O"}
+if type -p curl >/dev/null 2>&1; then
+    if [ "$https_proxy" != "" ]; then
+        CURL_PROXY="-x $https_proxy"
+    fi
+    HTTP_CLIENT="curl $CURL_PROXY -f -L -o"
+fi
+
+export JAVA_CMD=${JAVA_CMD:-"java"}
+export AVIATOR_JAVA_CMD=${AVIATOR_JAVA_CMD:-$JAVA_CMD}
+
+# Support $JAVA_OPTS for backwards-compatibility.
+export JVM_OPTS="${JVM_OPTS:-"$JAVA_OPTS"}"
+
+# TODO: investigate http://skife.org/java/unix/2011/06/20/really_executable_jars.html
+# If you're packaging this for a package manager (.deb, homebrew, etc)
+# you need to remove the self-install and upgrade functionality or see lein-pkg.
+if [ "$1" = "self-install" ]; then
+    if [ -r "$AVIATOR_JAR" ]; then
+      echo "The self-install jar already exists at $AVIATOR_JAR."
+      echo "If you wish to re-download, delete it and rerun \"$0 self-install\"."
+      exit 1
+    fi
+    echo "Downloading AviatorScript now..."
+    AVIATOR_DIR=`dirname "$AVIATOR_JAR"`
+    mkdir -p "$AVIATOR_DIR"
+    AVIATOR_URL="https://github.com/killme2008/aviator/raw/master/downloads/aviator-$AVIATOR_VERSION.jar"
+    $HTTP_CLIENT "$AVIATOR_JAR" "$AVIATOR_URL"
+    if [ $? != 0 ]; then
+        echo "Failed to download $AVIATOR_URL"
+        echo "If you have an old version of libssl you may not have the correct"
+        echo "certificate authority. Either upgrade or set HTTP_CLIENT to insecure:"
+        echo "  export HTTP_CLIENT=\"wget --no-check-certificate -O\" # or"
+        echo "  export HTTP_CLIENT=\"curl --insecure -f -L -o"
+        if [ $SNAPSHOT = "YES" ]; then
+            echo "If you have Maven installed, you can do"
+            echo "mvn dependency:copy-dependencies; mv target/dependency lib"
+            echo "See README.md for further SNAPSHOT build instructions."
+        fi
+        rm $AVIATOR_JAR 2> /dev/null
+        exit 1
+    fi
+elif [ "$1" = "upgrade" ]; then
+    if [ "$AVIATOR_DIR" != "" ]; then
+        echo "The upgrade task is not meant to be run from a checkout."
+        exit 1
+    fi
+    if [ $SNAPSHOT = "YES" ]; then
+        echo "The upgrade task is only meant for stable releases."
+        echo "See the \"Hacking\" section of the README."
+        exit 1
+    fi
+    if [ ! -w "$SCRIPT" ]; then
+        echo "You do not have permission to upgrade the installation in $SCRIPT"
+        exit 1
+    else
+        TARGET_VERSION="${2:-"stable"}"
+        echo "The script at $SCRIPT will be upgraded to the latest $TARGET_VERSION version."
+        echo -n "Do you want to continue [Y/n]? "
+        read RESP
+        case "$RESP" in
+            y|Y|"")
+                echo
+                echo "Upgrading..."
+                TARGET="/tmp/aviatorcript-$$-upgrade"
+                if ["$OSTYPE" = "cygwin" ]; then
+                    TARGET=`cygpath -w $TARGET`
+                fi
+                AVIATOR_SCRIPT_URL="https://github.com/killme2008/aviator/raw/$TARGET_VERSION/bin/aviator"
+                $HTTP_CLIENT "$TARGET" "$AVIATOR_SCRIPT_URL" \
+                    && mv "$TARGET" "$SCRIPT" \
+                    && chmod +x "$SCRIPT" \
+                    && echo && "$SCRIPT" self-install && echo && echo "Now running" `$SCRIPT version`
+                exit $?;;
+            *)
+                echo "Aborted."
+                exit 1;;
+        esac
+    fi
+else
+    if [ "$OSTYPE" = "cygwin" ]; then
+        # When running on Cygwin, use Windows-style paths for java
+        ORIGINAL_PWD=`cygpath -w "$ORIGINAL_PWD"`
+        CLASSPATH=`cygpath -wp "$CLASSPATH"`
+    fi
+
+    if [ $DEBUG ]; then
+        echo "Classpath: $CLASSPATH"
+    fi
+
+    $AVIATOR_JAVA_CMD \
+        -client -XX:+TieredCompilation \
+        $AVIATOR_JVM_OPTS \
+        -Dfile.encoding=UTF-8 \
+        -Dmaven.wagon.http.ssl.easy=false \
+        -Daviatorscript.original.pwd="$ORIGINAL_PWD" \
+        -cp "$CLASSPATH" \
+        com.googlecode.aviator.Main "$@"
+
+    EXIT_CODE=$?
+
+    exit $EXIT_CODE
+fi
