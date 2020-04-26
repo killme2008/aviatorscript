@@ -64,7 +64,9 @@ Downloading AviatorScript now...
                                  Dload  Upload   Total   Spent    Left  Speed
 100   153  100   153    0     0    111      0  0:00:01  0:00:01 --:--:--   111
 100 1373k  100 1373k    0     0   689k      0  0:00:01  0:00:01 --:--:--  689k
-Useage: java com.googlecode.aviator.Main [file] [args]
+Usage: java com.googlecode.aviator.Main [file] [args]
+     : java com.googlecode.aviator.Main -e [script]
+     : java com.googlecode.aviator.Main -v
 ```
 
 3. 将下面这个脚本保存为文件  `hello.av`:
