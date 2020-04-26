@@ -30,7 +30,7 @@
 
 # News
 
-
+* [5.0.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0), 正式发布 5.0 版本，增加 Main 入口类和执行脚本等。
 * [5.0.0-RC2](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0-RC2), 异常处理 try/catch/finally 和 new 语法支持等。
 * [5.0.0-RC1](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0-RC1), almost production-ready version before releasing 5.0
 
