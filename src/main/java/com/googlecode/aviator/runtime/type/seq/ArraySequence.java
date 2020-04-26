@@ -3,7 +3,6 @@ package com.googlecode.aviator.runtime.type.seq;
 import java.lang.reflect.Array;
 import java.util.Iterator;
 import com.googlecode.aviator.runtime.type.Collector;
-import com.googlecode.aviator.runtime.type.Sequence;
 
 /**
  * Sequence for object array.
@@ -11,7 +10,7 @@ import com.googlecode.aviator.runtime.type.Sequence;
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class ArraySequence implements Sequence<Object> {
+public class ArraySequence extends AbstractSequence<Object> {
   private final Object a;
   private final int len;
 

@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import com.googlecode.aviator.runtime.type.Collector;
-import com.googlecode.aviator.runtime.type.Sequence;
 
 /**
  * Sequence for map.
@@ -14,7 +13,7 @@ import com.googlecode.aviator.runtime.type.Sequence;
  *
  */
 @SuppressWarnings("rawtypes")
-public class MapSequence implements Sequence<Map.Entry> {
+public class MapSequence extends AbstractSequence<Map.Entry> {
   private final Map map;
 
   public MapSequence(final Map map) {

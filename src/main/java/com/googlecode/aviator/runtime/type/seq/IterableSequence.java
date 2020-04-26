@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import com.googlecode.aviator.runtime.type.Collector;
-import com.googlecode.aviator.runtime.type.Sequence;
 
 /**
  * Sequence for iterable.
@@ -12,7 +11,7 @@ import com.googlecode.aviator.runtime.type.Sequence;
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class IterableSequence implements Sequence<Object> {
+public class IterableSequence extends AbstractSequence<Object> {
   private final Iterable<Object> iterable;
 
 

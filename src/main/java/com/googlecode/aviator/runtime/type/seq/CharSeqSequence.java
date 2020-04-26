@@ -2,7 +2,6 @@ package com.googlecode.aviator.runtime.type.seq;
 
 import java.util.Iterator;
 import com.googlecode.aviator.runtime.type.Collector;
-import com.googlecode.aviator.runtime.type.Sequence;
 
 /**
  * Sequence for CharSequence.
@@ -10,7 +9,7 @@ import com.googlecode.aviator.runtime.type.Sequence;
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class CharSeqSequence implements Sequence<String> {
+public class CharSeqSequence extends AbstractSequence<String> {
   private final CharSequence cs;
 
 

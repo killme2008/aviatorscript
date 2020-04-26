@@ -133,6 +133,7 @@ import com.googlecode.aviator.runtime.function.system.PstFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
 import com.googlecode.aviator.runtime.function.system.RangeFunction;
 import com.googlecode.aviator.runtime.function.system.RequireFunction;
+import com.googlecode.aviator.runtime.function.system.SeqFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
 import com.googlecode.aviator.runtime.function.system.SysDateFunction;
@@ -806,6 +807,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new IsDefFunction());
     addFunction(new UndefFunction());
     addFunction(new TypeFunction());
+    addFunction(SeqFunction.INSTANCE);
 
     // module
     // load and require

@@ -5,7 +5,7 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.type.Collector;
 import com.googlecode.aviator.runtime.type.Sequence;
 
-public class LimitedSequence<T> implements Sequence<T> {
+public class LimitedSequence<T> extends AbstractSequence<T> {
 
   private final Sequence<T> seq;
   private final int maxLoopCount;
