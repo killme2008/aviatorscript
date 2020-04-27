@@ -1,0 +1,14 @@
+## examples/callable.av
+
+let callable = lambda() ->
+  new java.util.Date()
+end;
+
+p(call(callable));
+
+let task = new java.util.concurrent.FutureTask(callable);
+run(task);
+p(get(task));
+
+
+
