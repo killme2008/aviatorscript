@@ -94,7 +94,7 @@ The month is: 3
 ```
 
 
-更详细的请阅读[用户指南](https://www.yuque.com/boyan-avfmj/aviatorscript)。
+更详细的请阅读[用户指南](https://www.yuque.com/boyan-avfmj/aviatorscript/cpow90)。
 
 # Links
 
