@@ -15,7 +15,7 @@ It compiles script to java byte code and evaluate it on the fly.
 
 1. Suppport number,string, boolean and regular expression etc. [basic types](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw?translate=en)，support all java operators and their priorities.
 2. [Function](https://www.yuque.com/boyan-avfmj/aviatorscript/gl2p0q?translate=en) is first-class, supports closure and functional programming.
-2. Supports bigint/decmal for big integer and big decimal operations, using normal arithmetic operators `+-*/` by [operator overloading](https://www.yuque.com/boyan-avfmj/aviatorscript/ydllav#5hq4k?translate=en).
+2. Supports bigint/decmal for big integer and big decimal operations, using normal arithmetic operators `+-*/` by [operator overloading](https://www.yuque.com/boyan-avfmj/aviatorscript/ydllav?translate=en#5hq4k).
 3. Full-featured scripting language syntax, such as multi statements, conditional statement ,`for/while` loop, lexical scope and exception handling.
 4. Processing collections/array conveniently by [sequence abstract](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93?translate=en) and [functional programming](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc?translate=en).
 5. Lightweight [module system](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81?translate=en)。
