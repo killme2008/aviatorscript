@@ -3,6 +3,7 @@ package com.googlecode.aviator.runtime.module;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import com.googlecode.aviator.runtime.type.Collector;
 import com.googlecode.aviator.runtime.type.Sequence;
 import com.googlecode.aviator.runtime.type.seq.ListCollector;
@@ -26,15 +27,14 @@ class LineSequence implements Sequence<String> {
   public Iterator<String> iterator() {
     return new Iterator<String>() {
       String line;
-      {
-        readLine();
-      }
+      boolean eof;
 
       @Override
       public String next() {
-        String result = this.line;
-        readLine();
-        return result;
+        if (this.eof) {
+          throw new NoSuchElementException();
+        }
+        return this.line;
       }
 
       private void readLine() {
@@ -47,7 +47,13 @@ class LineSequence implements Sequence<String> {
 
       @Override
       public boolean hasNext() {
-        return this.line != null;
+        if (this.eof) {
+          return false;
+        } else {
+          readLine();
+          this.eof = (this.line == null);
+          return !this.eof;
+        }
       }
 
       @Override
