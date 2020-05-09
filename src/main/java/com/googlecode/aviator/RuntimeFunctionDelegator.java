@@ -290,6 +290,7 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
 
   private final String name;
   private final boolean containsDot;
+  private String[] subNames;
 
   private final FunctionMissing functionMissing;
 
@@ -310,7 +311,11 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
   }
 
   private AviatorFunction getFunc(final Map<String, Object> env, final AviatorObject... args) {
-    Object val = AviatorJavaType.getValueFromEnv(this.name, this.containsDot, env, false);
+    if (this.containsDot && this.subNames == null) {
+      this.subNames = AviatorJavaType.SPLIT_PAT.split(this.name);
+    }
+    Object val =
+        AviatorJavaType.getValueFromEnv(this.name, this.containsDot, this.subNames, env, false);
     if (val instanceof AviatorFunction) {
       return (AviatorFunction) val;
     }

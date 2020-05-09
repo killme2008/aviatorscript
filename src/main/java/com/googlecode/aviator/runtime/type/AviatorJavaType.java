@@ -42,6 +42,7 @@ public class AviatorJavaType extends AviatorObject {
   private static final long serialVersionUID = -4353225521490659987L;
   private String name;
   private final boolean containsDot;
+  private String[] subNames;
 
   @Override
   public AviatorType getAviatorType() {
@@ -305,15 +306,31 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public Object getValue(final Map<String, Object> env) {
-    return getValueFromEnv(this.name, this.containsDot, env, true);
+    return this.getValueFromEnv(this.name, this.containsDot, env, true);
   }
 
-  public static Object getValueFromEnv(final String name, final boolean nameContainsDot,
+  public Object getValueFromEnv(final String name, final boolean nameContainsDot,
       final Map<String, Object> env, final boolean throwExceptionNotFound) {
     if (env != null) {
       if (nameContainsDot && RuntimeUtils.getInstance(env)
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
-        return getProperty(name, env, throwExceptionNotFound);
+        if (this.subNames == null) {
+          // cache the result
+          this.subNames = SPLIT_PAT.split(name);
+        }
+        return getProperty(name, this.subNames, env, throwExceptionNotFound);
+      }
+      return env.get(name);
+    }
+    return null;
+  }
+
+  public static Object getValueFromEnv(final String name, final boolean nameContainsDot,
+      final String[] names, final Map<String, Object> env, final boolean throwExceptionNotFound) {
+    if (env != null) {
+      if (nameContainsDot && RuntimeUtils.getInstance(env)
+          .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
+        return getProperty(name, names, env, throwExceptionNotFound);
       }
       return env.get(name);
     }
@@ -372,10 +389,12 @@ public class AviatorJavaType extends AviatorObject {
   public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
 
   @SuppressWarnings("unchecked")
-  private static Object getProperty(final String name, final Map<String, Object> env,
-      final boolean throwExceptionNotFound) {
+  private static Object getProperty(final String name, String[] names,
+      final Map<String, Object> env, final boolean throwExceptionNotFound) {
     try {
-      String[] names = SPLIT_PAT.split(name);
+      if (names == null) {
+        names = SPLIT_PAT.split(name);
+      }
       Map<String, Object> innerEnv = env;
       for (int i = 0; i < names.length; i++) {
         // Fast path for nested map.
