@@ -616,7 +616,7 @@ public class AviatorJavaType extends AviatorObject {
           desc(env) + " is not an array or list,could not use [] to get element");
     }
     Object indexValue = indexObject.getValue(env);
-    if (!isInteger(indexValue)) {
+    if (!(indexValue instanceof Number)) {
       throw new IllegalArgumentException("Illegal index: " + indexObject.desc(env));
     }
     final int index = ((Number) indexValue).intValue();
@@ -639,11 +639,6 @@ public class AviatorJavaType extends AviatorObject {
 
           });
     }
-  }
-
-  private boolean isInteger(final Object value) {
-    return value instanceof Long && ((Long) value).longValue() < Integer.MAX_VALUE
-        || value instanceof Integer || value instanceof Short || value instanceof Byte;
   }
 
   @Override

@@ -50,6 +50,15 @@ public class AviatorEvaluatorInstanceUnitTest {
   }
 
   @Test
+  public void testIssue237() {
+    this.instance.setOption(Options.ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL, true);
+    Map<String, Object> env = AviatorEvaluator.newEnv("a", new Object[] {1, 2, 3});
+    assertEquals(1, this.instance.execute("a[0]", env));
+    assertEquals(2, this.instance.execute("a[1.1]", env));
+    assertEquals(3, this.instance.execute("a[2.0M]", env));
+  }
+
+  @Test
   public void testMaxLoopCount() {
     this.instance.setOption(Options.MAX_LOOP_COUNT, 3);
     assertEquals(6,

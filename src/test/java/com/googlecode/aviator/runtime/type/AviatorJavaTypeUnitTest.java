@@ -15,16 +15,17 @@
  **/
 package com.googlecode.aviator.runtime.type;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import junit.framework.Assert;
 import org.junit.Test;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import junit.framework.Assert;
 
 
 public class AviatorJavaTypeUnitTest {
@@ -63,7 +64,7 @@ public class AviatorJavaTypeUnitTest {
   }
 
 
-  public void doArthOpJavaTypeNumber(OperatorType operatorType) {
+  public void doArthOpJavaTypeNumber(final OperatorType operatorType) {
     AviatorJavaType byteType = new AviatorJavaType("byteType");
     AviatorJavaType shortType = new AviatorJavaType("shortType");
     AviatorJavaType intType = new AviatorJavaType("intType");
@@ -185,7 +186,7 @@ public class AviatorJavaTypeUnitTest {
   }
 
 
-  private Map<String, Object> createEnvWith(String name, Object obj) {
+  private Map<String, Object> createEnvWith(final String name, final Object obj) {
     Map<String, Object> env = new HashMap<String, Object>();
     if (name != null) {
       env.put(name, obj);
@@ -689,7 +690,6 @@ public class AviatorJavaTypeUnitTest {
 
     assertEquals("hello", javaTypeForList.getElement(env, AviatorLong.valueOf(0)).getValue(null));
     assertEquals("world", javaTypeForList.getElement(env, AviatorLong.valueOf(1)).getValue(null));
-
   }
 
 
@@ -714,7 +714,7 @@ public class AviatorJavaTypeUnitTest {
 
     AviatorJavaType javaTypeForArray = new AviatorJavaType("a");
 
-    javaTypeForArray.getElement(env, new AviatorDouble(0d)).getValue(null);
+    javaTypeForArray.getElement(env, new AviatorString("test")).getValue(null);
   }
 
 
