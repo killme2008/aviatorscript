@@ -410,16 +410,20 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onAssignment(final Token<?> lookhead) {
+    OperatorType opType = lookhead.getMeta(Constants.DEFINE_META, false) ? OperatorType.DEFINE
+        : OperatorType.ASSIGNMENT;
     loadEnv();
-
-    String methodName = "setValue";
-
-    if (lookhead.getMeta(Constants.DEFINE_META, false)) {
-      methodName = "defineValue";
+    if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
+      String methodName = (opType == OperatorType.DEFINE) ? "defineValue" : "setValue";
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, methodName,
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    } else {
+      loadOpType(opType);
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
+          "eval",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      this.popOperand();
     }
-
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, methodName,
-        "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
     this.popOperand(3);
     this.pushOperand();
   }

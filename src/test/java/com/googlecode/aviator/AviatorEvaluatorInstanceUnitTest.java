@@ -34,6 +34,8 @@ import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.token.OperatorType;
+import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorString;
@@ -56,6 +58,63 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertEquals(1, this.instance.execute("a[0]", env));
     assertEquals(2, this.instance.execute("a[1.1]", env));
     assertEquals(3, this.instance.execute("a[2.0M]", env));
+  }
+
+  @Test
+  public void testIssue245() {
+    // test EQ
+    this.instance.addOpFunction(OperatorType.EQ, new AbstractFunction() {
+
+
+      @Override
+      public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+          final AviatorObject arg2) {
+        if (!arg1.getValue(env).equals(arg2.getValue(env))) {
+          return AviatorBoolean.TRUE;
+        }
+        return AviatorBoolean.FALSE;
+      }
+
+      @Override
+      public String getName() {
+        return OperatorType.EQ.getToken();
+      }
+    });
+
+    assertFalse((boolean) this.instance.execute("1==1"));
+    assertTrue((boolean) this.instance.execute("0==1"));
+    assertFalse((boolean) this.instance.execute("a==b", AviatorEvaluator.newEnv("a", 1, "b", 1)));
+    assertTrue((boolean) this.instance.execute("a==b", AviatorEvaluator.newEnv("a", 1, "b", 0)));
+
+    // test Assignment
+    assertEquals(1, this.instance.execute("a=b", AviatorEvaluator.newEnv("a", 1, "b", 1)));
+    assertEquals(2, this.instance.execute("a=b", AviatorEvaluator.newEnv("a", 1, "b", 2)));
+
+    this.instance.addOpFunction(OperatorType.ASSIGNMENT, new AbstractFunction() {
+
+
+      @Override
+      public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+          final AviatorObject arg2) {
+        int c = arg1.compare(arg2, env);
+        return AviatorBoolean.valueOf(c == 0);
+      }
+
+      @Override
+      public String getName() {
+        return OperatorType.ASSIGNMENT.getToken();
+      }
+    });
+
+    assertTrue((boolean) this.instance.execute("1=1"));
+    assertFalse((boolean) this.instance.execute("0=1"));
+    assertTrue((boolean) this.instance.execute("a=b", AviatorEvaluator.newEnv("a", 1, "b", 1)));
+    assertFalse((boolean) this.instance.execute("a=b", AviatorEvaluator.newEnv("a", 1, "b", 0)));
+    assertFalse((boolean) this.instance.execute("a=b", AviatorEvaluator.newEnv("a", 1, "b", 2)));
+    assertFalse((boolean) this.instance.execute("a=b",
+        AviatorEvaluator.newEnv("a", "hello", "b", "world")));
+    assertTrue((boolean) this.instance.execute("a=b",
+        AviatorEvaluator.newEnv("a", "hello", "b", "hello")));
   }
 
   @Test
