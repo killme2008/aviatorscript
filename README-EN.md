@@ -24,10 +24,8 @@ It compiles script to java byte code and evaluate it on the fly.
 8. Lightweight and high performance.
 
 # News
-
+* [5.0.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.1), tweak variable accessing performance, bug fixes and adds `eval(script)` function etc.
 * [5.0.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0), release 5.0.0 officially, adds Main class to execute aviatorscript and bootstrap shell etc.
-* [5.0.0-RC2](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0-RC2), try/catch/finally/throw statement and new stament etc.
-* [5.0.0-RC1](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0-RC1), almost production-ready version before releasing 5.0
 
 # Dependency
 
