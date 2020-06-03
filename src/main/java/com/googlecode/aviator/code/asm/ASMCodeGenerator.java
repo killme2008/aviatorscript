@@ -1064,22 +1064,20 @@ public class ASMCodeGenerator implements CodeGenerator {
         : Collections.EMPTY_LIST;
 
     if (this.instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool) {
-      if (params != null && !params.isEmpty()) {
-        int funcId = getNextFuncInvocationId();
-        getFuncsArgs().put(funcId, Collections.unmodifiableList(params));
-        loadEnv();
-        this.mv.visitLdcInsn(FUNC_ARGS_INNER_VAR);
-        this.mv.visitLdcInsn(funcId);
-        this.mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf",
-            "(I)Ljava/lang/Integer;");
-        this.mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "put",
-            "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-        this.mv.visitInsn(POP);
-        this.pushOperand(2); // __args__ and ref id
-        this.popOperand(3); // env, __args and ref id
-        this.pushOperand(); // the put result
-        this.popOperand(); // pop the put result.
-      }
+      int funcId = getNextFuncInvocationId();
+      getFuncsArgs().put(funcId, Collections.unmodifiableList(params));
+      loadEnv();
+      this.mv.visitLdcInsn(FUNC_ARGS_INNER_VAR);
+      this.mv.visitLdcInsn(funcId);
+      this.mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf",
+          "(I)Ljava/lang/Integer;");
+      this.mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "put",
+          "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+      this.mv.visitInsn(POP);
+      this.pushOperand(2); // __args__ and ref id
+      this.popOperand(3); // env, __args and ref id
+      this.pushOperand(); // the put result
+      this.popOperand(); // pop the put result.
     }
 
     final MethodMetaData methodMetaData = this.methodMetaDataStack.pop();
