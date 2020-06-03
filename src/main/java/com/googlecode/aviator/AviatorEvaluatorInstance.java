@@ -120,6 +120,7 @@ import com.googlecode.aviator.runtime.function.system.CompareFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DecimalFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
+import com.googlecode.aviator.runtime.function.system.EvalFunction;
 import com.googlecode.aviator.runtime.function.system.IdentityFunction;
 import com.googlecode.aviator.runtime.function.system.IsDefFunction;
 import com.googlecode.aviator.runtime.function.system.LoadFunction;
@@ -808,6 +809,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new UndefFunction());
     addFunction(new TypeFunction());
     addFunction(SeqFunction.INSTANCE);
+    addFunction(EvalFunction.INSTANCE);
 
     // module
     // load and require

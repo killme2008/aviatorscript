@@ -2,6 +2,7 @@ package com.googlecode.aviator.runtime.module;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -82,9 +83,19 @@ public class IoModule {
 
   public static BufferedReader reader(final File file, final String charsetName)
       throws IOException {
-    return new BufferedReader(
-        new InputStreamReader(inputStream(file), Charset.forName(charsetName)));
+    return reader(inputStream(file), charsetName);
   }
+
+  public static BufferedReader reader(final InputStream in) throws IOException {
+    return new BufferedReader(new InputStreamReader(in, Charset.defaultCharset().name()));
+  }
+
+
+  public static BufferedReader reader(final InputStream in, final String charsetName)
+      throws IOException {
+    return new BufferedReader(new InputStreamReader(in, Charset.forName(charsetName)));
+  }
+
 
   public static BufferedWriter writer(final File file) throws IOException {
     return writer(file, Charset.defaultCharset().name());
@@ -92,8 +103,16 @@ public class IoModule {
 
   public static BufferedWriter writer(final File file, final String charsetName)
       throws IOException {
-    return new BufferedWriter(
-        new OutputStreamWriter(outputStream(file), Charset.forName(charsetName)));
+    return writer(outputStream(file), charsetName);
+  }
+
+  public static BufferedWriter writer(final OutputStream out) throws IOException {
+    return writer(out, Charset.defaultCharset().name());
+  }
+
+  public static BufferedWriter writer(final OutputStream out, final String charsetName)
+      throws IOException {
+    return new BufferedWriter(new OutputStreamWriter(out, Charset.forName(charsetName)));
   }
 
   /**
@@ -205,5 +224,15 @@ public class IoModule {
   @Function(rename = "line_seq")
   public static LineSequence seq(final BufferedReader reader) {
     return new LineSequence(reader);
+  }
+
+  public static void close(final Closeable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (IOException e) {
+        // ignore
+      }
+    }
   }
 }

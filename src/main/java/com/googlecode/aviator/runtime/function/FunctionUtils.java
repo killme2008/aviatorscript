@@ -63,6 +63,17 @@ public class FunctionUtils {
     return funcParams.get(refId);
   }
 
+  /**
+   * Get boolean value from env.
+   *
+   * @param arg the var name
+   * @param env
+   * @return
+   */
+  public static final boolean getBooleanValue(final AviatorObject arg,
+      final Map<String, Object> env) {
+    return (boolean) arg.getValue(env);
+  }
 
   /**
    * Get string value from env.

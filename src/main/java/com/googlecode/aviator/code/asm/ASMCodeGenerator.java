@@ -410,16 +410,20 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onAssignment(final Token<?> lookhead) {
+    OperatorType opType = lookhead.getMeta(Constants.DEFINE_META, false) ? OperatorType.DEFINE
+        : OperatorType.ASSIGNMENT;
     loadEnv();
-
-    String methodName = "setValue";
-
-    if (lookhead.getMeta(Constants.DEFINE_META, false)) {
-      methodName = "defineValue";
+    if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
+      String methodName = (opType == OperatorType.DEFINE) ? "defineValue" : "setValue";
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, methodName,
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+    } else {
+      loadOpType(opType);
+      this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
+          "eval",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+      this.popOperand();
     }
-
-    this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, methodName,
-        "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
     this.popOperand(3);
     this.pushOperand();
   }
@@ -1060,22 +1064,20 @@ public class ASMCodeGenerator implements CodeGenerator {
         : Collections.EMPTY_LIST;
 
     if (this.instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool) {
-      if (params != null && !params.isEmpty()) {
-        int funcId = getNextFuncInvocationId();
-        getFuncsArgs().put(funcId, Collections.unmodifiableList(params));
-        loadEnv();
-        this.mv.visitLdcInsn(FUNC_ARGS_INNER_VAR);
-        this.mv.visitLdcInsn(funcId);
-        this.mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf",
-            "(I)Ljava/lang/Integer;");
-        this.mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "put",
-            "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-        this.mv.visitInsn(POP);
-        this.pushOperand(2); // __args__ and ref id
-        this.popOperand(3); // env, __args and ref id
-        this.pushOperand(); // the put result
-        this.popOperand(); // pop the put result.
-      }
+      int funcId = getNextFuncInvocationId();
+      getFuncsArgs().put(funcId, Collections.unmodifiableList(params));
+      loadEnv();
+      this.mv.visitLdcInsn(FUNC_ARGS_INNER_VAR);
+      this.mv.visitLdcInsn(funcId);
+      this.mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf",
+          "(I)Ljava/lang/Integer;");
+      this.mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "put",
+          "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+      this.mv.visitInsn(POP);
+      this.pushOperand(2); // __args__ and ref id
+      this.popOperand(3); // env, __args and ref id
+      this.pushOperand(); // the put result
+      this.popOperand(); // pop the put result.
     }
 
     final MethodMetaData methodMetaData = this.methodMetaDataStack.pop();

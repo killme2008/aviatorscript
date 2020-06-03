@@ -1,0 +1,6 @@
+let sql = "SELECT u.id, u.name
+  FROM USER u
+  WHERE u.id = 1";
+
+
+return sql;

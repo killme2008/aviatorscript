@@ -40,6 +40,12 @@ public class TestScripts {
   }
 
   @Test
+  public void testMultilineString() {
+    assertEquals("SELECT u.id, u.name\n" + "  FROM USER u\n" + "  WHERE u.id = 1",
+        testScript("string.av"));
+  }
+
+  @Test
   public void testRange() {
     assertTrue(testScript("range.av") instanceof Range);
   }
