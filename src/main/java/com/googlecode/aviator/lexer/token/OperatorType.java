@@ -118,7 +118,7 @@ public enum OperatorType {
         if (!(args[0] instanceof AviatorJavaType)) {
           throw new IllegalArgumentException(args[0].desc(env) + " can't be as a left value.");
         }
-        env.put((String) args[0].getValue(env), args[1].getValue(env));
+        env.put(((AviatorJavaType) args[0]).getName(), args[1].getValue(env));
         return args[1];
       case DIV:
         return args[0].div(args[1], env);
