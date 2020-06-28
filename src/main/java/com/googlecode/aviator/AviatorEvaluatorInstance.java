@@ -46,6 +46,7 @@ import com.googlecode.aviator.annotation.Import;
 import com.googlecode.aviator.annotation.ImportScope;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.code.NoneCodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
@@ -1335,6 +1336,22 @@ public final class AviatorEvaluatorInstance {
    */
   public Expression compile(final String expression) {
     return compile(expression, false);
+  }
+
+  /**
+   * Validate a script text whether is a legal aviatorscript text, throw exception if not.
+   *
+   * @since 5.0.2
+   * @param script the script text
+   */
+  public void validate(final String script) {
+    if (script == null || script.trim().length() == 0) {
+      throw new CompileExpressionErrorException("Blank script");
+    }
+    ExpressionLexer lexer = new ExpressionLexer(this, script);
+    CodeGenerator codeGenerator = new NoneCodeGenerator();
+    ExpressionParser parser = new ExpressionParser(this, lexer, codeGenerator);
+    parser.parse();
   }
 
 
