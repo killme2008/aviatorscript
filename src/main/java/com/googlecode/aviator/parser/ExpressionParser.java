@@ -1187,14 +1187,26 @@ public class ExpressionParser implements Parser {
         reportSyntaxError("invalid exception class name");
       }
       checkVariableName();
-      Token<?> exceptionClass = this.lookhead;
+      List<Token<?>> exceptionClasses = new ArrayList<>();
+      exceptionClasses.add(this.lookhead);
       move(true);
 
       Token<?> boundVar = null;
       if (expectChar(')')) {
-        boundVar = exceptionClass;
-        exceptionClass = Constants.THROWABLE_VAR;
+        // catch(e) to catch all.
+        boundVar = exceptionClasses.remove(0);
+        exceptionClasses.add(Constants.THROWABLE_VAR);
       } else {
+        // catch multi exception
+        while (expectChar('|')) {
+          move(true);
+          if (this.lookhead.getType() != TokenType.Variable) {
+            reportSyntaxError("invalid exception class to catch");
+          }
+          checkVariableName();
+          exceptionClasses.add(this.lookhead);
+          move(true);
+        }
         if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
           reportSyntaxError("invalid bound variable name for exception");
         }
@@ -1222,8 +1234,10 @@ public class ExpressionParser implements Parser {
         statements();
         getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
         getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
-        getCodeGeneratorWithTimes().onConstant(exceptionClass);
-        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        for (Token<?> exceptionClass : exceptionClasses) {
+          getCodeGeneratorWithTimes().onConstant(exceptionClass);
+          getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        }
         getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
       }
       getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);

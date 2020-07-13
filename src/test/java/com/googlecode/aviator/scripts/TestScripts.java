@@ -277,5 +277,7 @@ public class TestScripts {
     assertTrue(e instanceof IOException);
 
     assertEquals(3, testScript("try_catch5.av"));
+    assertEquals(1, testScript("try_catch6.av"));
+    assertEquals(2, testScript("try_catch7.av"));
   }
 }

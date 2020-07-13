@@ -43,7 +43,7 @@ public class TryCatchFunction extends AbstractFunction {
       boolean handle = false;
       if (catchHandlers != null) {
         for (CatchHandler handler : catchHandlers) {
-          if (handler.getExceptionClass().isAssignableFrom(t.getClass())) {
+          if (handler.isMatch(t.getClass())) {
             AviatorObject ret = handler.getFunc().call(env, AviatorRuntimeJavaType.valueOf(t));
             result = chooseResult(result, ret);
             handle = true;
