@@ -585,10 +585,16 @@ public class GrammarUnitTest {
 
   @Test
   public void testMatchWithFlags() {
-
     assertTrue((Boolean) AviatorEvaluator.execute("'abc'=~/(?i)^[a-z]+$/"));
     assertTrue((Boolean) AviatorEvaluator.execute("'ABC'=~/(?i)^[a-z]+$/"));
   }
+
+  @Test
+  public void testMatchWithNull() {
+    assertFalse((Boolean) AviatorEvaluator.execute("nil=~/(?i)^[a-z]+$/"));
+    assertFalse((Boolean) AviatorEvaluator.execute("a=~/(?i)^[a-z]+$/"));
+  }
+
 
   @Test
   public void testComparePattern() {

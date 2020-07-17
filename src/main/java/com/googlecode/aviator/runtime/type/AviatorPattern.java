@@ -79,6 +79,8 @@ public class AviatorPattern extends AviatorObject {
   @Override
   public AviatorObject match(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
+      case Nil:
+        return AviatorBoolean.FALSE;
       case String:
         AviatorString aviatorString = (AviatorString) other;
         Matcher m = this.pattern.matcher(aviatorString.getLexeme());
@@ -98,6 +100,9 @@ public class AviatorPattern extends AviatorObject {
       case JavaType:
         AviatorJavaType javaType = (AviatorJavaType) other;
         final Object javaValue = javaType.getValue(env);
+        if (javaValue == null) {
+          return AviatorBoolean.FALSE;
+        }
         if (TypeUtils.isString(javaValue)) {
           return match(new AviatorString(String.valueOf(javaValue)), env);
         } else {
