@@ -29,11 +29,11 @@ public class SeqIntoFunction extends AbstractFunction {
       final AviatorObject arg2) {
     Object fromSeq = arg2.getValue(env);
     AviatorObject result = arg1;
-    if (fromSeq != null) {
-      for (Object e : RuntimeUtils.seq(fromSeq, env)) {
-        result = SEQ_ADD.call(env, result, AviatorRuntimeJavaType.valueOf(e));
-      }
+
+    for (Object e : RuntimeUtils.seq(fromSeq, env)) {
+      result = SEQ_ADD.call(env, result, AviatorRuntimeJavaType.valueOf(e));
     }
+
     return result;
   }
 

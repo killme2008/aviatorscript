@@ -42,7 +42,7 @@ public class SeqIncludeFunction extends AbstractFunction {
       final AviatorObject arg2) {
     Object first = arg1.getValue(env);
     if (first == null) {
-      throw new NullPointerException("null seq");
+      return AviatorBoolean.FALSE;
     }
     Class<?> clazz = first.getClass();
     boolean contains = false;

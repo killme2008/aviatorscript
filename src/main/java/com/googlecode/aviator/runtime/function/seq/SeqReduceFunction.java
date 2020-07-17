@@ -48,7 +48,7 @@ public class SeqReduceFunction extends AbstractFunction {
           "There is no function named " + ((AviatorJavaType) arg2).getName());
     }
     if (first == null) {
-      throw new NullPointerException("null seq");
+      return arg3;
     }
     AviatorObject result = arg3;
 

@@ -8,7 +8,6 @@ import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
-import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
@@ -32,7 +31,7 @@ public class SeqEveryFunction extends AbstractFunction {
           "There is no function named " + ((AviatorJavaType) arg2).getName());
     }
     if (first == null) {
-      return AviatorNil.NIL;
+      return AviatorBoolean.TRUE;
     }
 
     for (Object obj : RuntimeUtils.seq(first, env)) {

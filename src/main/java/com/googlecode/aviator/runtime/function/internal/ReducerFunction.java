@@ -34,10 +34,6 @@ public class ReducerFunction extends AbstractFunction {
 
     Object coll = arg1.getValue(env);
     AviatorFunction iteratorFn = (AviatorFunction) arg2;
-    if (coll == null) {
-      throw new NullPointerException("null seq");
-    }
-
 
     int maxLoopCount = RuntimeUtils.getInstance(env).getOptionValue(Options.MAX_LOOP_COUNT).number;
     AviatorObject result = null;

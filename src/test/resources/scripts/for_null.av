@@ -1,0 +1,5 @@
+let sum = 10;
+for x in a {
+  sum = sum + x;
+}
+return sum;

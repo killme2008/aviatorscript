@@ -190,6 +190,12 @@ public class TestScripts {
       // for statement values
       assertEquals(9, testScript("for5.av"));
     }
+
+    {
+      // for null sequence
+      assertEquals(10, testScript("for_null.av"));
+      assertEquals(13, testScript("for_null.av", "a", new int[] {1, 2}));
+    }
   }
 
   @Test

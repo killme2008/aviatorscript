@@ -61,6 +61,24 @@ public class GrammarUnitTest {
     }
   }
 
+
+  private Object exec(final String exp) {
+    return AviatorEvaluator.execute(exp);
+  }
+
+  @Test
+  public void testNullSequence() {
+    assertEquals(0, exec("count(nil)"));
+    assertFalse((Boolean) exec("include(nil, 1)"));
+    assertNull(exec("map(nil, lambda(x) -> x + 1 end)"));
+    assertEquals(10, exec("reduce(nil, lambda(r, x) -> r + x end, 10)"));
+    assertNull(exec("sort(nil)"));
+    assertNull(exec("filter(nil, lambda(x) -> x > 0 end)"));
+    assertTrue((boolean) exec("seq.every(nil, lambda(x) -> x == true end)"));
+    assertTrue((boolean) exec("seq.not_any(nil, lambda(x) -> x == true end)"));
+    assertNull(exec("seq.some(nil, lambda(x) -> x > 0 end)"));
+  }
+
   @Test
   public void testIfElseVar() {
     String r1 = "result=true;v1='test1';if(!result) {return 'ok';} v2='test2'; result";
