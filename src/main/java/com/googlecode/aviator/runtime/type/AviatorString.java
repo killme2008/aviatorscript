@@ -43,6 +43,7 @@ public class AviatorString extends AviatorObject {
 
   private static final long serialVersionUID = -7430694306919959899L;
   private final String lexeme;
+  private boolean hasInterpolation = true;
 
   private static interface StringSegment {
     StringBuilder appendTo(StringBuilder sb, Map<String, Object> env);
@@ -111,7 +112,7 @@ public class AviatorString extends AviatorObject {
 
   @Override
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
-    final StringBuilder sb = new StringBuilder(this.lexeme);
+    final StringBuilder sb = new StringBuilder(getLexeme(env));
 
     if (other.getAviatorType() == AviatorType.Pattern) {
       final AviatorPattern otherPatterh = (AviatorPattern) other;
@@ -193,14 +194,15 @@ public class AviatorString extends AviatorObject {
 
   public String getLexeme(final Map<String, Object> env) {
     AviatorEvaluatorInstance engine = RuntimeUtils.getInstance(env);
-    if (!engine.isFeatureEnabled(Feature.StringInterpolation) || this.lexeme == null
-        || this.lexeme.length() < 3) {
+    if (!this.hasInterpolation || !engine.isFeatureEnabled(Feature.StringInterpolation)
+        || this.lexeme == null || this.lexeme.length() < 3) {
       return this.lexeme;
     }
 
     if (this.segments == null) {
       List<StringSegment> segs = new ArrayList<AviatorString.StringSegment>();
 
+      boolean hasInterpolation = false;
       StringBuilder sb = new StringBuilder(this.lexeme.length());
       StringCharacterIterator it = new StringCharacterIterator(this.lexeme);
       char ch = it.current(), prev = StringCharacterIterator.DONE;
@@ -234,6 +236,7 @@ public class AviatorString extends AviatorObject {
             sb.append(exp.execute(env));
             segs.add(new ExpressionSegment(exp));
             lastInterPos = i;
+            hasInterpolation = true;
           } else {
             sb.append(prev);
             sb.append(ch);
@@ -255,6 +258,7 @@ public class AviatorString extends AviatorObject {
       }
       // cache string segments to speedup.
       this.segments = segs;
+      this.hasInterpolation = hasInterpolation;
       return sb.toString();
     } else {
       StringBuilder sb = new StringBuilder(this.lexeme.length());

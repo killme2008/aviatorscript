@@ -61,6 +61,57 @@ public class GrammarUnitTest {
     }
   }
 
+  @Test
+  public void testStringInterpolation() {
+    assertEquals("aviator", AviatorEvaluator.execute("let name='aviator'; '#{name}'"));
+    assertEquals("hello,aviator", AviatorEvaluator.execute("let name='aviator'; 'hello,#{name}'"));
+    assertEquals("hello,aviator,great",
+        AviatorEvaluator.execute("let name='aviator'; 'hello,#{name},great'"));
+    assertEquals("3", AviatorEvaluator.execute("'#{1+2}'"));
+    assertEquals("good,3", AviatorEvaluator.execute("'good,#{1+2}'"));
+
+    String name = "aviator";
+    Expression exp = AviatorEvaluator.compile(" a ? '#{name}': 'hello,#{name},great'");
+    assertEquals("aviator", exp.execute(exp.newEnv("a", true, "name", name)));
+    assertEquals("hello,aviator,great", exp.execute(exp.newEnv("a", false, "name", name)));
+    assertEquals("aviator", exp.execute(exp.newEnv("a", true, "name", name)));
+    assertEquals("hello,aviator,great", exp.execute(exp.newEnv("a", false, "name", name)));
+    assertEquals("cool", exp.execute(exp.newEnv("a", true, "name", "cool")));
+    assertEquals("hello,cool,great", exp.execute(exp.newEnv("a", false, "name", "cool")));
+
+    // String Interpolation in string.
+    exp = AviatorEvaluator.compile("'hello,#{a+b+\"good,#{c*d}\"}'");
+    assertEquals("hello,3good,12", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("hello,3good,12", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("hello,11good,56", exp.execute(exp.newEnv("a", 5, "b", 6, "c", 7, "d", 8)));
+
+    exp = AviatorEvaluator.compile("'hello,#{a+b+\"good,#{let c=100; c*d}\"}'");
+    assertEquals("hello,3good,400", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("hello,3good,400", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("hello,3good,9900", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 99)));
+
+    exp = AviatorEvaluator.compile("'#{a+b/c}'");
+    assertEquals("1", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("1", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+
+    exp = AviatorEvaluator.compile("'#{a+b/c}' + d");
+    assertEquals("14", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("14", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("36", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    assertEquals("36", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    exp = AviatorEvaluator.compile("d + '#{a+b/c}'");
+    assertEquals("41", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("41", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("63", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    assertEquals("63", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+
+    exp = AviatorEvaluator.compile("d + '#{a+b/c}' + a");
+    assertEquals("411", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("411", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("633", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    assertEquals("633", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+  }
+
 
   private Object exec(final String exp) {
     return AviatorEvaluator.execute(exp);
