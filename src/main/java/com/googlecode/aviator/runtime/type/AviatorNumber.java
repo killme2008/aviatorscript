@@ -95,7 +95,7 @@ public abstract class AviatorNumber extends AviatorObject {
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
-        return new AviatorString(getValue(env).toString() + ((AviatorString) other).getLexeme());
+        return new AviatorString(getValue(env).toString() + ((AviatorString) other).getLexeme(env));
       case BigInt:
       case Decimal:
       case Long:

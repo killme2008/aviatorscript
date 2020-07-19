@@ -1,10 +1,11 @@
 package com.googlecode.aviator.example;
 
+import com.googlecode.aviator.AviatorEvaluator;
+
+
 public class SimpleExample {
   public static void main(final String[] args) throws Exception {
-    Object[] as = null;
-    for (Object a : as) {
-      System.out.println(a);
-    }
+    Long result = (Long) AviatorEvaluator.execute("1+2+3");
+    System.out.println(result);
   }
 }

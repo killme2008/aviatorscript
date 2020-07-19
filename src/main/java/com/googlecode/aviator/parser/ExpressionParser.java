@@ -79,6 +79,14 @@ public class ExpressionParser implements Parser {
     return this.codeGenerator;
   }
 
+
+
+  public Token<?> getLookhead() {
+    return this.lookhead;
+  }
+
+
+
   @Override
   public SymbolTable getSymbolTable() {
     return this.lexer.getSymbolTable();
@@ -499,7 +507,7 @@ public class ExpressionParser implements Parser {
 
 
     while (expectChar('[') || expectChar('(')) {
-      if (isConstant(this.prevToken)) {
+      if (isConstant(this.prevToken, this.instance)) {
         break;
       }
 
@@ -867,7 +875,7 @@ public class ExpressionParser implements Parser {
   }
 
 
-  private void reportSyntaxError(final String message) {
+  public void reportSyntaxError(final String message) {
     int index = isValidLookhead() ? this.lookhead.getStartIndex() : this.lexer.getCurrentIndex();
 
     if (this.lookhead != null) {
@@ -916,9 +924,9 @@ public class ExpressionParser implements Parser {
   }
 
 
-  public Expression parse() {
+  public Expression parse(final boolean reportErrorIfNotEOF) {
     StatementType statementType = statements();
-    if (this.lookhead != null) {
+    if (this.lookhead != null && reportErrorIfNotEOF) {
       if (statementType == StatementType.Ternary) {
         reportSyntaxError("unexpect token '" + currentTokenLexeme()
             + "', maybe forget to insert ';' to complete last expression ");
@@ -927,6 +935,11 @@ public class ExpressionParser implements Parser {
       }
     }
     return getCodeGeneratorWithTimes().getResult(true);
+  }
+
+
+  public Expression parse() {
+    return parse(true);
   }
 
   static enum StatementType {
@@ -1747,26 +1760,29 @@ public class ExpressionParser implements Parser {
     }
   }
 
-  public static boolean isConstant(final Token<?> token) {
+  public static boolean isConstant(final Token<?> token, final AviatorEvaluatorInstance instance) {
     switch (token.getType()) {
       case Number:
       case Pattern:
-      case String:
         return true;
+      case String:
+        return !instance.isFeatureEnabled(Feature.StringInterpolation);
       default:
         return false;
     }
   }
 
-  public static boolean isLiteralToken(final Token<?> token) {
+  public static boolean isLiteralToken(final Token<?> token,
+      final AviatorEvaluatorInstance instance) {
     switch (token.getType()) {
       case Variable:
         return token == Variable.TRUE || token == Variable.FALSE || token == Variable.NIL;
       case Char:
       case Number:
       case Pattern:
-      case String:
         return true;
+      case String:
+        return !instance.isFeatureEnabled(Feature.StringInterpolation);
       default:
         return false;
     }

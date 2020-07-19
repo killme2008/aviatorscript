@@ -615,6 +615,16 @@ public final class AviatorEvaluatorInstance {
     this.options.get(Options.FEATURE_SET).featureSet.add(feature);
   }
 
+  /**
+   * Returns true when a syntax feature is enabled.
+   * 
+   * @param feature
+   * @return
+   */
+  public boolean isFeatureEnabled(final Feature feature) {
+    return this.options.get(Options.FEATURE_SET).featureSet.contains(feature);
+  }
+
 
   /**
    * Disable a script engine feature.

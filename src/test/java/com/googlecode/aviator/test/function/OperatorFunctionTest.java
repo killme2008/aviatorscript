@@ -35,7 +35,8 @@ public class OperatorFunctionTest {
     AviatorEvaluator.addOpFunction(OperatorType.INDEX, new AbstractFunction() {
 
       @Override
-      public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+      public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+          final AviatorObject arg2) {
         return arg1.getElement(env, arg2.sub(AviatorLong.valueOf(1), env));
       }
 
@@ -66,7 +67,7 @@ public class OperatorFunctionTest {
     AviatorEvaluator.addOpFunction(OperatorType.NOT, new AbstractFunction() {
 
       @Override
-      public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+      public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
         return new AviatorString(arg1.getValue(env).toString());
       }
 
@@ -84,14 +85,15 @@ public class OperatorFunctionTest {
   @Test
   public void testCustomBinOperatorFunction() {
     try {
-      assertEquals("hello world", AviatorEvaluator.exec("'hello' & ' world'"));
+      assertEquals("hello world", AviatorEvaluator.execute("'hello' & ' world'"));
       fail();
     } catch (Exception e) {
     }
     AviatorEvaluator.addOpFunction(OperatorType.BIT_AND, new AbstractFunction() {
 
       @Override
-      public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+      public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+          final AviatorObject arg2) {
         return new AviatorString(arg1.getValue(env).toString() + arg2.getValue(env).toString());
       }
 
@@ -103,7 +105,7 @@ public class OperatorFunctionTest {
 
     assertEquals("43", AviatorEvaluator.exec("a&3", 4));
     assertEquals("43", AviatorEvaluator.exec("4&3", 4));
-    assertEquals("hello world", AviatorEvaluator.exec("'hello' & ' world'"));
+    assertEquals("hello world", AviatorEvaluator.execute("'hello' & ' world'"));
     assertEquals("hello world", AviatorEvaluator.exec("a&' world'", "hello"));
     assertEquals("hello3 world", AviatorEvaluator.exec("a & 3 & ' world'", "hello"));
     Map<String, Object> env = new HashMap<>();

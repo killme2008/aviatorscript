@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.Env;
 
 public class AviatorStringUnitTest {
   @Test
@@ -123,7 +124,7 @@ public class AviatorStringUnitTest {
   @Test
   public void testCompareJavaString() {
     final AviatorString s = new AviatorString("hello ");
-    assertEquals("hello ", s.getLexeme());
+    assertEquals("hello ", s.getLexeme(Env.EMPTY_ENV));
     AviatorJavaType n = new AviatorJavaType("s");
     assertTrue(s.innerCompare(n, createEnvWith("s", "world")) < 0);
     assertEquals(0, s.innerCompare(s, createEnvWith("s", "world")));
