@@ -16,11 +16,11 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -144,22 +144,25 @@ public class AviatorString extends AviatorObject {
         || this.lexeme.length() < 3) {
       return this.lexeme;
     }
-    List<StringSegment> segs = Collections.emptyList();
+    StringSegments segs = null;
     BaseExpression exp = (BaseExpression) (env == null ? null : env.get(Constants.EXP_VAR));
     if (exp == null) {
       segs = engine.compileStringSegments(this.lexeme);
     } else {
       segs = exp.getStringSegements(this.lexeme);
     }
-    if (segs.isEmpty()) {
+    final List<StringSegment> segList = segs.segs;
+    if (segList.isEmpty()) {
       return this.lexeme;
     }
-    StringBuilder sb = new StringBuilder(this.lexeme.length() * 2 / 3);
-    final int size = segs.size();
+    StringBuilder sb = new StringBuilder(segs.hintLength);
+    final int size = segList.size();
     for (int i = 0; i < size; i++) {
-      segs.get(i).appendTo(sb, env);
+      segList.get(i).appendTo(sb, env);
     }
-    return sb.toString();
+    final String result = sb.toString();
+    segs.updateHintLength(result.length());
+    return result;
   }
 
 

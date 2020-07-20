@@ -1483,6 +1483,24 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
+  public static class StringSegments {
+    public final List<StringSegment> segs;
+    public int hintLength;
+
+    public StringSegments(final List<StringSegment> segs, final int hintLength) {
+      super();
+      this.segs = segs;
+      this.hintLength = hintLength;
+    }
+
+    public final void updateHintLength(final int newLen) {
+      // Prevent hintLength too large.
+      if (newLen > this.hintLength && newLen < 10 * this.hintLength) {
+        this.hintLength = newLen;
+      }
+    }
+  }
+
   /**
    * Compile a string to string segments, if string doesn't have a interpolation,returns an empty
    * list.
@@ -1490,7 +1508,7 @@ public final class AviatorEvaluatorInstance {
    * @param lexeme
    * @return
    */
-  public List<StringSegment> compileStringSegments(final String lexeme) {
+  public StringSegments compileStringSegments(final String lexeme) {
     List<StringSegment> segs = new ArrayList<StringSegment>();
     boolean hasInterpolation = false;
     StringCharacterIterator it = new StringCharacterIterator(lexeme);
@@ -1560,9 +1578,9 @@ public final class AviatorEvaluatorInstance {
       }
     }
     if (hasInterpolation) {
-      return segs;
+      return new StringSegments(segs, lexeme.length() * 2 / 3);
     } else {
-      return Collections.emptyList();
+      return new StringSegments(Collections.<StringSegment>emptyList(), 0);
     }
   }
 }
