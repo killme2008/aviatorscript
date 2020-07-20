@@ -59,6 +59,8 @@ public class ExpressionParser implements Parser {
 
   private ScopeInfo scope;
 
+  private int parsedTokens;
+
 
   private boolean inPattern = false;
 
@@ -67,6 +69,13 @@ public class ExpressionParser implements Parser {
   private final boolean captureFuncArgs;
 
   private final Set<Feature> featureSet;
+
+
+
+  public Token<?> getPrevToken() {
+    return this.prevToken;
+  }
+
 
 
   /*
@@ -133,6 +142,9 @@ public class ExpressionParser implements Parser {
     this.captureFuncArgs = instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool;
     this.lexer = lexer;
     this.lookhead = this.lexer.scan();
+    if (this.lookhead != null) {
+      this.parsedTokens++;
+    }
     this.featureSet = this.instance.getOptionValue(Options.FEATURE_SET).featureSet;
     if (this.lookhead == null) {
       reportSyntaxError("blank script");
@@ -907,18 +919,26 @@ public class ExpressionParser implements Parser {
     return this.lookhead != null && this.lookhead.getStartIndex() > 0;
   }
 
-
   public void move(final boolean analyse) {
     if (this.lookhead != null) {
       this.prevToken = this.lookhead;
       this.lookhead = this.lexer.scan(analyse);
+      if (this.lookhead != null) {
+        this.parsedTokens++;
+      }
     } else {
       reportSyntaxError("illegal token");
     }
   }
 
+  public int getParsedTokens() {
+    return this.parsedTokens;
+  }
 
   public void back() {
+    if (this.lookhead != null) {
+      this.parsedTokens--;
+    }
     this.lexer.pushback(this.lookhead);
     this.lookhead = this.prevToken;
   }

@@ -16,21 +16,17 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.text.SimpleDateFormat;
-import java.text.StringCharacterIterator;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
-import com.googlecode.aviator.lexer.ExpressionLexer;
-import com.googlecode.aviator.lexer.token.CharToken;
-import com.googlecode.aviator.lexer.token.Token;
-import com.googlecode.aviator.lexer.token.Token.TokenType;
-import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.type.string.StringSegment;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -43,56 +39,6 @@ public class AviatorString extends AviatorObject {
 
   private static final long serialVersionUID = -7430694306919959899L;
   private final String lexeme;
-  private boolean hasInterpolation = true;
-
-  private static interface StringSegment {
-    StringBuilder appendTo(StringBuilder sb, Map<String, Object> env);
-  }
-
-  private static class LiteralSegment implements StringSegment {
-    String literal;
-
-
-    public LiteralSegment(final String literal) {
-      super();
-      this.literal = literal;
-    }
-
-
-    @Override
-    public String toString() {
-      return "LiteralSegment [literal=" + this.literal + "]";
-    }
-
-
-    @Override
-    public StringBuilder appendTo(final StringBuilder sb, final Map<String, Object> env) {
-      return sb.append(this.literal);
-    }
-  }
-
-  private static class ExpressionSegment implements StringSegment {
-    Expression exp;
-
-    public ExpressionSegment(final Expression exp) {
-      super();
-      this.exp = exp;
-    }
-
-    @Override
-    public StringBuilder appendTo(final StringBuilder sb, final Map<String, Object> env) {
-      return sb.append(this.exp.execute(env));
-    }
-
-    @Override
-    public String toString() {
-      return "ExpressionSegment [exp=" + this.exp + "]";
-    }
-
-  }
-
-  private List<StringSegment> segments;
-
 
 
   @Override
@@ -194,79 +140,26 @@ public class AviatorString extends AviatorObject {
 
   public String getLexeme(final Map<String, Object> env) {
     AviatorEvaluatorInstance engine = RuntimeUtils.getInstance(env);
-    if (!this.hasInterpolation || !engine.isFeatureEnabled(Feature.StringInterpolation)
-        || this.lexeme == null || this.lexeme.length() < 3) {
+    if (!engine.isFeatureEnabled(Feature.StringInterpolation) || this.lexeme == null
+        || this.lexeme.length() < 3) {
       return this.lexeme;
     }
-
-    if (this.segments == null) {
-      List<StringSegment> segs = new ArrayList<AviatorString.StringSegment>();
-
-      boolean hasInterpolation = false;
-      StringBuilder sb = new StringBuilder(this.lexeme.length());
-      StringCharacterIterator it = new StringCharacterIterator(this.lexeme);
-      char ch = it.current(), prev = StringCharacterIterator.DONE;
-      int lastInterPos = 0;
-      int i = 1;
-      for (;;) {
-        if (ch == '#' && prev != '\\') {
-          prev = ch;
-          ch = it.next();
-          i++;
-          if (ch == '{') {
-            // interpolation position.
-            if (i - 2 > lastInterPos) {
-              segs.add(new LiteralSegment(this.lexeme.substring(lastInterPos, i - 2)));
-            }
-            ExpressionLexer lexer = new ExpressionLexer(engine, this.lexeme.substring(i));
-            ExpressionParser parser =
-                new ExpressionParser(engine, lexer, engine.newCodeGenerator(false));
-
-            Expression exp = parser.parse(false);
-            final Token<?> lookhead = parser.getLookhead();
-            if (lookhead.getType() != TokenType.Char || ((CharToken) lookhead).getCh() != '}') {
-              parser.reportSyntaxError("expect '}' to complete string interpolation");
-            }
-            int expStrLen = lookhead.getStartIndex() + 1;
-            while (expStrLen-- > 0) {
-              prev = ch;
-              i++;
-              ch = it.next();
-            }
-            sb.append(exp.execute(env));
-            segs.add(new ExpressionSegment(exp));
-            lastInterPos = i;
-            hasInterpolation = true;
-          } else {
-            sb.append(prev);
-            sb.append(ch);
-          }
-        } else {
-          sb.append(ch);
-        }
-
-        prev = ch;
-
-        ch = it.next();
-        i++;
-        if (ch == StringCharacterIterator.DONE) {
-          if (i - 1 > lastInterPos) {
-            segs.add(new LiteralSegment(this.lexeme.substring(lastInterPos, i - 1)));
-          }
-          break;
-        }
-      }
-      // cache string segments to speedup.
-      this.segments = segs;
-      this.hasInterpolation = hasInterpolation;
-      return sb.toString();
+    List<StringSegment> segs = Collections.emptyList();
+    BaseExpression exp = (BaseExpression) (env == null ? null : env.get(Constants.EXP_VAR));
+    if (exp == null) {
+      segs = engine.compileStringSegments(this.lexeme);
     } else {
-      StringBuilder sb = new StringBuilder(this.lexeme.length());
-      for (StringSegment ss : this.segments) {
-        ss.appendTo(sb, env);
-      }
-      return sb.toString();
+      segs = exp.getStringSegements(this.lexeme);
     }
+    if (segs.isEmpty()) {
+      return this.lexeme;
+    }
+    StringBuilder sb = new StringBuilder(this.lexeme.length() * 2 / 3);
+    final int size = segs.size();
+    for (int i = 0; i < size; i++) {
+      segs.get(i).appendTo(sb, env);
+    }
+    return sb.toString();
   }
 
 

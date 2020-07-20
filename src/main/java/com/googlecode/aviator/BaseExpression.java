@@ -6,10 +6,16 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.FutureTask;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.FunctionArgument;
+import com.googlecode.aviator.runtime.type.string.StringSegment;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
+import com.googlecode.aviator.utils.Reflector;
 
 
 /**
@@ -28,6 +34,9 @@ public abstract class BaseExpression implements Expression {
   private Env compileEnv;
   private Map<Integer, List<FunctionArgument>> funcsArgs = Collections.emptyMap();
   protected SymbolTable symbolTable;
+  // cached compiled string segments for string interpolation.
+  private final ConcurrentHashMap<String, FutureTask<List<StringSegment>>> stringSegs =
+      new ConcurrentHashMap<String, FutureTask<List<StringSegment>>>();
 
   public BaseExpression(final AviatorEvaluatorInstance instance, final List<String> varNames,
       final SymbolTable symbolTable) {
@@ -44,6 +53,33 @@ public abstract class BaseExpression implements Expression {
       tmp.add(name);
     }
     this.varNames = new ArrayList<String>(tmp);
+  }
+
+  public List<StringSegment> getStringSegements(final String lexeme) {
+    FutureTask<List<StringSegment>> task = this.stringSegs.get(lexeme);
+    if (task == null) {
+      task = new FutureTask<>(new Callable<List<StringSegment>>() {
+        @Override
+        public List<StringSegment> call() throws Exception {
+          final List<StringSegment> compiledSegs =
+              BaseExpression.this.instance.compileStringSegments(lexeme);
+          return compiledSegs;
+        }
+      });
+
+      FutureTask<List<StringSegment>> existsTask = this.stringSegs.putIfAbsent(lexeme, task);
+      if (existsTask != null) {
+        task = existsTask;
+      } else {
+        task.run(); // first run
+      }
+    }
+
+    try {
+      return task.get();
+    } catch (Throwable t) {
+      throw Reflector.sneakyThrow(t);
+    }
   }
 
   private class SymbolHashMap extends HashMap<String, Object> {
@@ -185,6 +221,7 @@ public abstract class BaseExpression implements Expression {
     if (!this.funcsArgs.isEmpty()) {
       env.override(FUNC_PARAMS_VAR, this.funcsArgs);
     }
+    env.override(Constants.EXP_VAR, this);
     return env;
   }
 

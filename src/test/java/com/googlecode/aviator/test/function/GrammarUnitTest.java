@@ -110,6 +110,21 @@ public class GrammarUnitTest {
     assertEquals("411", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
     assertEquals("633", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
     assertEquals("633", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    exp = AviatorEvaluator.compile("'#{d}#{a+b/c}#{a}'");
+    assertEquals("411", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("411", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("633", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    assertEquals("633", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    exp = AviatorEvaluator.compile("'#{d},a+b/c=#{a+b/c}#{a}'");
+    assertEquals("4,a+b/c=11", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("4,a+b/c=11", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("6,a+b/c=33", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    assertEquals("6,a+b/c=33", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    exp = AviatorEvaluator.compile("'d=#{d},a+b/c=#{a+b/c},a=#{a}'");
+    assertEquals("d=4,a+b/c=1,a=1", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("d=4,a+b/c=1,a=1", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
+    assertEquals("d=6,a+b/c=3,a=3", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+    assertEquals("d=6,a+b/c=3,a=3", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
   }
 
 
@@ -135,7 +150,7 @@ public class GrammarUnitTest {
     String r1 = "result=true;v1='test1';if(!result) {return 'ok';} v2='test2'; result";
     Map<String, Object> env = new HashMap<>();
     Assert.assertTrue((boolean) AviatorEvaluator.execute(r1, env));
-    assertEquals(3, env.size());
+    assertEquals(4, env.size());
     assertEquals(true, env.get("result"));
     assertEquals("test1", env.get("v1"));
     assertEquals("test2", env.get("v2"));

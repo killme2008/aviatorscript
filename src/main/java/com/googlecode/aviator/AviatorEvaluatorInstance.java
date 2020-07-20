@@ -31,7 +31,9 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.text.StringCharacterIterator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -55,7 +57,11 @@ import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
 import com.googlecode.aviator.lexer.SymbolTable;
+import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.OperatorType;
+import com.googlecode.aviator.lexer.token.Token;
+import com.googlecode.aviator.lexer.token.Token.TokenType;
+import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
@@ -146,6 +152,10 @@ import com.googlecode.aviator.runtime.module.IoModule;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
+import com.googlecode.aviator.runtime.type.string.ExpressionSegment;
+import com.googlecode.aviator.runtime.type.string.LiteralSegment;
+import com.googlecode.aviator.runtime.type.string.StringSegment;
+import com.googlecode.aviator.runtime.type.string.VarSegment;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.LRUMap;
 import com.googlecode.aviator.utils.Reflector;
@@ -617,7 +627,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Returns true when a syntax feature is enabled.
-   * 
+   *
    * @param feature
    * @return
    */
@@ -1470,6 +1480,89 @@ public final class AviatorEvaluatorInstance {
   public void ensureFeatureEnabled(final Feature feature) {
     if (!getOptionValue(Options.FEATURE_SET).featureSet.contains(feature)) {
       throw new UnsupportedFeatureException(feature);
+    }
+  }
+
+  /**
+   * Compile a string to string segments, if string doesn't have a interpolation,returns an empty
+   * list.
+   *
+   * @param lexeme
+   * @return
+   */
+  public List<StringSegment> compileStringSegments(final String lexeme) {
+    List<StringSegment> segs = new ArrayList<StringSegment>();
+    boolean hasInterpolation = false;
+    StringCharacterIterator it = new StringCharacterIterator(lexeme);
+    char ch = it.current(), prev = StringCharacterIterator.DONE;
+    int lastInterPos = 0;
+    int i = 1;
+    for (;;) {
+      if (ch == '#' && prev != '\\') {
+        prev = ch;
+        ch = it.next();
+        i++;
+        if (ch == '{') {
+          // interpolation position.
+          if (i - 2 > lastInterPos) {
+            final String segStr = lexeme.substring(lastInterPos, i - 2);
+            segs.add(new LiteralSegment(segStr));
+
+          }
+
+          ExpressionLexer lexer = new ExpressionLexer(this, lexeme.substring(i));
+          ExpressionParser parser = new ExpressionParser(this, lexer, newCodeGenerator(false));
+
+          Expression exp = parser.parse(false);
+          final Token<?> lookhead = parser.getLookhead();
+          if (lookhead.getType() != TokenType.Char || ((CharToken) lookhead).getCh() != '}') {
+            parser.reportSyntaxError("expect '}' to complete string interpolation");
+          }
+          int expStrLen = lookhead.getStartIndex() + 1;
+          while (expStrLen-- > 0) {
+            prev = ch;
+            ch = it.next();
+            i++;
+          }
+          Token<?> previousToken = null;
+
+          if (parser.getParsedTokens() == 2 && (previousToken = parser.getPrevToken()) != null
+              && previousToken.getType() == TokenType.Variable) {
+            // special case for inline variable.
+            if (previousToken == Variable.TRUE) {
+              segs.add(new LiteralSegment("true"));
+            } else if (previousToken == Variable.FALSE) {
+              segs.add(new LiteralSegment("false"));
+            } else if (previousToken == Variable.NIL) {
+              segs.add(new LiteralSegment("null"));
+            } else {
+              segs.add(new VarSegment(
+                  parser.getSymbolTable().reserve(previousToken.getLexeme()).getLexeme()));
+            }
+          } else {
+            segs.add(new ExpressionSegment(exp));
+          }
+          hasInterpolation = true;
+          lastInterPos = i;
+        }
+      }
+
+      prev = ch;
+
+      ch = it.next();
+      i++;
+      if (ch == StringCharacterIterator.DONE) {
+        if (i - 1 > lastInterPos) {
+          final String segStr = lexeme.substring(lastInterPos, i - 1);
+          segs.add(new LiteralSegment(segStr));
+        }
+        break;
+      }
+    }
+    if (hasInterpolation) {
+      return segs;
+    } else {
+      return Collections.emptyList();
     }
   }
 }

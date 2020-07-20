@@ -1,6 +1,7 @@
 package com.googlecode.aviator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -106,7 +107,7 @@ public class LambdaUnitTest {
 
     Map<String, Object> result = (Map<String, Object>) AviatorEvaluator.execute("#__env__", env);
 
-    assertEquals(3, result.size());
+    assertEquals(4, result.size());
     assertEquals("a", result.get("a"));
     assertEquals(3.2, result.get("b"));
     assertSame(c, result.get("c"));
@@ -114,6 +115,7 @@ public class LambdaUnitTest {
     assertSame(AviatorEvaluator.getInstance(), AviatorEvaluator.execute("#__instance__"));
     AviatorEvaluatorInstance instance = AviatorEvaluator.newInstance();
     assertSame(instance, instance.execute("#__instance__"));
+    assertNotNull(instance.execute("#__exp__"));
   }
 
   @Test
