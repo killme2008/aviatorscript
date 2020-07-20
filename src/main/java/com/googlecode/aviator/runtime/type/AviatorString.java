@@ -17,7 +17,6 @@ package com.googlecode.aviator.runtime.type;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
@@ -25,7 +24,6 @@ import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
-import com.googlecode.aviator.runtime.type.string.StringSegment;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.TypeUtils;
 
@@ -151,18 +149,8 @@ public class AviatorString extends AviatorObject {
     } else {
       segs = exp.getStringSegements(this.lexeme);
     }
-    final List<StringSegment> segList = segs.segs;
-    if (segList.isEmpty()) {
-      return this.lexeme;
-    }
-    StringBuilder sb = new StringBuilder(segs.hintLength);
-    final int size = segList.size();
-    for (int i = 0; i < size; i++) {
-      segList.get(i).appendTo(sb, env);
-    }
-    final String result = sb.toString();
-    segs.updateHintLength(result.length());
-    return result;
+    assert (segs != null);
+    return segs.toString(env, this.lexeme);
   }
 
 

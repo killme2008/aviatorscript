@@ -1493,11 +1493,22 @@ public final class AviatorEvaluatorInstance {
       this.hintLength = hintLength;
     }
 
-    public final void updateHintLength(final int newLen) {
+    public String toString(final Map<String, Object> env, final String lexeme) {
+      if (this.hintLength == 0) {
+        return lexeme;
+      }
+      StringBuilder sb = new StringBuilder(this.hintLength);
+      final int size = this.segs.size();
+      for (int i = 0; i < size; i++) {
+        this.segs.get(i).appendTo(sb, env);
+      }
+      final String result = sb.toString();
+      final int newLen = result.length();
       // Prevent hintLength too large.
       if (newLen > this.hintLength && newLen < 10 * this.hintLength) {
         this.hintLength = newLen;
       }
+      return result;
     }
   }
 
