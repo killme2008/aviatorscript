@@ -1521,58 +1521,68 @@ public final class AviatorEvaluatorInstance {
    */
   public StringSegments compileStringSegments(final String lexeme) {
     List<StringSegment> segs = new ArrayList<StringSegment>();
-    boolean hasInterpolation = false;
+    boolean hasInterpolationOrEscaped = false;
     StringCharacterIterator it = new StringCharacterIterator(lexeme);
     char ch = it.current(), prev = StringCharacterIterator.DONE;
     int lastInterPos = 0;
     int i = 1;
     for (;;) {
-      if (ch == '#' && prev != '\\') {
-        prev = ch;
-        ch = it.next();
-        i++;
-        if (ch == '{') {
-          // interpolation position.
-          if (i - 2 > lastInterPos) {
-            final String segStr = lexeme.substring(lastInterPos, i - 2);
-            segs.add(new LiteralSegment(segStr));
-
-          }
-
-          ExpressionLexer lexer = new ExpressionLexer(this, lexeme.substring(i));
-          ExpressionParser parser = new ExpressionParser(this, lexer, newCodeGenerator(false));
-
-          Expression exp = parser.parse(false);
-          final Token<?> lookhead = parser.getLookhead();
-          if (lookhead.getType() != TokenType.Char || ((CharToken) lookhead).getCh() != '}') {
-            parser.reportSyntaxError("expect '}' to complete string interpolation");
-          }
-          int expStrLen = lookhead.getStartIndex() + 1;
-          while (expStrLen-- > 0) {
-            prev = ch;
-            ch = it.next();
-            i++;
-          }
-          Token<?> previousToken = null;
-
-          if (parser.getParsedTokens() == 2 && (previousToken = parser.getPrevToken()) != null
-              && previousToken.getType() == TokenType.Variable) {
-            // special case for inline variable.
-            if (previousToken == Variable.TRUE) {
-              segs.add(new LiteralSegment("true"));
-            } else if (previousToken == Variable.FALSE) {
-              segs.add(new LiteralSegment("false"));
-            } else if (previousToken == Variable.NIL) {
-              segs.add(new LiteralSegment("null"));
-            } else {
-              segs.add(new VarSegment(
-                  parser.getSymbolTable().reserve(previousToken.getLexeme()).getLexeme()));
+      if (ch == '#') {
+        if (prev == '\\') {
+          // # is escaped, skip the backslash.
+          final String segStr = lexeme.substring(lastInterPos, i - 2);
+          segs.add(new LiteralSegment(segStr));
+          lastInterPos = i - 1;
+          hasInterpolationOrEscaped = true;
+        } else {
+          // # is not escaped.
+          prev = ch;
+          ch = it.next();
+          i++;
+          if (ch == '{') {
+            // Find a interpolation position.
+            if (i - 2 > lastInterPos) {
+              final String segStr = lexeme.substring(lastInterPos, i - 2);
+              segs.add(new LiteralSegment(segStr));
             }
-          } else {
-            segs.add(new ExpressionSegment(exp));
+
+            ExpressionLexer lexer = new ExpressionLexer(this, lexeme.substring(i));
+            ExpressionParser parser = new ExpressionParser(this, lexer, newCodeGenerator(false));
+
+            Expression exp = parser.parse(false);
+            final Token<?> lookhead = parser.getLookhead();
+            if (lookhead.getType() != TokenType.Char || ((CharToken) lookhead).getCh() != '}') {
+              parser.reportSyntaxError("expect '}' to complete string interpolation");
+            }
+            int expStrLen = lookhead.getStartIndex() + 1;
+            while (expStrLen-- > 0) {
+              prev = ch;
+              ch = it.next();
+              i++;
+            }
+            Token<?> previousToken = null;
+
+            if (parser.getParsedTokens() == 2 && (previousToken = parser.getPrevToken()) != null
+                && previousToken.getType() == TokenType.Variable) {
+              // special case for inline variable.
+              if (previousToken == Variable.TRUE) {
+                segs.add(new LiteralSegment("true"));
+              } else if (previousToken == Variable.FALSE) {
+                segs.add(new LiteralSegment("false"));
+              } else if (previousToken == Variable.NIL) {
+                segs.add(new LiteralSegment("null"));
+              } else {
+                segs.add(new VarSegment(
+                    parser.getSymbolTable().reserve(previousToken.getLexeme()).getLexeme()));
+              }
+            } else {
+              segs.add(new ExpressionSegment(exp));
+            }
+            hasInterpolationOrEscaped = true;
+            lastInterPos = i;
+            // End of interpolation
           }
-          hasInterpolation = true;
-          lastInterPos = i;
+          // End of # is not escaped.
         }
       }
 
@@ -1588,7 +1598,7 @@ public final class AviatorEvaluatorInstance {
         break;
       }
     }
-    if (hasInterpolation) {
+    if (hasInterpolationOrEscaped) {
       return new StringSegments(segs, lexeme.length() * 2 / 3);
     } else {
       return new StringSegments(Collections.<StringSegment>emptyList(), 0);

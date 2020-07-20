@@ -125,6 +125,11 @@ public class GrammarUnitTest {
     assertEquals("d=4,a+b/c=1,a=1", exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3, "d", 4)));
     assertEquals("d=6,a+b/c=3,a=3", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
     assertEquals("d=6,a+b/c=3,a=3", exp.execute(exp.newEnv("a", 3, "b", 4, "c", 5, "d", 6)));
+
+    assertEquals("#{name}", AviatorEvaluator.execute("'\\#{name}'"));
+    assertEquals("a#{name}", AviatorEvaluator.execute("'a\\#{name}'"));
+    assertEquals("a#{name}b3", AviatorEvaluator.execute("'a\\#{name}b#{1+2}'"));
+    assertEquals("\\#{name}", AviatorEvaluator.execute("'\\\\\\#{name}'"));
   }
 
 
