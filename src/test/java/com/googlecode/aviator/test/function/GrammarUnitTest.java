@@ -137,6 +137,12 @@ public class GrammarUnitTest {
     } catch (ExpressionSyntaxErrorException e) {
       e.printStackTrace();
     }
+    try {
+      AviatorEvaluator.execute("'#{1+*2'");
+      fail();
+    } catch (ExpressionSyntaxErrorException e) {
+      e.printStackTrace();
+    }
   }
 
 
