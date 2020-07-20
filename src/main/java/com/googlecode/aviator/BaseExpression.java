@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.lexer.SymbolTable;
@@ -77,8 +78,11 @@ public abstract class BaseExpression implements Expression {
 
     try {
       return task.get();
-    } catch (Throwable t) {
-      throw Reflector.sneakyThrow(t);
+    } catch (ExecutionException t) {
+      throw Reflector.sneakyThrow(t.getCause());
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw Reflector.sneakyThrow(e);
     }
   }
 

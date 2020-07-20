@@ -130,6 +130,13 @@ public class GrammarUnitTest {
     assertEquals("a#{name}", AviatorEvaluator.execute("'a\\#{name}'"));
     assertEquals("a#{name}b3", AviatorEvaluator.execute("'a\\#{name}b#{1+2}'"));
     assertEquals("\\#{name}", AviatorEvaluator.execute("'\\\\\\#{name}'"));
+    assertEquals("#{name3", AviatorEvaluator.execute("'\\#{name#{1+2}'"));
+    try {
+      AviatorEvaluator.execute("'#{1+2'");
+      fail();
+    } catch (ExpressionSyntaxErrorException e) {
+      e.printStackTrace();
+    }
   }
 
 

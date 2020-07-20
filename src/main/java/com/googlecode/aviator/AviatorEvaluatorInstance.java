@@ -1551,7 +1551,8 @@ public final class AviatorEvaluatorInstance {
 
             Expression exp = parser.parse(false);
             final Token<?> lookhead = parser.getLookhead();
-            if (lookhead.getType() != TokenType.Char || ((CharToken) lookhead).getCh() != '}') {
+            if (lookhead == null || (lookhead.getType() != TokenType.Char
+                || ((CharToken) lookhead).getCh() != '}')) {
               parser.reportSyntaxError("expect '}' to complete string interpolation");
             }
             int expStrLen = lookhead.getStartIndex() + 1;
