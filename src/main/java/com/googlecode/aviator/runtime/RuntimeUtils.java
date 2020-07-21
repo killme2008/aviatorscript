@@ -12,6 +12,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.Sequence;
 import com.googlecode.aviator.runtime.type.seq.ArraySequence;
 import com.googlecode.aviator.runtime.type.seq.CharSeqSequence;
+import com.googlecode.aviator.runtime.type.seq.EmptySequence;
 import com.googlecode.aviator.runtime.type.seq.IterableSequence;
 import com.googlecode.aviator.runtime.type.seq.LimitedSequence;
 import com.googlecode.aviator.runtime.type.seq.MapSequence;
@@ -52,7 +53,9 @@ public final class RuntimeUtils {
   public static Sequence seq(final Object o, final Map<String, Object> env) {
     Sequence seq = null;
 
-    if (o instanceof Sequence) {
+    if (o == null) {
+      return EmptySequence.INSTANCE;
+    } else if (o instanceof Sequence) {
       seq = (Sequence) o;
     } else if (o instanceof CharSequence) {
       seq = new CharSeqSequence((CharSequence) o);

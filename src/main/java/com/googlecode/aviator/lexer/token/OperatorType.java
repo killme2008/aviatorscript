@@ -109,12 +109,16 @@ public enum OperatorType {
       case MOD:
         return args[0].mod(args[1], env);
       case DEFINE:
-        // TODO check type?
-        ((Env) env).override((String) args[0].getValue(env), args[1].getValue(env));
+        if (!(args[0] instanceof AviatorJavaType)) {
+          throw new IllegalArgumentException(args[0].desc(env) + " can't be as a left value.");
+        }
+        ((Env) env).override(((AviatorJavaType) args[0]).getName(), args[1].getValue(env));
         return args[1];
       case ASSIGNMENT:
-        // TODO check type?
-        env.put((String) args[0].getValue(env), args[1].getValue(env));
+        if (!(args[0] instanceof AviatorJavaType)) {
+          throw new IllegalArgumentException(args[0].desc(env) + " can't be as a left value.");
+        }
+        env.put(((AviatorJavaType) args[0]).getName(), args[1].getValue(env));
         return args[1];
       case DIV:
         return args[0].div(args[1], env);

@@ -40,6 +40,12 @@ public class TestScripts {
   }
 
   @Test
+  public void testMisc() {
+    assertEquals("aviator execute 1 + 2 = 3.", testScript("string_interpolation.av"));
+    assertEquals("aviator execute 1 + 2 = 3.", testScript("string_interpolation.av"));
+  }
+
+  @Test
   public void testMultilineString() {
     assertEquals("SELECT u.id, u.name\n" + "  FROM USER u\n" + "  WHERE u.id = 1",
         testScript("string.av"));
@@ -190,6 +196,12 @@ public class TestScripts {
       // for statement values
       assertEquals(9, testScript("for5.av"));
     }
+
+    {
+      // for null sequence
+      assertEquals(10, testScript("for_null.av"));
+      assertEquals(13, testScript("for_null.av", "a", new int[] {1, 2}));
+    }
   }
 
   @Test
@@ -277,5 +289,7 @@ public class TestScripts {
     assertTrue(e instanceof IOException);
 
     assertEquals(3, testScript("try_catch5.av"));
+    assertEquals(1, testScript("try_catch6.av"));
+    assertEquals(2, testScript("try_catch7.av"));
   }
 }

@@ -22,6 +22,7 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.Collector;
@@ -51,7 +52,7 @@ public class SeqFilterFunction extends AbstractFunction {
           "There is no function named " + ((AviatorJavaType) arg2).getName());
     }
     if (first == null) {
-      throw new NullPointerException("null seq");
+      return AviatorNil.NIL;
     }
 
     Sequence seq = RuntimeUtils.seq(first, env);

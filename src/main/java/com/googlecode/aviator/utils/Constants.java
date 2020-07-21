@@ -32,6 +32,7 @@ public class Constants {
   public static final Variable THROW_VAR = new Variable("__throw", -1);
   public static final Variable NEW_VAR = new Variable("__new", -1);
   public static final Variable THROWABLE_VAR = new Variable("Throwable", -1);
+  public static final String EXP_VAR = "__exp__";
 
   private Constants() {
 

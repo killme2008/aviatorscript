@@ -60,7 +60,7 @@ public class AviatorPattern extends AviatorObject {
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case String:
-        return new AviatorString(this.pattern.pattern() + ((AviatorString) other).getLexeme());
+        return new AviatorString(this.pattern.pattern() + ((AviatorString) other).getLexeme(env));
       case JavaType:
         AviatorJavaType javaType = (AviatorJavaType) other;
         final Object otherValue = javaType.getValue(env);
@@ -79,9 +79,11 @@ public class AviatorPattern extends AviatorObject {
   @Override
   public AviatorObject match(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
+      case Nil:
+        return AviatorBoolean.FALSE;
       case String:
         AviatorString aviatorString = (AviatorString) other;
-        Matcher m = this.pattern.matcher(aviatorString.getLexeme());
+        Matcher m = this.pattern.matcher(aviatorString.getLexeme(env));
         if (m.matches()) {
           boolean captureGroups = RuntimeUtils.getInstance(env)
               .getOptionValue(Options.PUT_CAPTURING_GROUPS_INTO_ENV).bool;
@@ -98,6 +100,9 @@ public class AviatorPattern extends AviatorObject {
       case JavaType:
         AviatorJavaType javaType = (AviatorJavaType) other;
         final Object javaValue = javaType.getValue(env);
+        if (javaValue == null) {
+          return AviatorBoolean.FALSE;
+        }
         if (TypeUtils.isString(javaValue)) {
           return match(new AviatorString(String.valueOf(javaValue)), env);
         } else {

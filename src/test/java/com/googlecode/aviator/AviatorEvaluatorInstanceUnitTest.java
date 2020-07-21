@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.springframework.util.StringUtils;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -495,6 +496,17 @@ public class AviatorEvaluatorInstanceUnitTest {
       this.instance.setTraceOutputStream(System.out);
     }
 
+  }
+
+  @Test(expected = CompileExpressionErrorException.class)
+  public void testValidate1() {
+    this.instance.validate("");
+  }
+
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testValidate2() {
+    this.instance.validate("s = lambda(x) -> lambda(y) -> x + y end; s(3)(4)");
   }
 
   @Test(expected = CompileExpressionErrorException.class)

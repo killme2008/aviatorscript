@@ -1,0 +1,10 @@
+try {
+  throw new java.io.IOException("test");
+}catch(IllegalArgumentException | ClassCastException  e) {
+  return 1; 
+} catch(IllegalStateException | ArrayIndexOutOfBoundsException | java.io.IOException e) {
+  pst(e);
+  return 2;
+} catch(e) {
+  return 3;
+}

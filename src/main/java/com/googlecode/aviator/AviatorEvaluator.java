@@ -480,6 +480,14 @@ public final class AviatorEvaluator {
     return compile(expression, false);
   }
 
+  /**
+   * @see AviatorEvaluatorInstance#validate(String)
+   * @param script
+   */
+  public static void validate(final String script) {
+    getInstance().validate(script);
+  }
+
 
   /**
    * Execute a text expression with values that are variables order in the expression.It only runs

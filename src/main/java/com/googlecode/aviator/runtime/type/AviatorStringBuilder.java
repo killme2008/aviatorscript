@@ -24,14 +24,14 @@ public class AviatorStringBuilder extends AviatorString {
   }
 
   @Override
-  public String getLexeme() {
+  public String getLexeme(final Map<String, Object> env) {
     return this.sb.toString();
   }
 
 
   @Override
   public AviatorObject deref(final Map<String, Object> env) {
-    return new AviatorString(getLexeme());
+    return new AviatorString(getLexeme(env));
   }
 
   @Override

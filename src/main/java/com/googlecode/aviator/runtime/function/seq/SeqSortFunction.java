@@ -20,15 +20,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 
 /**
  * sort(list) function to sort java.util.List or array,return a sorted duplicate object
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class SeqSortFunction extends AbstractFunction {
 
@@ -37,11 +38,11 @@ public class SeqSortFunction extends AbstractFunction {
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
 
     Object first = arg1.getValue(env);
     if (first == null) {
-      throw new NullPointerException("null seq");
+      return AviatorNil.NIL;
     }
     Class<?> clazz = first.getClass();
 

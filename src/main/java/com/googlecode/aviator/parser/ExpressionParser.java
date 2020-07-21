@@ -59,6 +59,8 @@ public class ExpressionParser implements Parser {
 
   private ScopeInfo scope;
 
+  private int parsedTokens;
+
 
   private boolean inPattern = false;
 
@@ -67,6 +69,13 @@ public class ExpressionParser implements Parser {
   private final boolean captureFuncArgs;
 
   private final Set<Feature> featureSet;
+
+
+
+  public Token<?> getPrevToken() {
+    return this.prevToken;
+  }
+
 
 
   /*
@@ -78,6 +87,14 @@ public class ExpressionParser implements Parser {
   public CodeGenerator getCodeGenerator() {
     return this.codeGenerator;
   }
+
+
+
+  public Token<?> getLookhead() {
+    return this.lookhead;
+  }
+
+
 
   @Override
   public SymbolTable getSymbolTable() {
@@ -125,6 +142,9 @@ public class ExpressionParser implements Parser {
     this.captureFuncArgs = instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool;
     this.lexer = lexer;
     this.lookhead = this.lexer.scan();
+    if (this.lookhead != null) {
+      this.parsedTokens++;
+    }
     this.featureSet = this.instance.getOptionValue(Options.FEATURE_SET).featureSet;
     if (this.lookhead == null) {
       reportSyntaxError("blank script");
@@ -499,7 +519,7 @@ public class ExpressionParser implements Parser {
 
 
     while (expectChar('[') || expectChar('(')) {
-      if (isConstant(this.prevToken)) {
+      if (isConstant(this.prevToken, this.instance)) {
         break;
       }
 
@@ -867,7 +887,7 @@ public class ExpressionParser implements Parser {
   }
 
 
-  private void reportSyntaxError(final String message) {
+  public void reportSyntaxError(final String message) {
     int index = isValidLookhead() ? this.lookhead.getStartIndex() : this.lexer.getCurrentIndex();
 
     if (this.lookhead != null) {
@@ -899,26 +919,34 @@ public class ExpressionParser implements Parser {
     return this.lookhead != null && this.lookhead.getStartIndex() > 0;
   }
 
-
   public void move(final boolean analyse) {
     if (this.lookhead != null) {
       this.prevToken = this.lookhead;
       this.lookhead = this.lexer.scan(analyse);
+      if (this.lookhead != null) {
+        this.parsedTokens++;
+      }
     } else {
       reportSyntaxError("illegal token");
     }
   }
 
+  public int getParsedTokens() {
+    return this.parsedTokens;
+  }
 
   public void back() {
+    if (this.lookhead != null) {
+      this.parsedTokens--;
+    }
     this.lexer.pushback(this.lookhead);
     this.lookhead = this.prevToken;
   }
 
 
-  public Expression parse() {
+  public Expression parse(final boolean reportErrorIfNotEOF) {
     StatementType statementType = statements();
-    if (this.lookhead != null) {
+    if (this.lookhead != null && reportErrorIfNotEOF) {
       if (statementType == StatementType.Ternary) {
         reportSyntaxError("unexpect token '" + currentTokenLexeme()
             + "', maybe forget to insert ';' to complete last expression ");
@@ -927,6 +955,11 @@ public class ExpressionParser implements Parser {
       }
     }
     return getCodeGeneratorWithTimes().getResult(true);
+  }
+
+
+  public Expression parse() {
+    return parse(true);
   }
 
   static enum StatementType {
@@ -1187,14 +1220,26 @@ public class ExpressionParser implements Parser {
         reportSyntaxError("invalid exception class name");
       }
       checkVariableName();
-      Token<?> exceptionClass = this.lookhead;
+      List<Token<?>> exceptionClasses = new ArrayList<>();
+      exceptionClasses.add(this.lookhead);
       move(true);
 
       Token<?> boundVar = null;
       if (expectChar(')')) {
-        boundVar = exceptionClass;
-        exceptionClass = Constants.THROWABLE_VAR;
+        // catch(e) to catch all.
+        boundVar = exceptionClasses.remove(0);
+        exceptionClasses.add(Constants.THROWABLE_VAR);
       } else {
+        // catch multi exception
+        while (expectChar('|')) {
+          move(true);
+          if (this.lookhead.getType() != TokenType.Variable) {
+            reportSyntaxError("invalid exception class to catch");
+          }
+          checkVariableName();
+          exceptionClasses.add(this.lookhead);
+          move(true);
+        }
         if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
           reportSyntaxError("invalid bound variable name for exception");
         }
@@ -1222,8 +1267,10 @@ public class ExpressionParser implements Parser {
         statements();
         getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
         getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
-        getCodeGeneratorWithTimes().onConstant(exceptionClass);
-        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        for (Token<?> exceptionClass : exceptionClasses) {
+          getCodeGeneratorWithTimes().onConstant(exceptionClass);
+          getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        }
         getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
       }
       getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
@@ -1733,26 +1780,29 @@ public class ExpressionParser implements Parser {
     }
   }
 
-  public static boolean isConstant(final Token<?> token) {
+  public static boolean isConstant(final Token<?> token, final AviatorEvaluatorInstance instance) {
     switch (token.getType()) {
       case Number:
       case Pattern:
-      case String:
         return true;
+      case String:
+        return !instance.isFeatureEnabled(Feature.StringInterpolation);
       default:
         return false;
     }
   }
 
-  public static boolean isLiteralToken(final Token<?> token) {
+  public static boolean isLiteralToken(final Token<?> token,
+      final AviatorEvaluatorInstance instance) {
     switch (token.getType()) {
       case Variable:
         return token == Variable.TRUE || token == Variable.FALSE || token == Variable.NIL;
       case Char:
       case Number:
       case Pattern:
-      case String:
         return true;
+      case String:
+        return !instance.isFeatureEnabled(Feature.StringInterpolation);
       default:
         return false;
     }

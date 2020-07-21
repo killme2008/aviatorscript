@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.LiteralExpression;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
@@ -228,8 +229,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       case Char:
       case Number:
       case Pattern:
-      case String:
         return true;
+      case String:
+        return !this.instance.isFeatureEnabled(Feature.StringInterpolation);
     }
     return false;
   }
@@ -344,7 +346,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     Map<String, Integer/* counter */> methods = new HashMap<String, Integer>();
     Set<Token<?>> constants = new HashSet<>();
     for (Token<?> token : this.tokenList) {
-      if (ExpressionParser.isConstant(token)) {
+      if (ExpressionParser.isConstant(token, this.instance)) {
         constants.add(token);
       }
       switch (token.getType()) {
@@ -399,9 +401,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         exp = new LiteralExpression(this.instance, null, new ArrayList<String>(variables.keySet()));
       } else {
         final Token<?> lastToken = this.tokenList.get(0);
-        if (ExpressionParser.isLiteralToken(lastToken)) {
+        if (ExpressionParser.isLiteralToken(lastToken, this.instance)) {
           exp = new LiteralExpression(this.instance,
-              getAviatorObjectFromToken(lastToken).getValue(null),
+              getAviatorObjectFromToken(lastToken).getValue(getCompileEnv()),
               new ArrayList<String>(variables.keySet()));
         }
       }

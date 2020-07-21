@@ -1,5 +1,7 @@
 package com.googlecode.aviator.runtime.function.internal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -17,18 +19,21 @@ public class CatchHandler extends AviatorObject {
    */
   private static final long serialVersionUID = 2718902412145274738L;
   private final AviatorFunction func;
-  private final Class<?> exceptionClass;
+  private final List<Class<?>> exceptionClasses;
 
-  public CatchHandler(final AviatorFunction func, String exceptionClass) {
+  public CatchHandler(final AviatorFunction func, final List<String> exceptionClassNames) {
     super();
     this.func = func;
-    try {
-      if (!exceptionClass.contains(".")) {
-        exceptionClass = "java.lang." + exceptionClass;
+    this.exceptionClasses = new ArrayList<>(exceptionClassNames.size());
+    for (String exceptionClass : exceptionClassNames) {
+      try {
+        if (!exceptionClass.contains(".")) {
+          exceptionClass = "java.lang." + exceptionClass;
+        }
+        this.exceptionClasses.add(Class.forName(exceptionClass));
+      } catch (Exception e) {
+        throw Reflector.sneakyThrow(e);
       }
-      this.exceptionClass = Class.forName(exceptionClass);
-    } catch (Exception e) {
-      throw Reflector.sneakyThrow(e);
     }
   }
 
@@ -36,8 +41,13 @@ public class CatchHandler extends AviatorObject {
     return this.func;
   }
 
-  public Class<?> getExceptionClass() {
-    return this.exceptionClass;
+  public boolean isMatch(final Class<?> eClass) {
+    for (Class<?> clazz : this.exceptionClasses) {
+      if (clazz.isAssignableFrom(eClass)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

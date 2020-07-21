@@ -62,7 +62,12 @@ public enum Feature {
   /**
    * new Class(arguments) to create an instance of special class with arguments.
    */
-  NewInstance;
+  NewInstance,
+  /**
+   * String interpolation.For example, "a = 'aviator'; 'hello #{a}'" to generate a string 'hello
+   * aviator'
+   */
+  StringInterpolation;
 
   /**
    * Require feature sets for this feature.

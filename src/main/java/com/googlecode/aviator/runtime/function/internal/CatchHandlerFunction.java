@@ -1,7 +1,9 @@
 package com.googlecode.aviator.runtime.function.internal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.function.AbstractVariadicFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -12,7 +14,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class CatchHandlerFunction extends AbstractFunction {
+public class CatchHandlerFunction extends AbstractVariadicFunction {
 
   /**
    *
@@ -25,8 +27,13 @@ public class CatchHandlerFunction extends AbstractFunction {
   }
 
   @Override
-  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
-      final AviatorObject arg2) {
-    return new CatchHandler((AviatorFunction) arg1, ((AviatorJavaType) arg2).getName());
+  public AviatorObject variadicCall(final Map<String, Object> env, final AviatorObject... args) {
+    assert (args.length > 0);
+    List<String> exceptionClasses = new ArrayList<String>(args.length - 1);
+    for (int i = 1; i < args.length; i++) {
+      exceptionClasses.add(((AviatorJavaType) args[i]).getName());
+    }
+
+    return new CatchHandler((AviatorFunction) args[0], exceptionClasses);
   }
 }

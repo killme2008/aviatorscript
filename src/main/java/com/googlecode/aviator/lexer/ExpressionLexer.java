@@ -22,6 +22,7 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.LinkedList;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
@@ -382,6 +383,12 @@ public class ExpressionLexer {
             case 'f':
               this.peek = '\f';
               break;
+            case '#':
+              if (this.instance.isFeatureEnabled(Feature.StringInterpolation)) {
+                sb.append('\\');
+                this.peek = '#';
+                break;
+              }
             default: {
               throw new CompileExpressionErrorException(
                   "Unsupported escape character: \\" + this.peek);
