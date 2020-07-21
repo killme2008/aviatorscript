@@ -1012,8 +1012,7 @@ public final class AviatorEvaluatorInstance {
    * @param function
    */
   public void addFunction(final AviatorFunction function) {
-    final String name = function.getName();
-    addFunction(name, function);
+    addFunction(function.getName(), function);
   }
 
   /**
@@ -1026,7 +1025,7 @@ public final class AviatorEvaluatorInstance {
     if (function == null) {
       throw new IllegalArgumentException("Null function");
     }
-    if ("lambda".equals(name)) {
+    if (SymbolTable.isReservedKeyword(name)) {
       throw new IllegalArgumentException("Invalid function name, lambda is a keyword.");
     }
     if (this.funcMap.containsKey(name)) {
@@ -1494,7 +1493,7 @@ public final class AviatorEvaluatorInstance {
     }
 
     public String toString(final Map<String, Object> env, final String lexeme) {
-      if (this.hintLength == 0) {
+      if (this.segs.isEmpty()) {
         return lexeme;
       }
       StringBuilder sb = new StringBuilder(this.hintLength);

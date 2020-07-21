@@ -1,0 +1,6 @@
+let name = "aviator";
+
+let a = 1;
+let b = 2;
+
+return "#{name} execute #{a} + #{b} = #{a+b}.";

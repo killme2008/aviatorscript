@@ -40,6 +40,12 @@ public class TestScripts {
   }
 
   @Test
+  public void testMisc() {
+    assertEquals("aviator execute 1 + 2 = 3.", testScript("string_interpolation.av"));
+    assertEquals("aviator execute 1 + 2 = 3.", testScript("string_interpolation.av"));
+  }
+
+  @Test
   public void testMultilineString() {
     assertEquals("SELECT u.id, u.name\n" + "  FROM USER u\n" + "  WHERE u.id = 1",
         testScript("string.av"));

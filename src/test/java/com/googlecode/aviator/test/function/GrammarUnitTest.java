@@ -32,7 +32,9 @@ import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -58,6 +60,18 @@ public class GrammarUnitTest {
       fail();
     } catch (ExpressionSyntaxErrorException e) {
 
+    }
+  }
+
+  @Test
+  public void testEscapeStringInterpolation() {
+    AviatorEvaluator.getInstance().disableFeature(Feature.StringInterpolation);
+    try {
+      AviatorEvaluator.execute("'\\#{name}'");
+    } catch (CompileExpressionErrorException e) {
+
+    } finally {
+      AviatorEvaluator.getInstance().enableFeature(Feature.StringInterpolation);
     }
   }
 
