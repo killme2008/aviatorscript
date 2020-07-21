@@ -3,7 +3,7 @@
 #Modified from leiningen:https://raw.github.com/technomancy/leiningen/preview/bin/lein
 #License: Eclipse Public License,same as leiningen and clojure.
 
-export AVIATOR_VERSION="5.0.0"
+export AVIATOR_VERSION="5.1.0"
 
 case $AVIATOR_VERSION in
     *SNAPSHOT) SNAPSHOT="YES" ;;
