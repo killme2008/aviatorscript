@@ -1,0 +1,7 @@
+## examples/multi_catch.av
+
+try {
+  throw new java.io.IOException("test");
+} catch(IllegalArgumentException | IllegalStateException | java.io.IOException e) {
+  pst(e);
+}

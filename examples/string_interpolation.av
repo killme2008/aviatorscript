@@ -1,0 +1,7 @@
+## examples/string_interpolation.av
+
+let name = "aviator";
+let a = 1;
+let b = 2;
+let s = "hello, #{name}, #{a} + #{b} = #{a + b}";
+p(s);
