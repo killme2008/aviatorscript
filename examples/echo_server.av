@@ -5,7 +5,7 @@ let io = require('io');
 
 fn process_conn(socket) {
   let client_addr = getRemoteSocketAddress(socket);
-  p("Accepted a connection from " + client_addr);
+  p("Accepted a connection from #{client_addr}");
   let reader = nil;
   try{
     let out = getOutputStream(socket);
@@ -22,7 +22,7 @@ fn process_conn(socket) {
   }finally{
     io.close(reader);
     io.close(socket);
-    p("Closed a connection from " + client_addr);
+    p("Closed a connection from #{client_addr}");
   }
 }
 
@@ -30,7 +30,7 @@ let port = count(ARGV) >= 1? long(ARGV[0]) : 8080;
 
 let server =new java.net.ServerSocket(port);
 
-p("Echo server listen at " + port);
+p("Echo server listen at #{port}");
 
 let socket = nil;
 
