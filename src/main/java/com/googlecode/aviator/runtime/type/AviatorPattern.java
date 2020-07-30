@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.Env;
@@ -127,12 +128,13 @@ public class AviatorPattern extends AviatorObject {
         if (other.getValue(env) == null) {
           return 1;
         } else {
-          throw new ExpressionRuntimeException("Could not compare Pattern with " + other.desc(env));
+          throw new CompareNotSupportedException(
+              "Could not compare Pattern with " + other.desc(env));
         }
       case Nil:
         return 1;
       default:
-        throw new ExpressionRuntimeException("Could not compare Pattern with " + other.desc(env));
+        throw new CompareNotSupportedException("Could not compare Pattern with " + other.desc(env));
     }
   }
 

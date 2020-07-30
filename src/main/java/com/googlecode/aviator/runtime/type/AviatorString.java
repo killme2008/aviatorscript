@@ -22,6 +22,7 @@ import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Feature;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.Constants;
@@ -121,7 +122,7 @@ public class AviatorString extends AviatorObject {
         } else if (otherJavaValue instanceof Date) {
           return tryCompareDate(env, (Date) otherJavaValue);
         } else {
-          throw new ExpressionRuntimeException(
+          throw new CompareNotSupportedException(
               "Could not compare " + desc(env) + " with " + other.desc(env));
         }
       case Nil:
@@ -131,7 +132,7 @@ public class AviatorString extends AviatorObject {
           return 1;
         }
       default:
-        throw new ExpressionRuntimeException(
+        throw new CompareNotSupportedException(
             "Could not compare " + desc(env) + " with " + other.desc(env));
     }
   }

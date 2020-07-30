@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.utils.Env;
 
 /**
@@ -42,7 +43,7 @@ public final class Range extends AviatorObject implements Sequence<Number> {
 
   @Override
   public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
-    throw new UnsupportedOperationException();
+    throw new CompareNotSupportedException();
   }
 
 

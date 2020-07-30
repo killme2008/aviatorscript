@@ -36,6 +36,7 @@ import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.runtime.FunctionArgument;
@@ -59,7 +60,7 @@ public class FunctionTest {
     assertEquals(-32, AviatorEvaluator.execute("cmp('hEllo','hello')"));
   }
 
-  @Test(expected = ExpressionRuntimeException.class)
+  @Test(expected = CompareNotSupportedException.class)
   public void testCmpWrongType() {
     assertEquals(0, AviatorEvaluator.execute("cmp(1,'hello')"));
   }
@@ -1038,14 +1039,14 @@ public class FunctionTest {
     try {
       assertEquals(5, AviatorEvaluator.execute("seq.max(tuple(4,'hello',3,1,5))"));
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (CompareNotSupportedException e) {
       assertEquals("Could not compare `hello` with `4`", e.getMessage());
     }
 
     try {
       assertEquals(5, AviatorEvaluator.execute("seq.min(tuple(4,'hello',3,1,5))"));
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (CompareNotSupportedException e) {
       assertEquals("Could not compare `hello` with `4`", e.getMessage());
     }
 
@@ -1301,7 +1302,7 @@ public class FunctionTest {
     try {
       assertEquals(5, AviatorEvaluator.execute("max(4,'hello',3,1,5)"));
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (CompareNotSupportedException e) {
       assertEquals("Could not compare <String, hello> with <Long, 4>", e.getMessage());
     }
 
@@ -1309,7 +1310,7 @@ public class FunctionTest {
     try {
       assertEquals(5, AviatorEvaluator.execute("min(4,'hello',3,1,5)"));
       fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (CompareNotSupportedException e) {
       assertEquals("Could not compare <String, hello> with <Long, 4>", e.getMessage());
     }
 

@@ -34,6 +34,7 @@ import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
@@ -61,6 +62,34 @@ public class GrammarUnitTest {
     } catch (ExpressionSyntaxErrorException e) {
 
     }
+  }
+
+  @Test
+  public void testCompareWithVariableSyntaxSuger() {
+    try {
+      AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, false);
+      AviatorEvaluator.execute("data.uid != nil");
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals("Could not find variable data.uid", e.getMessage());
+    }
+    assertFalse((boolean) AviatorEvaluator.execute("data.uid != nil",
+        AviatorEvaluator.newEnv("data.uid", null)));
+    assertTrue((boolean) AviatorEvaluator.execute("data.uid == nil",
+        AviatorEvaluator.newEnv("data.uid", null)));
+    {
+      AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, true);
+      assertFalse((boolean) AviatorEvaluator.execute("data.uid != nil"));
+      assertTrue((boolean) AviatorEvaluator.execute("data.uid == nil"));
+      assertFalse((boolean) AviatorEvaluator.execute("data.uid != nil",
+          AviatorEvaluator.newEnv("data.uid", null)));
+      assertTrue((boolean) AviatorEvaluator.execute("data.uid == nil",
+          AviatorEvaluator.newEnv("data.uid", null)));
+      AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, false);
+    }
+
+    assertFalse((boolean) AviatorEvaluator.execute("data != nil"));
+    assertTrue((boolean) AviatorEvaluator.execute("data == nil"));
   }
 
   @Test
@@ -728,7 +757,7 @@ public class GrammarUnitTest {
     try {
       AviatorEvaluator.execute("3>/abc/");
       Assert.fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (CompareNotSupportedException e) {
     }
     assertTrue((boolean) AviatorEvaluator.execute("'abc'!=/abc/"));
     assertFalse((boolean) AviatorEvaluator.execute("3.999==p1", env));
@@ -765,7 +794,7 @@ public class GrammarUnitTest {
     try {
       AviatorEvaluator.execute("bool>s", env);
       Assert.fail();
-    } catch (ExpressionRuntimeException e) {
+    } catch (CompareNotSupportedException e) {
     }
     try {
       AviatorEvaluator.execute("true<'abc'");

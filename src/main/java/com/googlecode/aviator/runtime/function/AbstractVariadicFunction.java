@@ -1,6 +1,7 @@
 package com.googlecode.aviator.runtime.function;
 
 import java.util.Map;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
@@ -49,7 +50,7 @@ public abstract class AbstractVariadicFunction extends AviatorObject implements 
 
   @Override
   public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
-    throw new UnsupportedOperationException("Lambda function can't be compared.");
+    throw new CompareNotSupportedException("Lambda function can't be compared.");
   }
 
   @Override
