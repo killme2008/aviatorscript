@@ -18,7 +18,7 @@ package com.googlecode.aviator.runtime.type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.TypeUtils;
 
@@ -229,13 +229,13 @@ public abstract class AviatorNumber extends AviatorObject {
         if (otherValue instanceof Number) {
           return innerCompare(env, AviatorNumber.valueOf(otherValue));
         } else {
-          throw new ExpressionRuntimeException(
+          throw new CompareNotSupportedException(
               "Could not compare " + desc(env) + " with " + other.desc(env));
         }
       case Nil:
         return 1;
       default:
-        throw new ExpressionRuntimeException(
+        throw new CompareNotSupportedException(
             "Could not compare " + desc(env) + " with " + other.desc(env));
 
     }

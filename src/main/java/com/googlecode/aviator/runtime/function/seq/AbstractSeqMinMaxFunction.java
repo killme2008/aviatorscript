@@ -1,7 +1,7 @@
 package com.googlecode.aviator.runtime.function.seq;
 
 import java.util.Map;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -63,7 +63,7 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
       }
     }
     if (!(obj instanceof Comparable)) {
-      throw new IllegalArgumentException(
+      throw new CompareNotSupportedException(
           "Element in sequence doesn't implement java.lang.Comparable.");
     }
     if (wasFirst || compare(result, obj)) {
@@ -83,9 +83,9 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
           return c > 0;
       }
       return false;
-    } catch (RuntimeException e) {
-      throw new ExpressionRuntimeException("Could not compare `" + obj + "` with `" + result + "`",
-          e);
+    } catch (ClassCastException e) {
+      throw new CompareNotSupportedException(
+          "Could not compare `" + obj + "` with `" + result + "`", e);
     }
   }
 

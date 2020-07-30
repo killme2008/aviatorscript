@@ -16,6 +16,7 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.util.Map;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.TypeUtils;
@@ -45,18 +46,18 @@ public class AviatorLong extends AviatorNumber {
     }
   }
 
-  AviatorLong(long i) {
+  AviatorLong(final long i) {
     super(i);
   }
 
 
-  AviatorLong(Number number) {
+  AviatorLong(final Number number) {
     super(number);
 
   }
 
 
-  public static AviatorLong valueOf(long l) {
+  public static AviatorLong valueOf(final long l) {
     final int offset = 128;
     if (l >= -128 && l <= 127) { // will cache
       return LongCache.cache[(int) l + offset];
@@ -65,43 +66,43 @@ public class AviatorLong extends AviatorNumber {
   }
 
 
-  public static AviatorLong valueOf(Long l) {
+  public static AviatorLong valueOf(final Long l) {
     return valueOf(l.longValue());
   }
 
 
   @Override
-  public AviatorObject neg(Map<String, Object> env) {
+  public AviatorObject neg(final Map<String, Object> env) {
     return AviatorLong.valueOf(-this.longValue);
   }
 
 
   @Override
-  public int innerCompare(Map<String, Object> env, AviatorNumber other) {
+  public int innerCompare(final Map<String, Object> env, final AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
-        return this.toBigInt().compareTo(other.toBigInt());
+        return toBigInt().compareTo(other.toBigInt());
       case Decimal:
-        return this.toDecimal(env).compareTo(other.toDecimal(env));
+        return toDecimal(env).compareTo(other.toDecimal(env));
       case Long:
-        return TypeUtils.comapreLong(this.longValue(), other.longValue());
+        return TypeUtils.comapreLong(longValue(), other.longValue());
       case Double:
-        return Double.compare(this.doubleValue(), other.doubleValue());
+        return Double.compare(doubleValue(), other.doubleValue());
       default:
-        throw new ExpressionRuntimeException(
-            "Could not compare " + this.desc(env) + " with " + other.desc(env));
+        throw new CompareNotSupportedException(
+            "Could not compare " + desc(env) + " with " + other.desc(env));
     }
   }
 
 
   @Override
-  public AviatorObject innerDiv(Map<String, Object> env, AviatorNumber other) {
+  public AviatorObject innerDiv(final Map<String, Object> env, final AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
-        return AviatorBigInt.valueOf(this.toBigInt().divide(other.toBigInt()));
+        return AviatorBigInt.valueOf(toBigInt().divide(other.toBigInt()));
       case Decimal:
-        return AviatorDecimal.valueOf(
-            this.toDecimal(env).divide(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+        return AviatorDecimal
+            .valueOf(toDecimal(env).divide(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.longValue / other.longValue());
       default:
@@ -111,13 +112,13 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject innerAdd(Map<String, Object> env, AviatorNumber other) {
+  public AviatorObject innerAdd(final Map<String, Object> env, final AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
-        return AviatorBigInt.valueOf(this.toBigInt().add(other.toBigInt()));
+        return AviatorBigInt.valueOf(toBigInt().add(other.toBigInt()));
       case Decimal:
-        return AviatorDecimal.valueOf(
-            this.toDecimal(env).add(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+        return AviatorDecimal
+            .valueOf(toDecimal(env).add(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.longValue + other.longValue());
       default:
@@ -127,13 +128,13 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject innerMod(Map<String, Object> env, AviatorNumber other) {
+  public AviatorObject innerMod(final Map<String, Object> env, final AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
-        return AviatorBigInt.valueOf(this.toBigInt().mod(other.toBigInt()));
+        return AviatorBigInt.valueOf(toBigInt().mod(other.toBigInt()));
       case Decimal:
         return AviatorDecimal.valueOf(
-            this.toDecimal(env).remainder(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+            toDecimal(env).remainder(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.longValue % other.longValue());
       default:
@@ -143,13 +144,13 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject innerMult(Map<String, Object> env, AviatorNumber other) {
+  public AviatorObject innerMult(final Map<String, Object> env, final AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
-        return AviatorBigInt.valueOf(this.toBigInt().multiply(other.toBigInt()));
+        return AviatorBigInt.valueOf(toBigInt().multiply(other.toBigInt()));
       case Decimal:
         return AviatorDecimal.valueOf(
-            this.toDecimal(env).multiply(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+            toDecimal(env).multiply(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.longValue * other.longValue());
       default:
@@ -158,7 +159,7 @@ public class AviatorLong extends AviatorNumber {
   }
 
 
-  protected void ensureLong(AviatorObject other) {
+  protected void ensureLong(final AviatorObject other) {
     if (other.getAviatorType() != AviatorType.Long) {
       throw new ExpressionRuntimeException(
           other + " is not long type,could not be used as a bit operand.");
@@ -167,18 +168,18 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject bitAnd(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject bitAnd(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
       case Long:
       case Double:
-        return this.innerBitAnd(other);
+        return innerBitAnd(other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerBitAnd(AviatorNumber.valueOf(otherValue));
+          return innerBitAnd(AviatorNumber.valueOf(otherValue));
         } else {
           return super.bitAnd(other, env);
         }
@@ -188,57 +189,57 @@ public class AviatorLong extends AviatorNumber {
   }
 
 
-  protected AviatorObject innerBitAnd(AviatorObject other) {
-    this.ensureLong(other);
+  protected AviatorObject innerBitAnd(final AviatorObject other) {
+    ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
     return AviatorLong.valueOf(this.longValue & otherLong.longValue());
   }
 
 
-  protected AviatorObject innerBitOr(AviatorObject other) {
-    this.ensureLong(other);
+  protected AviatorObject innerBitOr(final AviatorObject other) {
+    ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
     return AviatorLong.valueOf(this.longValue | otherLong.longValue());
   }
 
 
-  protected AviatorObject innerBitXor(AviatorObject other) {
-    this.ensureLong(other);
+  protected AviatorObject innerBitXor(final AviatorObject other) {
+    ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
     return AviatorLong.valueOf(this.longValue ^ otherLong.longValue());
   }
 
 
-  protected AviatorObject innerShiftLeft(AviatorObject other) {
-    this.ensureLong(other);
+  protected AviatorObject innerShiftLeft(final AviatorObject other) {
+    ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
     return AviatorLong.valueOf(this.longValue << otherLong.longValue());
   }
 
 
-  protected AviatorObject innerShiftRight(AviatorObject other) {
-    this.ensureLong(other);
+  protected AviatorObject innerShiftRight(final AviatorObject other) {
+    ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
     return AviatorLong.valueOf(this.longValue >> otherLong.longValue());
   }
 
 
-  protected AviatorObject innerUnsignedShiftRight(AviatorObject other) {
-    this.ensureLong(other);
+  protected AviatorObject innerUnsignedShiftRight(final AviatorObject other) {
+    ensureLong(other);
     AviatorLong otherLong = (AviatorLong) other;
     return AviatorLong.valueOf(this.longValue >>> otherLong.longValue());
   }
 
 
   @Override
-  public AviatorObject bitNot(Map<String, Object> env) {
+  public AviatorObject bitNot(final Map<String, Object> env) {
     return AviatorLong.valueOf(~this.longValue);
   }
 
 
 
   @Override
-  public Object getValue(Map<String, Object> env) {
+  public Object getValue(final Map<String, Object> env) {
     return this.longValue;
   }
 
@@ -256,18 +257,18 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject bitOr(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject bitOr(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
       case Long:
       case Double:
-        return this.innerBitOr(other);
+        return innerBitOr(other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerBitOr(AviatorNumber.valueOf(otherValue));
+          return innerBitOr(AviatorNumber.valueOf(otherValue));
         } else {
           return super.bitOr(other, env);
         }
@@ -278,18 +279,18 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject bitXor(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject bitXor(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
       case Long:
       case Double:
-        return this.innerBitXor(other);
+        return innerBitXor(other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerBitXor(AviatorNumber.valueOf(otherValue));
+          return innerBitXor(AviatorNumber.valueOf(otherValue));
         } else {
           return super.bitXor(other, env);
         }
@@ -300,18 +301,18 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject shiftLeft(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject shiftLeft(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
       case Long:
       case Double:
-        return this.innerShiftLeft(other);
+        return innerShiftLeft(other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerShiftLeft(AviatorNumber.valueOf(otherValue));
+          return innerShiftLeft(AviatorNumber.valueOf(otherValue));
         } else {
           return super.shiftLeft(other, env);
         }
@@ -322,18 +323,18 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject shiftRight(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject shiftRight(final AviatorObject other, final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
       case Long:
       case Double:
-        return this.innerShiftRight(other);
+        return innerShiftRight(other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerShiftRight(AviatorNumber.valueOf(otherValue));
+          return innerShiftRight(AviatorNumber.valueOf(otherValue));
         } else {
           return super.shiftRight(other, env);
         }
@@ -344,18 +345,19 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject unsignedShiftRight(AviatorObject other, Map<String, Object> env) {
+  public AviatorObject unsignedShiftRight(final AviatorObject other,
+      final Map<String, Object> env) {
     switch (other.getAviatorType()) {
       case BigInt:
       case Decimal:
       case Long:
       case Double:
-        return this.innerUnsignedShiftRight(other);
+        return innerUnsignedShiftRight(other);
       case JavaType:
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object otherValue = otherJavaType.getValue(env);
         if (otherValue instanceof Number) {
-          return this.innerUnsignedShiftRight(AviatorNumber.valueOf(otherValue));
+          return innerUnsignedShiftRight(AviatorNumber.valueOf(otherValue));
         } else {
           return super.unsignedShiftRight(other, env);
         }
@@ -366,13 +368,13 @@ public class AviatorLong extends AviatorNumber {
 
 
   @Override
-  public AviatorObject innerSub(Map<String, Object> env, AviatorNumber other) {
+  public AviatorObject innerSub(final Map<String, Object> env, final AviatorNumber other) {
     switch (other.getAviatorType()) {
       case BigInt:
-        return AviatorBigInt.valueOf(this.toBigInt().subtract(other.toBigInt()));
+        return AviatorBigInt.valueOf(toBigInt().subtract(other.toBigInt()));
       case Decimal:
         return AviatorDecimal.valueOf(
-            this.toDecimal(env).subtract(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+            toDecimal(env).subtract(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
       case Long:
         return AviatorLong.valueOf(this.longValue - other.longValue());
       default:

@@ -17,7 +17,10 @@ package com.googlecode.aviator.runtime.type;
 
 import java.io.Serializable;
 import java.util.Map;
+import com.googlecode.aviator.Options;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.TypeUtils;
@@ -47,10 +50,15 @@ public abstract class AviatorObject implements Serializable {
     }
     try {
       return innerCompare(other, env);
-    } catch (Throwable t) {
+    } catch (CompareNotSupportedException t) {
       if (isEq) {
+        if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
+          t.printStackTrace();
+        }
         return 1;
       }
+      throw Reflector.sneakyThrow(t);
+    } catch (Throwable t) {
       throw Reflector.sneakyThrow(t);
     }
   }

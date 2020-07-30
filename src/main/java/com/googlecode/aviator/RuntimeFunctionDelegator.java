@@ -1,6 +1,7 @@
 package com.googlecode.aviator;
 
 import java.util.Map;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.function.system.ConstantFunction;
@@ -33,7 +34,7 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
 
   @Override
   public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
-    throw new UnsupportedOperationException("Lambda function can't be compared.");
+    throw new CompareNotSupportedException("Lambda function can't be compared.");
   }
 
   @Override

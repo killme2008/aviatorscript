@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.RuntimeUtils;
@@ -314,7 +315,7 @@ public class AviatorJavaType extends AviatorObject {
   public Object getValueFromEnv(final String name, final boolean nameContainsDot,
       final Map<String, Object> env, final boolean throwExceptionNotFound) {
     if (env != null) {
-      if (nameContainsDot && RuntimeUtils.getInstance(env)
+      if (nameContainsDot && !env.containsKey(name) && RuntimeUtils.getInstance(env)
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
         if (this.subNames == null) {
           // cache the result
@@ -529,9 +530,9 @@ public class AviatorJavaType extends AviatorObject {
           } else {
             try {
               return ((Comparable<Object>) thisValue).compareTo(otherValue);
-            } catch (Throwable t) {
-              throw new ExpressionRuntimeException(
-                  "Compare " + desc(env) + " with " + other.desc(env) + " error", t);
+            } catch (ClassCastException e) {
+              throw new CompareNotSupportedException(
+                  "Compare " + desc(env) + " with " + other.desc(env) + " error", e);
             }
           }
         }
@@ -543,7 +544,7 @@ public class AviatorJavaType extends AviatorObject {
           return 1;
         }
       default:
-        throw new ExpressionRuntimeException("Unknow aviator type");
+        throw new CompareNotSupportedException("Unknow aviator type");
     }
   }
 
