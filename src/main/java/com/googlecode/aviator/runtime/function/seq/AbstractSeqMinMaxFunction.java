@@ -63,7 +63,7 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
       }
     }
     if (!(obj instanceof Comparable)) {
-      throw new IllegalArgumentException(
+      throw new CompareNotSupportedException(
           "Element in sequence doesn't implement java.lang.Comparable.");
     }
     if (wasFirst || compare(result, obj)) {
@@ -83,7 +83,7 @@ public abstract class AbstractSeqMinMaxFunction extends AbstractFunction {
           return c > 0;
       }
       return false;
-    } catch (RuntimeException e) {
+    } catch (ClassCastException e) {
       throw new CompareNotSupportedException(
           "Could not compare `" + obj + "` with `" + result + "`", e);
     }
