@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.script.Bindings;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.utils.Env;
 
 /**
@@ -41,6 +42,10 @@ public class AviatorBindings implements Bindings {
 
   public void setInstance(final AviatorEvaluatorInstance instance) {
     this.env.setInstance(instance);
+  }
+
+  public void setExpression(final Expression exp) {
+    this.env.setExpression(exp);
   }
 
   @Override

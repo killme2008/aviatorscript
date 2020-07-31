@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.Range;
@@ -56,6 +57,16 @@ public class Env implements Map<String, Object> {
   /** Override values map. */
   private Map<String, Object> mOverrides;
 
+  private Expression expression;
+
+  public Expression getExpression() {
+    return this.expression;
+  }
+
+  public void setExpression(final Expression expression) {
+    this.expression = expression;
+  }
+
   public Map<String, Object> getDefaults() {
     return this.mDefaults;
   }
@@ -66,6 +77,11 @@ public class Env implements Map<String, Object> {
 
   public void setInstance(final AviatorEvaluatorInstance instance) {
     this.instance = instance;
+  }
+
+  public void configure(final AviatorEvaluatorInstance instance, final Expression exp) {
+    this.instance = instance;
+    this.expression = exp;
   }
 
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
@@ -174,6 +190,10 @@ public class Env implements Map<String, Object> {
     if (Constants.INSTANCE_VAR == key) {
       this.instance.ensureFeatureEnabled(Feature.InternalVars);
       return this.instance;
+    }
+    if (Constants.EXP_VAR == key) {
+      this.instance.ensureFeatureEnabled(Feature.InternalVars);
+      return this.expression;
     }
 
     Map<String, Object> overrides = getmOverrides(true);
@@ -329,6 +349,7 @@ public class Env implements Map<String, Object> {
     StringBuffer buf = new StringBuffer(32 * size());
     buf.append(super.toString()).append("{"). //
         append(Constants.INSTANCE_VAR).append("=").append(this.instance).append(", ").//
+        append(Constants.EXP_VAR).append("=").append(this.expression).append(", ").//
         append(Constants.ENV_VAR).append("=").append("<this>");
 
     Iterator<String> it = keySet().iterator();

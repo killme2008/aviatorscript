@@ -50,7 +50,7 @@ public abstract class LambdaFunction extends AbstractFunction {
     Env env = null;
     if (!this.inheritEnv) {
       final Env contextEnv = new Env(parentEnv, this.context);
-      contextEnv.setInstance(this.context.getInstance());
+      contextEnv.configure(this.context.getInstance(), this.expression);
       env = new Env(contextEnv);
       env.setInstance(this.context.getInstance());
     } else {

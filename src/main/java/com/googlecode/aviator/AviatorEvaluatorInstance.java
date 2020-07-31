@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
@@ -303,7 +304,7 @@ public final class AviatorEvaluatorInstance {
     final Map<String, Object> module = exp.newEnv("exports", exports, "path", abPath);
     Map<String, Object> env = exp.newEnv("__MODULE__", module, "exports", exports);
     exp.execute(env);
-    exports.setInstance(this);
+    exports.configure(this, exp);
     return (Map<String, Object>) module.get("exports");
   }
 
@@ -623,6 +624,16 @@ public final class AviatorEvaluatorInstance {
    */
   public void enableFeature(final Feature feature) {
     this.options.get(Options.FEATURE_SET).featureSet.add(feature);
+    this.options.get(Options.FEATURE_SET).featureSet.addAll(feature.getPrequires());
+  }
+
+  /**
+   * Returns current valid syntax feature set.
+   * 
+   * @return
+   */
+  public Set<Feature> getFeatures() {
+    return this.options.get(Options.FEATURE_SET).featureSet;
   }
 
   /**

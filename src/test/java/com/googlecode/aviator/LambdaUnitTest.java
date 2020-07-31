@@ -107,7 +107,7 @@ public class LambdaUnitTest {
 
     Map<String, Object> result = (Map<String, Object>) AviatorEvaluator.execute("#__env__", env);
 
-    assertEquals(4, result.size());
+    assertEquals(3, result.size());
     assertEquals("a", result.get("a"));
     assertEquals(3.2, result.get("b"));
     assertSame(c, result.get("c"));
