@@ -30,8 +30,9 @@
 
 # News
 
-* [5.0.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.1), 优化变量访问性能、bug 修复以及增加 eval(script) 函数等。
-* [5.0.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.0.0), 正式发布 5.0 版本，增加 Main 入口类和执行脚本等。
+* [5.1.2](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.2), 移除内部变量 `__exp__` 对用户 env 的污染
+* [5.1.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.1), 修复 == 和 != 运算符无法和 `a.b.c` 语法糖一起可能返回错误结果的 bug，推荐升级
+* [5.1.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.0), catch 语句支持多异常捕获，字符串插值支持等。
 
 # Dependency
 
