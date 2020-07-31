@@ -14,7 +14,6 @@ import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.FunctionArgument;
-import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
@@ -147,6 +146,7 @@ public abstract class BaseExpression implements Expression {
 
   public void setCompileEnv(final Env compileEnv) {
     this.compileEnv = compileEnv;
+    this.compileEnv.setExpression(this);
   }
 
 
@@ -208,13 +208,13 @@ public abstract class BaseExpression implements Expression {
     } else {
       env = new Env(map);
     }
-    env.setInstance(this.instance);
+    env.configure(this.instance, this);
     return env;
   }
 
   protected Env genTopEnv(final Map<String, Object> map) {
     if (map instanceof Env) {
-      ((Env) map).setInstance(this.instance);
+      ((Env) map).configure(this.instance, this);
     }
     Env env =
         newEnv(map, this.instance.getOptionValue(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY).bool);
@@ -225,7 +225,6 @@ public abstract class BaseExpression implements Expression {
     if (!this.funcsArgs.isEmpty()) {
       env.override(FUNC_PARAMS_VAR, this.funcsArgs);
     }
-    env.override(Constants.EXP_VAR, this);
     return env;
   }
 

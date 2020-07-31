@@ -40,6 +40,7 @@ import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorString;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.TestUtils;
 
 
@@ -143,6 +144,18 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Test
   public void testNewInstance() {
     assertNotSame(this.instance, AviatorEvaluator.newInstance());
+  }
+
+  @Test
+  public void testInternalVars() {
+    Map<String, Object> env = new HashMap<>();
+
+    Map<String, Object> theEnv = (Map<String, Object>) this.instance.execute("__env__", env);
+    assertTrue(env.isEmpty());
+    assertNotNull(theEnv.get(Constants.EXP_VAR));
+    assertSame(this.instance, theEnv.get(Constants.INSTANCE_VAR));
+    assertSame(theEnv, theEnv.get(Constants.ENV_VAR));
+    System.out.println(theEnv);
   }
 
   @Test

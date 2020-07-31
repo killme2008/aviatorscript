@@ -211,7 +211,7 @@ public class GrammarUnitTest {
     String r1 = "result=true;v1='test1';if(!result) {return 'ok';} v2='test2'; result";
     Map<String, Object> env = new HashMap<>();
     Assert.assertTrue((boolean) AviatorEvaluator.execute(r1, env));
-    assertEquals(4, env.size());
+    assertEquals(3, env.size());
     assertEquals(true, env.get("result"));
     assertEquals("test1", env.get("v1"));
     assertEquals("test2", env.get("v2"));

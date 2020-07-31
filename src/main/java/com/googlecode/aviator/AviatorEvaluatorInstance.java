@@ -303,7 +303,7 @@ public final class AviatorEvaluatorInstance {
     final Map<String, Object> module = exp.newEnv("exports", exports, "path", abPath);
     Map<String, Object> env = exp.newEnv("__MODULE__", module, "exports", exports);
     exp.execute(env);
-    exports.setInstance(this);
+    exports.configure(this, exp);
     return (Map<String, Object>) module.get("exports");
   }
 
