@@ -67,7 +67,7 @@ public enum Feature {
    * String interpolation.For example, "a = 'aviator'; 'hello #{a}'" to generate a string 'hello
    * aviator'
    */
-  StringInterpolation;
+  StringInterpolation(asSet(Feature.InternalVars));
 
   /**
    * Require feature sets for this feature.
@@ -96,6 +96,11 @@ public enum Feature {
     }
     return set;
   }
+
+  public Set<Feature> getPrequires() {
+    return this.prequires;
+  }
+
 
   /**
    * Returns the full feature set.
