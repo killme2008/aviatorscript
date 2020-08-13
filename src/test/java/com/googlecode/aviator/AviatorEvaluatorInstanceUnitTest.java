@@ -522,6 +522,16 @@ public class AviatorEvaluatorInstanceUnitTest {
     this.instance.validate("s = lambda(x) -> lambda(y) -> x + y end; s(3)(4)");
   }
 
+  @Test
+  public void testIssue278() {
+    if (this.instance.isFeatureEnabled(Feature.If)) {
+      this.instance.validate("if(true) {println('in body')}");
+    }
+    if (this.instance.isFeatureEnabled(Feature.ForLoop)) {
+      this.instance.validate("for x in range(0,3) {println(x)}");
+    }
+  }
+
   @Test(expected = CompileExpressionErrorException.class)
   public void compileBlankExpression1() {
     this.instance.compile("");
