@@ -448,6 +448,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             case MULT:
               this.codeGen.onMult(token);
               break;
+            case Exponent:
+              this.codeGen.onExponent(token);
+              break;
             case DIV:
               this.codeGen.onDiv(token);
               break;
@@ -781,6 +784,11 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   }
 
+  @Override
+  public void onExponent(final Token<?> lookhead) {
+    this.tokenList.add(new OperatorToken(lookhead, OperatorType.Exponent));
+
+  }
 
   @Override
   public void onNeg(final Token<?> lookhead) {

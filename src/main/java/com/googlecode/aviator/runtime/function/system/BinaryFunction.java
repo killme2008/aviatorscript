@@ -35,7 +35,7 @@ public class BinaryFunction extends AbstractFunction {
   private final OperatorType opType;
 
 
-  public BinaryFunction(OperatorType opType) {
+  public BinaryFunction(final OperatorType opType) {
     super();
     this.opType = opType;
   }
@@ -53,13 +53,14 @@ public class BinaryFunction extends AbstractFunction {
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
     return OperationRuntime.eval(arg1, arg2, env, this.opType);
   }
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
     AviatorObject left = arg1;
     switch (this.opType) {
       case BIT_AND:
@@ -68,9 +69,10 @@ public class BinaryFunction extends AbstractFunction {
       case ADD:
       case SUB:
       case MULT:
+      case Exponent:
       case DIV:
       case MOD:
-        return this.throwArity(1);
+        return throwArity(1);
       case NOT:
       case NEG:
         return OperationRuntime.eval(left, null, env, this.opType);

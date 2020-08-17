@@ -291,8 +291,6 @@ public class LambdaGenerator implements CodeGenerator {
     this.codeGenerator.onAdd(lookhead);
   }
 
-
-
   @Override
   public void onSub(final Token<?> lookhead) {
     this.codeGenerator.onSub(lookhead);
@@ -305,6 +303,12 @@ public class LambdaGenerator implements CodeGenerator {
     this.codeGenerator.onMult(lookhead);
   }
 
+
+
+  @Override
+  public void onExponent(final Token<?> lookhead) {
+    this.codeGenerator.onExponent(lookhead);
+  }
 
 
   @Override

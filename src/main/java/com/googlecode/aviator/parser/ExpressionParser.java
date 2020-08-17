@@ -459,21 +459,40 @@ public class ExpressionParser implements Parser {
     }
   }
 
-
-  public void term() {
+  public void exponent() {
     unary();
     while (true) {
       if (expectChar('*')) {
         move(true);
-        unary();
+        if (expectChar('*')) {
+          move(true);
+          unary();
+          getCodeGeneratorWithTimes().onExponent(this.lookhead);
+        } else {
+          back();
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+  }
+
+
+  public void term() {
+    exponent();
+    while (true) {
+      if (expectChar('*')) {
+        move(true);
+        exponent();
         getCodeGeneratorWithTimes().onMult(this.lookhead);
       } else if (expectChar('/')) {
         move(true);
-        unary();
+        exponent();
         getCodeGeneratorWithTimes().onDiv(this.lookhead);
       } else if (expectChar('%')) {
         move(true);
-        unary();
+        exponent();
         getCodeGeneratorWithTimes().onMod(this.lookhead);
       } else {
         break;

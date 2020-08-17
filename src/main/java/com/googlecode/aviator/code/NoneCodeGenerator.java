@@ -89,6 +89,13 @@ public class NoneCodeGenerator implements CodeGenerator {
 
   }
 
+
+
+  @Override
+  public void onExponent(final Token<?> lookhead) {
+
+  }
+
   @Override
   public void onDiv(final Token<?> lookhead) {
 

@@ -629,7 +629,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Returns current valid syntax feature set.
-   * 
+   *
    * @return
    */
   public Set<Feature> getFeatures() {
@@ -821,6 +821,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new Date2StringFunction());
     addFunction(new String2DateFunction());
     addFunction(new BinaryFunction(OperatorType.ADD));
+    addFunction(new BinaryFunction(OperatorType.Exponent));
     addFunction(new BinaryFunction(OperatorType.SUB));
     addFunction(new BinaryFunction(OperatorType.MULT));
     addFunction(new BinaryFunction(OperatorType.DIV));

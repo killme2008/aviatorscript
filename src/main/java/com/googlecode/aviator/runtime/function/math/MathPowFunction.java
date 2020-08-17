@@ -18,6 +18,7 @@ package com.googlecode.aviator.runtime.function.math;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBigInt;
@@ -29,9 +30,9 @@ import com.googlecode.aviator.utils.TypeUtils;
 
 /**
  * math.pow(d1,d2) function
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class MathPowFunction extends AbstractFunction {
 
@@ -39,13 +40,15 @@ public class MathPowFunction extends AbstractFunction {
   private static final long serialVersionUID = 5909888819672336251L;
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg1, AviatorObject arg2) {
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
     Number left = FunctionUtils.getNumberValue(arg1, env);
     Number right = FunctionUtils.getNumberValue(arg2, env);
     if (TypeUtils.isBigInt(left)) {
       return new AviatorBigInt(((BigInteger) left).pow(right.intValue()));
     } else if (TypeUtils.isDecimal(left)) {
-      return new AviatorDecimal(((BigDecimal) left).pow(right.intValue()));
+      return new AviatorDecimal(
+          ((BigDecimal) left).pow(right.intValue(), RuntimeUtils.getMathContext(env)));
     } else {
       return new AviatorDouble(Math.pow(left.doubleValue(), right.doubleValue()));
     }

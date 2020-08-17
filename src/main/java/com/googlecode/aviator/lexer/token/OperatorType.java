@@ -48,6 +48,8 @@ public enum OperatorType {
 
   MULT("*", 2),
 
+  Exponent("**", 2),
+
   DIV("/", 2),
 
   MOD("%", 2),
@@ -124,6 +126,8 @@ public enum OperatorType {
         return args[0].div(args[1], env);
       case MULT:
         return args[0].mult(args[1], env);
+      case Exponent:
+        return args[0].exponent(args[1], env);
       case EQ:
         int result = args[0].compareEq(args[1], env);
         return AviatorBoolean.valueOf(result == 0);

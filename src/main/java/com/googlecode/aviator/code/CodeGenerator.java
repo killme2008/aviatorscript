@@ -61,6 +61,8 @@ public interface CodeGenerator {
 
   public void onMult(Token<?> lookhead);
 
+  public void onExponent(Token<?> loohead);
+
 
   public void onDiv(Token<?> lookhead);
 
