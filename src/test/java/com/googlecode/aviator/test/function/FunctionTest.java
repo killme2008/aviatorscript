@@ -14,8 +14,8 @@
  **/
 package com.googlecode.aviator.test.function;
 
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -822,19 +822,19 @@ public class FunctionTest {
     // big int + decimal
     assertEquals(new BigDecimal("4.1"),
         AviatorEvaluator.exec("a+b", new BigDecimal("1.1"), new BigInteger("3")));
-    assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("a+3N", new BigDecimal("1")));
+    assertEquals(new BigDecimal("4"), AviatorEvaluator.exec("a+3N", new BigDecimal("1")));
     assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("1.1M+b", new BigInteger("3")));
     assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("3N+1.1M"));
-    assertEquals(new BigDecimal("301"), AviatorEvaluator.exec("3.01M*100N"));
+    assertEquals(new BigDecimal("301.00"), AviatorEvaluator.exec("3.01M*100N"));
     assertEquals(new BigDecimal("100"), AviatorEvaluator.exec("400M/4N"));
     assertEquals(new BigDecimal("-2.9"), AviatorEvaluator.exec("a-4N", new BigDecimal("1.1")));
 
     // decimal + long
     assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("a+b", new BigDecimal("1.1"), 3));
-    assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("a+3", new BigDecimal("1")));
+    assertEquals(new BigDecimal("4"), AviatorEvaluator.exec("a+3", new BigDecimal("1")));
     assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("1.1M+b", 3));
     assertEquals(new BigDecimal("4.1"), AviatorEvaluator.exec("3+1.1M"));
-    assertEquals(new BigDecimal("301"), AviatorEvaluator.exec("3.01M*100"));
+    assertEquals(new BigDecimal("301.00"), AviatorEvaluator.exec("3.01M*100"));
     assertEquals(new BigDecimal("100"), AviatorEvaluator.exec("400M/4"));
     assertEquals(new BigDecimal("-2.9"), AviatorEvaluator.exec("a-4", new BigDecimal("1.1")));
     // decimal + double

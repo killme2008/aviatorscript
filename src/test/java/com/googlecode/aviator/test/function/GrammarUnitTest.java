@@ -14,8 +14,8 @@
  **/
 package com.googlecode.aviator.test.function;
 
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -38,6 +38,7 @@ import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorLong;
@@ -62,6 +63,44 @@ public class GrammarUnitTest {
     } catch (ExpressionSyntaxErrorException e) {
 
     }
+  }
+
+  @Test
+  public void testExponent() {
+    assertEquals(1, exec("0**0"));
+    assertEquals(1, exec("1**0"));
+    assertEquals(1.0, exec("1.2**0"));
+    assertEquals(-9, exec("-3**2"));
+    assertEquals(-1.0, exec("-1.2**0"));
+    assertEquals(-1, exec("-1**0"));
+    assertEquals(new BigDecimal("1"), exec("3M**0"));
+    assertEquals(new BigInteger("-1"), exec("-2N**0"));
+    assertEquals(1, exec("1 + 4/2**3"));
+
+    assertEquals(1, exec("1 + 4/-2**3"));
+    assertEquals(33.0, exec("1 + 4/2**-3"));
+    assertEquals(5, exec("1 + 4/2**0"));
+    assertEquals(-2.2, exec("1-4**2*5**-1"));
+    assertEquals(-2.2, exec("1-(4**2)*(5**-1)"));
+
+    assertEquals(Math.pow(2, 1000), exec("2**1000.0"));
+    assertEquals(Math.pow(2, 1000), exec("2.0**1000.0"));
+    assertEquals(Math.pow(2, 1000), exec("2.0**1000"));
+
+    assertEquals(new BigDecimal("2.0").pow(1000, RuntimeUtils.getMathContext(null)),
+        exec("2.0M**1000"));
+    assertEquals(new BigDecimal("2.0").pow(1000, RuntimeUtils.getMathContext(null)),
+        exec("2.0M**1000.001"));
+    assertEquals(new BigInteger("2").pow(1000), exec("2N**1000.001"));
+    assertEquals(new BigInteger("2").pow(1000), exec("2N**1000.001"));
+
+    Expression exp = AviatorEvaluator.compile("a-b/c**2.0*1000");
+
+    assertEquals(-221.2222222222222, exp.execute(exp.newEnv("a", 1, "b", 2, "c", 3)));
+    assertEquals(-221.2222222222222, exp.execute(exp.newEnv("a", 1, "b", -2, "c", -3)));
+    assertEquals(322.2222222222222, exec("100-2/-3**2.0*1000"));
+    assertEquals(-122.2222222222222, exec("100-2/(-3)**2.0*1000"));
+    assertEquals(-122.2222222222222, exp.execute(exp.newEnv("a", 100, "b", 2, "c", -3)));
   }
 
   @Test

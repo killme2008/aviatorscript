@@ -3,15 +3,15 @@ package com.googlecode.aviator.runtime.function.math;
 import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
-import com.googlecode.aviator.runtime.type.AviatorDouble;
+import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
 /**
  * math.round(d) function
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class MathRoundFunction extends AbstractFunction {
 
@@ -20,8 +20,8 @@ public class MathRoundFunction extends AbstractFunction {
 
 
   @Override
-  public AviatorObject call(Map<String, Object> env, AviatorObject arg) {
-    return AviatorDouble.valueOf(Math.round(FunctionUtils.getNumberValue(arg, env).doubleValue()));
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg) {
+    return AviatorLong.valueOf(Math.round(FunctionUtils.getNumberValue(arg, env).doubleValue()));
   }
 
 

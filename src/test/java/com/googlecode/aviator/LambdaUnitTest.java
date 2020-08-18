@@ -1,6 +1,6 @@
 package com.googlecode.aviator;
 
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
