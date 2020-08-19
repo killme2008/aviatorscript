@@ -211,7 +211,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Retrieve current env processor, default is null.
-   * 
+   *
    * @since 5.2.0
    * @return
    */
@@ -1340,7 +1340,7 @@ public final class AviatorEvaluatorInstance {
       final Throwable cause = t.getCause();
       if (cause instanceof ExpressionSyntaxErrorException
           || cause instanceof CompileExpressionErrorException) {
-        Reflector.sneakyThrow(cause);
+        throw Reflector.sneakyThrow(cause);
       }
       throw new CompileExpressionErrorException("Compile expression failure, cacheKey=" + cacheKey,
           t);
