@@ -183,6 +183,8 @@ public final class AviatorEvaluatorInstance {
    */
   private int bytecodeVersion = Opcodes.V1_7;
 
+  private EnvProcessor envProcessor;
+
   /**
    * Options
    */
@@ -206,6 +208,30 @@ public final class AviatorEvaluatorInstance {
     }
     this.functionLoaders.add(loader);
   }
+
+  /**
+   * Retrieve current env processor, default is null.
+   * 
+   * @since 5.2.0
+   * @return
+   */
+  public EnvProcessor getEnvProcessor() {
+    return this.envProcessor;
+  }
+
+
+  /**
+   * Set an env processor. Note, this method should be called before using the evaluator instance.
+   *
+   * @since 5.2.0
+   *
+   * @param envProcessor
+   */
+  public void setEnvProcessor(final EnvProcessor envProcessor) {
+    this.envProcessor = envProcessor;
+  }
+
+
 
   /**
    * Compile a script file into expression.
