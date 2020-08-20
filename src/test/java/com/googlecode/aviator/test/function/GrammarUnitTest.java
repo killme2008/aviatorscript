@@ -65,6 +65,11 @@ public class GrammarUnitTest {
     }
   }
 
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testIllegalExponent() {
+    exec("0**'a'");
+  }
+
   @Test
   public void testExponent() {
     assertEquals(1, exec("0**0"));

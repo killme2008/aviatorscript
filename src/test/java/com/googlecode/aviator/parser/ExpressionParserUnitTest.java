@@ -41,6 +41,14 @@ public class ExpressionParserUnitTest {
 
 
   @Test
+  public void testExponenet() {
+    this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "3**1"),
+        this.codeGenerator);
+    this.parser.parse();
+    assertEquals("3 1 **", this.codeGenerator.getPostFixExpression());
+  }
+
+  @Test
   public void testComments() {
     this.parser = new ExpressionParser(this.instance, new ExpressionLexer(this.instance, "3 ##4"),
         this.codeGenerator);
