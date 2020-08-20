@@ -212,7 +212,7 @@ public final class AviatorEvaluatorInstance {
   /**
    * Retrieve current env processor, default is null.
    *
-   * @since 5.2.0
+   * @since 5.1.3
    * @return
    */
   public EnvProcessor getEnvProcessor() {
@@ -223,7 +223,7 @@ public final class AviatorEvaluatorInstance {
   /**
    * Set an env processor. Note, this method should be called before using the evaluator instance.
    *
-   * @since 5.2.0
+   * @since 5.1.3
    *
    * @param envProcessor
    */
