@@ -202,6 +202,12 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
   @Override
+  public void onExponent(final Token<?> lookhead) {
+    appendToken("**");
+  }
+
+
+  @Override
   public void onNeg(final Token<?> lookhead) {
     appendToken("-");
 

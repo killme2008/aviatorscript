@@ -183,6 +183,8 @@ public final class AviatorEvaluatorInstance {
    */
   private int bytecodeVersion = Opcodes.V1_7;
 
+  private EnvProcessor envProcessor;
+
   /**
    * Options
    */
@@ -206,6 +208,30 @@ public final class AviatorEvaluatorInstance {
     }
     this.functionLoaders.add(loader);
   }
+
+  /**
+   * Retrieve current env processor, default is null.
+   *
+   * @since 5.1.3
+   * @return
+   */
+  public EnvProcessor getEnvProcessor() {
+    return this.envProcessor;
+  }
+
+
+  /**
+   * Set an env processor. Note, this method should be called before using the evaluator instance.
+   *
+   * @since 5.1.3
+   *
+   * @param envProcessor
+   */
+  public void setEnvProcessor(final EnvProcessor envProcessor) {
+    this.envProcessor = envProcessor;
+  }
+
+
 
   /**
    * Compile a script file into expression.
@@ -629,7 +655,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Returns current valid syntax feature set.
-   * 
+   *
    * @return
    */
   public Set<Feature> getFeatures() {
@@ -821,6 +847,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new Date2StringFunction());
     addFunction(new String2DateFunction());
     addFunction(new BinaryFunction(OperatorType.ADD));
+    addFunction(new BinaryFunction(OperatorType.Exponent));
     addFunction(new BinaryFunction(OperatorType.SUB));
     addFunction(new BinaryFunction(OperatorType.MULT));
     addFunction(new BinaryFunction(OperatorType.DIV));
@@ -1313,7 +1340,7 @@ public final class AviatorEvaluatorInstance {
       final Throwable cause = t.getCause();
       if (cause instanceof ExpressionSyntaxErrorException
           || cause instanceof CompileExpressionErrorException) {
-        Reflector.sneakyThrow(cause);
+        throw Reflector.sneakyThrow(cause);
       }
       throw new CompileExpressionErrorException("Compile expression failure, cacheKey=" + cacheKey,
           t);

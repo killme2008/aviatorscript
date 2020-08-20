@@ -408,6 +408,13 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+
+  @Override
+  public void onExponent(final Token<?> lookhead) {
+    visitBinOperator(OperatorType.Exponent, "exponent");
+  }
+
+
   @Override
   public void onAssignment(final Token<?> lookhead) {
     OperatorType opType = lookhead.getMeta(Constants.DEFINE_META, false) ? OperatorType.DEFINE

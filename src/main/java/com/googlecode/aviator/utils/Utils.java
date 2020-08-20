@@ -3,8 +3,17 @@ package com.googlecode.aviator.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.util.Map;
 import java.util.Properties;
+import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.type.AviatorBigInt;
+import com.googlecode.aviator.runtime.type.AviatorDecimal;
+import com.googlecode.aviator.runtime.type.AviatorDouble;
+import com.googlecode.aviator.runtime.type.AviatorLong;
+import com.googlecode.aviator.runtime.type.AviatorNumber;
 
 /**
  * Some helper methods.
@@ -63,6 +72,23 @@ public class Utils {
     }
 
     return buf.toString();
+  }
+
+  public static AviatorNumber exponent(final Number base, final Number exp,
+      final Map<String, Object> env) {
+    final int expInt = exp.intValue();
+    if (base instanceof BigInteger) {
+      return new AviatorBigInt(((BigInteger) base).pow(expInt));
+    } else if (base instanceof BigDecimal) {
+      return new AviatorDecimal(((BigDecimal) base).pow(expInt, RuntimeUtils.getMathContext(env)));
+    } else {
+      final double ret = Math.pow(base.doubleValue(), exp.doubleValue());
+      if (TypeUtils.isDouble(base) || TypeUtils.isDouble(exp) || exp.doubleValue() < 0) {
+        return new AviatorDouble(ret);
+      } else {
+        return AviatorLong.valueOf((long) ret);
+      }
+    }
   }
 
   public static String getAviatorScriptVersion() {

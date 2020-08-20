@@ -24,6 +24,7 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.TypeUtils;
+import com.googlecode.aviator.utils.Utils;
 
 
 /**
@@ -186,6 +187,17 @@ public abstract class AviatorObject implements Serializable {
   public AviatorObject mult(final AviatorObject other, final Map<String, Object> env) {
     throw new ExpressionRuntimeException(
         "Could not mult " + desc(env) + " with " + other.desc(env));
+  }
+
+  public AviatorObject exponent(final AviatorObject other, final Map<String, Object> env) {
+    Object base = getValue(env);
+    Object exp = other.getValue(env);
+
+    if (!(base instanceof Number) || !(exp instanceof Number)) {
+      throw new ExpressionRuntimeException(
+          "Could not exponent " + desc(env) + " with " + other.desc(env));
+    }
+    return Utils.exponent((Number) base, (Number) exp, env);
   }
 
 

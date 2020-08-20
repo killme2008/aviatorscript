@@ -459,6 +459,25 @@ public class ExpressionParser implements Parser {
     }
   }
 
+  public void exponent() {
+    factor();
+    while (true) {
+      if (expectChar('*')) {
+        move(true);
+        if (expectChar('*')) {
+          move(true);
+          unary();
+          getCodeGeneratorWithTimes().onExponent(this.lookhead);
+        } else {
+          back();
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+  }
+
 
   public void term() {
     unary();
@@ -488,7 +507,7 @@ public class ExpressionParser implements Parser {
       // check if it is a seq function call,"!" as variable
       if (expectChar(',') || expectChar(')')) {
         back();
-        factor();
+        exponent();
       } else {
         unary();
         getCodeGeneratorWithTimes().onNot(this.lookhead);
@@ -498,7 +517,7 @@ public class ExpressionParser implements Parser {
       // check if it is a seq function call,"!" as variable
       if (expectChar(',') || expectChar(')')) {
         back();
-        factor();
+        exponent();
       } else {
         unary();
         getCodeGeneratorWithTimes().onNeg(this.lookhead);
@@ -508,13 +527,13 @@ public class ExpressionParser implements Parser {
       // check if it is a seq function call,"~" as variable
       if (expectChar(',') || expectChar(')')) {
         back();
-        factor();
+        exponent();
       } else {
         unary();
         getCodeGeneratorWithTimes().onBitNot(this.lookhead);
       }
     } else {
-      factor();
+      exponent();
     }
 
 

@@ -1,8 +1,11 @@
 package com.googlecode.aviator.code;
 
+import java.util.Stack;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.Parser;
+import com.googlecode.aviator.parser.ScopeInfo;
+import com.googlecode.aviator.utils.Constants;
 
 /**
  * A code generator that generates nothing.
@@ -12,6 +15,9 @@ import com.googlecode.aviator.parser.Parser;
  */
 public class NoneCodeGenerator implements CodeGenerator {
 
+  private final Stack<ScopeInfo> infos = new Stack<>();
+  private Parser parser;
+
   @Override
   public void onAssignment(final Token<?> lookhead) {
 
@@ -20,8 +26,7 @@ public class NoneCodeGenerator implements CodeGenerator {
 
   @Override
   public void setParser(final Parser parser) {
-
-
+    this.parser = parser;
   }
 
   @Override
@@ -81,6 +86,13 @@ public class NoneCodeGenerator implements CodeGenerator {
   @Override
   public void onMult(final Token<?> lookhead) {
 
+
+  }
+
+
+
+  @Override
+  public void onExponent(final Token<?> lookhead) {
 
   }
 
@@ -230,8 +242,8 @@ public class NoneCodeGenerator implements CodeGenerator {
 
   @Override
   public void onLambdaDefineStart(final Token<?> lookhead) {
-
-
+    Boolean newLexicalScope = lookhead.getMeta(Constants.SCOPE_META, false);
+    this.infos.push(this.parser.enterScope(newLexicalScope));
   }
 
   @Override
@@ -248,8 +260,7 @@ public class NoneCodeGenerator implements CodeGenerator {
 
   @Override
   public void onLambdaBodyEnd(final Token<?> lookhead) {
-
-
+    this.parser.restoreScope(this.infos.pop());
   }
 
   @Override

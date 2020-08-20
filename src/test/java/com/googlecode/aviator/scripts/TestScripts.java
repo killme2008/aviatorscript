@@ -1,6 +1,6 @@
 package com.googlecode.aviator.scripts;
 
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -14,6 +14,7 @@ import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.StandardError;
+import com.googlecode.aviator.runtime.module.IoModule;
 import com.googlecode.aviator.runtime.type.Range;
 import com.googlecode.aviator.utils.Reflector;
 
@@ -30,6 +31,8 @@ public class TestScripts {
   public Object testScript(final String name, final Object... args) {
     try {
       System.out.println("Testing script " + name + " with args: " + Arrays.toString(args));
+      this.instance
+          .validate(IoModule.slurp(TestScripts.class.getResource("/scripts/" + name).getFile()));
       Expression exp = this.instance
           .compileScript(TestScripts.class.getResource("/scripts/" + name).getFile(), true);
       return exp.execute(AviatorEvaluator.newEnv(args));

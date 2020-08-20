@@ -128,7 +128,17 @@ public abstract class BaseExpression implements Expression {
       map = Collections.emptyMap();
     }
     Env env = genTopEnv(map);
-    return executeDirectly(env);
+    EnvProcessor envProcessor = this.instance.getEnvProcessor();
+    if (envProcessor != null) {
+      envProcessor.beforeExecute(env, this);
+    }
+    try {
+      return executeDirectly(env);
+    } finally {
+      if (envProcessor != null) {
+        envProcessor.afterExecute(env, this);
+      }
+    }
   }
 
 

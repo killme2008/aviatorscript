@@ -15,10 +15,11 @@
  **/
 package com.googlecode.aviator;
 
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -60,6 +61,29 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertEquals(1, this.instance.execute("a[0]", env));
     assertEquals(2, this.instance.execute("a[1.1]", env));
     assertEquals(3, this.instance.execute("a[2.0M]", env));
+  }
+
+  @Test
+  public void testEnvProcessor() {
+    EnvProcessor processor = new EnvProcessor() {
+
+      @Override
+      public void beforeExecute(final Map<String, Object> env, final Expression script) {
+        env.put("test", true);
+      }
+
+      @Override
+      public void afterExecute(final Map<String, Object> env, final Expression script) {
+        env.put("test", false);
+      }
+    };
+    assertNull(((Map<String, Object>) this.instance.execute("__env__")).get("test"));
+    this.instance.setEnvProcessor(processor);
+    assertSame(this.instance.getEnvProcessor(), processor);
+
+    assertEquals(true, this.instance.execute("test"));
+    assertEquals(1, this.instance.execute("test ? 1 : 2"));
+    assertEquals(false, ((Map<String, Object>) this.instance.execute("__env__")).get("test"));
   }
 
   @Test
@@ -520,6 +544,16 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Test(expected = ExpressionSyntaxErrorException.class)
   public void testValidate2() {
     this.instance.validate("s = lambda(x) -> lambda(y) -> x + y end; s(3)(4)");
+  }
+
+  @Test
+  public void testIssue278() {
+    if (this.instance.isFeatureEnabled(Feature.If)) {
+      this.instance.validate("if(true) {println('in body')}");
+    }
+    if (this.instance.isFeatureEnabled(Feature.ForLoop)) {
+      this.instance.validate("for x in range(0,3) {println(x)}");
+    }
   }
 
   @Test(expected = CompileExpressionErrorException.class)

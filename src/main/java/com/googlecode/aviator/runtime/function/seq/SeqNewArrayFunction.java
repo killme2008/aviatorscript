@@ -46,13 +46,13 @@ public class SeqNewArrayFunction extends AbstractFunction {
 
     try {
       String name = ((AviatorJavaType) clazzVar).getName();
-      if (!name.contains(".")) {
-        name = "java.lang." + name;
-      }
       Class<?> clazz = null;
       if (TypeUtils.PRIMITIVE_TYPES.containsKey(name)) {
         clazz = TypeUtils.PRIMITIVE_TYPES.get(name);
       } else {
+        if (!name.contains(".")) {
+          name = "java.lang." + name;
+        }
         clazz = Class.forName(name);
       }
       return AviatorRuntimeJavaType.valueOf(Array.newInstance(clazz, len.intValue()));

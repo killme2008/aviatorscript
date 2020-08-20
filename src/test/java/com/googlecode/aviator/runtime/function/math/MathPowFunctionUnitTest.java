@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -39,7 +40,9 @@ public class MathPowFunctionUnitTest {
             AviatorNumber.valueOf(new BigInteger("1000000000000000000000000000000000000")),
             AviatorNumber.valueOf(3)).getValue(null));
 
-    assertEquals(new BigDecimal("1000000000000000000000000000000000000.000022222").pow(3),
+    assertEquals(
+        new BigDecimal("1000000000000000000000000000000000000.000022222").pow(3,
+            RuntimeUtils.getMathContext(null)),
         this.function.call(null,
             AviatorNumber
                 .valueOf(new BigDecimal("1000000000000000000000000000000000000.000022222")),
