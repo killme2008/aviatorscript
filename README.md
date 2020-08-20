@@ -30,9 +30,9 @@
 
 # News
 
+* [5.1.3](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.3)，支持幂运算符 `**`，以及 `EnvProcessor` 处理器等。
 * [5.1.2](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.2), 移除内部变量 `__exp__` 对用户 env 的污染
 * [5.1.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.1), 修复 == 和 != 运算符无法和 `a.b.c` 语法糖一起可能返回错误结果的 bug，推荐升级
-* [5.1.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.0), catch 语句支持多异常捕获，字符串插值支持等。
 
 # Dependency
 
