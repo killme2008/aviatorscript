@@ -147,11 +147,33 @@ public class AviatorString extends AviatorObject {
     BaseExpression exp = (BaseExpression) (env == null ? null : env.get(Constants.EXP_VAR));
     if (exp == null) {
       segs = engine.compileStringSegments(this.lexeme);
+      warnOnCompile();
     } else {
       segs = exp.getStringSegements(this.lexeme);
     }
     assert (segs != null);
     return segs.toString(env, this.lexeme);
+  }
+
+  private static int COMPILE_TIMES = 0;
+
+  private void warnOnCompile() {
+    if (COMPILE_TIMES++ % 10000 == 0) {
+      final StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+      StringBuilder sb = new StringBuilder();
+      boolean wasFirst = true;
+      for (StackTraceElement st : stackTraces) {
+        if (!wasFirst) {
+          sb.append("\t").append(st.toString()).append("\n");
+        }
+        if (wasFirst) {
+          wasFirst = false;
+        }
+      }
+      System.err.println("[Aviator WARN] compile lexeme `" + this.lexeme
+          + "` without caching, it may hurt performance and cause metaspace full gc, the stack:\n"
+          + sb.toString());
+    }
   }
 
 
