@@ -16,7 +16,7 @@ if a !=nil {
 println("a > nil: " + (a > nil));
 println("nil >= a: " + (nil >= a));
 println("\"\" >= nil: "+ ("" >= nil));
-println("nil > \"\": " + (niil > ""));
+println("nil > \"\": " + (nil > ""));
 println("0.0 > nil: " + (0.0 > nil));
 println("nil >= 0.0: " + (nil >= 0.0));
 println("/\\s/ > nil: " + (/\s/ > nil));

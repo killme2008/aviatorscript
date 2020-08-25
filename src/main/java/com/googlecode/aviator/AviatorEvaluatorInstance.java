@@ -406,9 +406,19 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
+  /**
+   * Remove a module by namespace name.
+   * 
+   * @param ns
+   * @since 5.1.4
+   */
+  public void removeModule(final String ns) {
+    this.moduleCache.remove(ns);
+  }
+
   private Env loadModule(final Class<?> moduleClazz)
       throws IllegalAccessException, NoSuchMethodException {
-    Map<String, List<Method>> methodMap = findMethodsFromClass(true, moduleClazz);
+    Map<String, List<Method>> methodMap = findMethodsFromClass(moduleClazz, true);
 
     if (methodMap == null || methodMap.isEmpty()) {
       throw new IllegalArgumentException("Empty module");
@@ -482,7 +492,7 @@ public final class AviatorEvaluatorInstance {
 
   private List<String> addMethodFunctions(final String namespace, final boolean isStatic,
       final Class<?> clazz) throws IllegalAccessException, NoSuchMethodException {
-    Map<String, List<Method>> methodMap = findMethodsFromClass(isStatic, clazz);
+    Map<String, List<Method>> methodMap = findMethodsFromClass(clazz, isStatic);
     List<String> added = new ArrayList<>();
 
     for (Map.Entry<String, List<Method>> entry : methodMap.entrySet()) {
@@ -561,8 +571,8 @@ public final class AviatorEvaluatorInstance {
     return result;
   }
 
-  private Map<String, List<Method>> findMethodsFromClass(final boolean isStatic,
-      final Class<?> clazz) {
+  private Map<String, List<Method>> findMethodsFromClass(final Class<?> clazz,
+      final boolean isStatic) {
     Map<String, List<Method>> methodMap = new HashMap<>();
 
     for (Method method : clazz.getMethods()) {
