@@ -145,11 +145,11 @@ public class AviatorString extends AviatorObject {
     }
     StringSegments segs = null;
     BaseExpression exp = (BaseExpression) (env == null ? null : env.get(Constants.EXP_VAR));
-    if (exp == null) {
+    if (exp != null) {
+      segs = exp.getStringSegements(this.lexeme);
+    } else {
       segs = engine.compileStringSegments(this.lexeme);
       warnOnCompile();
-    } else {
-      segs = exp.getStringSegements(this.lexeme);
     }
     assert (segs != null);
     return segs.toString(env, this.lexeme);
@@ -158,7 +158,7 @@ public class AviatorString extends AviatorObject {
   private static int COMPILE_TIMES = 0;
 
   private void warnOnCompile() {
-    if (COMPILE_TIMES++ % 10000 == 0) {
+    if (COMPILE_TIMES++ % 1000 == 0) {
       final StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
       StringBuilder sb = new StringBuilder();
       boolean wasFirst = true;

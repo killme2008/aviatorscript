@@ -1109,6 +1109,7 @@ public class ExpressionParser implements Parser {
     move(true);
 
     checkVariableName();
+    checkFunctionName();
     getCodeGeneratorWithTimes().onConstant(this.lookhead);
     move(true);
     if (!expectChar('(')) {
@@ -1117,6 +1118,19 @@ public class ExpressionParser implements Parser {
     lambda(true);
     ensureFeatureEnabled(Feature.Assignment);
     getCodeGeneratorWithTimes().onAssignment(currentToken().withMeta(Constants.DEFINE_META, true));
+  }
+
+
+
+  private void checkFunctionName() {
+    String fnName = this.lookhead.getLexeme();
+    if (SymbolTable.isReservedKeyword(fnName)) {
+      reportSyntaxError("The function name `" + fnName + "` is a reserved keyword");
+    }
+    if (this.instance.getFuncMap().containsKey(fnName)) {
+      System.out.println("[Aviator WARN] The function '" + fnName
+          + "' is already exists, but is replaced with new one.");
+    }
   }
 
   private Token<?> currentToken() {
