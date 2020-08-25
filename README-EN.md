@@ -75,7 +75,7 @@ p("sum of a is: " + reduce(a, +, 0));
 
 let date = new java.util.Date();
 p("The year is: "+ getYear(date));
-p("The month is: "+ getMonth(date));
+p("The month is: #{getMonth(date)}");
 ```
 
 4. Execute the script with `aviator`  command：
