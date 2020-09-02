@@ -48,7 +48,8 @@ public class DelegateToken extends AbstractToken<Token<?>> {
 
 
   public DelegateToken(final Token<?> token, final DelegateTokenType type) {
-    super(token != null ? token.getStartIndex() : -1, token != null ? token.getLexeme() : "");
+    super(token != null ? token.getLexeme() : "", token != null ? token.getLineNo() : 0,
+        token != null ? token.getStartIndex() : -1);
     this.token = token;
     this.delegateTokenType = type;
   }

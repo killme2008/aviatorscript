@@ -99,7 +99,7 @@ public class SymbolTable implements Serializable {
     if (isReserved(lexeme)) {
       return getVariable(lexeme);
     } else {
-      final Variable var = new Variable(lexeme, -1);
+      final Variable var = new Variable(lexeme, 0, -1);
       this.table.put(lexeme, var);
       return var;
     }

@@ -20,9 +20,9 @@ import java.util.Map;
 
 /**
  * A Number token
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class NumberToken extends AbstractToken<Number> {
 
@@ -31,19 +31,20 @@ public class NumberToken extends AbstractToken<Number> {
   private Number value;
 
 
-  public NumberToken(Number value, String lexeme) {
-    super(-1, lexeme);
+  public NumberToken(final Number value, final String lexeme) {
+    super(lexeme, 0, -1);
     this.value = value;
   }
 
 
-  public NumberToken(Number value, String lexeme, int startIndex) {
-    super(startIndex, lexeme);
+  public NumberToken(final Number value, final String lexeme, final int lineNo,
+      final int startIndex) {
+    super(lexeme, lineNo, startIndex);
     this.value = value;
   }
 
 
-  public void setNumber(Number number) {
+  public void setNumber(final Number number) {
     this.value = number;
   }
 
@@ -54,8 +55,8 @@ public class NumberToken extends AbstractToken<Number> {
 
 
   @Override
-  public Number getValue(Map<String, Object> env) {
-    return value;
+  public Number getValue(final Map<String, Object> env) {
+    return this.value;
   }
 
 
@@ -69,13 +70,13 @@ public class NumberToken extends AbstractToken<Number> {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((value == null) ? 0 : value.hashCode());
+    result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
     return result;
   }
 
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
@@ -86,11 +87,11 @@ public class NumberToken extends AbstractToken<Number> {
       return false;
     }
     NumberToken other = (NumberToken) obj;
-    if (value == null) {
+    if (this.value == null) {
       if (other.value != null) {
         return false;
       }
-    } else if (!value.equals(other.value)) {
+    } else if (!this.value.equals(other.value)) {
       return false;
     }
     return true;

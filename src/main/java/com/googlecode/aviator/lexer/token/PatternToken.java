@@ -17,9 +17,9 @@ package com.googlecode.aviator.lexer.token;
 
 /**
  * A pattern token
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class PatternToken extends StringToken {
 
@@ -27,8 +27,8 @@ public class PatternToken extends StringToken {
   private static final long serialVersionUID = 727969490471907456L;
 
 
-  public PatternToken(String lexeme, int startIndex) {
-    super(lexeme, startIndex);
+  public PatternToken(final String lexeme, final int lineNo, final int startIndex) {
+    super(lexeme, lineNo, startIndex);
   }
 
 

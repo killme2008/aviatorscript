@@ -45,4 +45,6 @@ public interface Token<T> {
 
 
   int getStartIndex();
+
+  int getLineNo();
 }

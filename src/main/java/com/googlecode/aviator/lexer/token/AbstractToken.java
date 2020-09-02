@@ -30,7 +30,16 @@ public abstract class AbstractToken<T> implements Token<T>, Serializable {
 
   private static final long serialVersionUID = 4498841242745542399L;
 
-  private final int startIndex;
+  private final int lineIndex;
+
+  private final int lineNo;
+
+
+  @Override
+  public int getLineNo() {
+    return this.lineNo;
+  }
+
 
   protected final String lexeme;
   private Map<String, Object> metaMap;
@@ -71,9 +80,10 @@ public abstract class AbstractToken<T> implements Token<T>, Serializable {
   }
 
 
-  public AbstractToken(final int startIndex, final String lexeme) {
+  public AbstractToken(final String lexeme, final int lineNo, final int lineIdex) {
     super();
-    this.startIndex = startIndex;
+    this.lineNo = lineNo;
+    this.lineIndex = lineIdex;
     this.lexeme = lexeme;
   }
 
@@ -86,13 +96,13 @@ public abstract class AbstractToken<T> implements Token<T>, Serializable {
 
   @Override
   public int getStartIndex() {
-    return this.startIndex;
+    return this.lineIndex;
   }
 
 
   @Override
   public String toString() {
-    return "[type='" + getType().name() + "',lexeme='" + getLexeme() + "',index=" + this.startIndex
+    return "[type='" + getType().name() + "',lexeme='" + getLexeme() + "',index=" + this.lineIndex
         + "]";
   }
 
@@ -102,7 +112,7 @@ public abstract class AbstractToken<T> implements Token<T>, Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((this.lexeme == null) ? 0 : this.lexeme.hashCode());
-    result = prime * result + this.startIndex;
+    result = prime * result + this.lineIndex;
     return result;
   }
 
@@ -126,7 +136,7 @@ public abstract class AbstractToken<T> implements Token<T>, Serializable {
     } else if (!this.lexeme.equals(other.lexeme)) {
       return false;
     }
-    if (this.startIndex != other.startIndex) {
+    if (this.lineIndex != other.lineIndex) {
       return false;
     }
     return true;

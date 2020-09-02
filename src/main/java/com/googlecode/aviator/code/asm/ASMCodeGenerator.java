@@ -163,10 +163,13 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   private Label currentLabel = START_LABEL;
 
+
   /**
    * parent code generator when compiling lambda.
    */
   private CodeGenerator parentCodeGenerator;
+
+  private final String sourceFile;
 
   @Override
   public void setParser(final Parser parser) {
@@ -192,11 +195,12 @@ public class ASMCodeGenerator implements CodeGenerator {
     return this.funcInvocationId++;
   }
 
-  public ASMCodeGenerator(final AviatorEvaluatorInstance instance,
+  public ASMCodeGenerator(final AviatorEvaluatorInstance instance, final String sourceFile,
       final AviatorClassLoader classLoader, final OutputStream traceOut) {
     this.classLoader = classLoader;
     this.instance = instance;
     this.compileEnv = new Env();
+    this.sourceFile = sourceFile;
     this.compileEnv.setInstance(this.instance);
     // Generate inner class name
     this.className = "Script_" + System.currentTimeMillis() + "_" + CLASS_COUNTER.getAndIncrement();
@@ -335,10 +339,10 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   }
 
-
   private void visitClass() {
     this.classWriter.visit(this.instance.getBytecodeVersion(), ACC_PUBLIC + ACC_SUPER,
         this.className, null, "com/googlecode/aviator/ClassExpression", null);
+    this.classWriter.visitSource(this.sourceFile == null ? this.className : this.sourceFile, null);
   }
 
 
@@ -359,7 +363,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onAdd(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.ADD, "add");
+    visitBinOperator(lookhead, OperatorType.ADD, "add");
   }
 
   private void loadOpType(final OperatorType opType) {
@@ -392,7 +396,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onSub(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.SUB, "sub");
+    visitBinOperator(lookhead, OperatorType.SUB, "sub");
   }
 
 
@@ -404,19 +408,20 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onMult(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.MULT, "mult");
+    visitBinOperator(lookhead, OperatorType.MULT, "mult");
   }
 
 
 
   @Override
   public void onExponent(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.Exponent, "exponent");
+    visitBinOperator(lookhead, OperatorType.Exponent, "exponent");
   }
 
 
   @Override
   public void onAssignment(final Token<?> lookhead) {
+    visitLineNumber(lookhead);
     OperatorType opType = lookhead.getMeta(Constants.DEFINE_META, false) ? OperatorType.DEFINE
         : OperatorType.ASSIGNMENT;
     loadEnv();
@@ -443,7 +448,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onDiv(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.DIV, "div");
+    visitBinOperator(lookhead, OperatorType.DIV, "div");
   }
 
 
@@ -454,7 +459,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onMod(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.MOD, "mod");
+    visitBinOperator(lookhead, OperatorType.MOD, "mod");
   }
 
 
@@ -464,7 +469,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onAndLeft(final Token<?> lookhead) {
     loadEnv();
-    visitLeftBranch(IFEQ, OperatorType.AND);
+    visitLeftBranch(lookhead, IFEQ, OperatorType.AND);
   }
 
 
@@ -483,13 +488,14 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onAndRight(final Token<?> lookhead) {
-    visitRightBranch(IFEQ, OperatorType.AND);
+    visitRightBranch(lookhead, IFEQ, OperatorType.AND);
     this.popOperand(2); // boolean object and environment
     this.pushOperand();
   }
 
 
-  private void visitRightBranch(final int ints, final OperatorType opType) {
+  private void visitRightBranch(final Token<?> lookhead, final int ints,
+      final OperatorType opType) {
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
       loadEnv();
       String first = "TRUE";
@@ -505,6 +511,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", first,
           "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
       Label l1 = makeLabel();
+      visitLineNumber(lookhead);
       this.mv.visitJumpInsn(GOTO, l1);
       visitLabel(popLabel0());
       // Result is false
@@ -513,6 +520,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       visitLabel(l1);
     } else {
       loadOpType(opType);
+      visitLineNumber(lookhead);
       this.mv.visitMethodInsn(INVOKESTATIC, "com/googlecode/aviator/runtime/op/OperationRuntime",
           "eval",
           "(Lcom/googlecode/aviator/runtime/type/AviatorObject;Ljava/util/Map;Lcom/googlecode/aviator/runtime/type/AviatorObject;Lcom/googlecode/aviator/lexer/token/OperatorType;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
@@ -530,6 +538,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onTernaryBoolean(final Token<?> lookhead) {
     loadEnv();
+    visitLineNumber(lookhead);
     visitBoolean();
     Label l0 = makeLabel();
     Label l1 = makeLabel();
@@ -553,6 +562,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   public void onTernaryLeft(final Token<?> lookhead) {
     this.mv.visitJumpInsn(GOTO, peekLabel1());
     visitLabel(popLabel0());
+    visitLineNumber(lookhead);
     this.popOperand(); // pop one boolean
   }
 
@@ -565,12 +575,14 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onTernaryRight(final Token<?> lookhead) {
     visitLabel(popLabel1());
+    visitLineNumber(lookhead);
     this.popOperand(); // pop one boolean
   }
 
 
   @Override
   public void onTernaryEnd(final Token<?> lookhead) {
+    visitLineNumber(lookhead);
     if (this.operandsCount == 0) {
       return;
     }
@@ -589,7 +601,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onJoinRight(final Token<?> lookhead) {
-    visitRightBranch(IFNE, OperatorType.OR);
+    visitRightBranch(lookhead, IFNE, OperatorType.OR);
     this.popOperand(2);
     this.pushOperand();
 
@@ -618,15 +630,16 @@ public class ASMCodeGenerator implements CodeGenerator {
   @Override
   public void onJoinLeft(final Token<?> lookhead) {
     loadEnv();
-    visitLeftBranch(IFNE, OperatorType.OR);
+    visitLeftBranch(lookhead, IFNE, OperatorType.OR);
   }
 
 
-  private void visitLeftBranch(final int ints, final OperatorType opType) {
+  private void visitLeftBranch(final Token<?> lookhead, final int ints, final OperatorType opType) {
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
       visitBoolean();
       Label l0 = makeLabel();
       pushLabel0(l0);
+      visitLineNumber(lookhead);
       this.mv.visitJumpInsn(ints, l0);
       this.popOperand();
     }
@@ -636,13 +649,14 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onEq(final Token<?> lookhead) {
-    doCompareAndJump(IFNE, OperatorType.EQ);
+    doCompareAndJump(lookhead, IFNE, OperatorType.EQ);
   }
 
 
   @Override
   public void onMatch(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.MATCH, "match");
+    visitLineNumber(lookhead);
+    visitBinOperator(lookhead, OperatorType.MATCH, "match");
     this.popOperand();
     this.pushOperand();
   }
@@ -650,11 +664,13 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onNeq(final Token<?> lookhead) {
-    doCompareAndJump(IFEQ, OperatorType.NEQ);
+    doCompareAndJump(lookhead, IFEQ, OperatorType.NEQ);
   }
 
 
-  private void doCompareAndJump(final int ints, final OperatorType opType) {
+  private void doCompareAndJump(final Token<?> lookhead, final int ints,
+      final OperatorType opType) {
+    visitLineNumber(lookhead);
     loadEnv();
     visitCompare(ints, opType);
     this.popOperand();
@@ -693,29 +709,29 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onGe(final Token<?> lookhead) {
-    doCompareAndJump(IFLT, OperatorType.GE);
+    doCompareAndJump(lookhead, IFLT, OperatorType.GE);
   }
 
 
   @Override
   public void onGt(final Token<?> lookhead) {
-    doCompareAndJump(IFLE, OperatorType.GT);
+    doCompareAndJump(lookhead, IFLE, OperatorType.GT);
   }
 
 
   @Override
   public void onLe(final Token<?> lookhead) {
-    doCompareAndJump(IFGT, OperatorType.LE);
+    doCompareAndJump(lookhead, IFGT, OperatorType.LE);
 
   }
 
 
   @Override
   public void onLt(final Token<?> lookhead) {
-    doCompareAndJump(IFGE, OperatorType.LT);
+    doCompareAndJump(lookhead, IFGE, OperatorType.LT);
   }
 
-  public void pushOperand(final int delta) {
+  private void pushOperand(final int delta) {
     this.operandsCount += delta;
     setMaxStacks(this.operandsCount);
   }
@@ -726,10 +742,12 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onNot(final Token<?> lookhead) {
-    visitUnaryOperator(OperatorType.NOT, "not");
+    visitUnaryOperator(lookhead, OperatorType.NOT, "not");
   }
 
-  private void visitBinOperator(final OperatorType opType, final String methodName) {
+  private void visitBinOperator(final Token<?> token, final OperatorType opType,
+      final String methodName) {
+    visitLineNumber(token);
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
       // swap arguments for regular-expression match operator.
       if (opType == OperatorType.MATCH) {
@@ -750,7 +768,15 @@ public class ASMCodeGenerator implements CodeGenerator {
     this.popOperand();
   }
 
-  private void visitUnaryOperator(final OperatorType opType, final String methodName) {
+  private void visitLineNumber(final Token<?> token) {
+    if (token != null && token.getLineNo() > 0) {
+      this.mv.visitLineNumber(token.getLineNo(), this.currentLabel);
+    }
+  }
+
+  private void visitUnaryOperator(final Token<?> lookhead, final OperatorType opType,
+      final String methodName) {
+    visitLineNumber(lookhead);
     this.mv.visitTypeInsn(CHECKCAST, OBJECT_OWNER);
     loadEnv();
 
@@ -775,7 +801,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onBitNot(final Token<?> lookhead) {
-    visitUnaryOperator(OperatorType.BIT_NOT, "bitNot");
+    visitUnaryOperator(lookhead, OperatorType.BIT_NOT, "bitNot");
   }
 
 
@@ -787,7 +813,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    */
   @Override
   public void onNeg(final Token<?> lookhead) {
-    visitUnaryOperator(OperatorType.NEG, "neg");
+    visitUnaryOperator(lookhead, OperatorType.NEG, "neg");
   }
 
   /*
@@ -843,7 +869,7 @@ public class ASMCodeGenerator implements CodeGenerator {
     if (lookhead == null) {
       return;
     }
-
+    visitLineNumber(lookhead);
     // load token to stack
     switch (lookhead.getType()) {
       case Number:
@@ -1065,6 +1091,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onMethodInvoke(final Token<?> lookhead) {
+    visitLineNumber(lookhead);
     @SuppressWarnings("unchecked")
     final List<FunctionArgument> params = lookhead != null
         ? (List<FunctionArgument>) lookhead.getMeta(Constants.PARAMS_META, Collections.EMPTY_LIST)
@@ -1133,6 +1160,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onMethodParameter(final Token<?> lookhead) {
+    visitLineNumber(lookhead);
     MethodMetaData currentMethodMetaData = this.methodMetaDataStack.peek();
     if (currentMethodMetaData.parameterCount >= 20) {
       // Add last param to variadic param list
@@ -1200,6 +1228,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onArrayIndexEnd(final Token<?> lookhead) {
+    visitLineNumber(lookhead);
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, OperatorType.INDEX)) {
       this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "getElement",
           "(Ljava/util/Map;Lcom/googlecode/aviator/runtime/type/AviatorObject;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
@@ -1229,7 +1258,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       Boolean inheritEnv = lookhead.getMeta(Constants.INHERIT_ENV_META, false);
       // TODO cache?
       this.lambdaGenerator = new LambdaGenerator(this.instance, this, this.parser, this.classLoader,
-          newLexicalScope, inheritEnv);
+          this.sourceFile, newLexicalScope, inheritEnv);
       this.lambdaGenerator.setScopeInfo(this.parser.enterScope(newLexicalScope));
     } else {
       throw new CompileExpressionErrorException("Compile lambda error");
@@ -1255,6 +1284,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       this.lambdaBootstraps = new HashMap<String, LambdaFunctionBootstrap>();
     }
     this.lambdaBootstraps.put(bootstrap.getName(), bootstrap);
+    visitLineNumber(lookhead);
     genNewLambdaCode(bootstrap);
     this.parser.restoreScope(this.lambdaGenerator.getScopeInfo());
     this.lambdaGenerator = null;
@@ -1348,39 +1378,39 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onBitAnd(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.BIT_AND, "bitAnd");
+    visitBinOperator(lookhead, OperatorType.BIT_AND, "bitAnd");
   }
 
 
   @Override
   public void onBitOr(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.BIT_OR, "bitOr");
+    visitBinOperator(lookhead, OperatorType.BIT_OR, "bitOr");
   }
 
 
   @Override
   public void onBitXor(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.BIT_XOR, "bitXor");
+    visitBinOperator(lookhead, OperatorType.BIT_XOR, "bitXor");
   }
 
 
   @Override
   public void onShiftLeft(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.SHIFT_LEFT, "shiftLeft");
+    visitBinOperator(lookhead, OperatorType.SHIFT_LEFT, "shiftLeft");
 
   }
 
 
   @Override
   public void onShiftRight(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.SHIFT_RIGHT, "shiftRight");
+    visitBinOperator(lookhead, OperatorType.SHIFT_RIGHT, "shiftRight");
 
   }
 
 
   @Override
   public void onUnsignedShiftRight(final Token<?> lookhead) {
-    visitBinOperator(OperatorType.U_SHIFT_RIGHT, "unsignedShiftRight");
+    visitBinOperator(lookhead, OperatorType.U_SHIFT_RIGHT, "unsignedShiftRight");
 
   }
 

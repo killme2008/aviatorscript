@@ -85,11 +85,15 @@ public class OptimizeCodeGenerator implements CodeGenerator {
    */
   private Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
 
+  private final String sourceFile;
 
-  public OptimizeCodeGenerator(final AviatorEvaluatorInstance instance,
+
+  public OptimizeCodeGenerator(final AviatorEvaluatorInstance instance, final String sourceFile,
       final ClassLoader classLoader, final OutputStream traceOutStream) {
     this.instance = instance;
-    this.codeGen = new ASMCodeGenerator(instance, (AviatorClassLoader) classLoader, traceOutStream);
+    this.sourceFile = sourceFile;
+    this.codeGen = new ASMCodeGenerator(instance, sourceFile, (AviatorClassLoader) classLoader,
+        traceOutStream);
   }
 
   private Env getCompileEnv() {
@@ -144,7 +148,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
           default:
             Map<Integer, DelegateTokenType> index2DelegateType =
                 getIndex2DelegateTypeMap(operatorType);
-            final int result = executeOperator(i, operatorType, operandCount, index2DelegateType);
+            final int result =
+                executeOperator(index2DelegateType, token, operatorType, i, operandCount);
             if (result < 0) {
               compactTokenList();
               return exeCount;
@@ -160,8 +165,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   }
 
 
-  private int executeOperator(final int operatorIndex, final OperatorType operatorType,
-      int operandCount, final Map<Integer, DelegateTokenType> index2DelegateType) {
+  private int executeOperator(final Map<Integer, DelegateTokenType> index2DelegateType,
+      final Token<?> operatorToken, final OperatorType operatorType, final int operatorIndex,
+      int operandCount) {
     Token<?> token = null;
     operandCount += index2DelegateType.size();
     // check if literal expression can be executed
@@ -208,7 +214,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       }
       AviatorObject result = OperationRuntime.eval(getCompileEnv(), args, operatorType);
       // set result as token to tokenList for next executing
-      this.tokenList.set(operatorIndex, getTokenFromOperand(result));
+      this.tokenList.set(operatorIndex, getTokenFromOperand(operatorToken, result));
       return 1;
     }
     return 0;
@@ -243,7 +249,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
    * @param operand
    * @return
    */
-  private Token<?> getTokenFromOperand(final AviatorObject operand) {
+  private Token<?> getTokenFromOperand(final Token<?> operatorToken, final AviatorObject operand) {
     Token<?> token = null;
     switch (operand.getAviatorType()) {
       case JavaType:
@@ -252,11 +258,14 @@ public class OptimizeCodeGenerator implements CodeGenerator {
           if (val == null) {
             token = Variable.NIL;
           } else if (val instanceof Number) {
-            token = new NumberToken((Number) val, val.toString());
+            token = new NumberToken((Number) val, val.toString(), operatorToken.getLineNo(),
+                operatorToken.getStartIndex());
           } else if (val instanceof String || val instanceof Character) {
-            token = new StringToken(val.toString(), -1);
+            token = new StringToken(val.toString(), operatorToken.getLineNo(),
+                operatorToken.getStartIndex());
           } else if (val instanceof Pattern) {
-            token = new PatternToken(((Pattern) val).pattern(), -1);
+            token = new PatternToken(((Pattern) val).pattern(), operatorToken.getLineNo(),
+                operatorToken.getStartIndex());
           } else if (val instanceof Boolean) {
             token = (boolean) val ? Variable.TRUE : Variable.FALSE;
           } else {
@@ -277,14 +286,16 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       case Double:
       case Long:
         final Number value = (Number) operand.getValue(null);
-        token = new NumberToken(value, value.toString());
+        token = new NumberToken(value, value.toString(), operatorToken.getLineNo(),
+            operatorToken.getStartIndex());
         break;
       case String:
         final String str = (String) operand.getValue(null);
-        token = new StringToken(str, -1);
+        token = new StringToken(str, operatorToken.getLineNo(), operatorToken.getStartIndex());
         break;
       case Pattern:
-        token = new PatternToken(((AviatorPattern) operand).getPattern().pattern(), -1);
+        token = new PatternToken(((AviatorPattern) operand).getPattern().pattern(),
+            operatorToken.getLineNo(), operatorToken.getStartIndex());
         break;
     }
     return token;
@@ -733,7 +744,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       Boolean newLexicalScope = lookhead.getMeta(Constants.SCOPE_META, false);
       Boolean inheritEnv = lookhead.getMeta(Constants.INHERIT_ENV_META, false);
       this.lambdaGenerator = new LambdaGenerator(this.instance, this, this.parser,
-          this.codeGen.getClassLoader(), newLexicalScope, inheritEnv);
+          this.codeGen.getClassLoader(), this.sourceFile, newLexicalScope, inheritEnv);
       this.lambdaGenerator.setScopeInfo(this.parser.enterScope(newLexicalScope));
     } else {
       throw new CompileExpressionErrorException("Compile lambda error");

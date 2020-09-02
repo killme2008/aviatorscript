@@ -211,10 +211,11 @@ public class ExpressionParser implements Parser {
     if (this.lookhead == null || expectChar(':') || expectChar(',')) {
       return gcTimes < this.getCGTimes;
     }
+    Token<?> opToken = this.lookhead;
     if (expectChar('?')) {
       move(true);
       CodeGenerator cg = getCodeGeneratorWithTimes();
-      cg.onTernaryBoolean(this.lookhead);
+      cg.onTernaryBoolean(opToken);
       if (!ternary()) {
         reportSyntaxError("invalid token for ternary operator");
       }
@@ -236,13 +237,14 @@ public class ExpressionParser implements Parser {
   public void join() {
     and();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('|')) {
-        getCodeGeneratorWithTimes().onJoinLeft(this.lookhead);
+        getCodeGeneratorWithTimes().onJoinLeft(opToken);
         move(true);
         if (expectChar('|')) {
           move(true);
           and();
-          getCodeGeneratorWithTimes().onJoinRight(this.lookhead);
+          getCodeGeneratorWithTimes().onJoinRight(opToken);
         } else {
           reportSyntaxError("expect '|'");
         }
@@ -269,6 +271,7 @@ public class ExpressionParser implements Parser {
   public void bitOr() {
     xor();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('|')) {
         move(true);
         if (expectChar('|')) {
@@ -276,7 +279,7 @@ public class ExpressionParser implements Parser {
           break;
         }
         xor();
-        getCodeGeneratorWithTimes().onBitOr(this.lookhead);
+        getCodeGeneratorWithTimes().onBitOr(opToken);
       } else {
         break;
       }
@@ -287,10 +290,11 @@ public class ExpressionParser implements Parser {
   public void xor() {
     bitAnd();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('^')) {
         move(true);
         bitAnd();
-        getCodeGeneratorWithTimes().onBitXor(this.lookhead);
+        getCodeGeneratorWithTimes().onBitXor(opToken);
       } else {
         break;
       }
@@ -301,6 +305,7 @@ public class ExpressionParser implements Parser {
   public void bitAnd() {
     equality();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('&')) {
         move(true);
         if (expectChar('&')) {
@@ -308,7 +313,7 @@ public class ExpressionParser implements Parser {
           break;
         }
         equality();
-        getCodeGeneratorWithTimes().onBitAnd(this.lookhead);
+        getCodeGeneratorWithTimes().onBitAnd(opToken);
       } else {
         break;
       }
@@ -319,14 +324,15 @@ public class ExpressionParser implements Parser {
   public void and() {
     bitOr();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('&')) {
         CodeGenerator cg = getCodeGeneratorWithTimes();
-        cg.onAndLeft(this.lookhead);
+        cg.onAndLeft(opToken);
         move(true);
         if (expectChar('&')) {
           move(true);
           bitOr();
-          cg.onAndRight(this.lookhead);
+          cg.onAndRight(opToken);
         } else {
           reportSyntaxError("expect '&'");
         }
@@ -341,30 +347,31 @@ public class ExpressionParser implements Parser {
   public void equality() {
     rel();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('=')) {
         move(true);
         if (expectChar('=')) {
           move(true);
           rel();
-          getCodeGeneratorWithTimes().onEq(this.lookhead);
+          getCodeGeneratorWithTimes().onEq(opToken);
         } else if (expectChar('~')) {
           // It is a regular expression
           move(true);
           rel();
-          getCodeGeneratorWithTimes().onMatch(this.lookhead);
+          getCodeGeneratorWithTimes().onMatch(opToken);
         } else {
           // this.back();
           // assignment
           statement();
           ensureFeatureEnabled(Feature.Assignment);
-          getCodeGeneratorWithTimes().onAssignment(this.lookhead);
+          getCodeGeneratorWithTimes().onAssignment(opToken);
         }
       } else if (expectChar('!')) {
         move(true);
         if (expectChar('=')) {
           move(true);
           rel();
-          getCodeGeneratorWithTimes().onNeq(this.lookhead);
+          getCodeGeneratorWithTimes().onNeq(opToken);
         } else {
           reportSyntaxError("expect '='");
         }
@@ -378,25 +385,26 @@ public class ExpressionParser implements Parser {
   public void rel() {
     shift();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('<')) {
         move(true);
         if (expectChar('=')) {
           move(true);
           expr();
-          getCodeGeneratorWithTimes().onLe(this.lookhead);
+          getCodeGeneratorWithTimes().onLe(opToken);
         } else {
           expr();
-          getCodeGeneratorWithTimes().onLt(this.lookhead);
+          getCodeGeneratorWithTimes().onLt(opToken);
         }
       } else if (expectChar('>')) {
         move(true);
         if (expectChar('=')) {
           move(true);
           expr();
-          getCodeGeneratorWithTimes().onGe(this.lookhead);
+          getCodeGeneratorWithTimes().onGe(opToken);
         } else {
           expr();
-          getCodeGeneratorWithTimes().onGt(this.lookhead);
+          getCodeGeneratorWithTimes().onGt(opToken);
         }
       } else {
         break;
@@ -408,12 +416,13 @@ public class ExpressionParser implements Parser {
   public void shift() {
     expr();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('<')) {
         move(true);
         if (expectChar('<')) {
           move(true);
           expr();
-          getCodeGeneratorWithTimes().onShiftLeft(this.lookhead);
+          getCodeGeneratorWithTimes().onShiftLeft(opToken);
         } else {
           back();
           break;
@@ -425,10 +434,10 @@ public class ExpressionParser implements Parser {
           if (expectChar('>')) {
             move(true);
             expr();
-            getCodeGeneratorWithTimes().onUnsignedShiftRight(this.lookhead);
+            getCodeGeneratorWithTimes().onUnsignedShiftRight(opToken);
           } else {
             expr();
-            getCodeGeneratorWithTimes().onShiftRight(this.lookhead);
+            getCodeGeneratorWithTimes().onShiftRight(opToken);
           }
 
         } else {
@@ -445,14 +454,15 @@ public class ExpressionParser implements Parser {
   public void expr() {
     term();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('+')) {
         move(true);
         term();
-        getCodeGeneratorWithTimes().onAdd(this.lookhead);
+        getCodeGeneratorWithTimes().onAdd(opToken);
       } else if (expectChar('-')) {
         move(true);
         term();
-        getCodeGeneratorWithTimes().onSub(this.lookhead);
+        getCodeGeneratorWithTimes().onSub(opToken);
       } else {
         break;
       }
@@ -462,12 +472,13 @@ public class ExpressionParser implements Parser {
   public void exponent() {
     factor();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('*')) {
         move(true);
         if (expectChar('*')) {
           move(true);
           unary();
-          getCodeGeneratorWithTimes().onExponent(this.lookhead);
+          getCodeGeneratorWithTimes().onExponent(opToken);
         } else {
           back();
           break;
@@ -482,18 +493,19 @@ public class ExpressionParser implements Parser {
   public void term() {
     unary();
     while (true) {
+      Token<?> opToken = this.lookhead;
       if (expectChar('*')) {
         move(true);
         unary();
-        getCodeGeneratorWithTimes().onMult(this.lookhead);
+        getCodeGeneratorWithTimes().onMult(opToken);
       } else if (expectChar('/')) {
         move(true);
         unary();
-        getCodeGeneratorWithTimes().onDiv(this.lookhead);
+        getCodeGeneratorWithTimes().onDiv(opToken);
       } else if (expectChar('%')) {
         move(true);
         unary();
-        getCodeGeneratorWithTimes().onMod(this.lookhead);
+        getCodeGeneratorWithTimes().onMod(opToken);
       } else {
         break;
       }
@@ -502,6 +514,7 @@ public class ExpressionParser implements Parser {
 
 
   public void unary() {
+    Token<?> opToken = this.lookhead;
     if (expectChar('!')) {
       move(true);
       // check if it is a seq function call,"!" as variable
@@ -510,7 +523,7 @@ public class ExpressionParser implements Parser {
         exponent();
       } else {
         unary();
-        getCodeGeneratorWithTimes().onNot(this.lookhead);
+        getCodeGeneratorWithTimes().onNot(opToken);
       }
     } else if (expectChar('-')) {
       move(true);
@@ -520,7 +533,7 @@ public class ExpressionParser implements Parser {
         exponent();
       } else {
         unary();
-        getCodeGeneratorWithTimes().onNeg(this.lookhead);
+        getCodeGeneratorWithTimes().onNeg(opToken);
       }
     } else if (expectChar('~')) {
       move(true);
@@ -530,7 +543,7 @@ public class ExpressionParser implements Parser {
         exponent();
       } else {
         unary();
-        getCodeGeneratorWithTimes().onBitNot(this.lookhead);
+        getCodeGeneratorWithTimes().onBitNot(opToken);
       }
     } else {
       exponent();
@@ -609,8 +622,8 @@ public class ExpressionParser implements Parser {
     }
   }
 
-  public static final CharToken LEFT_PAREN = new CharToken('(', -1);
-  public static final CharToken RIGHT_PAREN = new CharToken(')', -1);
+  public static final CharToken LEFT_PAREN = new CharToken('(', 0, -1);
+  public static final CharToken RIGHT_PAREN = new CharToken(')', 0, -1);
 
 
   public boolean isOPVariable(final Token<?> token) {
@@ -663,8 +676,8 @@ public class ExpressionParser implements Parser {
           reportSyntaxError("unexpect char '" + charToken.getCh() + "'");
         }
         // make it as variable
-        this.lookhead = this.lexer.getSymbolTable()
-            .reserve(new Variable(charToken.getLexeme(), charToken.getStartIndex()));
+        this.lookhead = this.lexer.getSymbolTable().reserve(
+            new Variable(charToken.getLexeme(), charToken.getLineNo(), charToken.getStartIndex()));
       }
       move(true);
       // function
@@ -901,7 +914,8 @@ public class ExpressionParser implements Parser {
     if (this.inPattern) {
       reportSyntaxError("invalid regular pattern:" + sb.toString());
     }
-    getCodeGeneratorWithTimes().onConstant(new PatternToken(sb.toString(), startIndex));
+    getCodeGeneratorWithTimes()
+        .onConstant(new PatternToken(sb.toString(), this.lexer.getLineNo(), startIndex));
     move(true);
   }
 
@@ -1136,7 +1150,7 @@ public class ExpressionParser implements Parser {
   private Token<?> currentToken() {
     Token<?> token = this.lookhead;
     if (token == null) {
-      token = new CharToken((char) -1, this.lexer.getCurrentIndex());
+      token = new CharToken((char) -1, this.lexer.getLineNo(), this.lexer.getCurrentIndex());
     }
     return token;
   }

@@ -83,8 +83,6 @@ public class ExpressionLexer {
     return this.lineNo;
   }
 
-
-
   /**
    * Push back token
    *
@@ -155,7 +153,7 @@ public class ExpressionLexer {
         char ch = this.peek;
         int index = this.iterator.getIndex();
         nextChar();
-        return new CharToken(ch, index);
+        return new CharToken(ch, this.lineNo, index);
       }
     }
 
@@ -172,7 +170,7 @@ public class ExpressionLexer {
           value = 16 * value + Character.digit(this.peek, 16);
           nextChar();
         } while (isValidHexChar(this.peek));
-        return new NumberToken(value, sb.toString(), startIndex);
+        return new NumberToken(value, sb.toString(), this.lineNo, startIndex);
       } else {
         prevChar();
       }
@@ -180,7 +178,7 @@ public class ExpressionLexer {
 
     // If it is a digit
     if (Character.isDigit(this.peek) || this.peek == '.') {
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       int startIndex = this.iterator.getIndex();
       long lval = 0L;
 
@@ -279,7 +277,7 @@ public class ExpressionLexer {
           value = new BigDecimal(sb.toString(), this.mathContext);
         } else if (sb.length() == 1) {
           // only have a dot character.
-          return new CharToken('.', startIndex);
+          return new CharToken('.', this.lineNo, startIndex);
         } else {
           value = dval;
         }
@@ -300,7 +298,7 @@ public class ExpressionLexer {
       if (isBigDecimal || isBigInt) {
         lexeme = lexeme.substring(0, lexeme.length() - 1);
       }
-      return new NumberToken(value, lexeme, startIndex);
+      return new NumberToken(value, lexeme, this.lineNo, startIndex);
     }
 
     // It is a variable
@@ -326,7 +324,7 @@ public class ExpressionLexer {
       if (lexeme.isEmpty()) {
         throw new ExpressionSyntaxErrorException("Blank variable name after '#'");
       }
-      Variable variable = new Variable(lexeme, startIndex);
+      Variable variable = new Variable(lexeme, this.lineNo, startIndex);
       variable.setQuote(true);
       return this.symbolTable.reserve(variable);
     }
@@ -338,12 +336,12 @@ public class ExpressionLexer {
         nextChar();
       } while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.');
       String lexeme = sb.toString();
-      Variable variable = new Variable(lexeme, startIndex);
+      Variable variable = new Variable(lexeme, this.lineNo, startIndex);
       return this.symbolTable.reserve(variable);
     }
 
     if (isBinaryOP(this.peek)) {
-      CharToken opToken = new CharToken(this.peek, this.iterator.getIndex());
+      CharToken opToken = new CharToken(this.peek, this.lineNo, this.iterator.getIndex());
       nextChar();
       return opToken;
     }
@@ -405,10 +403,10 @@ public class ExpressionLexer {
         sb.append(this.peek);
       }
       nextChar();
-      return new StringToken(sb.toString(), startIndex);
+      return new StringToken(sb.toString(), this.lineNo, startIndex);
     }
 
-    Token<Character> token = new CharToken(this.peek, this.iterator.getIndex());
+    Token<Character> token = new CharToken(this.peek, this.lineNo, this.iterator.getIndex());
     nextChar();
     return token;
   }
@@ -417,7 +415,7 @@ public class ExpressionLexer {
     return this.expression.substring(0, this.iterator.getIndex());
   }
 
-  private String getBigNumberLexeme(final StringBuffer sb) {
+  private String getBigNumberLexeme(final StringBuilder sb) {
     String lexeme = sb.toString();
     lexeme = lexeme.substring(0, lexeme.length() - 1);
     return lexeme;

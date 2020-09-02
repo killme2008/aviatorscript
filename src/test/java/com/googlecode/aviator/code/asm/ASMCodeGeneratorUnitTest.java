@@ -60,7 +60,7 @@ public class ASMCodeGeneratorUnitTest {
         });
 
     this.codeGenerator =
-        new ASMCodeGenerator(AviatorEvaluator.newInstance(), classloader, System.out);
+        new ASMCodeGenerator(AviatorEvaluator.newInstance(), null, classloader, System.out);
     this.codeGenerator.start();
   }
 
@@ -112,7 +112,7 @@ public class ASMCodeGeneratorUnitTest {
 
   @Test
   public void testOnConstant_String() throws Exception {
-    this.codeGenerator.onConstant(new StringToken("hello", 0));
+    this.codeGenerator.onConstant(new StringToken("hello", 0, 0));
     Expression exp = this.codeGenerator.getResult(true);
     Object result = exp.execute();
     assertEquals("hello", result);
@@ -121,7 +121,7 @@ public class ASMCodeGeneratorUnitTest {
 
   @Test
   public void testOnConstant_Pattern() throws Exception {
-    this.codeGenerator.onConstant(new PatternToken("[a-z_A-Z]+", 0));
+    this.codeGenerator.onConstant(new PatternToken("[a-z_A-Z]+", 0, 0));
     Expression exp = this.codeGenerator.getResult(true);
     Object result = exp.execute();
     assertTrue(result instanceof Pattern);
@@ -131,7 +131,7 @@ public class ASMCodeGeneratorUnitTest {
 
   @Test
   public void testOnConstant_Variable() throws Exception {
-    this.codeGenerator.onConstant(new Variable("a", 0));
+    this.codeGenerator.onConstant(new Variable("a", 0, 0));
     Expression exp = this.codeGenerator.getResult(true);
     HashMap<String, Object> env = new HashMap<String, Object>();
     long now = System.currentTimeMillis();
@@ -212,7 +212,7 @@ public class ASMCodeGeneratorUnitTest {
     NumberToken b = new NumberToken(3.5d, "3.5");
     Map<String, Object> env = new HashMap<String, Object>();
     env.put("c", 9L);
-    this.codeGenerator.onConstant(new Variable("c", 0));
+    this.codeGenerator.onConstant(new Variable("c", 0, 0));
     this.codeGenerator.onConstant(a);
     this.codeGenerator.onConstant(b);
     switch (operatorType) {
@@ -255,7 +255,7 @@ public class ASMCodeGeneratorUnitTest {
     NumberToken b = new NumberToken(2, "2");
     Map<String, Object> env = new HashMap<String, Object>();
     env.put("c", 9L);
-    this.codeGenerator.onConstant(new Variable("c", 7));
+    this.codeGenerator.onConstant(new Variable("c", 0, 7));
     this.codeGenerator.onConstant(a);
     this.codeGenerator.onConstant(b);
     switch (operatorType) {
@@ -476,7 +476,7 @@ public class ASMCodeGeneratorUnitTest {
         break;
       case LT:
         this.codeGenerator.onConstant(a);
-        this.codeGenerator.onConstant(new Variable("c", 0));
+        this.codeGenerator.onConstant(new Variable("c", 0, 0));
         this.codeGenerator.onLt(null);
         result = eval(env);
         assertEquals(Boolean.TRUE, result);
@@ -495,9 +495,9 @@ public class ASMCodeGeneratorUnitTest {
 
   @Test
   public void testOnMatch() throws Exception {
-    this.codeGenerator.onConstant(new StringToken("killme2008@gmail.com", 0));
-    this.codeGenerator
-        .onConstant(new PatternToken("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-z]{2,4}$", 1));
+    this.codeGenerator.onConstant(new StringToken("killme2008@gmail.com", 0, 0));
+    this.codeGenerator.onConstant(
+        new PatternToken("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-z]{2,4}$", 0, 1));
     this.codeGenerator.onMatch(null);
     Object result = eval(new HashMap<String, Object>());
     assertEquals(Boolean.TRUE, result);
@@ -506,7 +506,7 @@ public class ASMCodeGeneratorUnitTest {
 
   @Test
   public void testOnMethod_withoutArguments() throws Exception {
-    this.codeGenerator.onMethodName(new Variable("sysdate", -1));
+    this.codeGenerator.onMethodName(new Variable("sysdate", 0, -1));
     this.codeGenerator.onMethodInvoke(null);
     Object result = eval(new HashMap<String, Object>());
     assertNotNull(result);
@@ -543,16 +543,16 @@ public class ASMCodeGeneratorUnitTest {
       }
     });
     assertNull(this.codeGenerator.getLambdaGenerator());
-    this.codeGenerator.onLambdaDefineStart(new Variable("lambda", 0));
+    this.codeGenerator.onLambdaDefineStart(new Variable("lambda", 0, 0));
     LambdaGenerator lambdaGenerator = this.codeGenerator.getLambdaGenerator();
     assertNotNull(lambdaGenerator);
-    this.codeGenerator.onLambdaArgument(new Variable("x", 1));
-    this.codeGenerator.onLambdaArgument(new Variable("y", 2));
-    this.codeGenerator.onLambdaBodyStart(new Variable(">", 3));
-    lambdaGenerator.onConstant(new Variable("x", 4));
-    lambdaGenerator.onConstant(new Variable("y", 5));
+    this.codeGenerator.onLambdaArgument(new Variable("x", 0, 1));
+    this.codeGenerator.onLambdaArgument(new Variable("y", 0, 2));
+    this.codeGenerator.onLambdaBodyStart(new Variable(">", 0, 3));
+    lambdaGenerator.onConstant(new Variable("x", 0, 4));
+    lambdaGenerator.onConstant(new Variable("y", 0, 5));
     lambdaGenerator.onAdd(null);
-    this.codeGenerator.onLambdaBodyEnd(new Variable("end", 7));
+    this.codeGenerator.onLambdaBodyEnd(new Variable("end", 0, 7));
     HashMap<String, Object> env = new HashMap<String, Object>();
     env.put("x", 2);
     env.put("y", 3);
@@ -565,8 +565,8 @@ public class ASMCodeGeneratorUnitTest {
 
   @Test
   public void testOnMethod_withTwoArguments() throws Exception {
-    this.codeGenerator.onMethodName(new Variable("string.substring", -1));
-    this.codeGenerator.onConstant(new StringToken("hello", -1));
+    this.codeGenerator.onMethodName(new Variable("string.substring", 0, -1));
+    this.codeGenerator.onConstant(new StringToken("hello", 0, -1));
     this.codeGenerator.onMethodParameter(null);
     this.codeGenerator.onConstant(new NumberToken(2L, "2"));
     this.codeGenerator.onMethodParameter(null);
