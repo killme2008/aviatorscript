@@ -162,7 +162,7 @@ public class ExpressionLexer {
       nextChar();
       if (this.peek == 'x' || this.peek == 'X') {
         nextChar();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int startIndex = this.iterator.getIndex() - 2;
         long value = 0L;
         do {

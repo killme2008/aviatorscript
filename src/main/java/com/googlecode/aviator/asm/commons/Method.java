@@ -90,7 +90,7 @@ public class Method {
    * @param m a java.lang.reflect method descriptor
    * @return a {@link Method} corresponding to the given Java method declaration.
    */
-  public static Method getMethod(java.lang.reflect.Method m) {
+  public static Method getMethod(final java.lang.reflect.Method m) {
     return new Method(m.getName(), Type.getMethodDescriptor(m));
   }
 
@@ -100,7 +100,7 @@ public class Method {
    * @param c a java.lang.reflect constructor descriptor
    * @return a {@link Method} corresponding to the given Java constructor declaration.
    */
-  public static Method getMethod(java.lang.reflect.Constructor<?> c) {
+  public static Method getMethod(final java.lang.reflect.Constructor<?> c) {
     return new Method("<init>", Type.getConstructorDescriptor(c));
   }
 
@@ -142,7 +142,7 @@ public class Method {
     }
     String returnType = method.substring(0, space);
     String methodName = method.substring(space + 1, start - 1).trim();
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     sb.append('(');
     int p;
     do {
@@ -166,7 +166,7 @@ public class Method {
       return type;
     }
 
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     int index = 0;
     while ((index = type.indexOf("[]", index) + 1) > 0) {
       sb.append('[');
@@ -197,7 +197,7 @@ public class Method {
    * @return the name of the method described by this object.
    */
   public String getName() {
-    return name;
+    return this.name;
   }
 
   /**
@@ -206,7 +206,7 @@ public class Method {
    * @return the descriptor of the method described by this object.
    */
   public String getDescriptor() {
-    return desc;
+    return this.desc;
   }
 
   /**
@@ -215,7 +215,7 @@ public class Method {
    * @return the return type of the method described by this object.
    */
   public Type getReturnType() {
-    return Type.getReturnType(desc);
+    return Type.getReturnType(this.desc);
   }
 
   /**
@@ -224,12 +224,12 @@ public class Method {
    * @return the argument types of the method described by this object.
    */
   public Type[] getArgumentTypes() {
-    return Type.getArgumentTypes(desc);
+    return Type.getArgumentTypes(this.desc);
   }
 
   @Override
   public String toString() {
-    return name + desc;
+    return this.name + this.desc;
   }
 
   @Override
@@ -238,11 +238,11 @@ public class Method {
       return false;
     }
     Method other = (Method) o;
-    return name.equals(other.name) && desc.equals(other.desc);
+    return this.name.equals(other.name) && this.desc.equals(other.desc);
   }
 
   @Override
   public int hashCode() {
-    return name.hashCode() ^ desc.hashCode();
+    return this.name.hashCode() ^ this.desc.hashCode();
   }
 }
