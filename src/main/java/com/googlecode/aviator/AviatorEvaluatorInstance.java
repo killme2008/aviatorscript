@@ -1049,7 +1049,7 @@ public final class AviatorEvaluatorInstance {
     if (cached) {
       return this.aviatorClassLoader;
     } else {
-      return new AviatorClassLoader(Thread.currentThread().getContextClassLoader());
+      return new AviatorClassLoader(this.getClass().getClassLoader());
     }
   }
 
