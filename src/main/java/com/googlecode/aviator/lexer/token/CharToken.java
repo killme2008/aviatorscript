@@ -20,9 +20,9 @@ import java.util.Map;
 
 /**
  * Charactor token
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class CharToken extends AbstractToken<Character> {
 
@@ -32,12 +32,12 @@ public class CharToken extends AbstractToken<Character> {
 
 
   public char getCh() {
-    return ch;
+    return this.ch;
   }
 
 
-  public CharToken(char peek, int startIndex) {
-    super(startIndex, String.valueOf(peek));
+  public CharToken(final char peek, final int lineNo, final int startIndex) {
+    super(String.valueOf(peek), lineNo, startIndex);
     this.ch = peek;
   }
 
@@ -49,8 +49,8 @@ public class CharToken extends AbstractToken<Character> {
 
 
   @Override
-  public Character getValue(Map<String, Object> env) {
-    return ch;
+  public Character getValue(final Map<String, Object> env) {
+    return this.ch;
   }
 
 
@@ -58,14 +58,14 @@ public class CharToken extends AbstractToken<Character> {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ch;
-    result = prime * result + startIndex;
+    result = prime * result + this.ch;
+    result = prime * result + this.startIndex;
     return result;
   }
 
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
@@ -76,10 +76,10 @@ public class CharToken extends AbstractToken<Character> {
       return false;
     }
     CharToken other = (CharToken) obj;
-    if (ch != other.ch) {
+    if (this.ch != other.ch) {
       return false;
     }
-    if (startIndex != other.startIndex) {
+    if (this.startIndex != other.startIndex) {
       return false;
     }
     return true;

@@ -346,7 +346,7 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer(32 * size());
+    StringBuilder buf = new StringBuilder(32 * size());
     buf.append(super.toString()).append("{"). //
         append(Constants.INSTANCE_VAR).append("=").append(this.instance).append(", ").//
         append(Constants.EXP_VAR).append("=").append(this.expression).append(", ").//

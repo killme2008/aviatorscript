@@ -261,7 +261,7 @@ public final class AviatorEvaluatorInstance {
     try (InputStream in = new FileInputStream(file);
         Reader reader = new InputStreamReader(in, Charset.forName("utf-8"));) {
 
-      return compile(cacheKey, Utils.readFully(reader), cached);
+      return compile(cacheKey, Utils.readFully(reader), file.getName(), cached);
     }
   }
 
@@ -408,7 +408,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Remove a module by namespace name.
-   * 
+   *
    * @param ns
    * @since 5.1.4
    */
@@ -1279,6 +1279,7 @@ public final class AviatorEvaluatorInstance {
     return this.compile(expression, expression, cached);
   }
 
+
   /**
    * Compile a text expression to Expression object
    *
@@ -1288,6 +1289,11 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Expression compile(final String cacheKey, final String expression, final boolean cached) {
+    return this.compile(cacheKey, expression, null, cached);
+  }
+
+  private Expression compile(final String cacheKey, final String expression,
+      final String sourceFile, final boolean cached) {
     if (expression == null || expression.trim().length() == 0) {
       throw new CompileExpressionErrorException("Blank expression");
     }
@@ -1302,7 +1308,7 @@ public final class AviatorEvaluatorInstance {
         synchronized (this.expressionLRUCache) {
           existedTask = this.expressionLRUCache.get(cacheKey);
           if (existedTask == null) {
-            existedTask = newCompileTask(expression, cached);
+            existedTask = newCompileTask(expression, sourceFile, cached);
             runTask = true;
             this.expressionLRUCache.put(cacheKey, existedTask);
           }
@@ -1315,7 +1321,7 @@ public final class AviatorEvaluatorInstance {
         if (task != null) {
           return getCompiledExpression(expression, task);
         }
-        task = newCompileTask(expression, cached);
+        task = newCompileTask(expression, sourceFile, cached);
         existedTask = this.expressionCache.putIfAbsent(cacheKey, task);
         if (existedTask == null) {
           existedTask = task;
@@ -1325,16 +1331,17 @@ public final class AviatorEvaluatorInstance {
       return getCompiledExpression(cacheKey, existedTask);
 
     } else {
-      return innerCompile(expression, cached);
+      return innerCompile(expression, sourceFile, cached);
     }
 
   }
 
-  private FutureTask<Expression> newCompileTask(final String expression, final boolean cached) {
+  private FutureTask<Expression> newCompileTask(final String expression, final String sourceFile,
+      final boolean cached) {
     return new FutureTask<>(new Callable<Expression>() {
       @Override
       public Expression call() throws Exception {
-        return innerCompile(expression, cached);
+        return innerCompile(expression, sourceFile, cached);
       }
 
     });
@@ -1358,9 +1365,10 @@ public final class AviatorEvaluatorInstance {
   }
 
 
-  private Expression innerCompile(final String expression, final boolean cached) {
+  private Expression innerCompile(final String expression, final String sourceFile,
+      final boolean cached) {
     ExpressionLexer lexer = new ExpressionLexer(this, expression);
-    CodeGenerator codeGenerator = newCodeGenerator(cached);
+    CodeGenerator codeGenerator = newCodeGenerator(sourceFile, cached);
     ExpressionParser parser = new ExpressionParser(this, lexer, codeGenerator);
     Expression exp = parser.parse();
     if (getOptionValue(Options.TRACE_EVAL).bool) {
@@ -1374,21 +1382,22 @@ public final class AviatorEvaluatorInstance {
   }
 
 
-  public CodeGenerator newCodeGenerator(final boolean cached) {
+  public CodeGenerator newCodeGenerator(final String sourceFile, final boolean cached) {
     AviatorClassLoader classLoader = getAviatorClassLoader(cached);
-    return newCodeGenerator(classLoader);
+    return newCodeGenerator(classLoader, sourceFile);
 
   }
 
-  public CodeGenerator newCodeGenerator(final AviatorClassLoader classLoader) {
+  public CodeGenerator newCodeGenerator(final AviatorClassLoader classLoader,
+      final String sourceFile) {
     switch (getOptimizeLevel()) {
       case AviatorEvaluator.COMPILE:
         ASMCodeGenerator asmCodeGenerator =
-            new ASMCodeGenerator(this, classLoader, this.traceOutputStream);
+            new ASMCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
         asmCodeGenerator.start();
         return asmCodeGenerator;
       case AviatorEvaluator.EVAL:
-        return new OptimizeCodeGenerator(this, classLoader, this.traceOutputStream);
+        return new OptimizeCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
       default:
         throw new IllegalArgumentException("Unknow option " + getOptimizeLevel());
     }
@@ -1594,7 +1603,8 @@ public final class AviatorEvaluatorInstance {
             }
 
             ExpressionLexer lexer = new ExpressionLexer(this, lexeme.substring(i));
-            ExpressionParser parser = new ExpressionParser(this, lexer, newCodeGenerator(false));
+            ExpressionParser parser =
+                new ExpressionParser(this, lexer, newCodeGenerator(null, false));
 
             Expression exp = parser.parse(false);
             final Token<?> lookhead = parser.getLookhead();

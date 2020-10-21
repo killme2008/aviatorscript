@@ -20,9 +20,9 @@ import java.util.Map;
 
 /**
  * String token
- * 
+ *
  * @author dennis
- * 
+ *
  */
 public class StringToken extends AbstractToken<java.lang.String> {
 
@@ -30,8 +30,8 @@ public class StringToken extends AbstractToken<java.lang.String> {
   private static final long serialVersionUID = -8305143945358948254L;
 
 
-  public StringToken(String lexeme, int startIndex) {
-    super(startIndex, lexeme);
+  public StringToken(final String lexeme, final int lineNo, final int startIndex) {
+    super(lexeme, lineNo, startIndex);
   }
 
 
@@ -42,8 +42,8 @@ public class StringToken extends AbstractToken<java.lang.String> {
 
 
   @Override
-  public java.lang.String getValue(Map<String, Object> env) {
-    return lexeme;
+  public java.lang.String getValue(final Map<String, Object> env) {
+    return this.lexeme;
   }
 
 }
