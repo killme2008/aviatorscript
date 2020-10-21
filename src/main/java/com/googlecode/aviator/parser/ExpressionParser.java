@@ -667,7 +667,7 @@ public class ExpressionParser implements Parser {
         || this.lookhead.getType() == TokenType.Variable || this.lookhead == Variable.TRUE
         || this.lookhead == Variable.FALSE || isOPVariable(this.lookhead)) {
       if (this.lookhead.getType() == TokenType.Variable) {
-        checkVariableName();
+        checkVariableName(this.lookhead);
       }
       // binary operation as variable for seq functions
       if (this.lookhead.getType() == TokenType.Char) {
@@ -686,7 +686,7 @@ public class ExpressionParser implements Parser {
         if (prev == Variable.LAMBDA) {
           lambda(false);
         } else {
-          method();
+          method(prev);
         }
       } else if (prev.getType() == TokenType.Variable) {
         arrayAccess();
@@ -810,9 +810,9 @@ public class ExpressionParser implements Parser {
     }
   }
 
-  private void checkVariableName() {
-    if (!((Variable) this.lookhead).isQuote()) {
-      String[] names = this.lookhead.getLexeme().split("\\.");
+  private void checkVariableName(final Token<?> token) {
+    if (!((Variable) token).isQuote()) {
+      String[] names = token.getLexeme().split("\\.");
       for (String name : names) {
         if (!isJavaIdentifier(name)) {
           reportSyntaxError("illegal identifier: " + name);
@@ -821,9 +821,11 @@ public class ExpressionParser implements Parser {
     }
   }
 
-  private void method() {
+  private void method(final Token<?> methodName) {
     if (expectChar('(')) {
       this.scope.enterParen();
+      checkVariableName(methodName);
+      checkFunctionName(methodName, false);
       getCodeGeneratorWithTimes().onMethodName(this.prevToken);
       move(true);
       int paramIndex = 0;
@@ -1101,7 +1103,7 @@ public class ExpressionParser implements Parser {
 
   private void letStatement() {
     move(true);
-    checkVariableName();
+    checkVariableName(this.lookhead);
     getCodeGenerator().onConstant(this.lookhead);
     move(true);
     if (!expectChar('=')) {
@@ -1122,8 +1124,8 @@ public class ExpressionParser implements Parser {
   private void fnStatement() {
     move(true);
 
-    checkVariableName();
-    checkFunctionName();
+    checkVariableName(this.lookhead);
+    checkFunctionName(this.lookhead, true);
     getCodeGeneratorWithTimes().onConstant(this.lookhead);
     move(true);
     if (!expectChar('(')) {
@@ -1136,12 +1138,12 @@ public class ExpressionParser implements Parser {
 
 
 
-  private void checkFunctionName() {
-    String fnName = this.lookhead.getLexeme();
+  private void checkFunctionName(final Token<?> token, final boolean warnOnExists) {
+    String fnName = token.getLexeme();
     if (SymbolTable.isReservedKeyword(fnName)) {
       reportSyntaxError("The function name `" + fnName + "` is a reserved keyword");
     }
-    if (this.instance.getFuncMap().containsKey(fnName)) {
+    if (warnOnExists && this.instance.getFuncMap().containsKey(fnName)) {
       System.out.println("[Aviator WARN] The function '" + fnName
           + "' is already exists, but is replaced with new one.");
     }
@@ -1266,7 +1268,7 @@ public class ExpressionParser implements Parser {
       if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
         reportSyntaxError("invalid exception class name");
       }
-      checkVariableName();
+      checkVariableName(this.lookhead);
       List<Token<?>> exceptionClasses = new ArrayList<>();
       exceptionClasses.add(this.lookhead);
       move(true);
@@ -1283,14 +1285,14 @@ public class ExpressionParser implements Parser {
           if (this.lookhead.getType() != TokenType.Variable) {
             reportSyntaxError("invalid exception class to catch");
           }
-          checkVariableName();
+          checkVariableName(this.lookhead);
           exceptionClasses.add(this.lookhead);
           move(true);
         }
         if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
           reportSyntaxError("invalid bound variable name for exception");
         }
-        checkVariableName();
+        checkVariableName(this.lookhead);
         boundVar = this.lookhead;
         move(true);
       }
@@ -1402,7 +1404,7 @@ public class ExpressionParser implements Parser {
     if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
       reportSyntaxError("invalid class name");
     }
-    checkVariableName();
+    checkVariableName(this.lookhead);
     getCodeGeneratorWithTimes().onConstant(this.lookhead);
     getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
     move(true);
@@ -1513,7 +1515,7 @@ public class ExpressionParser implements Parser {
     move(true);
 
     Token<?> reducerArg = this.lookhead;
-    checkVariableName();
+    checkVariableName(this.lookhead);
     move(true);
     if (this.lookhead == Variable.IN) {
       move(true);
