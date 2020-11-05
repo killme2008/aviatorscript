@@ -548,55 +548,6 @@ public class ExpressionParser implements Parser {
     } else {
       exponent();
     }
-
-
-    while (expectChar('[') || expectChar('(')) {
-      if (isConstant(this.prevToken, this.instance)) {
-        break;
-      }
-
-      if (expectChar('[')) {
-        // (...)[index]
-        arrayAccess();
-      } else if (expectChar('(')) {
-        this.scope.enterParen();
-        final CodeGenerator cg = getCodeGeneratorWithTimes();
-        cg.onMethodName(anonymousMethodName());
-        move(true);
-        // FIXME: duplicated code with method()
-        List<FunctionArgument> params = null;
-        if (this.captureFuncArgs) {
-          params = new ArrayList<>();
-        }
-        int paramIndex = 0;
-        int lastTokenIndex = getLookheadStartIndex();
-        if (!expectChar(')')) {
-          ternary();
-          cg.onMethodParameter(this.lookhead);
-          if (this.captureFuncArgs) {
-            params.add(new FunctionArgument(paramIndex++, getParamExp(lastTokenIndex)));
-          }
-
-          while (expectChar(',')) {
-            move(true);
-            lastTokenIndex = getLookheadStartIndex();
-            if (!ternary()) {
-              reportSyntaxError("invalid argument");
-            }
-            cg.onMethodParameter(this.lookhead);
-            if (this.captureFuncArgs) {
-              params.add(new FunctionArgument(paramIndex++, getParamExp(lastTokenIndex)));
-            }
-          }
-        }
-        if (expectChar(')')) {
-          cg.onMethodInvoke(currentToken().withMeta(Constants.PARAMS_META, params));
-          this.scope.leaveParen();
-          move(true);
-        }
-      }
-    }
-
   }
 
   private int getLookheadStartIndex() {
@@ -647,11 +598,19 @@ public class ExpressionParser implements Parser {
   }
 
   public void factor() {
+    if (factor0()) {
+      methodInvokeOrArrayAccess();
+    }
+  }
+
+
+
+  private boolean factor0() {
     if (this.lookhead == null) {
       reportSyntaxError("illegal token");
     }
     if (this.lookhead == Variable.END) {
-      return;
+      return false;
     }
     if (expectChar('(')) {
       move(true);
@@ -661,7 +620,6 @@ public class ExpressionParser implements Parser {
         move(true);
         this.scope.leaveParen();
       }
-
     } else if (this.lookhead.getType() == TokenType.Number
         || this.lookhead.getType() == TokenType.String
         || this.lookhead.getType() == TokenType.Variable || this.lookhead == Variable.TRUE
@@ -689,18 +647,20 @@ public class ExpressionParser implements Parser {
           method(prev);
         }
       } else if (prev.getType() == TokenType.Variable) {
-        arrayAccess();
+        if (!arrayAccess()) {
+          getCodeGeneratorWithTimes().onConstant(prev);
+        }
       } else {
         getCodeGeneratorWithTimes().onConstant(prev);
       }
     } else if (expectChar('/')) {
       pattern();
     } else if (expectChar('}')) {
-      return;
+      return false;
     } else {
       reportSyntaxError("invalid token");
     }
-
+    return true;
   }
 
 
@@ -774,7 +734,7 @@ public class ExpressionParser implements Parser {
   }
 
 
-  private void arrayAccess() {
+  private boolean arrayAccess() {
     // check if it is a array index access
     boolean hasArray = false;
     while (expectChar('[')) {
@@ -788,9 +748,8 @@ public class ExpressionParser implements Parser {
       getCodeGeneratorWithTimes().onArrayIndexStart(this.prevToken);
       array();
     }
-    if (!hasArray) {
-      getCodeGeneratorWithTimes().onConstant(this.prevToken);
-    }
+    return hasArray;
+
   }
 
 
@@ -811,6 +770,9 @@ public class ExpressionParser implements Parser {
   }
 
   private void checkVariableName(final Token<?> token) {
+    if (token.getType() == TokenType.Delegate) {
+      return;
+    }
     if (!((Variable) token).isQuote()) {
       String[] names = token.getLexeme().split("\\.");
       for (String name : names) {
@@ -821,12 +783,25 @@ public class ExpressionParser implements Parser {
     }
   }
 
+  private void methodInvokeOrArrayAccess() {
+    while (expectChar('[') || expectChar('(')) {
+      if (isConstant(this.prevToken, this.instance)) {
+        break;
+      }
+      if (expectChar('[')) {
+        arrayAccess();
+      } else if (expectChar('(')) {
+        method(anonymousMethodName());
+      }
+    }
+  }
+
   private void method(final Token<?> methodName) {
     if (expectChar('(')) {
       this.scope.enterParen();
       checkVariableName(methodName);
       checkFunctionName(methodName, false);
-      getCodeGeneratorWithTimes().onMethodName(this.prevToken);
+      getCodeGeneratorWithTimes().onMethodName(methodName);
       move(true);
       int paramIndex = 0;
       List<FunctionArgument> params = null;
