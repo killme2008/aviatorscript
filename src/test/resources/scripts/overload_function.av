@@ -1,0 +1,22 @@
+fn add(a, b) {
+  a + b
+}
+
+fn add(a, b, c) {
+  a + b + c
+}
+
+fn add() {
+  0
+}
+
+j.assertEquals(add(1, 2), 3);
+j.assertEquals(add(1, 2, 3), 6);
+j.assertEquals(add(), 0);
+
+try {
+  add(1, 2, 3, 4);
+  j.fail();
+} catch(com.googlecode.aviator.exception.FunctionNotFoundException e) {
+  pst(e);
+}

@@ -45,6 +45,10 @@ public abstract class LambdaFunction extends AbstractFunction {
     this.expression = (BaseExpression) expression;
   }
 
+  public int getArity() {
+    return this.arguments.size();
+  }
+
   protected Map<String, Object> newEnv(final Map<String, Object> parentEnv,
       final AviatorObject... args) {
     Env env = null;

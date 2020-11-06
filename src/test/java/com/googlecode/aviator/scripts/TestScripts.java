@@ -43,6 +43,11 @@ public class TestScripts {
   }
 
   @Test
+  public void testOverloadFunction() {
+    testScript("overload_function.av");
+  }
+
+  @Test
   public void testMisc() {
     assertEquals("aviator execute 1 + 2 = 3.", testScript("string_interpolation.av"));
     assertEquals("aviator execute 1 + 2 = 3.", testScript("string_interpolation.av"));

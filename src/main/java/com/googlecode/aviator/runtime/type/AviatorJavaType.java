@@ -27,6 +27,8 @@ import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
+import com.googlecode.aviator.runtime.function.OverloadFunction;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
@@ -348,6 +350,26 @@ public class AviatorJavaType extends AviatorObject {
     }
 
     Object v = getAssignedValue(value, env);
+
+    // special processing for define functions.
+    if (v instanceof LambdaFunction) {
+      // try to define a function
+      Object existsFn = getValue(env);
+      if (existsFn instanceof OverloadFunction) {
+        // It's already an overload function, install the new branch.
+        ((OverloadFunction) existsFn).install(((LambdaFunction) v).getArity(), (AviatorFunction) v);
+        return AviatorRuntimeJavaType.valueOf(existsFn);
+      } else if (existsFn instanceof LambdaFunction) {
+        // cast it to an overload function
+        OverloadFunction newFn = new OverloadFunction(this.name);
+        // install the exists branch
+        newFn.install(((LambdaFunction) existsFn).getArity(), (AviatorFunction) existsFn);
+        // and the new branch.
+        newFn.install(((LambdaFunction) v).getArity(), (AviatorFunction) v);
+        v = newFn;
+      }
+    }
+
     ((Env) env).override(this.name, v);
     return AviatorRuntimeJavaType.valueOf(v);
   }
