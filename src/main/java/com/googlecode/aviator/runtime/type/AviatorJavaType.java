@@ -351,6 +351,7 @@ public class AviatorJavaType extends AviatorObject {
 
     Object v = getAssignedValue(value, env);
 
+    // TODO refactor
     // special processing for define functions.
     if (v instanceof LambdaFunction) {
       // try to define a function

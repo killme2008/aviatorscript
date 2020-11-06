@@ -3,16 +3,23 @@ fn add(a, b) {
 }
 
 fn add(a, b, c) {
-  a + b + c
+  add(a, b) + c
 }
 
 fn add() {
   0
 }
 
+fn add(a) {
+  add(a, 0)
+}
+
 j.assertEquals(add(1, 2), 3);
 j.assertEquals(add(1, 2, 3), 6);
 j.assertEquals(add(), 0);
+j.assertEquals(add(1), 1);
+j.assertEquals(add(2), 2);
+j.assertEquals(add(100), 100);
 
 try {
   add(1, 2, 3, 4);
