@@ -79,5 +79,10 @@ j.assertEquals(2, count(called));
 j.assertEquals(2, seq.get(called, "join3"));
 j.assertEquals(5, seq.get(called, "join2"));
 
+j.assertEquals("abcde", join("a", "b", "c", "d", "e"));
+j.assertEquals(2, count(called));
+j.assertEquals(3, seq.get(called, "join3"));
+j.assertEquals(7, seq.get(called, "join2"));
+
 
 

@@ -8,12 +8,12 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 /**
- * Overload function
+ * Dispatch function by argument arity.
  *
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class OverloadFunction extends AbstractVariadicFunction {
+public class DispatchFunction extends AbstractVariadicFunction {
 
   private static final Object[] EMPTY_VAR_ARGS = new Object[0];
 
@@ -25,7 +25,7 @@ public class OverloadFunction extends AbstractVariadicFunction {
 
   private final String name;
 
-  public OverloadFunction(final String name) {
+  public DispatchFunction(final String name) {
     super();
     this.name = name;
   }

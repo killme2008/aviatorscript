@@ -28,7 +28,7 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
-import com.googlecode.aviator.runtime.function.OverloadFunction;
+import com.googlecode.aviator.runtime.function.DispatchFunction;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
@@ -356,13 +356,13 @@ public class AviatorJavaType extends AviatorObject {
     if (v instanceof LambdaFunction) {
       // try to define a function
       Object existsFn = getValue(env);
-      if (existsFn instanceof OverloadFunction) {
+      if (existsFn instanceof DispatchFunction) {
         // It's already an overload function, install the new branch.
-        ((OverloadFunction) existsFn).install((LambdaFunction) v);
+        ((DispatchFunction) existsFn).install((LambdaFunction) v);
         return AviatorRuntimeJavaType.valueOf(existsFn);
       } else if (existsFn instanceof LambdaFunction) {
         // cast it to an overload function
-        OverloadFunction newFn = new OverloadFunction(this.name);
+        DispatchFunction newFn = new DispatchFunction(this.name);
         // install the exists branch
         newFn.install((LambdaFunction) existsFn);
         // and the new branch.
@@ -370,7 +370,7 @@ public class AviatorJavaType extends AviatorObject {
         v = newFn;
       } else if (existsFn == null && ((LambdaFunction) v).isVariadic()) {
         // cast variadic function to overload function
-        OverloadFunction newFn = new OverloadFunction(this.name);
+        DispatchFunction newFn = new DispatchFunction(this.name);
         newFn.install(((LambdaFunction) v));
         v = newFn;
       }
