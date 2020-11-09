@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -22,7 +23,7 @@ public abstract class LambdaFunction extends AbstractFunction {
   private static final long serialVersionUID = -4388339706945053452L;
 
   // the arguments.
-  protected List<String> arguments;
+  protected List<FunctionParam> params;
 
   // the compiled lambda body expression
   protected BaseExpression expression;
@@ -33,20 +34,31 @@ public abstract class LambdaFunction extends AbstractFunction {
   // whether to inherit parent env
   private boolean inheritEnv = false;
 
+  private final boolean isVariadic;
+
   public void setInheritEnv(final boolean inheritEnv) {
     this.inheritEnv = inheritEnv;
   }
 
-  public LambdaFunction(final List<String> arguments, final Expression expression,
+  public LambdaFunction(final List<FunctionParam> params, final Expression expression,
       final Env context) {
     super();
-    this.arguments = arguments;
+    this.params = params;
     this.context = context;
     this.expression = (BaseExpression) expression;
+    if (!this.params.isEmpty()) {
+      this.isVariadic = this.params.get(this.params.size() - 1).isVariadic();
+    } else {
+      this.isVariadic = false;
+    }
   }
 
   public int getArity() {
-    return this.arguments.size();
+    return this.params.size();
+  }
+
+  public boolean isVariadic() {
+    return this.isVariadic;
   }
 
   protected Map<String, Object> newEnv(final Map<String, Object> parentEnv,
@@ -62,14 +74,14 @@ public abstract class LambdaFunction extends AbstractFunction {
       env = (Env) parentEnv;
     }
     int i = 0;
-    for (String name : this.arguments) {
+    for (FunctionParam param : this.params) {
       final AviatorObject arg = args[i++];
       Object value = arg.getValue(parentEnv);
       if (value == null && arg.getAviatorType() == AviatorType.JavaType
           && !parentEnv.containsKey(((AviatorJavaType) arg).getName())) {
         value = RuntimeUtils.getInstance(parentEnv).getFunction(((AviatorJavaType) arg).getName());
       }
-      env.override(name, value);
+      env.override(param.getName(), value);
     }
 
     return env;

@@ -21,7 +21,7 @@ public class LambdaFunctionBootstrap {
   // The method handle to create lambda instance.
   private final MethodHandle constructor;
   // The arguments list.
-  private final List<String> arguments;
+  private final List<FunctionParam> params;
   private final boolean inheritEnv;
 
 
@@ -30,12 +30,13 @@ public class LambdaFunctionBootstrap {
   }
 
   public LambdaFunctionBootstrap(final String name, final Expression expression,
-      final MethodHandle constructor, final List<String> arguments, final boolean inheritEnv) {
+      final MethodHandle constructor, final List<FunctionParam> arguments,
+      final boolean inheritEnv) {
     super();
     this.name = name;
     this.expression = expression;
     this.constructor = constructor;
-    this.arguments = arguments;
+    this.params = arguments;
     this.inheritEnv = inheritEnv;
   }
 
@@ -49,7 +50,7 @@ public class LambdaFunctionBootstrap {
   public LambdaFunction newInstance(final Env env) {
     try {
       final LambdaFunction fn =
-          (LambdaFunction) this.constructor.invoke(this.arguments, this.expression, env);
+          (LambdaFunction) this.constructor.invoke(this.params, this.expression, env);
       fn.setInheritEnv(this.inheritEnv);
       return fn;
     } catch (ExpressionRuntimeException e) {

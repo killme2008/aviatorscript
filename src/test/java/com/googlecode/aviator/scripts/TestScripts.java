@@ -48,6 +48,21 @@ public class TestScripts {
   }
 
   @Test
+  public void testVariadicFunctions() {
+    testScript("variadic_function.av");
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testVariadicFunctionsWrongPosition() {
+    testScript("variadic_function2.av");
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testVariadicFunctionsTwoArgs() {
+    testScript("variadic_function3.av");
+  }
+
+  @Test
   public void testMisc() {
     assertEquals("aviator execute 1 + 2 = 3.", testScript("string_interpolation.av"));
     assertEquals("aviator execute 1 + 2 = 3.", testScript("string_interpolation.av"));

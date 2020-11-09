@@ -76,6 +76,7 @@ import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.runtime.FunctionArgument;
+import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.utils.Constants;
@@ -1266,8 +1267,8 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onLambdaArgument(final Token<?> lookhead) {
-    this.lambdaGenerator.addArgument(lookhead.getLexeme());
+  public void onLambdaArgument(final Token<?> lookhead, final FunctionParam param) {
+    this.lambdaGenerator.addParam(param);
   }
 
   @Override

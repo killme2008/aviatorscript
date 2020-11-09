@@ -36,6 +36,7 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.FunctionArgument;
+import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.utils.Constants;
 
 
@@ -670,14 +671,34 @@ public class ExpressionParser implements Parser {
     getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken);
     this.scope.enterParen();
     move(true);
+    int paramIndex = 0;
+    FunctionParam lastParam = null;
+    List<FunctionParam> variadicParams = new ArrayList<>(2);
     if (!expectChar(')')) {
-      lambdaArgument();
+      lastParam = lambdaArgument(paramIndex++);
+      if (lastParam.isVariadic()) {
+        variadicParams.add(lastParam);
+      }
 
       while (expectChar(',')) {
         move(true);
-        lambdaArgument();
+        lastParam = lambdaArgument(paramIndex++);
+        if (lastParam.isVariadic()) {
+          variadicParams.add(lastParam);
+        }
       }
     }
+
+    // assert only one variadic param and it's the last one.
+    if (variadicParams.size() > 1) {
+      reportSyntaxError("The variadic argument must be the last parameter: `"
+          + variadicParams.get(0).getName() + "`");
+    }
+    if (variadicParams.size() > 0 && variadicParams.get(0) != lastParam) {
+      reportSyntaxError("The variadic argument must be the last parameter: `"
+          + variadicParams.get(0).getName() + "`");
+    }
+
     if (expectChar(')')) {
       this.scope.leaveParen();
       move(true);
@@ -721,16 +742,31 @@ public class ExpressionParser implements Parser {
   }
 
 
-  private void lambdaArgument() {
-    if (this.lookhead.getType() == TokenType.Variable) {
-      if (!isJavaIdentifier(this.lookhead.getLexeme())) {
-        reportSyntaxError("illegal argument name: " + currentTokenLexeme());
-      }
-      getCodeGeneratorWithTimes().onLambdaArgument(this.lookhead);
+  private FunctionParam lambdaArgument(final int index) {
+    if (expectChar('&')) {
       move(true);
+
+      if (this.lookhead.getType() != TokenType.Variable) {
+        reportSyntaxError("expect argument name, but is: " + currentTokenLexeme());
+      }
+
+      return lambdaArgument0(index, true);
+    } else if (this.lookhead.getType() == TokenType.Variable) {
+      return lambdaArgument0(index, false);
     } else {
       reportSyntaxError("expect argument name, but is: " + currentTokenLexeme());
+      return null;
     }
+  }
+
+  private FunctionParam lambdaArgument0(final int index, final boolean isVariadic) {
+    if (!isJavaIdentifier(this.lookhead.getLexeme())) {
+      reportSyntaxError("illegal argument name: " + currentTokenLexeme());
+    }
+    final FunctionParam param = new FunctionParam(index, this.lookhead.getLexeme(), isVariadic);
+    getCodeGeneratorWithTimes().onLambdaArgument(this.lookhead, param);
+    move(true);
+    return param;
   }
 
 
@@ -1286,7 +1322,8 @@ public class ExpressionParser implements Parser {
         getCodeGeneratorWithTimes().onMethodName(Constants.CATCH_HANDLER_VAR);
         getCodeGeneratorWithTimes().onLambdaDefineStart(this.prevToken //
             .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
-        getCodeGeneratorWithTimes().onLambdaArgument(boundVar);
+        getCodeGeneratorWithTimes().onLambdaArgument(boundVar,
+            new FunctionParam(0, boundVar.getLexeme(), false));
         getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
         statements();
         getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
@@ -1514,7 +1551,8 @@ public class ExpressionParser implements Parser {
         {
           getCodeGeneratorWithTimes().onLambdaDefineStart(
               this.prevToken.withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
-          getCodeGeneratorWithTimes().onLambdaArgument(reducerArg);
+          getCodeGeneratorWithTimes().onLambdaArgument(reducerArg,
+              new FunctionParam(0, reducerArg.getLexeme(), false));
           getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
           statements();
           getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);

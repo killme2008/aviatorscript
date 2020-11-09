@@ -358,15 +358,20 @@ public class AviatorJavaType extends AviatorObject {
       Object existsFn = getValue(env);
       if (existsFn instanceof OverloadFunction) {
         // It's already an overload function, install the new branch.
-        ((OverloadFunction) existsFn).install(((LambdaFunction) v).getArity(), (AviatorFunction) v);
+        ((OverloadFunction) existsFn).install((LambdaFunction) v);
         return AviatorRuntimeJavaType.valueOf(existsFn);
       } else if (existsFn instanceof LambdaFunction) {
         // cast it to an overload function
         OverloadFunction newFn = new OverloadFunction(this.name);
         // install the exists branch
-        newFn.install(((LambdaFunction) existsFn).getArity(), (AviatorFunction) existsFn);
+        newFn.install((LambdaFunction) existsFn);
         // and the new branch.
-        newFn.install(((LambdaFunction) v).getArity(), (AviatorFunction) v);
+        newFn.install(((LambdaFunction) v));
+        v = newFn;
+      } else if (existsFn == null && ((LambdaFunction) v).isVariadic()) {
+        // cast variadic function to overload function
+        OverloadFunction newFn = new OverloadFunction(this.name);
+        newFn.install(((LambdaFunction) v));
         v = newFn;
       }
     }

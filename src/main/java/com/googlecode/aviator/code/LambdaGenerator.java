@@ -35,6 +35,7 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.ScopeInfo;
+import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Env;
@@ -47,7 +48,7 @@ import com.googlecode.aviator.utils.Env;
  */
 public class LambdaGenerator implements CodeGenerator {
   private final ClassWriter classWriter;
-  private final List<String> arguments;
+  private final List<FunctionParam> params;
   private final CodeGenerator codeGenerator;
   private final CodeGenerator parentCodeGenerator;
   private final AviatorClassLoader classLoader;
@@ -63,7 +64,7 @@ public class LambdaGenerator implements CodeGenerator {
       final CodeGenerator parentCodeGenerator, final Parser parser,
       final AviatorClassLoader classLoader, final String sourceFile, final boolean newLexicalScope,
       final boolean inheritEnv) {
-    this.arguments = new ArrayList<>();
+    this.params = new ArrayList<>();
     this.instance = instance;
     this.parentCodeGenerator = parentCodeGenerator;
     this.codeGenerator = instance.newCodeGenerator(classLoader, sourceFile);
@@ -141,7 +142,7 @@ public class LambdaGenerator implements CodeGenerator {
    * Compile a call method to invoke lambda compiled body expression.
    */
   public void compileCallMethod() {
-    int argsNumber = this.arguments.size();
+    int argsNumber = this.params.size();
     int arrayIndex = 2 + argsNumber;
     if (argsNumber < 20) {
       StringBuilder argsDescSb = new StringBuilder();
@@ -218,7 +219,7 @@ public class LambdaGenerator implements CodeGenerator {
       Constructor<?> constructor =
           defineClass.getConstructor(List.class, Expression.class, Env.class);
       MethodHandle methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
-      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, this.arguments,
+      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, this.params,
           this.inheritEnv);
     } catch (Exception e) {
       throw new CompileExpressionErrorException("define lambda class error", e);
@@ -226,10 +227,9 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
 
-  public void addArgument(final String name) {
-    this.arguments.add(name);
+  public void addParam(final FunctionParam name) {
+    this.params.add(name);
   }
-
 
 
   @Override
@@ -480,8 +480,8 @@ public class LambdaGenerator implements CodeGenerator {
 
 
   @Override
-  public void onLambdaArgument(final Token<?> lookhead) {
-    this.codeGenerator.onLambdaArgument(lookhead);
+  public void onLambdaArgument(final Token<?> lookhead, final FunctionParam param) {
+    this.codeGenerator.onLambdaArgument(lookhead, param);
   }
 
   @Override
