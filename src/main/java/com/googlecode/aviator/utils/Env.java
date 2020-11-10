@@ -62,6 +62,8 @@ public class Env implements Map<String, Object> {
 
   private List<String> importedSymbols;
 
+  private List<String> importedPackages;
+
   // Caching resolved classes
   private Map<String/* class name */, Class<?>> resolvedClasses;
 
@@ -109,11 +111,25 @@ public class Env implements Map<String, Object> {
     return this.mDefaults;
   }
 
-  public void addSymbol(final String sym) {
+  public String addSymbol(final String sym) {
     if (this.importedSymbols == null) {
       this.importedSymbols = new ArrayList<>();
     }
     this.importedSymbols.add(sym);
+    invalidateCache();
+    return sym;
+  }
+
+  public String addPackageSymbol(final String sym) {
+    if (this.importedPackages == null) {
+      this.importedPackages = new ArrayList<>();
+    }
+    this.importedPackages.add(sym);
+    invalidateCache();
+    return sym;
+  }
+
+  private void invalidateCache() {
     if (this.resolvedClasses != null) {
       this.resolvedClasses.clear();
     }
@@ -151,14 +167,22 @@ public class Env implements Map<String, Object> {
     if (name.contains(".")) {
       clazz = classForName(name);
     } else {
+      // java.lang.XXX
       clazz = classForName("java.lang." + name);
       if (clazz != null) {
         return clazz;
       }
+      // from cache
       clazz = retrieveFromCache(name);
       if (clazz != null) {
         return clazz;
       }
+      // from imported packages
+      clazz = retrieveFromImportedPackages(name);
+      if (clazz != null) {
+        return clazz;
+      }
+      // from imported classes
       clazz = resolveFromImportedSymbols(name, clazz);
       // try to find from parent env.
       if (clazz == null && this.mDefaults instanceof Env) {
@@ -170,6 +194,20 @@ public class Env implements Map<String, Object> {
       throw new ClassNotFoundException(name);
     }
 
+    return clazz;
+  }
+
+  private Class<?> retrieveFromImportedPackages(final String name) {
+    Class<?> clazz = null;
+    if (this.importedPackages != null) {
+      for (String pkg : this.importedPackages) {
+        clazz = classForName(pkg + name);
+        if (clazz != null) {
+          put2cache(name, clazz);
+          return clazz;
+        }
+      }
+    }
     return clazz;
   }
 

@@ -1446,15 +1446,60 @@ public class ExpressionParser implements Parser {
     this.scope.leaveParen();
   }
 
+  private void className() {
+    if (this.lookhead.getType() != TokenType.Variable && !expectChar('*')) {
+      reportSyntaxError("expect variable name or * to use");
+    }
+    if (expectChar('*')) {
+      wildcard();
+    } else {
+      checkVariableName(this.lookhead);
+      getCodeGenerator().onConstant(this.lookhead);
+    }
+    move(true);
+  }
+
   private void useStatement() {
     getCodeGeneratorWithTimes().onMethodName(Constants.USE_VAR);
     move(true);
-    factor();
+    className();
     getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+
+    if (expectChar('*')) {
+      // wildcard
+      wildcard();
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      move(true);
+    } else if (expectChar('{')) {
+      this.scope.enterBrace();
+      move(true);
+      className();
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      while (expectChar(',')) {
+        move(true);
+        className();
+        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      }
+      if (!expectChar('}')) {
+        reportSyntaxError("expect '}' to complete use statement");
+      } else {
+        move(true);
+        this.scope.leaveBrace();
+      }
+    }
+
+
     getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
     if (!expectChar(';')) {
       reportSyntaxError("missing ';' for use statement");
     }
+  }
+
+
+
+  private void wildcard() {
+    getCodeGenerator()
+        .onConstant(new Variable("*", this.lookhead.getLineNo(), this.lookhead.getStartIndex()));
   }
 
   private StatementType statement() {

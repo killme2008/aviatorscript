@@ -57,6 +57,15 @@ public class TestScripts {
     assertTrue(symbols.contains("java.util.List"));
 
     testScript("use2.av");
+    testScript("use3.av");
+    testScript("use4.av");
+
+    try {
+      testScript("use5.av");
+      fail();
+    } catch (ExpressionSyntaxErrorException e) {
+      assertTrue(e.getMessage().contains("expect variable name or * to use at"));
+    }
   }
 
   @Test

@@ -1,0 +1,83 @@
+use java.util.*;
+
+let list = new ArrayList(10);
+
+j.assertEquals("java.util.ArrayList", type(list));
+seq.add(list, 1);
+seq.add(list, 99);
+j.assertEquals(1, seq.get(list, 0));
+j.assertEquals(99, seq.get(list, 1));
+
+let set = new HashSet();
+j.assertEquals("java.util.HashSet", type(set));
+seq.add(set, 1);
+seq.add(set, 99);
+j.assertTrue(include(set, 1));
+j.assertTrue(include(set, 99));
+
+{
+   ## test in block
+   let list = new ArrayList(10);
+
+   j.assertEquals("java.util.ArrayList", type(list));
+   seq.add(list, 1);
+   seq.add(list, 99);
+   j.assertEquals(1, seq.get(list, 0));
+   j.assertEquals(99, seq.get(list, 1));
+   
+   let set = new HashSet();
+   j.assertEquals("java.util.HashSet", type(set));
+   seq.add(set, 1);
+   seq.add(set, 99);
+   j.assertTrue(include(set, 1));
+   j.assertTrue(include(set, 99));
+   
+   use java.net.{Socket};
+   
+   let sock = new Socket();
+   j.assertEquals("java.net.Socket", type(sock));
+}
+
+{
+  use java.util.concurrent.locks.{ReentrantLock, ReentrantReadWriteLock};
+  
+  let l = new ReentrantLock();
+  
+  let i = 0;
+  lock(l);
+  i = i + 1;
+  unlock(l);
+  j.assertEquals(1, i);
+  
+   let l = new ReentrantReadWriteLock();
+  
+   let i = 0;
+   lock(writeLock(l));
+   i = i + 1;
+   unlock(writeLock(l));
+   j.assertEquals(1, i);
+}
+
+try {
+   ## Socket only valid in block
+   let lock = new Socket();
+   j.fail();
+}catch(ClassNotFoundException e) {
+  pst(e);
+}
+
+try {
+   ## ReentrantLock only valid in last block
+   let lock = new ReentrantLock();
+   j.fail();
+}catch(ClassNotFoundException e) {
+  pst(e);
+}
+
+try {
+   ## ReentrantReadWriteLock only valid in last block
+   let lock = new ReentrantReadWriteLock();
+   j.fail();
+}catch(ClassNotFoundException e) {
+  pst(e);
+}
