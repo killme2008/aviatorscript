@@ -8,6 +8,7 @@ import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorType;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.TypeUtils;
 
@@ -50,10 +51,8 @@ public class SeqNewArrayFunction extends AbstractFunction {
       if (TypeUtils.PRIMITIVE_TYPES.containsKey(name)) {
         clazz = TypeUtils.PRIMITIVE_TYPES.get(name);
       } else {
-        if (!name.contains(".")) {
-          name = "java.lang." + name;
-        }
-        clazz = Class.forName(name);
+        assert (env instanceof Env);
+        clazz = ((Env) env).resolveClassSymbol(name);
       }
       return AviatorRuntimeJavaType.valueOf(Array.newInstance(clazz, len.intValue()));
     } catch (Throwable t) {

@@ -1446,6 +1446,17 @@ public class ExpressionParser implements Parser {
     this.scope.leaveParen();
   }
 
+  private void useStatement() {
+    getCodeGeneratorWithTimes().onMethodName(Constants.USE_VAR);
+    move(true);
+    factor();
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    if (!expectChar(';')) {
+      reportSyntaxError("missing ';' for use statement");
+    }
+  }
+
   private StatementType statement() {
     if (this.lookhead == Variable.IF) {
       ensureFeatureEnabled(Feature.If);
@@ -1495,6 +1506,9 @@ public class ExpressionParser implements Parser {
       } else {
         return StatementType.Other;
       }
+    } else if (this.lookhead == Variable.USE) {
+      useStatement();
+      return StatementType.Other;
     } else {
       if (ternary()) {
         return StatementType.Ternary;

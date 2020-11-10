@@ -75,6 +75,7 @@ import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
 import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
 import com.googlecode.aviator.runtime.function.internal.ThrowFunction;
 import com.googlecode.aviator.runtime.function.internal.TryCatchFunction;
+import com.googlecode.aviator.runtime.function.internal.UseFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -896,6 +897,9 @@ public final class AviatorEvaluatorInstance {
     addFunction(new TryCatchFunction());
     addFunction(new CatchHandlerFunction());
     addFunction(new ThrowFunction());
+
+    // use statement
+    addFunction(new UseFunction());
 
     // new instance
     addFunction(new NewInstanceFunction());

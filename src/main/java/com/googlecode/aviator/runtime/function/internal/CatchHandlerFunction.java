@@ -7,6 +7,7 @@ import com.googlecode.aviator.runtime.function.AbstractVariadicFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.Env;
 
 /**
  * __catch_handler(fun, exception) to create a {@link CatchHandler}.
@@ -34,6 +35,6 @@ public class CatchHandlerFunction extends AbstractVariadicFunction {
       exceptionClasses.add(((AviatorJavaType) args[i]).getName());
     }
 
-    return new CatchHandler((AviatorFunction) args[0], exceptionClasses);
+    return new CatchHandler((Env) env, (AviatorFunction) args[0], exceptionClasses);
   }
 }

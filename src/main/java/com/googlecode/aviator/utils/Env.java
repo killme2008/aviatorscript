@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
@@ -59,30 +60,11 @@ public class Env implements Map<String, Object> {
 
   private Expression expression;
 
-  public Expression getExpression() {
-    return this.expression;
-  }
+  private List<String> importedSymbols;
 
-  public void setExpression(final Expression expression) {
-    this.expression = expression;
-  }
+  // Caching resolved classes
+  private Map<String/* class name */, Class<?>> resolvedClasses;
 
-  public Map<String, Object> getDefaults() {
-    return this.mDefaults;
-  }
-
-  public AviatorEvaluatorInstance getInstance() {
-    return this.instance;
-  }
-
-  public void setInstance(final AviatorEvaluatorInstance instance) {
-    this.instance = instance;
-  }
-
-  public void configure(final AviatorEvaluatorInstance instance, final Expression exp) {
-    this.instance = instance;
-    this.expression = exp;
-  }
 
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
 
@@ -109,6 +91,117 @@ public class Env implements Map<String, Object> {
 
   public void setmOverrides(final Map<String, Object> mOverrides) {
     this.mOverrides = mOverrides;
+  }
+
+  public List<String> getImportedSymbols() {
+    return this.importedSymbols;
+  }
+
+  public Expression getExpression() {
+    return this.expression;
+  }
+
+  public void setExpression(final Expression expression) {
+    this.expression = expression;
+  }
+
+  public Map<String, Object> getDefaults() {
+    return this.mDefaults;
+  }
+
+  public void addSymbol(final String sym) {
+    if (this.importedSymbols == null) {
+      this.importedSymbols = new ArrayList<>();
+    }
+    this.importedSymbols.add(sym);
+    if (this.resolvedClasses != null) {
+      this.resolvedClasses.clear();
+    }
+  }
+
+  public AviatorEvaluatorInstance getInstance() {
+    return this.instance;
+  }
+
+  public void setInstance(final AviatorEvaluatorInstance instance) {
+    this.instance = instance;
+  }
+
+  public void configure(final AviatorEvaluatorInstance instance, final Expression exp) {
+    this.instance = instance;
+    this.expression = exp;
+  }
+
+  private String findSymbol(final String name) throws ClassNotFoundException {
+    final String postfix = "." + name;
+    String targetSym = null;
+    if (this.importedSymbols != null) {
+      for (String sym : this.importedSymbols) {
+        if (sym.endsWith(postfix)) {
+          targetSym = sym;
+          break;
+        }
+      }
+    }
+    return targetSym;
+  }
+
+  public Class<?> resolveClassSymbol(final String name) throws ClassNotFoundException {
+    Class<?> clazz = null;
+    if (name.contains(".")) {
+      clazz = classForName(name);
+    } else {
+      clazz = classForName("java.lang." + name);
+      if (clazz != null) {
+        return clazz;
+      }
+      clazz = retrieveFromCache(name);
+      if (clazz != null) {
+        return clazz;
+      }
+      clazz = resolveFromImportedSymbols(name, clazz);
+      // try to find from parent env.
+      if (clazz == null && this.mDefaults instanceof Env) {
+        clazz = ((Env) this.mDefaults).resolveClassSymbol(name);
+      }
+    }
+
+    if (clazz == null) {
+      throw new ClassNotFoundException(name);
+    }
+
+    return clazz;
+  }
+
+  private Class<?> resolveFromImportedSymbols(final String name, Class<?> clazz)
+      throws ClassNotFoundException {
+    final String classSym = findSymbol(name);
+    if (classSym != null) {
+      clazz = classForName(classSym);
+      if (clazz != null) {
+        put2cache(name, clazz);
+      }
+    }
+    return clazz;
+  }
+
+  private void put2cache(final String name, final Class<?> ret) {
+    if (this.resolvedClasses == null) {
+      this.resolvedClasses = new HashMap<>();
+    }
+    this.resolvedClasses.put(name, ret);
+  }
+
+  private Class<?> retrieveFromCache(final String name) {
+    return this.resolvedClasses != null ? this.resolvedClasses.get(name) : null;
+  }
+
+  private Class<?> classForName(final String name) {
+    try {
+      return Class.forName(name);
+    } catch (ClassNotFoundException e) {
+      return null;
+    }
   }
 
   /**

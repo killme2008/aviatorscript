@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +15,10 @@ import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.StandardError;
+import com.googlecode.aviator.runtime.JavaMethodReflectionFunctionMissing;
 import com.googlecode.aviator.runtime.module.IoModule;
 import com.googlecode.aviator.runtime.type.Range;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
 public class TestScripts {
@@ -26,6 +29,7 @@ public class TestScripts {
   public void setup() throws Exception {
     this.instance = AviatorEvaluator.newInstance();
     this.instance.addStaticFunctions("j", org.junit.Assert.class);
+    this.instance.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());
   }
 
   public Object testScript(final String name, final Object... args) {
@@ -40,6 +44,19 @@ public class TestScripts {
       Reflector.sneakyThrow(t);
     }
     return null;
+  }
+
+  @Test
+  public void testUseStatement() {
+    Env env = (Env) testScript("use1.av", "Long", Long.class);
+    assertNotNull(env);
+    List<String> symbols = env.getImportedSymbols();
+    assertNotNull(symbols);
+    assertEquals(2, symbols.size());
+    assertTrue(symbols.contains("com.googlecode.aviator.runtime.type.AviatorObject"));
+    assertTrue(symbols.contains("java.util.List"));
+
+    testScript("use2.av");
   }
 
   @Test

@@ -341,6 +341,18 @@ public class Variable extends AbstractToken<Object> {
 
   };
 
+
+  public static final Variable USE = new Variable("use", 0, -1) {
+
+    private static final long serialVersionUID = 113057346952612067L;
+
+    @Override
+    public Object getValue(final Map<String, Object> env) {
+      return this;
+    }
+
+  };
+
   @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
     return TokenType.Variable;
