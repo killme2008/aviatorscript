@@ -19,6 +19,13 @@ public class UseFunction extends AbstractVariadicFunction {
 
   private static final long serialVersionUID = 1710427343500339000L;
 
+  private UseFunction() {
+
+  }
+
+  public static final UseFunction INSTANCE = new UseFunction();
+
+
   @Override
   public AviatorObject variadicCall(final Map<String, Object> env, final AviatorObject... args) {
     if (args.length < 3) {

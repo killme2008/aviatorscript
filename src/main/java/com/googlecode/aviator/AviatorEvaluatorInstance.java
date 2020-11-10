@@ -35,6 +35,7 @@ import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,16 +67,6 @@ import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
-import com.googlecode.aviator.runtime.function.internal.CatchHandlerFunction;
-import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
-import com.googlecode.aviator.runtime.function.internal.NewInstanceFunction;
-import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
-import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
-import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
-import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
-import com.googlecode.aviator.runtime.function.internal.ThrowFunction;
-import com.googlecode.aviator.runtime.function.internal.TryCatchFunction;
-import com.googlecode.aviator.runtime.function.internal.UseFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
@@ -132,7 +123,6 @@ import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.EvalFunction;
 import com.googlecode.aviator.runtime.function.system.IdentityFunction;
 import com.googlecode.aviator.runtime.function.system.IsDefFunction;
-import com.googlecode.aviator.runtime.function.system.LoadFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
 import com.googlecode.aviator.runtime.function.system.MaxFunction;
 import com.googlecode.aviator.runtime.function.system.MinFunction;
@@ -142,7 +132,6 @@ import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
 import com.googlecode.aviator.runtime.function.system.PstFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
 import com.googlecode.aviator.runtime.function.system.RangeFunction;
-import com.googlecode.aviator.runtime.function.system.RequireFunction;
 import com.googlecode.aviator.runtime.function.system.SeqFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
@@ -649,7 +638,23 @@ public final class AviatorEvaluatorInstance {
     }
     Map<Options, Value> newOpts = new IdentityHashMap<>(this.options);
     newOpts.put(opt, opt.intoValue(val));
+    if (opt == Options.FEATURE_SET) {
+      Set<Feature> oldSet = new HashSet<>(getFeatures());
+      @SuppressWarnings("unchecked")
+      Set<Feature> newSet = (Set<Feature>) val;
+      if (oldSet.removeAll(newSet)) {
+        // removed functions that feature is disabled.
+        for (Feature feat : oldSet) {
+          for (AviatorFunction fn : feat.getFunctions()) {
+            this.removeFunction(fn);
+          }
+        }
+      }
+    }
     this.options = newOpts;
+    if (opt == Options.FEATURE_SET) {
+      loadFeatureFunctions();
+    }
   }
 
   /**
@@ -662,6 +667,7 @@ public final class AviatorEvaluatorInstance {
   public void enableFeature(final Feature feature) {
     this.options.get(Options.FEATURE_SET).featureSet.add(feature);
     this.options.get(Options.FEATURE_SET).featureSet.addAll(feature.getPrequires());
+    loadFeatureFunctions();
   }
 
   /**
@@ -693,6 +699,10 @@ public final class AviatorEvaluatorInstance {
    */
   public void disableFeature(final Feature feature) {
     this.options.get(Options.FEATURE_SET).featureSet.remove(feature);
+    for (AviatorFunction fn : feature.getFunctions()) {
+      this.removeFunction(fn);
+    }
+    loadFeatureFunctions();
   }
 
 
@@ -881,29 +891,6 @@ public final class AviatorEvaluatorInstance {
     addFunction(SeqFunction.INSTANCE);
     addFunction(EvalFunction.INSTANCE);
 
-    // module
-    // load and require
-    addFunction(new RequireFunction());
-    addFunction(new LoadFunction());
-
-    // for-loop and if statement supporting
-    addFunction(new ReducerFunction());
-    addFunction(new ReducerReturnFunction());
-    addFunction(new ReducerContFunction());
-    addFunction(new ReducerBreakFunction());
-    addFunction(new IfCallccFunction());
-
-    // try..catch
-    addFunction(new TryCatchFunction());
-    addFunction(new CatchHandlerFunction());
-    addFunction(new ThrowFunction());
-
-    // use statement
-    addFunction(new UseFunction());
-
-    // new instance
-    addFunction(new NewInstanceFunction());
-
     // load string lib
     addFunction(new StringContainsFunction());
     addFunction(new StringIndexOfFunction());
@@ -991,8 +978,23 @@ public final class AviatorEvaluatorInstance {
     loadLib();
     loadModule();
     addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
+    fillDefaultOpts();
+    loadFeatureFunctions();
+  }
+
+  private void fillDefaultOpts() {
     for (Options opt : Options.values()) {
       this.options.put(opt, opt.getDefaultValueObject());
+    }
+  }
+
+  private void loadFeatureFunctions() {
+    for (Feature feat : this.options.get(Options.FEATURE_SET).featureSet) {
+      for (AviatorFunction fn : feat.getFunctions()) {
+        if (!containsFunction(fn.getName())) {
+          this.addFunction(fn);
+        }
+      }
     }
   }
 

@@ -17,6 +17,12 @@ import com.googlecode.aviator.utils.Env;
  */
 public class CatchHandlerFunction extends AbstractVariadicFunction {
 
+  private CatchHandlerFunction() {
+
+  }
+
+  public static final CatchHandlerFunction INSTANCE = new CatchHandlerFunction();
+
   /**
    *
    */

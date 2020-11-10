@@ -21,6 +21,12 @@ public class NewInstanceFunction extends AbstractVariadicFunction {
 
   private static final long serialVersionUID = -2257891325568093945L;
 
+  private NewInstanceFunction() {
+
+  }
+
+  public static final NewInstanceFunction INSTANCE = new NewInstanceFunction();
+
   @Override
   public String getName() {
     return "__new";

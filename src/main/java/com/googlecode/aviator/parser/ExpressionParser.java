@@ -1552,6 +1552,7 @@ public class ExpressionParser implements Parser {
         return StatementType.Other;
       }
     } else if (this.lookhead == Variable.USE) {
+      ensureFeatureEnabled(Feature.Use);
       useStatement();
       return StatementType.Other;
     } else {
