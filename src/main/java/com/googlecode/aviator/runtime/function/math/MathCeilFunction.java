@@ -3,7 +3,7 @@ package com.googlecode.aviator.runtime.function.math;
 import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
-import com.googlecode.aviator.runtime.type.AviatorLong;
+import com.googlecode.aviator.runtime.type.AviatorDouble;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
@@ -26,7 +26,7 @@ public class MathCeilFunction extends AbstractFunction {
 
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg) {
-    return AviatorLong.valueOf(Math.ceil(FunctionUtils.getNumberValue(arg, env).doubleValue()));
+    return AviatorDouble.valueOf(Math.ceil(FunctionUtils.getNumberValue(arg, env).doubleValue()));
   }
 
 
