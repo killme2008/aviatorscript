@@ -69,7 +69,12 @@ import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
+import com.googlecode.aviator.runtime.function.math.MathAcosFunction;
+import com.googlecode.aviator.runtime.function.math.MathAsinFunction;
+import com.googlecode.aviator.runtime.function.math.MathAtanFunction;
+import com.googlecode.aviator.runtime.function.math.MathCeilFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
+import com.googlecode.aviator.runtime.function.math.MathFloorFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
 import com.googlecode.aviator.runtime.function.math.MathLogFunction;
 import com.googlecode.aviator.runtime.function.math.MathPowFunction;
@@ -872,71 +877,25 @@ public final class AviatorEvaluatorInstance {
   private void loadLib() {
     // Load internal functions
     // load sys lib
-    addFunction(ComparatorFunction.INSTANCE);
-    addFunction(new CompareFunction());
-    addFunction(new SysDateFunction());
-    addFunction(new PrintlnFunction());
-    addFunction(new PrintFunction());
-    addFunction(new PstFunction());
-    addFunction(new RandomFunction());
-    addFunction(new NowFunction());
-    addFunction(new LongFunction());
-    addFunction(new BooleanFunction());
-    addFunction(new DoubleFunction());
-    addFunction(new StrFunction());
-    addFunction(new BigIntFunction());
-    addFunction(new DecimalFunction());
-    addFunction(new Date2StringFunction());
-    addFunction(new String2DateFunction());
-    addFunction(new BinaryFunction(OperatorType.ADD));
-    addFunction(new BinaryFunction(OperatorType.Exponent));
-    addFunction(new BinaryFunction(OperatorType.SUB));
-    addFunction(new BinaryFunction(OperatorType.MULT));
-    addFunction(new BinaryFunction(OperatorType.DIV));
-    addFunction(new BinaryFunction(OperatorType.MOD));
-    addFunction(new BinaryFunction(OperatorType.NEG));
-    addFunction(new BinaryFunction(OperatorType.NOT));
-    addFunction(new BinaryFunction(OperatorType.BIT_AND));
-    addFunction(new BinaryFunction(OperatorType.BIT_OR));
-    addFunction(new BinaryFunction(OperatorType.BIT_XOR));
-    addFunction(new BinaryFunction(OperatorType.BIT_NOT));
-    addFunction(new TupleFunction());
-    addFunction(new MinFunction());
-    addFunction(new MaxFunction());
-    addFunction(new IdentityFunction());
-    addFunction(new AssertFunction());
-    addFunction(new RangeFunction());
-    addFunction(new IsDefFunction());
-    addFunction(new UndefFunction());
-    addFunction(new TypeFunction());
-    addFunction(SeqFunction.INSTANCE);
-    addFunction(EvalFunction.INSTANCE);
-    addFunction(IsAFunction.INSTANCE);
+    loadSystemFunctions();
 
     // load string lib
-    addFunction(new StringContainsFunction());
-    addFunction(new StringIndexOfFunction());
-    addFunction(new StringStartsWithFunction());
-    addFunction(new StringEndsWithFunction());
-    addFunction(new StringSubStringFunction());
-    addFunction(new StringLengthFunction());
-    addFunction(new StringSplitFunction());
-    addFunction(new StringJoinFunction());
-    addFunction(new StringReplaceFirstFunction());
-    addFunction(new StringReplaceAllFunction());
+    loadStringFunctions();
 
     // load math lib
-    addFunction(new MathAbsFunction());
-    addFunction(new MathRoundFunction());
-    addFunction(new MathPowFunction());
-    addFunction(new MathSqrtFunction());
-    addFunction(new MathLog10Function());
-    addFunction(new MathLogFunction());
-    addFunction(new MathSinFunction());
-    addFunction(new MathCosFunction());
-    addFunction(new MathTanFunction());
+    loadMathFunctions();
 
     // seq lib
+    loadSeqFunctions();
+
+    // alias
+    aliasFunction("println", "p");
+    aliasFunction("pst", "printStackTrace");
+
+    loadInternalLibs();
+  }
+
+  private void loadSeqFunctions() {
     addFunction(SeqCollectorFunction.INSTANCE);
     addFunction(SeqCollectorRawFunction.INSTANCE);
     addFunction(SeqKeysFunction.INSTANCE);
@@ -979,12 +938,79 @@ public final class AviatorEvaluatorInstance {
         new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
     addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
     addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
+  }
 
-    // alias
-    aliasFunction("println", "p");
-    aliasFunction("pst", "printStackTrace");
+  private void loadMathFunctions() {
+    addFunction(new MathAbsFunction());
+    addFunction(new MathRoundFunction());
+    addFunction(new MathPowFunction());
+    addFunction(new MathSqrtFunction());
+    addFunction(new MathLog10Function());
+    addFunction(new MathLogFunction());
+    addFunction(new MathSinFunction());
+    addFunction(new MathCosFunction());
+    addFunction(new MathTanFunction());
+    addFunction(MathAsinFunction.INSTANCE);
+    addFunction(MathAcosFunction.INSTANCE);
+    addFunction(MathAtanFunction.INSTANCE);
+    addFunction(MathFloorFunction.INSTANCE);
+    addFunction(MathCeilFunction.INSTANCE);
+  }
 
-    loadInternalLibs();
+  private void loadStringFunctions() {
+    addFunction(new StringContainsFunction());
+    addFunction(new StringIndexOfFunction());
+    addFunction(new StringStartsWithFunction());
+    addFunction(new StringEndsWithFunction());
+    addFunction(new StringSubStringFunction());
+    addFunction(new StringLengthFunction());
+    addFunction(new StringSplitFunction());
+    addFunction(new StringJoinFunction());
+    addFunction(new StringReplaceFirstFunction());
+    addFunction(new StringReplaceAllFunction());
+  }
+
+  private void loadSystemFunctions() {
+    addFunction(ComparatorFunction.INSTANCE);
+    addFunction(new CompareFunction());
+    addFunction(new SysDateFunction());
+    addFunction(new PrintlnFunction());
+    addFunction(new PrintFunction());
+    addFunction(new PstFunction());
+    addFunction(new RandomFunction());
+    addFunction(new NowFunction());
+    addFunction(new LongFunction());
+    addFunction(new BooleanFunction());
+    addFunction(new DoubleFunction());
+    addFunction(new StrFunction());
+    addFunction(new BigIntFunction());
+    addFunction(new DecimalFunction());
+    addFunction(new Date2StringFunction());
+    addFunction(new String2DateFunction());
+    addFunction(new BinaryFunction(OperatorType.ADD));
+    addFunction(new BinaryFunction(OperatorType.Exponent));
+    addFunction(new BinaryFunction(OperatorType.SUB));
+    addFunction(new BinaryFunction(OperatorType.MULT));
+    addFunction(new BinaryFunction(OperatorType.DIV));
+    addFunction(new BinaryFunction(OperatorType.MOD));
+    addFunction(new BinaryFunction(OperatorType.NEG));
+    addFunction(new BinaryFunction(OperatorType.NOT));
+    addFunction(new BinaryFunction(OperatorType.BIT_AND));
+    addFunction(new BinaryFunction(OperatorType.BIT_OR));
+    addFunction(new BinaryFunction(OperatorType.BIT_XOR));
+    addFunction(new BinaryFunction(OperatorType.BIT_NOT));
+    addFunction(new TupleFunction());
+    addFunction(new MinFunction());
+    addFunction(new MaxFunction());
+    addFunction(new IdentityFunction());
+    addFunction(new AssertFunction());
+    addFunction(new RangeFunction());
+    addFunction(new IsDefFunction());
+    addFunction(new UndefFunction());
+    addFunction(new TypeFunction());
+    addFunction(SeqFunction.INSTANCE);
+    addFunction(EvalFunction.INSTANCE);
+    addFunction(IsAFunction.INSTANCE);
   }
 
   private void loadInternalLibs() {
