@@ -16,6 +16,8 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -27,8 +29,8 @@ import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.RuntimeUtils;
-import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.runtime.function.DispatchFunction;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
@@ -427,21 +429,37 @@ public class AviatorJavaType extends AviatorObject {
         names = SPLIT_PAT.split(name);
       }
       Map<String, Object> innerEnv = env;
+      Class<?> innerClazz = null;
       for (int i = 0; i < names.length; i++) {
         // Fast path for nested map.
         String rName = reserveName(names[i]);
-        Object val = innerEnv.get(rName != null ? rName : names[i]);
+        rName = rName != null ? rName : names[i];
+
+        Object val = null;
+        if (innerEnv != null) {
+          val = innerEnv.get(rName);
+          if (val == null && i == 0 && env instanceof Env) {
+            val = tryResolveAsClass(env, rName);
+          }
+        } else {
+          val = tryAccessStaticField(innerClazz, rName, val);
+        }
 
         if (i == names.length - 1) {
           return val;
         }
-
-        // fallback to property utils
-        if (!(val instanceof Map)) {
+        if (val instanceof Map) {
+          innerEnv = (Map<String, Object>) val;
+          innerClazz = null;
+        } else if (val instanceof Class<?>) {
+          innerClazz = (Class<?>) val;
+          innerEnv = null;
+        } else if (val == null) {
+          throw new NullPointerException(rName);
+        } else {
+          // fallback to property utils
           return Reflector.getProperty(env, name);
         }
-
-        innerEnv = (Map<String, Object>) val;
       }
       return Reflector.getProperty(env, name);
 
@@ -456,6 +474,24 @@ public class AviatorJavaType extends AviatorObject {
       } else {
         return null;
       }
+    }
+  }
+
+  private static Object tryAccessStaticField(final Class<?> innerClazz, final String rName,
+      Object val) throws NoSuchFieldException, IllegalAccessException {
+    final Field field = innerClazz.getDeclaredField(rName);
+    if (field != null && Modifier.isStatic(field.getModifiers())) {
+      field.setAccessible(true);
+      val = field.get(null);
+    }
+    return val;
+  }
+
+  private static Object tryResolveAsClass(final Map<String, Object> env, final String rName) {
+    try {
+      return ((Env) env).resolveClassSymbol(rName);
+    } catch (ClassNotFoundException e) {
+      return null;
     }
   }
 
@@ -642,16 +678,10 @@ public class AviatorJavaType extends AviatorObject {
   @Override
   public AviatorObject getElement(final Map<String, Object> env, final AviatorObject indexObject) {
     final Object thisValue = getValue(env);
-    if (!thisValue.getClass().isArray() && !(thisValue instanceof List)) {
-      throw new ExpressionRuntimeException(
-          desc(env) + " is not an array or list,could not use [] to get element");
-    }
-    Object indexValue = indexObject.getValue(env);
-    if (!(indexValue instanceof Number)) {
-      throw new IllegalArgumentException("Illegal index: " + indexObject.desc(env));
-    }
-    final int index = ((Number) indexValue).intValue();
+    final Object indexValue = indexObject.getValue(env);
+
     if (thisValue.getClass().isArray()) {
+      final int index = ((Number) indexValue).intValue();
       return new AviatorRuntimeJavaElementType(ContainerType.Array, thisValue, index,
           new Callable<Object>() {
             @Override
@@ -659,7 +689,8 @@ public class AviatorJavaType extends AviatorObject {
               return Array.get(thisValue, index);
             }
           });
-    } else {
+    } else if (thisValue instanceof List) {
+      final int index = ((Number) indexValue).intValue();
       return new AviatorRuntimeJavaElementType(ContainerType.List, thisValue, index,
           new Callable<Object>() {
 
@@ -669,6 +700,19 @@ public class AviatorJavaType extends AviatorObject {
             }
 
           });
+    } else if (thisValue instanceof Map) {
+      return new AviatorRuntimeJavaElementType(ContainerType.Map, thisValue, indexValue,
+          new Callable<Object>() {
+
+            @Override
+            public Object call() throws Exception {
+              return ((Map) thisValue).get(indexValue);
+            }
+
+          });
+    } else {
+      throw new ExpressionRuntimeException(
+          desc(env) + " is not an array, list or map,could not use [] to get element");
     }
   }
 

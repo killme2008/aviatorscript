@@ -11,17 +11,17 @@ public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
 
 
   private static final long serialVersionUID = -955529214730255727L;
-  private final int index;
+  private final Object index;
   private final Object container;
 
   private final ContainerType containerType;
 
   public static enum ContainerType {
-    List, Array
+    List, Array, Map
   }
 
   public AviatorRuntimeJavaElementType(final ContainerType containerType, final Object container,
-      final int index, final Callable<Object> callable) {
+      final Object index, final Callable<Object> callable) {
     super(null);
     setCallable(callable);
     this.container = container;
@@ -35,11 +35,14 @@ public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
     Object val = value.getValue(env);
     switch (this.containerType) {
       case Array:
-        Array.set(this.container, this.index,
+        Array.set(this.container, (int) this.index,
             Reflector.boxArg(this.container.getClass().getComponentType(), val));
         break;
       case List:
-        ((List) this.container).set(this.index, val);
+        ((List) this.container).set((int) this.index, val);
+        break;
+      case Map:
+        ((Map) this.container).put(this.index, val);
         break;
       default:
         throw new ExpressionRuntimeException("Unknown container type: " + this.containerType);

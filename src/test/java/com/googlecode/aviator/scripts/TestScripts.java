@@ -63,6 +63,7 @@ public class TestScripts {
   public void testLibs() {
     testLib("aviator");
     testLib("math");
+    testLib("map");
   }
 
   @Test

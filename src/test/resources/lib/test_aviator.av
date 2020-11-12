@@ -208,6 +208,15 @@ fn test_zipmap() {
   j.assertEquals(1, seq.get(m, "a"));
   j.assertEquals(2, seq.get(m, "b"));
   j.assertEquals(3, seq.get(m, "c"));
+  
+  let attr = seq.map("margin", 0, "padding", 0);
+  let ret = zipmap(tuple("html", "body", "div"), repeat(4, attr));
+  
+  j.assertEquals(3, count(ret));
+  j.assertTrue(is_a(ret, java.util.HashMap));
+  j.assertEquals(attr, seq.get(ret, "html"));
+  j.assertEquals(attr, seq.get(ret, "body"));
+  j.assertEquals(attr, seq.get(ret, "div"));
 }
 
 fn test_is_a() {
@@ -252,6 +261,21 @@ fn test_sort() {
   j.assertEquals(tuple(-100, 2, 3, 5, 7, 99), b);
 }
 
+fn test_static_fields() {
+  tests = tests + 1;
+  
+  j.assertEquals(9223372036854775807, Long.MAX_VALUE);
+  j.assertEquals(3.14159265358979323846, Math.PI);  
+}
+
+fn test_new_static_class() {
+  tests = tests + 1;
+  
+  let handler = new java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy();
+  j.assertNotNull(handler);
+  j.assertEquals("java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy", (type(handler)));
+}
+
 test_take_while();
 test_drop_while();
 test_concat();
@@ -266,5 +290,7 @@ test_zipmap();
 test_is_a();
 test_comparator();
 test_sort();
+test_static_fields();
+test_new_static_class();
 
-j.assertEquals(14, tests);
+j.assertEquals(16, tests);
