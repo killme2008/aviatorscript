@@ -17,6 +17,7 @@ package com.googlecode.aviator.runtime.function.seq;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -26,7 +27,8 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
 
 /**
- * sort(list) function to sort java.util.List or array,return a sorted duplicate object
+ * sort(list, [comparator]) function to sort a java.util.List or array,return a sorted duplicate
+ * object
  *
  * @author dennis
  *
@@ -61,7 +63,41 @@ public class SeqSortFunction extends AbstractFunction {
       Arrays.sort(dup);
       return AviatorRuntimeJavaType.valueOf(dup);
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a seq");
+      throw new IllegalArgumentException(arg1.desc(env) + " is not an array or list.");
+    }
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  @Override
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
+
+    Object first = arg1.getValue(env);
+    Comparator comparator = (Comparator) arg2.getValue(env);
+    if (first == null) {
+      return AviatorNil.NIL;
+    }
+    if (comparator == null) {
+      throw new IllegalArgumentException("null comparator");
+    }
+    Class<?> clazz = first.getClass();
+
+    if (List.class.isAssignableFrom(clazz)) {
+      List<?> list = (List<?>) first;
+      Object[] a = list.toArray();
+      Arrays.sort(a, comparator);
+      return AviatorRuntimeJavaType.valueOf(Arrays.asList(a));
+    } else if (clazz.isArray()) {
+      int length = Array.getLength(first);
+      Object[] dup = (Object[]) Array.newInstance(first.getClass().getComponentType(), length);
+      for (int i = 0; i < length; i++) {
+        dup[i] = Array.get(first, i);
+      }
+      // System.arraycopy(array, 0, dup, 0, dup.length);
+      Arrays.sort(dup, comparator);
+      return AviatorRuntimeJavaType.valueOf(dup);
+    } else {
+      throw new IllegalArgumentException(arg1.desc(env) + " is not an array or list.");
     }
   }
 

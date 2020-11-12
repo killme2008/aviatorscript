@@ -35,15 +35,33 @@ public class TestScripts {
   public Object testScript(final String name, final Object... args) {
     try {
       System.out.println("Testing script " + name + " with args: " + Arrays.toString(args));
-      this.instance
-          .validate(IoModule.slurp(TestScripts.class.getResource("/scripts/" + name).getFile()));
-      Expression exp = this.instance
-          .compileScript(TestScripts.class.getResource("/scripts/" + name).getFile(), true);
+      final String file = TestScripts.class.getResource("/scripts/" + name).getFile();
+      this.instance.validate(IoModule.slurp(file));
+      Expression exp = this.instance.compileScript(file, true);
       return exp.execute(AviatorEvaluator.newEnv(args));
     } catch (Throwable t) {
       Reflector.sneakyThrow(t);
     }
     return null;
+  }
+
+  public Object testLib(final String name, final Object... args) {
+    try {
+      System.out.println("Testing lib " + name + " with args: " + Arrays.toString(args));
+      final String file = TestScripts.class.getResource("/lib/test_" + name + ".av").getFile();
+      this.instance.validate(IoModule.slurp(file));
+      Expression exp = this.instance.compileScript(file, true);
+      return exp.execute(AviatorEvaluator.newEnv(args));
+    } catch (Throwable t) {
+      Reflector.sneakyThrow(t);
+    }
+    return null;
+  }
+
+
+  @Test
+  public void testLibs() {
+    testLib("aviator");
   }
 
   @Test

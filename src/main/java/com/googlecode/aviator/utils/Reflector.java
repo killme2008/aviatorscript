@@ -250,6 +250,7 @@ public class Reflector {
       int modifiers = method.getModifiers();
       if (!Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)
           && methodName.equals(method.getName())) {
+        method.setAccessible(true);
         ret.add(method);
       }
     }

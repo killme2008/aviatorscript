@@ -17,6 +17,7 @@
 package com.googlecode.aviator;
 
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -78,6 +79,8 @@ import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqArrayFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqCollectorFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqCollectorRawFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
 import com.googlecode.aviator.runtime.function.seq.SeqContainsKeyFunction;
@@ -87,6 +90,7 @@ import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqGetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIntoFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqKeysFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapEntryFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
@@ -100,8 +104,11 @@ import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqPutFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqRemoveFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqReverseFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqValsFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqZipmapFunction;
 import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
 import com.googlecode.aviator.runtime.function.string.StringEndsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringIndexOfFunction;
@@ -116,12 +123,14 @@ import com.googlecode.aviator.runtime.function.system.AssertFunction;
 import com.googlecode.aviator.runtime.function.system.BigIntFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;
 import com.googlecode.aviator.runtime.function.system.BooleanFunction;
+import com.googlecode.aviator.runtime.function.system.ComparatorFunction;
 import com.googlecode.aviator.runtime.function.system.CompareFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DecimalFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.EvalFunction;
 import com.googlecode.aviator.runtime.function.system.IdentityFunction;
+import com.googlecode.aviator.runtime.function.system.IsAFunction;
 import com.googlecode.aviator.runtime.function.system.IsDefFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
 import com.googlecode.aviator.runtime.function.system.MaxFunction;
@@ -183,6 +192,12 @@ public final class AviatorEvaluatorInstance {
 
   /** function loader list */
   private List<FunctionLoader> functionLoaders;
+
+  /** internal libs in main resources */
+  private static final String[] libs = new String[] {"aviator.av"};
+
+  /** cached compiled internal lib functions */
+  private static volatile Map<String, AviatorFunction> internalLibFunctions;
 
 
   /**
@@ -313,9 +328,14 @@ public final class AviatorEvaluatorInstance {
     return loadScript0(abPath);
   }
 
-  @SuppressWarnings("unchecked")
+
   private Map<String, Object> loadScript0(final String abPath) throws IOException {
     Expression exp = this.compileScript(abPath);
+    return executeModule(exp, abPath);
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> executeModule(final Expression exp, final String abPath) {
     final Env exports = new Env();
     final Map<String, Object> module = exp.newEnv("exports", exports, "path", abPath);
     Map<String, Object> env = exp.newEnv("__MODULE__", module, "exports", exports);
@@ -852,6 +872,7 @@ public final class AviatorEvaluatorInstance {
   private void loadLib() {
     // Load internal functions
     // load sys lib
+    addFunction(ComparatorFunction.INSTANCE);
     addFunction(new CompareFunction());
     addFunction(new SysDateFunction());
     addFunction(new PrintlnFunction());
@@ -890,6 +911,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new TypeFunction());
     addFunction(SeqFunction.INSTANCE);
     addFunction(EvalFunction.INSTANCE);
+    addFunction(IsAFunction.INSTANCE);
 
     // load string lib
     addFunction(new StringContainsFunction());
@@ -915,6 +937,12 @@ public final class AviatorEvaluatorInstance {
     addFunction(new MathTanFunction());
 
     // seq lib
+    addFunction(SeqCollectorFunction.INSTANCE);
+    addFunction(SeqCollectorRawFunction.INSTANCE);
+    addFunction(SeqKeysFunction.INSTANCE);
+    addFunction(SeqValsFunction.INSTANCE);
+    addFunction(SeqReverseFunction.INSTANCE);
+    addFunction(SeqZipmapFunction.INSTANCE);
     addFunction(new SeqNewArrayFunction());
     addFunction(new SeqArrayFunction());
     addFunction(new SeqNewListFunction());
@@ -955,6 +983,37 @@ public final class AviatorEvaluatorInstance {
     // alias
     aliasFunction("println", "p");
     aliasFunction("pst", "printStackTrace");
+
+    loadInternalLibs();
+  }
+
+  private void loadInternalLibs() {
+    if (internalLibFunctions == null) {
+      Map<String, AviatorFunction> funcs = new HashMap<>();
+      for (String lib : libs) {
+        try (final InputStream in = this.getClass().getResourceAsStream("/" + lib);
+            final BufferedInputStream bis = new BufferedInputStream(in);
+            final Reader reader = new InputStreamReader(bis)) {
+          Expression exp = this.compile(lib, Utils.readFully(reader), false);
+          Map<String, Object> exports = executeModule(exp, lib);
+          for (Map.Entry<String, Object> entry : exports.entrySet()) {
+            if (entry.getValue() instanceof AviatorFunction) {
+              final AviatorFunction fn = (AviatorFunction) entry.getValue();
+              addFunction(entry.getKey(), fn);
+              funcs.put(entry.getKey(), fn);
+            }
+          }
+        } catch (IOException e) {
+          throw new IllegalStateException("Fail to load internal lib: " + lib, e);
+        }
+      }
+
+      internalLibFunctions = funcs; // cache it
+    } else {
+      for (Map.Entry<String, AviatorFunction> entry : internalLibFunctions.entrySet()) {
+        addFunction(entry.getKey(), entry.getValue());
+      }
+    }
   }
 
   /**
@@ -975,11 +1034,11 @@ public final class AviatorEvaluatorInstance {
    * Create a aviator evaluator instance.
    */
   AviatorEvaluatorInstance() {
+    fillDefaultOpts();
+    loadFeatureFunctions();
     loadLib();
     loadModule();
     addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
-    fillDefaultOpts();
-    loadFeatureFunctions();
   }
 
   private void fillDefaultOpts() {
