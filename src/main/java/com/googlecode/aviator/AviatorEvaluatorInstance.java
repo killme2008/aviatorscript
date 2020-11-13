@@ -275,7 +275,7 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
-  private File tryFindScriptFile(final String path) throws IOException {
+  public File tryFindScriptFile(final String path) throws IOException {
     // 1. absolute path
     File file = new File(path);
     if (file.exists()) {

@@ -1,6 +1,6 @@
 ## examples/test_module.av
 
-let t = require('examples/module.av');
+let t = require(__MODULE__.dir + '/module.av');
 
 println(t.add(1, 2));
 println(t.sub(1, 2));

@@ -1,6 +1,9 @@
 package com.googlecode.aviator;
 
+import java.io.IOException;
+import java.util.Map;
 import com.googlecode.aviator.runtime.JavaMethodReflectionFunctionMissing;
+import com.googlecode.aviator.utils.Env;
 
 /**
  * AviatorScript bootstrap
@@ -34,14 +37,29 @@ public class Main {
       String script = args[1];
       String[] remainArgs = getRemainArgs(args, 2);
       Expression exp = AviatorEvaluator.getInstance().compile(script);
-      System.out.println(exp.execute(exp.newEnv("ARGV", remainArgs)));
+      System.out.println(exp.execute(newEnv(exp, null, remainArgs)));
     } else {
       String[] remainArgs = getRemainArgs(args, 1);
       Expression exp = AviatorEvaluator.getInstance().compileScript(cmdOrPath);
 
-      exp.execute(exp.newEnv("ARGV", remainArgs));
+      System.out.println(exp.execute(newEnv(exp, cmdOrPath, remainArgs)));
     }
 
+  }
+
+  private static Map<String, Object> newEnv(final Expression exp, final String abPath,
+      final String[] args) throws IOException {
+    final Env exports = new Env();
+    final Map<String, Object> module =
+        exp.newEnv("exports", exports, "path", abPath, "dir", getFileDir(abPath));
+    Map<String, Object> env = exp.newEnv("__MODULE__", module, "exports", exports, "ARGV", args);
+    return env;
+  }
+
+  private static String getFileDir(final String abPath) throws IOException {
+    return abPath != null
+        ? AviatorEvaluator.getInstance().tryFindScriptFile(abPath).getAbsoluteFile().getParent()
+        : null;
   }
 
   private static String[] getRemainArgs(final String[] args, final int startPos) {
