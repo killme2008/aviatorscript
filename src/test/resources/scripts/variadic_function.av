@@ -84,5 +84,14 @@ j.assertEquals(2, count(called));
 j.assertEquals(3, seq.get(called, "join3"));
 j.assertEquals(7, seq.get(called, "join2"));
 
+fn dummy(&args) {
+  return args;
+}
+
+j.assertEquals(tuple(), dummy());
+j.assertEquals(tuple(1), dummy(1));
+j.assertEquals(tuple("hello"), dummy("hello"));
+j.assertEquals(tuple(1,2,3), dummy(1, 2, 3));
+
 
 

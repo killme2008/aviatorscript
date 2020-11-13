@@ -4,105 +4,105 @@
 ## Description:  more seuence functions implemented in aviatorscript
 
 fn group_by(seq, f) {
-	let m = seq.map();
-	
-	for e in seq {
-		let k = f(e);
-		let l = seq.get(m, k);
-		if l == nil {
-			l = seq.list();
-			seq.put(m, k, l);
-		}
-		seq.add(l, e);
-	}
-	
-	return m;
+  let m = seq.map();
+
+  for e in seq {
+    let k = f(e);
+    let l = seq.get(m, k);
+    if l == nil {
+      l = seq.list();
+      seq.put(m, k, l);
+    }
+    seq.add(l, e);
+  }
+
+  return m;
 }
 
 fn distinct(seq) {
   if seq == nil {
-  	return nil;
+    return nil;
   }
 
   let seen = seq.set();
   let result = seq.collector(seq);
   for x in seq {
-	  if !include(seen, x) {
-		  seq.add(result, x);
-		  seq.add(seen, x);
-	  }
+    if !include(seen, x) {
+      seq.add(result, x);
+      seq.add(seen, x);
+    }
   }
-  
+
   return seq.raw(result);
 }
 
 fn repeat(n, x) {
   let result = seq.list();
-  
+
   for i in range(0, n) {
-	  seq.add(result, x);
+    seq.add(result, x);
   }
-  
+
   return result;
 }
 
 fn repeatedly(n, f) {
-	let result = seq.list();
-	  
-	for i in range(0, n) {
-		seq.add(result, f());
-	}
-	  
-	return result;
+  let result = seq.list();
+
+  for i in range(0, n) {
+    seq.add(result, f());
+  }
+
+  return result;
 }
 
 fn take_while(seq, pred) {
-    if seq == nil {
-    	return nil;
-    }
+  if seq == nil {
+    return nil;
+  }
 
-	let result = seq.collector(seq);
-	
-	for x in seq {
-		if pred(x) {
-			seq.add(result, x);
-		}
-	}
-	
-	return seq.raw(result);
+  let result = seq.collector(seq);
+
+  for x in seq {
+    if pred(x) {
+      seq.add(result, x);
+    }
+  }
+
+  return seq.raw(result);
 }
 
 fn drop_while(seq, pred) {
-    if seq == nil {
-    	return nil;
-    }
+  if seq == nil {
+    return nil;
+  }
 
-	let result = seq.collector(seq);
-	
-	for x in seq {
-		if !pred(x) {
-			seq.add(result, x);
-		}
-	}
-	
-	return seq.raw(result);
+  let result = seq.collector(seq);
+
+  for x in seq {
+    if !pred(x) {
+      seq.add(result, x);
+    }
+  }
+
+  return seq.raw(result);
 }
 
 fn concat(seq1, seq2) {
-    if seq == nil && seq2 == nil {
-    	return nil;
-    }
+  if seq == nil && seq2 == nil {
+    return nil;
+  }
 
-	let result = seq.collector(seq);
-	
-	for x in seq1 {
-		seq.add(result, x);
-	}
-	for x in seq2 {
-		seq.add(result, x);
-	}
-	
-	return seq.raw(result);
+  let result = seq.collector(seq);
+
+  for x in seq1 {
+    seq.add(result, x);
+  }
+  for x in seq2 {
+    seq.add(result, x);
+  }
+
+  return seq.raw(result);
 }
 
 fn constantly(x) {

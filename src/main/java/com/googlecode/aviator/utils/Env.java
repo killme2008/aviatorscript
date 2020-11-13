@@ -178,7 +178,7 @@ public class Env implements Map<String, Object> {
         return clazz;
       }
       // from imported packages
-      clazz = retrieveFromImportedPackages(name);
+      clazz = resolveFromImportedPackages(name);
       if (clazz != null) {
         return clazz;
       }
@@ -197,7 +197,7 @@ public class Env implements Map<String, Object> {
     return clazz;
   }
 
-  private Class<?> retrieveFromImportedPackages(final String name) {
+  private Class<?> resolveFromImportedPackages(final String name) {
     Class<?> clazz = null;
     if (this.importedPackages != null) {
       for (String pkg : this.importedPackages) {

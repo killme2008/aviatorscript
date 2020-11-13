@@ -691,11 +691,11 @@ public class ExpressionParser implements Parser {
 
     // assert only one variadic param and it's the last one.
     if (variadicParams.size() > 1) {
-      reportSyntaxError("The variadic argument must be the last parameter: `"
+      reportSyntaxError("The variadic parameter must be the last parameter: `"
           + variadicParams.get(0).getName() + "`");
     }
     if (variadicParams.size() > 0 && variadicParams.get(0) != lastParam) {
-      reportSyntaxError("The variadic argument must be the last parameter: `"
+      reportSyntaxError("The variadic parameter must be the last parameter: `"
           + variadicParams.get(0).getName() + "`");
     }
 
@@ -1487,7 +1487,6 @@ public class ExpressionParser implements Parser {
         this.scope.leaveBrace();
       }
     }
-
 
     getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
     if (!expectChar(';')) {

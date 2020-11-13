@@ -64,7 +64,7 @@ public class DispatchFunction extends AbstractVariadicFunction {
             "Function `" + this.name + "` with args(" + arity + ") not found");
       }
     }
-    assert (args.length + 1 >= arity);
+    assert (arity + 1 >= arity);
 
     if (fn.isVariadic()) {
       if (arity + 1 == fn.getArity()) {
@@ -76,8 +76,12 @@ public class DispatchFunction extends AbstractVariadicFunction {
       } else {
         AviatorObject[] newArgs = new AviatorObject[fn.getArity()];
         System.arraycopy(args, 0, newArgs, 0, fn.getArity() - 1);
-        AviatorObject[] varArgs = new AviatorObject[arity - fn.getArity() + 1];
-        System.arraycopy(args, fn.getArity() - 1, varArgs, 0, varArgs.length);
+        Object[] varArgs = new Object[arity - fn.getArity() + 1];
+
+        for (int i = 0; i < varArgs.length; i++) {
+          varArgs[i] = args[fn.getArity() - 1 + i].getValue(env);
+        }
+
         newArgs[fn.getArity() - 1] = AviatorRuntimeJavaType.valueOf(varArgs);
 
         args = newArgs;
@@ -143,8 +147,12 @@ public class DispatchFunction extends AbstractVariadicFunction {
             args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16],
             args[17], args[18], args[19]);
       default:
-        throw new IllegalArgumentException(
-            "Wrong number of args (" + arity + ") passed to: " + this.name);
+        assert (args.length >= 20);
+        AviatorObject[] remainingArgs = new AviatorObject[args.length - 20];
+        System.arraycopy(args, 20, remainingArgs, 0, remainingArgs.length);
+        return fn.call(env, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7],
+            args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16],
+            args[17], args[18], args[19], remainingArgs);
     }
 
   }

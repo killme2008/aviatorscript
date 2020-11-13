@@ -26,6 +26,9 @@ public class UseFunction extends AbstractVariadicFunction {
   public static final UseFunction INSTANCE = new UseFunction();
 
 
+  /**
+   * use package.{class1, class2};
+   */
   @Override
   public AviatorObject variadicCall(final Map<String, Object> env, final AviatorObject... args) {
     if (args.length < 3) {
@@ -37,13 +40,14 @@ public class UseFunction extends AbstractVariadicFunction {
     }
     final String packageSym = ((AviatorJavaType) args[0]).getName();
 
+    assert (env instanceof Env);
+    final Env theEnv = (Env) env;
+
     for (int i = 1; i < args.length; i++) {
       if (args[i].getAviatorType() != AviatorType.JavaType) {
         throw new IllegalArgumentException("Can't use other aviator type except varaible");
       }
       final String name = ((AviatorJavaType) args[i]).getName();
-      assert (env instanceof Env);
-      final Env theEnv = (Env) env;
       addSym(theEnv, packageSym, name);
     }
     return AviatorNil.NIL;
@@ -57,6 +61,9 @@ public class UseFunction extends AbstractVariadicFunction {
     }
   }
 
+  /**
+   * use package.class;
+   */
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
 
@@ -74,6 +81,9 @@ public class UseFunction extends AbstractVariadicFunction {
 
 
 
+  /**
+   * use package.* or use.package.{class};
+   */
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {
