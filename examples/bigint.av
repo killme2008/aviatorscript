@@ -4,13 +4,11 @@ let a = 10223372036854774807;  ## Literal BigInteger
 let b = 1000N;  ## BigInteger
 let c = 1000; ## long type
 
+p("type of a is :#{type(a)}");
+p("type of b is :#{type(b)}");
+p("type of c is :#{type(c)}");
+
 println(a);
-
 println(a + a);
-
 println(a * a);
-
 println(a + b + c);
-
-
-

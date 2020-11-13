@@ -1,10 +1,10 @@
- ## examples/handle_exception.av
- 
- try {
-	throw "an exception";
- } catch(e) {
-	pst(e);
- } finally {
-    p("finally");
- }
- 
+## examples/handle_exception.av
+
+try {
+  throw "an exception";
+} catch(e) {
+  ## print stack trace
+  pst(e);
+} finally {
+  p("finally");
+}

@@ -11,6 +11,8 @@ println("m.4 = " + seq.get(m, 4));
 m.a = 100;
 println("m.a = " + m.a);
 
+m["a"] = 'aviator';
+println("m['a'] = " + m['a']);
+
 seq.put(m, 4, 99);
 println("m.4 = " + seq.get(m, 4));
-

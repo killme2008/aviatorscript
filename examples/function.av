@@ -1,4 +1,5 @@
 ## examples/function.av
+
 fn add(x, y) {
   return x + y;
 }
@@ -8,4 +9,3 @@ println(three);
 
 s = add('hello', ' world');
 println(s);
-
