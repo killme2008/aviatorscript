@@ -6,39 +6,17 @@ package com.googlecode.aviator.code;
  *
  */
 
-import static com.googlecode.aviator.asm.Opcodes.AASTORE;
-import static com.googlecode.aviator.asm.Opcodes.ACC_FINAL;
-import static com.googlecode.aviator.asm.Opcodes.ACC_PUBLIC;
-import static com.googlecode.aviator.asm.Opcodes.ACC_SUPER;
-import static com.googlecode.aviator.asm.Opcodes.ALOAD;
-import static com.googlecode.aviator.asm.Opcodes.ARETURN;
-import static com.googlecode.aviator.asm.Opcodes.ASTORE;
-import static com.googlecode.aviator.asm.Opcodes.GETFIELD;
-import static com.googlecode.aviator.asm.Opcodes.INVOKESPECIAL;
-import static com.googlecode.aviator.asm.Opcodes.INVOKESTATIC;
-import static com.googlecode.aviator.asm.Opcodes.INVOKEVIRTUAL;
-import static com.googlecode.aviator.asm.Opcodes.RETURN;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
-import com.googlecode.aviator.asm.ClassWriter;
-import com.googlecode.aviator.asm.MethodVisitor;
-import com.googlecode.aviator.asm.Opcodes;
-import com.googlecode.aviator.code.asm.ClassDefiner;
-import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.ScopeInfo;
 import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
-import com.googlecode.aviator.runtime.function.LambdaFunction;
-import com.googlecode.aviator.utils.Env;
 
 /**
  * Lambda function generator
@@ -47,15 +25,15 @@ import com.googlecode.aviator.utils.Env;
  *
  */
 public class LambdaGenerator implements CodeGenerator {
-  private final ClassWriter classWriter;
+  // private final ClassWriter classWriter;
   private final List<FunctionParam> params;
   private final CodeGenerator codeGenerator;
   private final CodeGenerator parentCodeGenerator;
-  private final AviatorClassLoader classLoader;
-  private final AviatorEvaluatorInstance instance;
+  // private final AviatorClassLoader classLoader;
+  // private final AviatorEvaluatorInstance instance;
   private final String className;
   private static final AtomicLong LAMBDA_COUNTER = new AtomicLong();
-  private MethodVisitor mv;
+  // private MethodVisitor mv;
   private ScopeInfo scopeInfo;
   private final boolean newLexicalScope;
   private final boolean inheritEnv;
@@ -65,21 +43,21 @@ public class LambdaGenerator implements CodeGenerator {
       final AviatorClassLoader classLoader, final String sourceFile, final boolean newLexicalScope,
       final boolean inheritEnv) {
     this.params = new ArrayList<>();
-    this.instance = instance;
+    // this.instance = instance;
     this.parentCodeGenerator = parentCodeGenerator;
     this.codeGenerator = instance.newCodeGenerator(classLoader, sourceFile);
     this.codeGenerator.setParser(parser);
-    this.classLoader = classLoader;
+    // this.classLoader = classLoader;
     this.newLexicalScope = newLexicalScope;
     this.inheritEnv = inheritEnv;
     // Generate lambda class name
     this.className =
         "Lambda_" + System.currentTimeMillis() + "_" + LAMBDA_COUNTER.getAndIncrement();
     // Auto compute frames
-    this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-    visitClass();
-    makeConstructor();
-    makeGetName();
+    // this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    // visitClass();
+    // makeConstructor();
+    // makeGetName();
   }
 
 
@@ -99,131 +77,130 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
 
-  /**
-   * Make a default constructor
-   */
-  private void makeConstructor() {
-    {
-      this.mv = this.classWriter.visitMethod(ACC_PUBLIC, "<init>",
-          "(Ljava/util/List;Lcom/googlecode/aviator/Expression;Lcom/googlecode/aviator/utils/Env;)V",
-          null, null);
-      this.mv.visitCode();
-      this.mv.visitVarInsn(ALOAD, 0);
-      this.mv.visitVarInsn(ALOAD, 1);
-      this.mv.visitVarInsn(ALOAD, 2);
-      this.mv.visitVarInsn(ALOAD, 3);
-      this.mv.visitMethodInsn(INVOKESPECIAL,
-          "com/googlecode/aviator/runtime/function/LambdaFunction", "<init>",
-          "(Ljava/util/List;Lcom/googlecode/aviator/Expression;Lcom/googlecode/aviator/utils/Env;)V");
-
-      this.mv.visitInsn(RETURN);
-      this.mv.visitMaxs(4, 1);
-      this.mv.visitEnd();
-    }
-  }
-
+  // /**
+  // * Make a default constructor
+  // */
+  // private void makeConstructor() {
+  // {
+  // this.mv = this.classWriter.visitMethod(ACC_PUBLIC, "<init>",
+  // "(Ljava/util/List;Lcom/googlecode/aviator/Expression;Lcom/googlecode/aviator/utils/Env;)V",
+  // null, null);
+  // this.mv.visitCode();
+  // this.mv.visitVarInsn(ALOAD, 0);
+  // this.mv.visitVarInsn(ALOAD, 1);
+  // this.mv.visitVarInsn(ALOAD, 2);
+  // this.mv.visitVarInsn(ALOAD, 3);
+  // this.mv.visitMethodInsn(INVOKESPECIAL,
+  // "com/googlecode/aviator/runtime/function/LambdaFunction", "<init>",
+  // "(Ljava/util/List;Lcom/googlecode/aviator/Expression;Lcom/googlecode/aviator/utils/Env;)V");
+  //
+  // this.mv.visitInsn(RETURN);
+  // this.mv.visitMaxs(4, 1);
+  // this.mv.visitEnd();
+  // }
+  // }
+  //
 
   /**
    * Make a getName method
    */
-  private void makeGetName() {
-    {
-      this.mv = this.classWriter.visitMethod(ACC_PUBLIC + +ACC_FINAL, "getName",
-          "()Ljava/lang/String;", "()Ljava/lang/String;", null);
-      this.mv.visitCode();
-      this.mv.visitLdcInsn(this.className);
-      this.mv.visitInsn(ARETURN);
-      this.mv.visitMaxs(1, 1);
-      this.mv.visitEnd();
-    }
-  }
+  // private void makeGetName() {
+  // {
+  // this.mv = this.classWriter.visitMethod(ACC_PUBLIC + +ACC_FINAL, "getName",
+  // "()Ljava/lang/String;", "()Ljava/lang/String;", null);
+  // this.mv.visitCode();
+  // this.mv.visitLdcInsn(this.className);
+  // this.mv.visitInsn(ARETURN);
+  // this.mv.visitMaxs(1, 1);
+  // this.mv.visitEnd();
+  // }
+  // }
 
   /**
    * Compile a call method to invoke lambda compiled body expression.
    */
-  public void compileCallMethod() {
-    int argsNumber = this.params.size();
-    int arrayIndex = 2 + argsNumber;
-    if (argsNumber < 20) {
-      StringBuilder argsDescSb = new StringBuilder();
-      for (int i = 0; i < argsNumber; i++) {
-        argsDescSb.append("Lcom/googlecode/aviator/runtime/type/AviatorObject;");
-      }
-      String argsDec = argsDescSb.toString();
-
-      this.mv = this.classWriter.visitMethod(ACC_PUBLIC + +ACC_FINAL, "call",
-          "(Ljava/util/Map;" + argsDec + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
-          "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;" + argsDec
-              + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
-          null);
-      this.mv.visitCode();
-
-      // load expression field
-      this.mv.visitIntInsn(ALOAD, 0);
-      this.mv.visitFieldInsn(GETFIELD, this.className, "expression",
-          "Lcom/googlecode/aviator/BaseExpression;");
-      // this pointer
-      this.mv.visitIntInsn(ALOAD, 0);
-      // load env
-      this.mv.visitIntInsn(ALOAD, 1);
-      // new array
-      this.mv.visitLdcInsn(argsNumber);
-      this.mv.visitTypeInsn(Opcodes.ANEWARRAY, "com/googlecode/aviator/runtime/type/AviatorObject");
-      this.mv.visitVarInsn(ASTORE, arrayIndex);
-      // load other arguments
-      for (int i = 0; i < argsNumber; i++) {
-        this.mv.visitVarInsn(ALOAD, arrayIndex);
-        this.mv.visitLdcInsn(i);
-        this.mv.visitVarInsn(ALOAD, i + 2);
-        this.mv.visitInsn(AASTORE);
-      }
-      this.mv.visitVarInsn(ALOAD, arrayIndex);
-      this.mv.visitMethodInsn(INVOKEVIRTUAL,
-          "com/googlecode/aviator/runtime/function/LambdaFunction", "newEnv",
-          "(Ljava/util/Map;[Lcom/googlecode/aviator/runtime/type/AviatorObject;)Ljava/util/Map;");
-      // execute body expression
-      this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/BaseExpression",
-          "executeDirectly", "(Ljava/util/Map;)Ljava/lang/Object;");
-      // get the result
-      this.mv.visitMethodInsn(INVOKESTATIC,
-          "com/googlecode/aviator/runtime/type/AviatorRuntimeJavaType", "valueOf",
-          "(Ljava/lang/Object;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
-      this.mv.visitInsn(ARETURN);
-      this.mv.visitMaxs(5, 1);
-      this.mv.visitEnd();
-    } else {
-      throw new CompileExpressionErrorException("Lambda function arguments number at most 20.");
-    }
-  }
-
-  private void visitClass() {
-    this.classWriter.visit(this.instance.getBytecodeVersion(), ACC_PUBLIC + ACC_SUPER,
-        this.className, null, "com/googlecode/aviator/runtime/function/LambdaFunction", null);
-  }
-
-
-
-  private void endVisitClass() {
-    this.classWriter.visitEnd();
-  }
+  // public void compileCallMethod() {
+  // int argsNumber = this.params.size();
+  // int arrayIndex = 2 + argsNumber;
+  // if (argsNumber < 20) {
+  // StringBuilder argsDescSb = new StringBuilder();
+  // for (int i = 0; i < argsNumber; i++) {
+  // argsDescSb.append("Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+  // }
+  // String argsDec = argsDescSb.toString();
+  //
+  // this.mv = this.classWriter.visitMethod(ACC_PUBLIC + +ACC_FINAL, "call",
+  // "(Ljava/util/Map;" + argsDec + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
+  // "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;" + argsDec
+  // + ")Lcom/googlecode/aviator/runtime/type/AviatorObject;",
+  // null);
+  // this.mv.visitCode();
+  //
+  // // load expression field
+  // this.mv.visitIntInsn(ALOAD, 0);
+  // this.mv.visitFieldInsn(GETFIELD, this.className, "expression",
+  // "Lcom/googlecode/aviator/BaseExpression;");
+  // // this pointer
+  // this.mv.visitIntInsn(ALOAD, 0);
+  // // load env
+  // this.mv.visitIntInsn(ALOAD, 1);
+  // // new array
+  // this.mv.visitLdcInsn(argsNumber);
+  // this.mv.visitTypeInsn(Opcodes.ANEWARRAY, "com/googlecode/aviator/runtime/type/AviatorObject");
+  // this.mv.visitVarInsn(ASTORE, arrayIndex);
+  // // load other arguments
+  // for (int i = 0; i < argsNumber; i++) {
+  // this.mv.visitVarInsn(ALOAD, arrayIndex);
+  // this.mv.visitLdcInsn(i);
+  // this.mv.visitVarInsn(ALOAD, i + 2);
+  // this.mv.visitInsn(AASTORE);
+  // }
+  // this.mv.visitVarInsn(ALOAD, arrayIndex);
+  // this.mv.visitMethodInsn(INVOKEVIRTUAL,
+  // "com/googlecode/aviator/runtime/function/LambdaFunction", "newEnv",
+  // "(Ljava/util/Map;[Lcom/googlecode/aviator/runtime/type/AviatorObject;)Ljava/util/Map;");
+  // // execute body expression
+  // this.mv.visitMethodInsn(INVOKEVIRTUAL, "com/googlecode/aviator/BaseExpression",
+  // "executeDirectly", "(Ljava/util/Map;)Ljava/lang/Object;");
+  // // get the result
+  // this.mv.visitMethodInsn(INVOKESTATIC,
+  // "com/googlecode/aviator/runtime/type/AviatorRuntimeJavaType", "valueOf",
+  // "(Ljava/lang/Object;)Lcom/googlecode/aviator/runtime/type/AviatorObject;");
+  // this.mv.visitInsn(ARETURN);
+  // this.mv.visitMaxs(5, 1);
+  // this.mv.visitEnd();
+  // } else {
+  // throw new CompileExpressionErrorException("Lambda function arguments number at most 20.");
+  // }
+  // }
+  //
+  // private void visitClass() {
+  // this.classWriter.visit(this.instance.getBytecodeVersion(), ACC_PUBLIC + ACC_SUPER,
+  // this.className, null, "com/googlecode/aviator/runtime/function/LambdaFunction", null);
+  // }
+  //
+  //
+  //
+  // private void endVisitClass() {
+  // this.classWriter.visitEnd();
+  // }
 
   public LambdaFunctionBootstrap getLmabdaBootstrap() {
     Expression expression = getResult(!this.newLexicalScope);
-    endVisitClass();
-    byte[] bytes = this.classWriter.toByteArray();
-    try {
+    // endVisitClass();
+    // byte[] bytes = this.classWriter.toByteArray();
+    // try {
 
-      Class<?> defineClass =
-          ClassDefiner.defineClass(this.className, LambdaFunction.class, bytes, this.classLoader);
-
-      Constructor<?> constructor =
-          defineClass.getConstructor(List.class, Expression.class, Env.class);
-      MethodHandle methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
-      return new LambdaFunctionBootstrap(this.className, expression, methodHandle, this.params,
-          this.inheritEnv);
-    } catch (Exception e) {
-      throw new CompileExpressionErrorException("define lambda class error", e);
-    }
+    // Class<?> defineClass =
+    // ClassDefiner.defineClass(this.className, LambdaFunction.class, bytes, this.classLoader);
+    //
+    // Constructor<?> constructor =
+    // defineClass.getConstructor(List.class, Expression.class, Env.class);
+    // MethodHandle methodHandle = MethodHandles.lookup().unreflectConstructor(constructor);
+    return new LambdaFunctionBootstrap(this.className, expression, this.params, this.inheritEnv);
+    // } catch (Exception e) {
+    // throw new CompileExpressionErrorException("define lambda class error", e);
+    // }
   }
 
 

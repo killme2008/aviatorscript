@@ -1279,7 +1279,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
   @Override
   public void onLambdaBodyEnd(final Token<?> lookhead) {
-    this.lambdaGenerator.compileCallMethod();
+    // this.lambdaGenerator.compileCallMethod();
     LambdaFunctionBootstrap bootstrap = this.lambdaGenerator.getLmabdaBootstrap();
     if (this.lambdaBootstraps == null) {
       this.lambdaBootstraps = new HashMap<String, LambdaFunctionBootstrap>();
