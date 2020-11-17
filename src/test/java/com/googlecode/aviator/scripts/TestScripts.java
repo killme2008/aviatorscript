@@ -64,6 +64,7 @@ public class TestScripts {
     testLib("aviator");
     testLib("math");
     testLib("map");
+    testLib("var");
   }
 
   @Test

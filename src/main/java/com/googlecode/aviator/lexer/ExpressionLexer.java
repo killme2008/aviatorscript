@@ -305,6 +305,7 @@ public class ExpressionLexer {
     if (this.peek == '#') {
       int startIndex = this.iterator.getIndex();
       nextChar(); // skip '#'
+      boolean hasBackquote = false;
 
       if (this.peek == '#') {
         // ## comments
@@ -312,13 +313,30 @@ public class ExpressionLexer {
           nextChar();
         }
         return this.scan(analyse);
+      } else if (this.peek == '`') {
+        hasBackquote = true;
+        nextChar();
       }
 
       StringBuilder sb = new StringBuilder();
-      while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '['
-          || this.peek == ']') {
-        sb.append(this.peek);
+
+      if (hasBackquote) {
+        while (this.peek != '`') {
+          if (this.peek == CharacterIterator.DONE) {
+            throw new CompileExpressionErrorException(
+                "EOF while reading string at index: " + this.iterator.getIndex());
+          }
+          sb.append(this.peek);
+          nextChar();
+        }
+        // skip '`'
         nextChar();
+      } else {
+        while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '['
+            || this.peek == ']') {
+          sb.append(this.peek);
+          nextChar();
+        }
       }
       String lexeme = sb.toString();
       if (lexeme.isEmpty()) {

@@ -11,17 +11,23 @@
 /* rich Apr 19, 2006 */
 package com.googlecode.aviator.utils;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.FluentPropertyBeanIntrospector;
@@ -128,6 +134,159 @@ public class Reflector {
 
   }
 
+  public static StringBuilder capitalize(final StringBuilder sb, final String s) {
+    if (s == null) {
+      return sb;
+    }
+    sb.append(s.substring(0, 1).toUpperCase());
+    sb.append(s.substring(1));
+    return sb;
+  }
+
+  static class MethodHandleResult {
+    MethodHandle handle;
+    boolean isBooleanType;
+
+    public MethodHandleResult(final MethodHandle handle, final boolean isBooleanType) {
+      super();
+      this.isBooleanType = isBooleanType;
+      this.handle = handle;
+    }
+
+    @Override
+    public String toString() {
+      return "MethodHandleResult [handle=" + this.handle + ", isBooleanType=" + this.isBooleanType
+          + "]";
+    }
+
+  }
+
+  public static Map<Class, Reference<Map<String, MethodHandleResult>>> cachedHandles =
+      new ConcurrentHashMap<Class, Reference<Map<String, MethodHandleResult>>>();
+
+  private static final ReferenceQueue<Map<String, MethodHandleResult>> cacheHandleRq =
+      new ReferenceQueue<>();
+
+  private static String genGetterName(final String prefix, final String name) {
+    StringBuilder sb = new StringBuilder(prefix);
+    capitalize(sb, name);
+    return sb.toString();
+  }
+
+  public static Object fastGetProperty(final Object obj, final String name,
+      final boolean isStaticField) {
+    final Class<?> clazz = isStaticField ? (Class<?>) obj : obj.getClass();
+    Map<String, MethodHandleResult> handles = getClassHandles(clazz);
+    try {
+      MethodHandleResult handleRet = handles.get(name);
+      if (handleRet == null) {
+        if (isStaticField) {
+          handleRet = retrieveStaticFieldHandle(handles, clazz, name);
+        } else {
+          handleRet = retrieveGetterHandle(handles, clazz, name);
+        }
+      }
+
+      if (handleRet.handle != null) {
+        Object ret = isStaticField ? handleRet.handle.invoke() : handleRet.handle.invoke(obj);
+        if (handleRet.isBooleanType && !(ret instanceof Boolean)) {
+          putDummyHandle(name, handles);
+          // fallback to properties
+          return getProperty(obj, name);
+        }
+        return ret;
+      } else {
+        if (isStaticField) {
+          return null;
+        } else {
+          return getProperty(obj, name);
+        }
+      }
+    } catch (Throwable t) {
+      if (!handles.containsKey(name)) {
+        putDummyHandle(name, handles);
+      }
+      throw sneakyThrow(t);
+    }
+  }
+
+  private static MethodHandleResult retrieveStaticFieldHandle(
+      final Map<String, MethodHandleResult> handles, final Class<? extends Object> clazz,
+      final String name) throws IllegalAccessException, NoSuchFieldException {
+    MethodHandleResult handleRet;
+    Field field = null;
+    try {
+      field = clazz.getDeclaredField(name);
+    } catch (NoSuchFieldException e) {
+
+    }
+    if (field != null && Modifier.isStatic(field.getModifiers())) {
+      field.setAccessible(true);
+      MethodHandle handle = MethodHandles.lookup().unreflectGetter(field);
+      handleRet = new MethodHandleResult(handle, false);
+    } else {
+      handleRet = new MethodHandleResult(null, false);
+    }
+    handles.put(name, handleRet);
+    return handleRet;
+  }
+
+  private static MethodHandleResult retrieveGetterHandle(
+      final Map<String, MethodHandleResult> handles, final Class<? extends Object> clazz,
+      final String name) throws IllegalAccessException {
+    MethodHandleResult handleRet;
+    List<Method> methods = getInstanceMethods(clazz, genGetterName("get", name));
+    boolean isBooleanType = false;
+
+    if (methods == null || methods.isEmpty()) {
+      methods = getInstanceMethods(clazz, genGetterName("is", name));
+      isBooleanType = true;
+    }
+
+    if (methods != null && !methods.isEmpty()) {
+      Method method = methods.get(0);
+      for (Method m : methods) {
+        if (method.getParameterCount() == 0) {
+          method = m;
+          break;
+        }
+      }
+      method.setAccessible(true);
+      MethodHandle handle = MethodHandles.lookup().unreflect(method);
+      handleRet = new MethodHandleResult(handle, isBooleanType);
+    } else {
+      handleRet = new MethodHandleResult(null, isBooleanType);
+    }
+    handles.put(name, handleRet);
+    return handleRet;
+  }
+
+  private static void putDummyHandle(final String name,
+      final Map<String, MethodHandleResult> handles) {
+    handles.put(name, new MethodHandleResult(null, false));
+  }
+
+  private static Map<String, MethodHandleResult> getClassHandles(
+      final Class<? extends Object> clazz) {
+    Reference<Map<String, MethodHandleResult>> existsHandlesRef = cachedHandles.get(clazz);
+    Map<String, MethodHandleResult> handles = Collections.emptyMap();
+    if (existsHandlesRef == null) {
+      handles = new ConcurrentHashMap<String, MethodHandleResult>();
+      existsHandlesRef = cachedHandles.putIfAbsent(clazz,
+          new WeakReference<Map<String, MethodHandleResult>>(handles, cacheHandleRq));
+    }
+    if (existsHandlesRef == null) {
+      return handles;
+    }
+
+    handles = existsHandlesRef.get();
+    if (handles != null) {
+      return handles;
+    }
+    cachedHandles.remove(clazz, existsHandlesRef);
+    return getClassHandles(clazz);
+  }
+
 
   public static List<Method> getStaticMethods(final Class c, final String methodName) {
     List<Method> ret = new ArrayList<Method>();
@@ -215,7 +374,7 @@ public class Reflector {
 
   static ConcurrentHashMap<MethodKey, Reference<List<Method>>> instanceMethodsCache =
       new ConcurrentHashMap<>();
-  static final ReferenceQueue<List<Method>> rq = new ReferenceQueue<>();
+  static final ReferenceQueue<List<Method>> instanceMethodsRq = new ReferenceQueue<>();
 
 
   public static List<Method> getInstanceMethods(final Class<?> clazz, final String methodName) {
@@ -224,10 +383,10 @@ public class Reflector {
     List<Method> methods = Collections.emptyList();
 
     if (existingRef == null) {
-      clearCache(rq, instanceMethodsCache);
+      clearCache(instanceMethodsRq, instanceMethodsCache);
       methods = getClassInstanceMethods(clazz, methodName);
-      existingRef =
-          instanceMethodsCache.putIfAbsent(key, new WeakReference<List<Method>>(methods, rq));
+      existingRef = instanceMethodsCache.putIfAbsent(key,
+          new SoftReference<List<Method>>(methods, instanceMethodsRq));
     }
     if (existingRef == null) {
       return methods;
@@ -308,6 +467,21 @@ public class Reflector {
     return ret;
   }
 
+  private static Set<Class<?>> longClasses = asSet(Long.class, long.class, Integer.class, int.class,
+      Byte.class, byte.class, Short.class, short.class, Byte.class, byte.class);
+
+  private static Set<Class<?>> doubleClasses =
+      asSet(Double.class, double.class, Float.class, float.class);
+
+
+  private static Set<Class<?>> asSet(final Class<?>... classes) {
+    Set<Class<?>> ret = new HashSet<>();
+    for (Class<?> clazz : classes) {
+      ret.add(clazz);
+    }
+    return ret;
+  }
+
   static public boolean paramArgTypeMatch(final Class paramType, final Class argType) {
     if (argType == null) {
       return !paramType.isPrimitive();
@@ -315,23 +489,21 @@ public class Reflector {
     if (paramType == argType || paramType.isAssignableFrom(argType)) {
       return true;
     }
-    if (paramType == int.class) {
-      return argType == Integer.class || argType == long.class || argType == Long.class
-          || argType == short.class || argType == byte.class;// || argType == FixNum.class;
-    } else if (paramType == float.class) {
-      return argType == Float.class || argType == double.class;
-    } else if (paramType == double.class) {
-      return argType == Double.class || argType == float.class;// || argType == DoubleNum.class;
-    } else if (paramType == long.class) {
-      return argType == Long.class || argType == int.class || argType == short.class
-          || argType == byte.class;// || argType == BigNum.class;
-    } else if (paramType == char.class) {
+
+    boolean ret = longClasses.contains(paramType) && longClasses.contains(argType);
+    if (ret) {
+      return ret;
+    }
+
+    ret = doubleClasses.contains(paramType) && doubleClasses.contains(argType);
+    if (ret) {
+      return ret;
+    }
+
+    if (paramType == char.class) {
       return argType == Character.class;
-    } else if (paramType == short.class) {
-      return argType == Short.class;
-    } else if (paramType == byte.class) {
-      return argType == Byte.class;
-    } else if (paramType == boolean.class) {
+    }
+    if (paramType == boolean.class) {
       return argType == Boolean.class;
     }
     return false;
@@ -369,7 +541,7 @@ public class Reflector {
       instance = new BeanUtilsBean();
       instance.getPropertyUtils().addBeanIntrospector(INTROSPECTOR);
       ref = beansByClassLoader.putIfAbsent(classLoader,
-          new WeakReference<BeanUtilsBean>(instance, beansRq));
+          new SoftReference<BeanUtilsBean>(instance, beansRq));
       if (ref == null) {
         // insert a new one, return the instance directly.
         return instance;
@@ -384,9 +556,9 @@ public class Reflector {
     return getBeanUtilsBean();
   }
 
-  public static Object getProperty(final Map<String, Object> env, final String name)
+  public static Object getProperty(final Object bean, final String name)
       throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    return getBeanUtilsBean().getPropertyUtils().getProperty(env, name);
+    return getBeanUtilsBean().getPropertyUtils().getProperty(bean, name);
   }
 
   public static void setProperty(final Object bean, final String name, final Object value)

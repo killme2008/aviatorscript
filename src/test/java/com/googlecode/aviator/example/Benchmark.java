@@ -9,14 +9,15 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.example.VariableExample.Foo;
+import com.googlecode.aviator.utils.Reflector;
 
 public class Benchmark {
 
   public static void main(final String[] args) throws Exception {
     // benchCompile();
     // benchCaptureGroupsOptions();
-    benchmarkScript();
-    // benchmarkBeanUtils();
+    // benchmarkScript();
+    benchmarkBeanUtils();
   }
 
   /**
@@ -63,6 +64,7 @@ public class Benchmark {
     barrier.await();
     System.out.println("benchmarkBeanUtils cost: " + (System.currentTimeMillis() - start) + " ms.");
     System.out.println("c: " + c.get());
+    System.out.println(Reflector.cachedHandles);
   }
 
   private static void benchmarkScript() throws Exception {
