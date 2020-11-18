@@ -72,7 +72,7 @@ public class Reflector {
         + (target == null ? "" : " for " + target.getClass());
   }
 
-  static public boolean subsumes(final Class[] c1, final Class[] c2) {
+  static public boolean subsumes(final Class<?>[] c1, final Class<?>[] c2) {
     // presumes matching lengths
     Boolean better = false;
     for (int i = 0; i < c1.length; i++) {
@@ -161,8 +161,8 @@ public class Reflector {
 
   }
 
-  public static Map<Class, Reference<Map<String, MethodHandleResult>>> cachedHandles =
-      new ConcurrentHashMap<Class, Reference<Map<String, MethodHandleResult>>>();
+  public static Map<Class<?>, Reference<Map<String, MethodHandleResult>>> cachedHandles =
+      new ConcurrentHashMap<Class<?>, Reference<Map<String, MethodHandleResult>>>();
 
   private static final ReferenceQueue<Map<String, MethodHandleResult>> cacheHandleRq =
       new ReferenceQueue<>();
@@ -211,8 +211,8 @@ public class Reflector {
   }
 
   private static MethodHandleResult retrieveStaticFieldHandle(
-      final Map<String, MethodHandleResult> handles, final Class<? extends Object> clazz,
-      final String name) throws IllegalAccessException, NoSuchFieldException {
+      final Map<String, MethodHandleResult> handles, final Class<?> clazz, final String name)
+      throws IllegalAccessException, NoSuchFieldException {
     MethodHandleResult handleRet;
     Field field = null;
     try {
@@ -232,8 +232,8 @@ public class Reflector {
   }
 
   private static MethodHandleResult retrieveGetterHandle(
-      final Map<String, MethodHandleResult> handles, final Class<? extends Object> clazz,
-      final String name) throws IllegalAccessException {
+      final Map<String, MethodHandleResult> handles, final Class<?> clazz, final String name)
+      throws IllegalAccessException {
     MethodHandleResult handleRet;
     List<Method> methods = getInstanceMethods(clazz, genGetterName("get", name));
     boolean isBooleanType = false;
@@ -246,7 +246,7 @@ public class Reflector {
     if (methods != null && !methods.isEmpty()) {
       Method method = methods.get(0);
       for (Method m : methods) {
-        if (method.getParameterCount() == 0) {
+        if (method.getParameterTypes().length == 0) {
           method = m;
           break;
         }
@@ -266,8 +266,7 @@ public class Reflector {
     handles.put(name, new MethodHandleResult(null, false));
   }
 
-  private static Map<String, MethodHandleResult> getClassHandles(
-      final Class<? extends Object> clazz) {
+  private static Map<String, MethodHandleResult> getClassHandles(final Class<?> clazz) {
     Reference<Map<String, MethodHandleResult>> existsHandlesRef = cachedHandles.get(clazz);
     Map<String, MethodHandleResult> handles = Collections.emptyMap();
     if (existsHandlesRef == null) {
@@ -288,7 +287,7 @@ public class Reflector {
   }
 
 
-  public static List<Method> getStaticMethods(final Class c, final String methodName) {
+  public static List<Method> getStaticMethods(final Class<?> c, final String methodName) {
     List<Method> ret = new ArrayList<Method>();
     for (Method method : c.getMethods()) {
       int modifiers = method.getModifiers();
@@ -403,7 +402,7 @@ public class Reflector {
     return getInstanceMethods(clazz, methodName);
   }
 
-  private static List<Method> getClassInstanceMethods(final Class c, final String methodName) {
+  private static List<Method> getClassInstanceMethods(final Class<?> c, final String methodName) {
     List<Method> ret = new ArrayList<Method>();
     for (Method method : c.getMethods()) {
       int modifiers = method.getModifiers();
@@ -416,18 +415,18 @@ public class Reflector {
     return ret;
   }
 
-  public static Object invokeStaticMethod(final Class c, final String methodName,
+  public static Object invokeStaticMethod(final Class<?> c, final String methodName,
       final List<Method> methods, final Object[] args) {
     return invokeMatchingMethod(methodName, methods, null, args);
   }
 
-  public static Object invokeInstanceMethod(final Class c, final String methodName,
+  public static Object invokeInstanceMethod(final Class<?> c, final String methodName,
       final Object target, final List<Method> methods, final Object[] args) {
     return invokeMatchingMethod(methodName, methods, target, args);
   }
 
 
-  public static Object boxArg(final Class paramType, final Object arg) {
+  public static Object boxArg(final Class<?> paramType, final Object arg) {
     if (!paramType.isPrimitive()) {
       return paramType.cast(arg);
     } else if (paramType == boolean.class) {
@@ -454,14 +453,14 @@ public class Reflector {
         "Unexpected param type, expected: " + paramType + ", given: " + arg.getClass().getName());
   }
 
-  public static Object[] boxArgs(final Class[] params, final Object[] args) {
+  public static Object[] boxArgs(final Class<?>[] params, final Object[] args) {
     if (params.length == 0) {
       return null;
     }
     Object[] ret = new Object[params.length];
     for (int i = 0; i < params.length; i++) {
       Object arg = args[i];
-      Class paramType = params[i];
+      Class<?> paramType = params[i];
       ret[i] = boxArg(paramType, arg);
     }
     return ret;
@@ -482,7 +481,7 @@ public class Reflector {
     return ret;
   }
 
-  static public boolean paramArgTypeMatch(final Class paramType, final Class argType) {
+  static public boolean paramArgTypeMatch(final Class<?> paramType, final Class<?> argType) {
     if (argType == null) {
       return !paramType.isPrimitive();
     }
@@ -509,7 +508,7 @@ public class Reflector {
     return false;
   }
 
-  public static boolean isCongruent(final Class[] params, final Object[] args) {
+  public static boolean isCongruent(final Class<?>[] params, final Object[] args) {
     boolean ret = false;
     if (args == null) {
       return params.length == 0;
@@ -518,8 +517,8 @@ public class Reflector {
       ret = true;
       for (int i = 0; ret && i < params.length; i++) {
         Object arg = args[i];
-        Class argType = (arg == null) ? null : arg.getClass();
-        Class paramType = params[i];
+        Class<?> argType = (arg == null) ? null : arg.getClass();
+        Class<?> paramType = params[i];
         ret = paramArgTypeMatch(paramType, argType);
       }
     }
