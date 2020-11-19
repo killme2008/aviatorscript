@@ -8,7 +8,6 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
-import com.googlecode.aviator.utils.TypeUtils;
 
 
 /**
@@ -41,9 +40,9 @@ public class SeqGetFunction extends AbstractFunction {
     Class<?> clazz = coll.getClass();
 
     if (List.class.isAssignableFrom(clazz)) {
-      if (!TypeUtils.isLong(key)) {
+      if (!(key instanceof Number)) {
         throw new IllegalArgumentException(
-            "Invalid index `" + key + "` for list,it's not a integer.");
+            "Invalid index `" + key + "` for list,it's not a number.");
       }
 
       Object value = ((List) coll).get(((Number) key).intValue());
@@ -58,10 +57,11 @@ public class SeqGetFunction extends AbstractFunction {
       Object value = ((Map) coll).get(key);
       return AviatorRuntimeJavaType.valueOf(value);
     } else if (clazz.isArray()) {
-      if (!TypeUtils.isLong(key)) {
+      if (!(key instanceof Number)) {
         throw new IllegalArgumentException(
-            "Invalid index `" + key + "` for array,it's not a integer.");
+            "Invalid index `" + key + "` for list,it's not a number.");
       }
+
       return AviatorRuntimeJavaType.valueOf(Array.get(coll, ((Number) key).intValue()));
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " is not a collection.");

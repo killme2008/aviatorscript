@@ -941,13 +941,13 @@ public class FunctionTest {
   public void testPropertyNilNotFound() {
     Map<String, Object> env = createUsersEnv();
     try {
-      AviatorEvaluator.execute("#data[0].name", env);
+      AviatorEvaluator.execute("#data[3].age", env);
       fail();
     } catch (ExpressionRuntimeException e) {
       assertTrue(true);
     }
     AviatorEvaluator.setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, true);
-    assertNull(AviatorEvaluator.execute("#data[0].name", env));
+    assertNull(AviatorEvaluator.execute("#data[3].age", env));
   }
 
   @Test

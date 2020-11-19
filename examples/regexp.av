@@ -2,9 +2,10 @@
 
 let p = /^(.*)\.av$/;
 
+println(type(p));
 println(p == p); ## print true
 
-println("regexp.av" =~ p);
-
-println("$0=" + $0);
-println("$1=" + $1);
+if "regexp.av" =~ p {
+  println("$0=" + $0);
+  println("$1=" + $1);
+}

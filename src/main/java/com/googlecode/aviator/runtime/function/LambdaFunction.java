@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorType;
 import com.googlecode.aviator.utils.Env;
 
@@ -16,13 +18,13 @@ import com.googlecode.aviator.utils.Env;
  * @author dennis
  *
  */
-public abstract class LambdaFunction extends AbstractFunction {
+public final class LambdaFunction extends AbstractVariadicFunction {
 
 
   private static final long serialVersionUID = -4388339706945053452L;
 
   // the arguments.
-  protected List<String> arguments;
+  protected List<FunctionParam> params;
 
   // the compiled lambda body expression
   protected BaseExpression expression;
@@ -33,17 +35,115 @@ public abstract class LambdaFunction extends AbstractFunction {
   // whether to inherit parent env
   private boolean inheritEnv = false;
 
+  private final boolean isVariadic;
+
+  private final String name;
+
+
+
+  public boolean isInheritEnv() {
+    return this.inheritEnv;
+  }
+
+  public Env getContext() {
+    return this.context;
+  }
+
+  public void setContext(final Env context) {
+    this.context = context;
+  }
+
+  public LambdaFunction(final String name, final List<FunctionParam> params,
+      final Expression expression, final Env context) {
+    super();
+    this.name = name;
+    this.params = params;
+    this.context = context;
+    this.expression = (BaseExpression) expression;
+    if (!this.params.isEmpty()) {
+      this.isVariadic = this.params.get(this.params.size() - 1).isVariadic();
+    } else {
+      this.isVariadic = false;
+    }
+  }
+
   public void setInheritEnv(final boolean inheritEnv) {
     this.inheritEnv = inheritEnv;
   }
 
-  public LambdaFunction(final List<String> arguments, final Expression expression,
-      final Env context) {
-    super();
-    this.arguments = arguments;
-    this.context = context;
-    this.expression = (BaseExpression) expression;
+
+  @Override
+  public String getName() {
+    return this.name;
   }
+
+
+  public int getArity() {
+    return this.params.size();
+  }
+
+  public boolean isVariadic() {
+    return this.isVariadic;
+  }
+
+
+
+  @Override
+  public AviatorObject call(final Map<String, Object> env) {
+    return AviatorRuntimeJavaType.valueOf(this.expression.executeDirectly(newEnv(env)));
+  }
+
+  @Override
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
+    return AviatorRuntimeJavaType.valueOf(this.expression.executeDirectly(newEnv(env, arg1)));
+  }
+
+  @Override
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2) {
+    return AviatorRuntimeJavaType.valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2)));
+  }
+
+  @Override
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3) {
+    return AviatorRuntimeJavaType
+        .valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3)));
+  }
+
+  @Override
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4) {
+    return AviatorRuntimeJavaType
+        .valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3, arg4)));
+  }
+
+  @Override
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5) {
+    return AviatorRuntimeJavaType
+        .valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3, arg4, arg5)));
+  }
+
+
+  @Override
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6) {
+    return AviatorRuntimeJavaType
+        .valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3, arg4, arg5, arg6)));
+  }
+
+
+  @Override
+  public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+      final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
+      final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7) {
+    return AviatorRuntimeJavaType.valueOf(
+        this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7)));
+  }
+
 
   protected Map<String, Object> newEnv(final Map<String, Object> parentEnv,
       final AviatorObject... args) {
@@ -57,17 +157,23 @@ public abstract class LambdaFunction extends AbstractFunction {
       assert (parentEnv == this.context);
       env = (Env) parentEnv;
     }
-    int i = 0;
-    for (String name : this.arguments) {
-      final AviatorObject arg = args[i++];
+    for (int i = 0; i < this.params.size(); i++) {
+      FunctionParam param = this.params.get(i);
+      final AviatorObject arg = args[i];
       Object value = arg.getValue(parentEnv);
       if (value == null && arg.getAviatorType() == AviatorType.JavaType
           && !parentEnv.containsKey(((AviatorJavaType) arg).getName())) {
         value = RuntimeUtils.getInstance(parentEnv).getFunction(((AviatorJavaType) arg).getName());
       }
-      env.override(name, value);
+      env.override(param.getName(), value);
     }
 
     return env;
   }
+
+  @Override
+  public AviatorObject variadicCall(final Map<String, Object> env, final AviatorObject... args) {
+    return AviatorRuntimeJavaType.valueOf(this.expression.executeDirectly(newEnv(env, args)));
+  }
+
 }

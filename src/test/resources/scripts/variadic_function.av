@@ -1,0 +1,97 @@
+
+
+fn add(a, b, &args) {
+  let sum = a + b;
+  for i in args {
+    sum = sum + i;
+  }
+  return sum;
+}
+
+j.assertEquals(3, add(1, 2));
+j.assertEquals(6, add(1, 2, 3));
+j.assertEquals(10, add(1, 2, 3, 4));
+j.assertEquals(21, add(1, 2, 3, 4, 5, 6));
+
+try{
+  add(1);
+  j.fail();
+} catch(com.googlecode.aviator.exception.FunctionNotFoundException e) {
+  pst(e);
+}
+
+
+let called = seq.map();
+
+fn join(a) {
+  a
+}
+
+fn join(a, b, &args) {
+  let s = a + b;
+  for ss in args {
+    s = s + ss;
+  }
+  
+  let v = seq.get(called, "join2");
+  
+  if v == nil {
+    seq.put(called, "join2", 1);
+  } else {
+    seq.put(called, "join2", v + 1);
+  }
+  
+  return s;
+}
+
+fn join(a, b, c,  &args) {
+  let s = join(join(a, b), c);
+  for ss in args {
+    s = s + ss;
+  }
+  
+  let v = seq.get(called, "join3");
+  
+  if v == nil {
+    seq.put(called, "join3", 1);
+  } else {
+    seq.put(called, "join3", v + 1);
+  }
+  
+  return s;
+}
+
+j.assertEquals("a", join("a"));
+j.assertEquals("b", join("b"));
+j.assertEquals(0, count(called));
+
+j.assertEquals("ab", join("a", "b"));
+j.assertEquals(1, count(called));
+j.assertEquals(1, seq.get(called, "join2"));
+
+j.assertEquals("abc", join("a", "b", "c"));
+j.assertEquals(2, count(called));
+j.assertEquals(1, seq.get(called, "join3"));
+j.assertEquals(3, seq.get(called, "join2"));
+
+j.assertEquals("abcd", join("a", "b", "c", "d"));
+j.assertEquals(2, count(called));
+j.assertEquals(2, seq.get(called, "join3"));
+j.assertEquals(5, seq.get(called, "join2"));
+
+j.assertEquals("abcde", join("a", "b", "c", "d", "e"));
+j.assertEquals(2, count(called));
+j.assertEquals(3, seq.get(called, "join3"));
+j.assertEquals(7, seq.get(called, "join2"));
+
+fn dummy(&args) {
+  return args;
+}
+
+j.assertEquals(tuple(), dummy());
+j.assertEquals(tuple(1), dummy(1));
+j.assertEquals(tuple("hello"), dummy("hello"));
+j.assertEquals(tuple(1,2,3), dummy(1, 2, 3));
+
+
+

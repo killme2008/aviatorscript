@@ -8,6 +8,7 @@ import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorType;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
 /**
@@ -19,6 +20,12 @@ import com.googlecode.aviator.utils.Reflector;
 public class NewInstanceFunction extends AbstractVariadicFunction {
 
   private static final long serialVersionUID = -2257891325568093945L;
+
+  private NewInstanceFunction() {
+
+  }
+
+  public static final NewInstanceFunction INSTANCE = new NewInstanceFunction();
 
   @Override
   public String getName() {
@@ -35,12 +42,10 @@ public class NewInstanceFunction extends AbstractVariadicFunction {
       throw new IllegalArgumentException("Invalid class name: " + firstArg.desc(env));
     }
     String className = ((AviatorJavaType) firstArg).getName();
-    if (!className.contains(".")) {
-      className = "java.lang." + className;
-    }
 
     try {
-      Class<?> clazz = Class.forName(className);
+      assert (env instanceof Env);
+      Class<?> clazz = ((Env) env).resolveClassSymbol(className);
       Constructor<?>[] constructors = clazz.getConstructors();
       final Object[] constructArgs = new Object[args.length - 1];
       for (int i = 1; i < args.length; i++) {

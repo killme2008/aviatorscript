@@ -22,7 +22,5 @@ println("nil >= 0.0: " + (nil >= 0.0));
 println("/\\s/ > nil: " + (/\s/ > nil));
 println("nil <= /\\s/: " + (nil <= /\s/));
 
+## c is nil, could not add it with 3
 c + 3;
-
-
-

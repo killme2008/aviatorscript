@@ -1,0 +1,9 @@
+
+
+fn add(a, &args, b) {
+  let sum = a + b;
+  for i in args {
+    sum = sum + i;
+  }
+  return sum;
+}

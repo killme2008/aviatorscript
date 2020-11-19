@@ -14,6 +14,10 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
  */
 public class ReducerReturnFunction extends AbstractFunction {
 
+  private ReducerReturnFunction() {}
+
+  public static final ReducerReturnFunction INSTANCE = new ReducerReturnFunction();
+
 
   private static final long serialVersionUID = -7242229684085361882L;
 

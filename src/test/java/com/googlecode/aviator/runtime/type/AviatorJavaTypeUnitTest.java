@@ -708,7 +708,7 @@ public class AviatorJavaTypeUnitTest {
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ClassCastException.class)
   public void testGetElement_IllegalArgument1() {
     Map<String, Object> env = createEnvForArrayTest();
 
@@ -718,7 +718,7 @@ public class AviatorJavaTypeUnitTest {
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ClassCastException.class)
   public void testGetElement_IllegalArgument2() {
     Map<String, Object> env = createEnvForArrayTest();
 
@@ -739,13 +739,14 @@ public class AviatorJavaTypeUnitTest {
   }
 
 
-  @Test(expected = ExpressionRuntimeException.class)
   public void testGetElement_IllegalTarget2() {
     Map<String, Object> env = createEnvForArrayTest();
 
-    env.put("a", new HashMap<String, String>());
+    final HashMap<String, Integer> map = new HashMap<String, Integer>();
+    map.put("key", 99);
+    env.put("a", map);
     AviatorJavaType javaTypeForArray = new AviatorJavaType("a");
 
-    javaTypeForArray.getElement(env, AviatorLong.valueOf(0)).getValue(null);
+    assertEquals(99, javaTypeForArray.getElement(env, new AviatorString("key")).getValue(null));
   }
 }

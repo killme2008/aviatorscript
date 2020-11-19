@@ -22,6 +22,12 @@ public class RequireFunction extends AbstractFunction {
 
   private static final long serialVersionUID = 5708185199888892952L;
 
+  private RequireFunction() {
+
+  }
+
+  public static final RequireFunction INSTANCE = new RequireFunction();
+
   @Override
   public String getName() {
     return Constants.REQUIRE_FN;

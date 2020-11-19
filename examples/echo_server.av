@@ -2,6 +2,7 @@
 ## A simple echo server in aviatorscript
 
 let io = require('io');
+use java.net.ServerSocket;
 
 fn process_conn(socket) {
   let client_addr = getRemoteSocketAddress(socket);
@@ -28,7 +29,7 @@ fn process_conn(socket) {
 
 let port = count(ARGV) >= 1? long(ARGV[0]) : 8080;
 
-let server =new java.net.ServerSocket(port);
+let server =new ServerSocket(port);
 
 p("Echo server listen at #{port}");
 

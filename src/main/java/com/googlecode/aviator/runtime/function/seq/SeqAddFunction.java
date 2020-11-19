@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.Collector;
 
 /**
  * seq.add function to add an element into seq.
@@ -41,6 +42,9 @@ public class SeqAddFunction extends AbstractFunction {
     } else if (Map.class.isAssignableFrom(clazz) && element instanceof Map.Entry) {
       Map.Entry entry = (Map.Entry) element;
       ((Map) coll).put(entry.getKey(), entry.getValue());
+      return arg1;
+    } else if (Collector.class.isAssignableFrom(clazz)) {
+      ((Collector) coll).add(element);
       return arg1;
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " is not a collection or map.");

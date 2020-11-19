@@ -5,6 +5,7 @@ import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.ScopeInfo;
+import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.utils.Constants;
 
 /**
@@ -247,7 +248,7 @@ public class NoneCodeGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onLambdaArgument(final Token<?> lookhead) {
+  public void onLambdaArgument(final Token<?> lookhead, final FunctionParam param) {
 
 
   }

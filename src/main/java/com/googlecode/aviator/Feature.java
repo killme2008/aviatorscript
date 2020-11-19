@@ -1,8 +1,23 @@
 package com.googlecode.aviator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import com.googlecode.aviator.runtime.function.internal.CatchHandlerFunction;
+import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
+import com.googlecode.aviator.runtime.function.internal.NewInstanceFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
+import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
+import com.googlecode.aviator.runtime.function.internal.ThrowFunction;
+import com.googlecode.aviator.runtime.function.internal.TryCatchFunction;
+import com.googlecode.aviator.runtime.function.internal.UseFunction;
+import com.googlecode.aviator.runtime.function.system.LoadFunction;
+import com.googlecode.aviator.runtime.function.system.RequireFunction;
+import com.googlecode.aviator.runtime.type.AviatorFunction;
 
 /**
  * Syntax features.
@@ -11,6 +26,8 @@ import java.util.Set;
  *
  */
 public enum Feature {
+
+
   /**
    * variable assignment
    */
@@ -18,19 +35,21 @@ public enum Feature {
   /**
    * return statement
    */
-  Return,
+  Return(asList(ReducerReturnFunction.INSTANCE)),
   /**
    * if/elsif/else statement
    */
-  If,
+  If(asList(IfCallccFunction.INSTANCE)),
   /**
    * for loop statement
    */
-  ForLoop,
+  ForLoop(asList(ReducerFunction.INSTANCE, ReducerBreakFunction.INSTANCE,
+      ReducerContFunction.INSTANCE, ReducerReturnFunction.INSTANCE)),
   /**
    * while statement
    */
-  WhileLoop,
+  WhileLoop(asList(ReducerFunction.INSTANCE, ReducerBreakFunction.INSTANCE,
+      ReducerContFunction.INSTANCE, ReducerReturnFunction.INSTANCE)),
   /**
    * let statement
    */
@@ -54,32 +73,66 @@ public enum Feature {
   /**
    * module system such as exports/require/load function supporting.
    */
-  Module,
+  Module(asList(LoadFunction.INSTANCE, RequireFunction.INSTANCE)),
   /**
    * try..catch..finally and throw statement to handle exceptions.
    */
-  ExceptionHandle,
+  ExceptionHandle(
+      asList(TryCatchFunction.INSTANCE, CatchHandlerFunction.INSTANCE, ThrowFunction.INSTANCE)),
   /**
    * new Class(arguments) to create an instance of special class with arguments.
    */
-  NewInstance,
+  NewInstance(asList(NewInstanceFunction.INSTANCE)),
   /**
    * String interpolation.For example, "a = 'aviator'; 'hello #{a}'" to generate a string 'hello
    * aviator'
    */
-  StringInterpolation(asSet(Feature.InternalVars));
+  StringInterpolation(asSet(Feature.InternalVars)),
+  /**
+   * use package.class to import java classes into current context.
+   *
+   * @since 5.2.0
+   */
+  Use(asList(UseFunction.INSTANCE));
 
   /**
    * Require feature sets for this feature.
    */
   private Set<Feature> prequires = Collections.emptySet();
 
+  /**
+   * Functions to support the feature.
+   */
+  private List<AviatorFunction> functions = Collections.emptyList();
+
+
   private Feature() {
 
   }
 
+  private static List<AviatorFunction> asList(final AviatorFunction... args) {
+    List<AviatorFunction> ret = new ArrayList<>(args.length);
+    for (AviatorFunction f : args) {
+      ret.add(f);
+    }
+    return ret;
+  }
+
   private Feature(final Set<Feature> prequires) {
     this.prequires = prequires;
+  }
+
+  private Feature(final List<AviatorFunction> funcs) {
+    this.functions = funcs;
+  }
+
+  private Feature(final Set<Feature> prequires, final List<AviatorFunction> funcs) {
+    this.prequires = prequires;
+    this.functions = funcs;
+  }
+
+  public List<AviatorFunction> getFunctions() {
+    return this.functions;
   }
 
   /**

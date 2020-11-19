@@ -1,0 +1,29 @@
+let m = seq.map("a", 1, "b", 2, "c", 3, 4, 5);
+
+j.assertEquals(4, count(m));
+j.assertEquals(1, m.a);
+j.assertEquals(1, m["a"]);
+j.assertEquals(2, m.b);
+j.assertEquals(2, m["b"]);
+j.assertEquals(3, m.c);
+j.assertEquals(3, m["c"]);
+j.assertEquals(5, seq.get(m, 4));
+j.assertEquals(5, m[4]);
+
+
+
+m.a = 100;
+j.assertEquals(100, m.a);
+
+m["c"] = -2;
+j.assertEquals(-2, m.c);
+
+m["b"] = "hello";
+j.assertEquals("hello", m.b);
+j.assertEquals("hello", m["b"]);
+
+m[4] = 88;
+j.assertEquals(88, seq.get(m, 4));
+j.assertEquals(88, m[4]);
+
+

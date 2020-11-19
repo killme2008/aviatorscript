@@ -41,6 +41,7 @@ import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.ScopeInfo;
+import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 
@@ -546,8 +547,8 @@ public class ASMCodeGeneratorUnitTest {
     this.codeGenerator.onLambdaDefineStart(new Variable("lambda", 0, 0));
     LambdaGenerator lambdaGenerator = this.codeGenerator.getLambdaGenerator();
     assertNotNull(lambdaGenerator);
-    this.codeGenerator.onLambdaArgument(new Variable("x", 0, 1));
-    this.codeGenerator.onLambdaArgument(new Variable("y", 0, 2));
+    this.codeGenerator.onLambdaArgument(new Variable("x", 0, 1), new FunctionParam(0, "x", false));
+    this.codeGenerator.onLambdaArgument(new Variable("y", 0, 2), new FunctionParam(1, "y", false));
     this.codeGenerator.onLambdaBodyStart(new Variable(">", 0, 3));
     lambdaGenerator.onConstant(new Variable("x", 0, 4));
     lambdaGenerator.onConstant(new Variable("y", 0, 5));

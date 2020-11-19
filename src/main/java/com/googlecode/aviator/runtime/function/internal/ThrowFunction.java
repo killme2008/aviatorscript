@@ -16,6 +16,10 @@ public class ThrowFunction extends AbstractFunction {
 
   private static final long serialVersionUID = -8464670257920503718L;
 
+  private ThrowFunction() {}
+
+  public static final ThrowFunction INSTANCE = new ThrowFunction();
+
   @Override
   public String getName() {
     return "__throw";

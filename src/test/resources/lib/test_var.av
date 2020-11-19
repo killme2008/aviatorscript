@@ -1,0 +1,28 @@
+
+use com.googlecode.aviator.example.VariableExample$Foo;
+use java.util.Date;
+
+let foo = new VariableExample$Foo(-100, 99.9, new Date());
+
+j.assertNotNull(foo);
+j.assertTrue(is_a(foo, VariableExample$Foo));
+j.assertEquals(-100, foo.i);
+j.assertEquals(99.9, foo.f);
+j.assertTrue(is_a(foo.date, Date));
+j.assertNotNull(foo.bars);
+j.assertNotNull(foo.bars[0]);
+j.assertEquals("bar", #foo.bars[0].name);
+j.assertEquals("bar", #`foo.bars[0].name`);
+
+#`foo.context(test)` = "test value";
+
+j.assertEquals(1, count(foo.context));
+j.assertEquals("test value", #`foo.context(test)`);
+j.assertEquals("test value", seq.get(foo.context, "test"));
+
+foo.i = 1;
+j.assertEquals(1, foo.i);
+foo.f = 2.2;
+j.assertEquals(2.2, foo.f);
+
+foo.k = 1000;

@@ -1,0 +1,14 @@
+use java.io.*;
+use java.nio.channels.{ClosedChannelException,*};
+
+try {
+  throw new IOException("test");
+  j.fail();
+} catch(ClosedChannelException e){
+  j.fail();
+} catch(IOException e) {
+  pst(e);
+  j.assertEquals("test", getMessage(e));
+} catch(AcceptPendingException e) {
+  j.fail();
+}

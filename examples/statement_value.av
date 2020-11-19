@@ -14,7 +14,7 @@ let a = if (false) {
 p("a is :" + type(a) +", " + a);
 
 let a = if (false) {
- 	1
+   1
 } else {
     2
 };
@@ -54,7 +54,7 @@ p("c is :" + type(c) +", " + c);
 let c = {
   let a = 1;
   let b = 2;
-  
+
   if a > b {
     return a;
   } else {
@@ -63,5 +63,3 @@ let c = {
 };
 
 p("c is :" + type(c) +", " + c);
-
-
