@@ -161,7 +161,7 @@ public class Reflector {
 
   }
 
-  public static Map<Class<?>, Reference<Map<String, MethodHandleResult>>> cachedHandles =
+  public static ConcurrentHashMap<Class<?>, Reference<Map<String, MethodHandleResult>>> cachedHandles =
       new ConcurrentHashMap<Class<?>, Reference<Map<String, MethodHandleResult>>>();
 
   private static final ReferenceQueue<Map<String, MethodHandleResult>> cacheHandleRq =
