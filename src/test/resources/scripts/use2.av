@@ -1,0 +1,41 @@
+use java.util.ArrayList;
+
+
+let list = new ArrayList(10);
+
+j.assertEquals("java.util.ArrayList", type(list));
+seq.add(list, 1);
+seq.add(list, 99);
+j.assertEquals(1, seq.get(list, 0));
+j.assertEquals(99, seq.get(list, 1));
+
+{
+   ## test in block
+   let list = new ArrayList(10);
+
+   j.assertEquals("java.util.ArrayList", type(list));
+   seq.add(list, 1);
+   seq.add(list, 99);
+   j.assertEquals(1, seq.get(list, 0));
+   j.assertEquals(99, seq.get(list, 1));
+}
+
+{
+  use java.util.concurrent.locks.ReentrantLock;
+  
+  let l = new ReentrantLock();
+  
+  let i = 0;
+  lock(l);
+  i = i + 1;
+  unlock(l);
+  j.assertEquals(1, i);
+}
+
+try {
+   ## ReentrantLock only valid in last block
+   let lock = new ReentrantLock();
+   j.fail();
+}catch(ClassNotFoundException e) {
+  pst(e);
+}

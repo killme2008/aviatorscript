@@ -13,5 +13,4 @@ for x in list {
   sum = sum + x;
 }
 
-println("sum of list is "+ sum);
-
+println("sum of list is #{sum}");

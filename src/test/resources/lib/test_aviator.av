@@ -1,0 +1,309 @@
+fn is_neg(x) {
+  x < 0
+}
+
+let tests = 0;
+
+fn test_take_while() {
+	tests = tests + 1;
+	j.assertNull(take_while(nil, identity));
+	j.assertEquals(0, count(take_while(tuple(), is_neg)));
+	
+	let list = tuple(-2, -1, 0, 1, 2, 3);
+	let ret = take_while(list, is_neg);
+	
+	j.assertEquals(2, count(ret));
+	j.assertEquals(-2, ret[0]);
+	j.assertEquals(-1, ret[1]);
+	
+    let m = seq.map("a", 1, "b", -2, "c", 100);
+	let ret = take_while(m, lambda(entry) -> entry.value > 0 end);
+	j.assertTrue(is_a(ret, java.util.HashMap));
+	j.assertEquals(2, count(ret));
+	j.assertEquals(1, ret["a"]);
+    j.assertEquals(100, ret["c"]);
+}
+
+fn test_drop_while() {
+	tests = tests + 1;
+	j.assertNull(drop_while(nil, identity));
+	j.assertEquals(0, count(drop_while(tuple(), is_neg)));
+	
+	let list = tuple(-2, -1, 0, 1, 2, 3);
+	let ret = drop_while(list, is_neg);
+	
+	j.assertEquals(4, count(ret));
+	j.assertEquals(0, ret[0]);
+	j.assertEquals(1, ret[1]);
+	j.assertEquals(2, ret[2]);
+	j.assertEquals(3, ret[3]);
+	
+	let m = seq.map("a", 1, "b", -2, "c", 100);
+	let ret = drop_while(m, lambda(entry) -> entry.value > 0 end);
+	j.assertTrue(is_a(ret, java.util.HashMap));
+	j.assertEquals(1, count(ret));
+	j.assertEquals(-2, ret["b"]);
+}
+
+fn test_concat() {
+   tests = tests + 1;
+   j.assertNull(concat(nil, nil));
+   j.assertEquals(0, count(concat(tuple(), nil)));
+   j.assertEquals(0, count(concat(nil, tuple())));
+   
+   let l1 = seq.list(1,2,3);
+   let l2 = tuple(4, 5, 6);
+   
+   	let ret = concat(l1, l2);
+	
+	j.assertEquals(6, count(ret));
+	for i in range(0, 6) {
+		j.assertEquals(i + 1, ret[i]); 
+	}
+	
+	let l1 = seq.map("a", 1);
+    let l2 = tuple(4, 5, 6);
+    let ret = concat(l1, l2);
+	
+	j.assertEquals(4, count(ret));
+	j.assertEquals(seq.entry("a", 1), ret[0]);
+	j.assertEquals(4, ret[1]);
+	j.assertEquals(5, ret[2]);
+	j.assertEquals(6, ret[3]);
+}
+
+fn test_repeat(){
+   tests = tests + 1;
+   let s = repeat(0, nil);
+   j.assertEquals(0, count(s));
+   j.assertEquals('java.util.ArrayList', type(s));
+   
+   let s = repeat(1, "a");
+   j.assertEquals(1, count(s));
+   j.assertEquals("a", s[0]);
+   
+   let s = repeat(10, "x");
+   j.assertEquals(10, count(s));
+   for x in s {
+   	  j.assertEquals("x", x);
+   }
+}
+
+fn test_repeatedly() {
+  tests = tests + 1;
+  let s = repeatedly(0, rand);
+  j.assertEquals(0, count(s));
+  j.assertEquals('java.util.ArrayList', type(s));
+  
+  let s = repeatedly(10, rand);
+  j.assertEquals(10, count(s));
+  for x in s {
+    j.assertEquals("double", type(x));
+  	j.assertTrue(x >=0 && x < 1);
+  }
+}
+
+fn test_group_by() {
+  tests = tests + 1;
+  let m = group_by(nil, identity);
+  j.assertEquals("java.util.HashMap", type(m));
+  j.assertTrue(is_empty(m));
+  
+  let m = group_by(tuple(), identity);
+  j.assertEquals("java.util.HashMap", type(m));
+  j.assertTrue(is_empty(m));
+  
+  let m = group_by(tuple(1,2,3), identity);
+  j.assertEquals("java.util.HashMap", type(m));
+  j.assertEquals(3, count(m));
+  j.assertEquals(seq.list(1), seq.get(m, 1));
+  j.assertEquals(seq.list(2), seq.get(m, 2));
+  j.assertEquals(seq.list(3), seq.get(m, 3));
+  
+  let m = group_by(tuple(1,2,3), lambda(x) -> x > 2 end);
+  j.assertEquals("java.util.HashMap", type(m));
+  j.assertEquals(2, count(m));
+  j.assertEquals(seq.list(3), seq.get(m, true));
+  j.assertEquals(seq.list(1, 2), seq.get(m, false));
+}
+
+fn test_distinct() {
+  tests = tests + 1;
+  
+  j.assertTrue(is_empty(distinct(nil)));
+  j.assertTrue(is_empty(distinct(tuple())));
+  
+  let s = tuple(1, 2, 1, 3, 1, 4, 1, 5);
+  let ret = distinct(s);
+  j.assertEquals(5, count(ret));
+  j.assertEquals(tuple(1, 2, 3, 4, 5), ret);
+  
+  let s = seq.list(1, 2, 1,"b", 3, 1, "a", 4, 1, 5, "a", "c");
+  let ret = distinct(s);
+  j.assertEquals(8, count(ret));
+  j.assertEquals(seq.list(1, 2, "b", 3, "a", 4, 5, "c"), ret);
+}
+
+fn test_constantly() {
+  tests = tests + 1;
+  
+  let f = constantly(100);
+  
+  ## always returns 100
+  j.assertEquals(100, f());
+  j.assertEquals(100, f(1));
+  j.assertEquals(100, f(1, 2));
+  j.assertEquals(100, f("a"));
+  j.assertEquals(100, f("a", "b", 100));
+}
+
+fn test_keys_vals(){
+  tests = tests + 1;
+  
+  j.assertNull(seq.keys(nil));
+  j.assertNull(seq.vals(nil)); 
+  
+  let m = seq.map("a", 1, "b", 2, "c", 3);
+  
+  let ks = seq.keys(m);
+  let vs = seq.vals(m);
+  
+  j.assertEquals(3, count(ks));
+  j.assertEquals(3, count(vs));
+  
+  j.assertTrue(include(ks, "a"));
+  j.assertTrue(include(ks, "b"));
+  j.assertTrue(include(ks, "c"));
+ 
+  j.assertTrue(include(vs, 1));
+  j.assertTrue(include(vs, 2));
+  j.assertTrue(include(vs, 3));     
+}
+
+fn test_reverse() {
+  tests = tests + 1;
+
+  j.assertNull(reverse(nil));
+  
+  let a = tuple(1 ,2, 3, 4, 5);
+  
+  reverse(a);
+  j.assertEquals(tuple(5, 4, 3, 2, 1), a);
+  for i in range(0, 5) {
+    j.assertEquals(5-i, a[i]);
+  }
+  
+  let a = seq.list(1 ,2, 3, 4, 5);
+  
+  reverse(a);
+  j.assertEquals(seq.list(5, 4, 3, 2, 1), a);
+  for i in range(0, 5) {
+    j.assertEquals(5-i, a[i]);
+  }
+  try{
+    reverse(seq.map("a", 1));
+    j.fail();
+  }catch(e) {
+  }
+}
+
+fn test_zipmap() {
+  tests = tests + 1;
+  
+  let m = zipmap(nil, nil);
+  j.assertEquals("java.util.HashMap", type(m));
+  j.assertTrue(is_empty(m));
+  
+  let m = zipmap(tuple("a", "b", "c"), seq.list(1,2,3,4));
+  
+  j.assertTrue(is_a(m, java.util.HashMap));
+  j.assertEquals(3, count(m));
+  j.assertEquals(1, seq.get(m, "a"));
+  j.assertEquals(2, seq.get(m, "b"));
+  j.assertEquals(3, seq.get(m, "c"));
+  
+  let attr = seq.map("margin", 0, "padding", 0);
+  let ret = zipmap(tuple("html", "body", "div"), repeat(4, attr));
+  
+  j.assertEquals(3, count(ret));
+  j.assertTrue(is_a(ret, java.util.HashMap));
+  j.assertEquals(attr, seq.get(ret, "html"));
+  j.assertEquals(attr, seq.get(ret, "body"));
+  j.assertEquals(attr, seq.get(ret, "div"));
+}
+
+fn test_is_a() {
+  tests = tests + 1;
+  
+  j.assertFalse(is_a(nil, long));
+  j.assertFalse(is_a("a", long));
+  
+  j.assertTrue(is_a(1, Long));
+  j.assertTrue(is_a("a", String));  
+  j.assertTrue(is_a(seq.map(), java.util.HashMap));
+  j.assertEquals("function", type(lambda() -> end));
+}
+
+fn test_comparator() {
+  tests = tests + 1;
+  
+  let c = comparator(lambda(x, y) -> x > y end);
+  
+  j.assertTrue(is_a(c, java.util.Comparator));
+  
+  j.assertEquals(1, compare(c, 1, 2));
+  j.assertEquals(-1, compare(c, 2, 1));
+  j.assertEquals(0, compare(c, 2, 2));
+}
+
+fn test_sort() {
+  tests = tests + 1;
+  
+  let a = tuple(5, 2, 99, -100, 3, 7);
+  
+  let b = sort(a);
+  j.assertEquals(tuple(-100, 2, 3, 5, 7, 99), b);
+  j.assertEquals(tuple(5, 2, 99, -100, 3, 7), a);
+  
+  let c = comparator(lambda(x, y) -> x > y end);
+  let b = sort(a, c);
+  j.assertEquals(tuple(99, 7, 5, 3, 2, -100), b);  
+  
+  let c = comparator(lambda(x, y) -> x < y end);
+  let b = sort(a, c);
+  j.assertEquals(tuple(-100, 2, 3, 5, 7, 99), b);
+}
+
+fn test_static_fields() {
+  tests = tests + 1;
+  
+  j.assertEquals(9223372036854775807, Long.MAX_VALUE);
+  j.assertEquals(3.14159265358979323846, Math.PI);  
+}
+
+fn test_new_static_class() {
+  tests = tests + 1;
+  
+  let handler = new java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy();
+  j.assertNotNull(handler);
+  j.assertEquals("java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy", (type(handler)));
+}
+
+test_take_while();
+test_drop_while();
+test_concat();
+test_repeat();
+test_repeatedly();
+test_group_by();
+test_distinct();
+test_constantly();
+test_keys_vals();
+test_reverse();
+test_zipmap();
+test_is_a();
+test_comparator();
+test_sort();
+test_static_fields();
+test_new_static_class();
+
+j.assertEquals(16, tests);

@@ -15,6 +15,12 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 public class ReducerContFunction extends AbstractFunction {
 
 
+  private ReducerContFunction() {
+
+  }
+
+  public static final ReducerContFunction INSTANCE = new ReducerContFunction();
+
   private static final long serialVersionUID = 7517333105872722540L;
 
   @Override

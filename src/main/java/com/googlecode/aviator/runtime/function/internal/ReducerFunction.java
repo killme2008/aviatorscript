@@ -23,6 +23,10 @@ public class ReducerFunction extends AbstractFunction {
 
   private static final long serialVersionUID = -6117602709327741955L;
 
+  private ReducerFunction() {}
+
+  public static final ReducerFunction INSTANCE = new ReducerFunction();
+
   @Override
   public String getName() {
     return "__reducer_callcc";

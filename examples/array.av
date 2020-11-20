@@ -10,8 +10,8 @@ let s = seq.array(java.lang.String, "hello", "world", "aviator");
 println(string.join(s, ","));
 
 let a = seq.array_of(int, 3);
-println("type(a) is : " + type(a));
-println("count(a) is: " + count(a));
+println("type(a) is : #{type(a)}");
+println("count(a) is: #{count(a)}");
 
 println("before assignment:");
 for x in a {
@@ -26,5 +26,3 @@ println("after assignment:");
 for x in a {
   println(x);
 }
-
-

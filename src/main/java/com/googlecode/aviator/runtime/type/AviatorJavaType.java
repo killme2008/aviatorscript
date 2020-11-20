@@ -16,6 +16,7 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,8 @@ import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.function.DispatchFunction;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
@@ -44,6 +47,8 @@ public class AviatorJavaType extends AviatorObject {
   private String name;
   private final boolean containsDot;
   private String[] subNames;
+  // slow path to get nested property
+  private boolean slowPath = false;
 
   @Override
   public AviatorType getAviatorType() {
@@ -321,7 +326,7 @@ public class AviatorJavaType extends AviatorObject {
           // cache the result
           this.subNames = SPLIT_PAT.split(name);
         }
-        return getProperty(name, this.subNames, env, throwExceptionNotFound);
+        return getProperty(name, this.subNames, env, throwExceptionNotFound, this);
       }
       return env.get(name);
     }
@@ -333,7 +338,7 @@ public class AviatorJavaType extends AviatorObject {
     if (env != null) {
       if (nameContainsDot && RuntimeUtils.getInstance(env)
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
-        return getProperty(name, names, env, throwExceptionNotFound);
+        return getProperty(name, names, env, throwExceptionNotFound, null);
       }
       return env.get(name);
     }
@@ -348,6 +353,32 @@ public class AviatorJavaType extends AviatorObject {
     }
 
     Object v = getAssignedValue(value, env);
+
+    // TODO refactor
+    // special processing for define functions.
+    if (v instanceof LambdaFunction) {
+      // try to define a function
+      Object existsFn = getValue(env);
+      if (existsFn instanceof DispatchFunction) {
+        // It's already an overload function, install the new branch.
+        ((DispatchFunction) existsFn).install((LambdaFunction) v);
+        return AviatorRuntimeJavaType.valueOf(existsFn);
+      } else if (existsFn instanceof LambdaFunction) {
+        // cast it to an overload function
+        DispatchFunction newFn = new DispatchFunction(this.name);
+        // install the exists branch
+        newFn.install((LambdaFunction) existsFn);
+        // and the new branch.
+        newFn.install(((LambdaFunction) v));
+        v = newFn;
+      } else if (existsFn == null && ((LambdaFunction) v).isVariadic()) {
+        // cast variadic function to overload function
+        DispatchFunction newFn = new DispatchFunction(this.name);
+        newFn.install(((LambdaFunction) v));
+        v = newFn;
+      }
+    }
+
     ((Env) env).override(this.name, v);
     return AviatorRuntimeJavaType.valueOf(v);
   }
@@ -393,29 +424,13 @@ public class AviatorJavaType extends AviatorObject {
 
   @SuppressWarnings("unchecked")
   private static Object getProperty(final String name, String[] names,
-      final Map<String, Object> env, final boolean throwExceptionNotFound) {
+      final Map<String, Object> env, final boolean throwExceptionNotFound,
+      final AviatorJavaType javaType) {
     try {
       if (names == null) {
         names = SPLIT_PAT.split(name);
       }
-      Map<String, Object> innerEnv = env;
-      for (int i = 0; i < names.length; i++) {
-        // Fast path for nested map.
-        String rName = reserveName(names[i]);
-        Object val = innerEnv.get(rName != null ? rName : names[i]);
-
-        if (i == names.length - 1) {
-          return val;
-        }
-
-        // fallback to property utils
-        if (!(val instanceof Map)) {
-          return Reflector.getProperty(env, name);
-        }
-
-        innerEnv = (Map<String, Object>) val;
-      }
-      return Reflector.getProperty(env, name);
+      return fastGetProperty(name, names, env, javaType);
 
     } catch (Throwable t) {
       if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
@@ -428,6 +443,120 @@ public class AviatorJavaType extends AviatorObject {
       } else {
         return null;
       }
+    }
+  }
+
+  private static Object fastGetProperty(final String name, final String[] names,
+      final Map<String, Object> env, final AviatorJavaType javaType)
+      throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    if (javaType != null && javaType.slowPath) {
+      return Reflector.getProperty(env, name);
+    }
+
+    Map<String, Object> innerEnv = env;
+    Class<?> innerClazz = null;
+    Object targetObject = null;
+    for (int i = 0; i < names.length; i++) {
+      String rName = reserveName(names[i]);
+      rName = rName != null ? rName : names[i];
+      int arrayIndex = -1;
+      String keyIndex = null;
+
+      // compatible with PropertyUtilsBean indexed and mapped formats.
+      // https://commons.apache.org/proper/commons-beanutils/apidocs/org/apache/commons/beanutils/PropertyUtilsBean.html
+      switch (rName.charAt(rName.length() - 1)) {
+        case ']':
+          int idx = rName.indexOf("[");
+          if (idx < 0) {
+            throw new IllegalArgumentException("Should not happen, doesn't contains '['");
+          }
+          String rawName = rName;
+          rName = rName.substring(0, idx);
+          arrayIndex = Integer.valueOf(rawName.substring(idx + 1, rawName.length() - 1));
+          break;
+        case ')':
+          idx = rName.indexOf("(");
+          if (idx < 0) {
+            throw new IllegalArgumentException("Should not happen, doesn't contains '('");
+          }
+          rawName = rName;
+          rName = rName.substring(0, idx);
+          keyIndex = rawName.substring(idx + 1, rawName.length() - 1);
+          break;
+      }
+
+
+      Object val = null;
+      if (innerEnv != null) {
+        val = innerEnv.get(rName);
+        if (val == null && i == 0 && env instanceof Env) {
+          val = tryResolveAsClass(env, rName);
+        }
+      } else if (innerClazz != null) {
+        val = Reflector.fastGetProperty(innerClazz, rName, true);
+      } else {
+        // in the format of a.b.[0].c
+        if (rName.isEmpty()) {
+          if (!(arrayIndex >= 0 || keyIndex != null)) {
+            throw new IllegalArgumentException("Invalid format");
+          }
+          val = targetObject;
+        } else {
+          val = Reflector.fastGetProperty(targetObject, rName, false);
+        }
+      }
+
+      if (arrayIndex >= 0) {
+        if (val.getClass().isArray()) {
+          val = Array.get(val, arrayIndex);
+        } else if (val instanceof List) {
+          val = ((List) val).get(arrayIndex);
+        } else if (val instanceof CharSequence) {
+          val = ((CharSequence) val).charAt(arrayIndex);
+        } else {
+          throw new IllegalArgumentException("Can't access " + val + " with index `" + arrayIndex
+              + "`, it's not an array, list or CharSequence");
+        }
+      }
+      if (keyIndex != null) {
+        if (Map.class.isAssignableFrom(val.getClass())) {
+          val = ((Map) val).get(keyIndex);
+        } else {
+          throw new IllegalArgumentException(
+              "Can't access " + val + " with key `" + keyIndex + "`, it's not a map");
+        }
+      }
+
+      if (i == names.length - 1) {
+        return val;
+      }
+      if (val instanceof Map) {
+        innerEnv = (Map<String, Object>) val;
+        innerClazz = null;
+        targetObject = null;
+      } else if (val instanceof Class<?>) {
+        innerClazz = (Class<?>) val;
+        innerEnv = null;
+        targetObject = null;
+      } else if (val == null) {
+        throw new NullPointerException(rName);
+      } else {
+        targetObject = val;
+        innerEnv = null;
+        innerClazz = null;
+      }
+    }
+    if (javaType != null) {
+      javaType.slowPath = true;
+    }
+    return Reflector.getProperty(env, name);
+  }
+
+  private static Object tryResolveAsClass(final Map<String, Object> env, final String rName) {
+    try {
+      return ((Env) env).resolveClassSymbol(rName);
+    } catch (ClassNotFoundException e) {
+      return null;
     }
   }
 
@@ -614,16 +743,10 @@ public class AviatorJavaType extends AviatorObject {
   @Override
   public AviatorObject getElement(final Map<String, Object> env, final AviatorObject indexObject) {
     final Object thisValue = getValue(env);
-    if (!thisValue.getClass().isArray() && !(thisValue instanceof List)) {
-      throw new ExpressionRuntimeException(
-          desc(env) + " is not an array or list,could not use [] to get element");
-    }
-    Object indexValue = indexObject.getValue(env);
-    if (!(indexValue instanceof Number)) {
-      throw new IllegalArgumentException("Illegal index: " + indexObject.desc(env));
-    }
-    final int index = ((Number) indexValue).intValue();
+    final Object indexValue = indexObject.getValue(env);
+
     if (thisValue.getClass().isArray()) {
+      final int index = ((Number) indexValue).intValue();
       return new AviatorRuntimeJavaElementType(ContainerType.Array, thisValue, index,
           new Callable<Object>() {
             @Override
@@ -631,7 +754,8 @@ public class AviatorJavaType extends AviatorObject {
               return Array.get(thisValue, index);
             }
           });
-    } else {
+    } else if (thisValue instanceof List) {
+      final int index = ((Number) indexValue).intValue();
       return new AviatorRuntimeJavaElementType(ContainerType.List, thisValue, index,
           new Callable<Object>() {
 
@@ -641,6 +765,19 @@ public class AviatorJavaType extends AviatorObject {
             }
 
           });
+    } else if (thisValue instanceof Map) {
+      return new AviatorRuntimeJavaElementType(ContainerType.Map, thisValue, indexValue,
+          new Callable<Object>() {
+
+            @Override
+            public Object call() throws Exception {
+              return ((Map) thisValue).get(indexValue);
+            }
+
+          });
+    } else {
+      throw new ExpressionRuntimeException(
+          desc(env) + " is not an array, list or map,could not use [] to get element");
     }
   }
 

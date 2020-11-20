@@ -1,0 +1,8 @@
+
+j.assertEquals(0.3, math.asin(0.3));
+j.assertEquals(1.2661036727794992, math.acos(0.3));
+j.assertEquals(0.2914567944778671, math.atan(0.3));
+j.assertEquals(6.0, math.ceil(5.5));
+j.assertEquals(5.0, math.floor(5.5));
+j.assertEquals(6.0, math.ceil(5.1));
+j.assertEquals(5.0, math.floor(5.1));

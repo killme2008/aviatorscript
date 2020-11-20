@@ -6,6 +6,7 @@ import java.util.Map;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
 /**
@@ -21,16 +22,14 @@ public class CatchHandler extends AviatorObject {
   private final AviatorFunction func;
   private final List<Class<?>> exceptionClasses;
 
-  public CatchHandler(final AviatorFunction func, final List<String> exceptionClassNames) {
+  public CatchHandler(final Env env, final AviatorFunction func,
+      final List<String> exceptionClassNames) {
     super();
     this.func = func;
     this.exceptionClasses = new ArrayList<>(exceptionClassNames.size());
     for (String exceptionClass : exceptionClassNames) {
       try {
-        if (!exceptionClass.contains(".")) {
-          exceptionClass = "java.lang." + exceptionClass;
-        }
-        this.exceptionClasses.add(Class.forName(exceptionClass));
+        this.exceptionClasses.add(env.resolveClassSymbol(exceptionClass));
       } catch (Exception e) {
         throw Reflector.sneakyThrow(e);
       }

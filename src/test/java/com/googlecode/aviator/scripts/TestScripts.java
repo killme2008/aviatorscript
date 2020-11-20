@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +15,10 @@ import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.StandardError;
+import com.googlecode.aviator.runtime.JavaMethodReflectionFunctionMissing;
 import com.googlecode.aviator.runtime.module.IoModule;
 import com.googlecode.aviator.runtime.type.Range;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
 public class TestScripts {
@@ -26,20 +29,84 @@ public class TestScripts {
   public void setup() throws Exception {
     this.instance = AviatorEvaluator.newInstance();
     this.instance.addStaticFunctions("j", org.junit.Assert.class);
+    this.instance.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());
   }
 
   public Object testScript(final String name, final Object... args) {
     try {
       System.out.println("Testing script " + name + " with args: " + Arrays.toString(args));
-      this.instance
-          .validate(IoModule.slurp(TestScripts.class.getResource("/scripts/" + name).getFile()));
-      Expression exp = this.instance
-          .compileScript(TestScripts.class.getResource("/scripts/" + name).getFile(), true);
+      final String file = TestScripts.class.getResource("/scripts/" + name).getFile();
+      this.instance.validate(IoModule.slurp(file));
+      Expression exp = this.instance.compileScript(file, true);
       return exp.execute(AviatorEvaluator.newEnv(args));
     } catch (Throwable t) {
       Reflector.sneakyThrow(t);
     }
     return null;
+  }
+
+  public Object testLib(final String name, final Object... args) {
+    try {
+      System.out.println("Testing lib " + name + " with args: " + Arrays.toString(args));
+      final String file = TestScripts.class.getResource("/lib/test_" + name + ".av").getFile();
+      this.instance.validate(IoModule.slurp(file));
+      Expression exp = this.instance.compileScript(file, true);
+      return exp.execute(AviatorEvaluator.newEnv(args));
+    } catch (Throwable t) {
+      Reflector.sneakyThrow(t);
+    }
+    return null;
+  }
+
+
+  @Test
+  public void testLibs() {
+    testLib("aviator");
+    testLib("math");
+    testLib("map");
+    testLib("var");
+  }
+
+  @Test
+  public void testUseStatement() {
+    Env env = (Env) testScript("use1.av", "Long", Long.class);
+    assertNotNull(env);
+    List<String> symbols = env.getImportedSymbols();
+    assertNotNull(symbols);
+    assertEquals(2, symbols.size());
+    assertTrue(symbols.contains("com.googlecode.aviator.runtime.type.AviatorObject"));
+    assertTrue(symbols.contains("java.util.List"));
+
+    testScript("use2.av");
+    testScript("use3.av");
+    testScript("use4.av");
+
+    try {
+      testScript("use5.av");
+      fail();
+    } catch (ExpressionSyntaxErrorException e) {
+      assertTrue(e.getMessage().contains("expect variable name or * to use at"));
+    }
+  }
+
+  @Test
+  public void testOverloadFunction() {
+    testScript("overload_function.av");
+  }
+
+  @Test
+  public void testVariadicFunctions() {
+    testScript("variadic_function.av");
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testVariadicFunctionsWrongPosition() {
+    testScript("variadic_function2.av");
+  }
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testVariadicFunctionsTwoArgs() {
+    testScript("variadic_function3.av");
   }
 
   @Test

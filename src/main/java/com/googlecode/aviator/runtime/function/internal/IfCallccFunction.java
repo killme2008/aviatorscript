@@ -17,6 +17,12 @@ public class IfCallccFunction extends AbstractFunction {
 
   private static final long serialVersionUID = 3511688119189694245L;
 
+  private IfCallccFunction() {
+
+  }
+
+  public static final IfCallccFunction INSTANCE = new IfCallccFunction();
+
   @Override
   public String getName() {
     return "__if_callcc";

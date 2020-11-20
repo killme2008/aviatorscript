@@ -46,6 +46,7 @@ import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.parser.Parser;
+import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -753,8 +754,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onLambdaArgument(final Token<?> lookhead) {
-    this.lambdaGenerator.addArgument(lookhead.getLexeme());
+  public void onLambdaArgument(final Token<?> lookhead, final FunctionParam param) {
+    this.lambdaGenerator.addParam(param);
   }
 
 
@@ -767,7 +768,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onLambdaBodyEnd(final Token<?> lookhead) {
-    this.lambdaGenerator.compileCallMethod();
+    // this.lambdaGenerator.compileCallMethod();
     LambdaFunctionBootstrap bootstrap = this.lambdaGenerator.getLmabdaBootstrap();
     if (this.lambdaBootstraps == null) {
       this.lambdaBootstraps = new HashMap<String, LambdaFunctionBootstrap>();

@@ -4,8 +4,11 @@ let a = 2M;
 let err = 1e-15M;
 let root = a;
 
+p("type of a is: #{type(a)}");
+p("type of err is: #{type(err)}");
+
 while math.abs(a - root * root) > err {
   root = (a/root + root) / 2.0M;
 }
 
-println("square root of 2M is: " + root);
+p("square root of 2M is: #{root}");

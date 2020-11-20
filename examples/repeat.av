@@ -1,0 +1,21 @@
+## examples/repeat.av
+## require aviatorscript >= 5.2
+
+let list = repeat(10, "a");
+
+p("type of list: " + type(list));
+p("count of list: " + count(list));
+p("list[0]=" + list[0]);
+p("list is: " + list);
+
+let c = 0 ;
+let counter = lambda() ->
+    c = c + 1;
+    return c;
+end;
+
+let list = repeatedly(10, counter);
+p("type of list: " + type(list));
+p("count of list: " + count(list));
+p("list[0]=" + list[0]);
+p("list is: " + list);

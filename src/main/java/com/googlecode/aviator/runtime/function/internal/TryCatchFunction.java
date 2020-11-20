@@ -19,10 +19,11 @@ import com.googlecode.aviator.utils.Reflector;
  */
 public class TryCatchFunction extends AbstractFunction {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 7314510329619948965L;
+
+  private TryCatchFunction() {}
+
+  public static final TryCatchFunction INSTANCE = new TryCatchFunction();
 
   @Override
   public String getName() {

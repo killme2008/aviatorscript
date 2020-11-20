@@ -10,8 +10,9 @@ let n = seq.list("car", "bus", "bike");
 let sum = 0 ;
 for e in r {
   sum = sum + e;
-} 
+}
 println("sum of range r: " + sum);
+println("print map:");
 for e in m {
   println(e.key + "=" + e.value);
 }
@@ -22,6 +23,11 @@ println("count of range: " + count(r));
 println("count of set: " + count(s));
 println("count of map: " + count(m));
 println("count of list: " + count(n));
+
+## is_empty
+println("is_empty(array): " + is_empty(a));
+println("is_empty(seq.list()): " + is_empty(seq.list()));
+println("is_empty(nil): " + is_empty(nil));
 
 ## include
 println("array has 3: " + include(a, 3));
@@ -53,10 +59,10 @@ println("some of range is: " + sum_of_r);
 let len = reduce(n, lambda(len, x) -> len  + count(x) end, 0);
 println("total string length in list is: " + len);
 
-fn mymap(seq, fn) {
-  reduce(seq, 
-         lambda(c, e) -> 
-           seq.add(c, fn(e))
+fn mymap(seq, func) {
+  reduce(seq,
+         lambda(c, e) ->
+           seq.add(c, func(e))
          end,
          seq.list())
 }
@@ -66,6 +72,9 @@ println("test mymap: " + mymap(a, lambda(x) -> x * 2 end));
 println("sort(list) is: " + sort(n));
 println("sort(set) is: " + sort(into(seq.list(), s)));
 
+let c = comparator(lambda(x, y) -> x > y end);
+println("sort(list, c) is: " + sort(n, c));
+
 ## filter
 let es = filter(r, lambda(x) -> x %2 == 0 end);
 println("filter even number in range:"  + es);
@@ -73,21 +82,21 @@ let bs = filter(n, lambda(x) -> string.startsWith(x, "b") end);
 println("bs is: "  + bs);
 
 ## seq.every
-println("every element in array is greater than zero: " 
+println("every element in array is greater than zero: "
         + seq.every(a, lambda(x) -> x > 0 end));
-println("every element in range is greater than zero: " 
+println("every element in range is greater than zero: "
         + seq.every(r, lambda(x) -> x > 0 end));
-        
+
 ## seq.not_any
-println("There are not any elements in array is less than zero: " 
+println("There are not any elements in array is less than zero: "
         + seq.not_any(a, lambda(x) -> x < 0 end));
-println("There are not any elements in range is less than zero: " 
+println("There are not any elements in range is less than zero: "
         + seq.not_any(r, lambda(x) -> x < 0 end));
-        
+
 ## seq.some
-println("Find a element in array is greater than zero: " 
+println("Find a element in array is greater than zero: "
         + seq.some(a, lambda(x) -> x > 0 end));
-println("Find a element in range is greater than zero: " 
+println("Find a element in range is greater than zero: "
         + seq.some(r, lambda(x) -> x > 0 end));
-println("Find a element in list is starting with 'c': " 
-        + seq.some(n, lambda(x) -> string.startsWith(x, "c") end));        
+println("Find a element in list is starting with 'c': "
+        + seq.some(n, lambda(x) -> string.startsWith(x, "c") end));

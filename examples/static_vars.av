@@ -1,0 +1,12 @@
+## examples/static_vars.av
+## require aviatorscript >= 5.2
+
+p("Math.PI is: " + Math.PI);
+
+
+use  com.googlecode.aviator.AviatorEvaluator;
+
+p("AviatorEvaluator.VERSION is: " + AviatorEvaluator.VERSION);
+p("AviatorEvaluator.COMPILE is: " + AviatorEvaluator.COMPILE);
+
+p(com.googlecode.aviator.AviatorEvaluator.VERSION);

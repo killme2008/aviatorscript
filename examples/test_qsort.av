@@ -1,6 +1,6 @@
 ## examples/test_qsort.av
 
-let q = require('examples/qsort.av');
+let q = require(__MODULE__.dir + '/qsort.av');
 
 fn rand_list(n) {
   let a = seq.list();

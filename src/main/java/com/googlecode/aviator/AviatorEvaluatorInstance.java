@@ -17,6 +17,7 @@
 package com.googlecode.aviator;
 
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,6 +36,7 @@ import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,17 +68,13 @@ import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
-import com.googlecode.aviator.runtime.function.internal.CatchHandlerFunction;
-import com.googlecode.aviator.runtime.function.internal.IfCallccFunction;
-import com.googlecode.aviator.runtime.function.internal.NewInstanceFunction;
-import com.googlecode.aviator.runtime.function.internal.ReducerBreakFunction;
-import com.googlecode.aviator.runtime.function.internal.ReducerContFunction;
-import com.googlecode.aviator.runtime.function.internal.ReducerFunction;
-import com.googlecode.aviator.runtime.function.internal.ReducerReturnFunction;
-import com.googlecode.aviator.runtime.function.internal.ThrowFunction;
-import com.googlecode.aviator.runtime.function.internal.TryCatchFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
+import com.googlecode.aviator.runtime.function.math.MathAcosFunction;
+import com.googlecode.aviator.runtime.function.math.MathAsinFunction;
+import com.googlecode.aviator.runtime.function.math.MathAtanFunction;
+import com.googlecode.aviator.runtime.function.math.MathCeilFunction;
 import com.googlecode.aviator.runtime.function.math.MathCosFunction;
+import com.googlecode.aviator.runtime.function.math.MathFloorFunction;
 import com.googlecode.aviator.runtime.function.math.MathLog10Function;
 import com.googlecode.aviator.runtime.function.math.MathLogFunction;
 import com.googlecode.aviator.runtime.function.math.MathPowFunction;
@@ -86,6 +84,8 @@ import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqArrayFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqCollectorFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqCollectorRawFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
 import com.googlecode.aviator.runtime.function.seq.SeqContainsKeyFunction;
@@ -95,6 +95,7 @@ import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqGetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIntoFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqKeysFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapEntryFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapFunction;
@@ -108,8 +109,11 @@ import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqPutFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqRemoveFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqReverseFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqValsFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqZipmapFunction;
 import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
 import com.googlecode.aviator.runtime.function.string.StringEndsWithFunction;
 import com.googlecode.aviator.runtime.function.string.StringIndexOfFunction;
@@ -124,14 +128,15 @@ import com.googlecode.aviator.runtime.function.system.AssertFunction;
 import com.googlecode.aviator.runtime.function.system.BigIntFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;
 import com.googlecode.aviator.runtime.function.system.BooleanFunction;
+import com.googlecode.aviator.runtime.function.system.ComparatorFunction;
 import com.googlecode.aviator.runtime.function.system.CompareFunction;
 import com.googlecode.aviator.runtime.function.system.Date2StringFunction;
 import com.googlecode.aviator.runtime.function.system.DecimalFunction;
 import com.googlecode.aviator.runtime.function.system.DoubleFunction;
 import com.googlecode.aviator.runtime.function.system.EvalFunction;
 import com.googlecode.aviator.runtime.function.system.IdentityFunction;
+import com.googlecode.aviator.runtime.function.system.IsAFunction;
 import com.googlecode.aviator.runtime.function.system.IsDefFunction;
-import com.googlecode.aviator.runtime.function.system.LoadFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
 import com.googlecode.aviator.runtime.function.system.MaxFunction;
 import com.googlecode.aviator.runtime.function.system.MinFunction;
@@ -141,7 +146,6 @@ import com.googlecode.aviator.runtime.function.system.PrintlnFunction;
 import com.googlecode.aviator.runtime.function.system.PstFunction;
 import com.googlecode.aviator.runtime.function.system.RandomFunction;
 import com.googlecode.aviator.runtime.function.system.RangeFunction;
-import com.googlecode.aviator.runtime.function.system.RequireFunction;
 import com.googlecode.aviator.runtime.function.system.SeqFunction;
 import com.googlecode.aviator.runtime.function.system.StrFunction;
 import com.googlecode.aviator.runtime.function.system.String2DateFunction;
@@ -193,6 +197,12 @@ public final class AviatorEvaluatorInstance {
 
   /** function loader list */
   private List<FunctionLoader> functionLoaders;
+
+  /** internal libs in main resources */
+  private static final String[] libs = new String[] {"aviator.av"};
+
+  /** cached compiled internal lib functions */
+  private static volatile Map<String, AviatorFunction> internalLibFunctions;
 
 
   /**
@@ -265,7 +275,7 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
-  private File tryFindScriptFile(final String path) throws IOException {
+  public File tryFindScriptFile(final String path) throws IOException {
     // 1. absolute path
     File file = new File(path);
     if (file.exists()) {
@@ -323,9 +333,14 @@ public final class AviatorEvaluatorInstance {
     return loadScript0(abPath);
   }
 
-  @SuppressWarnings("unchecked")
+
   private Map<String, Object> loadScript0(final String abPath) throws IOException {
     Expression exp = this.compileScript(abPath);
+    return executeModule(exp, abPath);
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> executeModule(final Expression exp, final String abPath) {
     final Env exports = new Env();
     final Map<String, Object> module = exp.newEnv("exports", exports, "path", abPath);
     Map<String, Object> env = exp.newEnv("__MODULE__", module, "exports", exports);
@@ -648,7 +663,23 @@ public final class AviatorEvaluatorInstance {
     }
     Map<Options, Value> newOpts = new IdentityHashMap<>(this.options);
     newOpts.put(opt, opt.intoValue(val));
+    if (opt == Options.FEATURE_SET) {
+      Set<Feature> oldSet = new HashSet<>(getFeatures());
+      @SuppressWarnings("unchecked")
+      Set<Feature> newSet = (Set<Feature>) val;
+      if (oldSet.removeAll(newSet)) {
+        // removed functions that feature is disabled.
+        for (Feature feat : oldSet) {
+          for (AviatorFunction fn : feat.getFunctions()) {
+            this.removeFunction(fn);
+          }
+        }
+      }
+    }
     this.options = newOpts;
+    if (opt == Options.FEATURE_SET) {
+      loadFeatureFunctions();
+    }
   }
 
   /**
@@ -661,6 +692,7 @@ public final class AviatorEvaluatorInstance {
   public void enableFeature(final Feature feature) {
     this.options.get(Options.FEATURE_SET).featureSet.add(feature);
     this.options.get(Options.FEATURE_SET).featureSet.addAll(feature.getPrequires());
+    loadFeatureFunctions();
   }
 
   /**
@@ -692,6 +724,10 @@ public final class AviatorEvaluatorInstance {
    */
   public void disableFeature(final Feature feature) {
     this.options.get(Options.FEATURE_SET).featureSet.remove(feature);
+    for (AviatorFunction fn : feature.getFunctions()) {
+      this.removeFunction(fn);
+    }
+    loadFeatureFunctions();
   }
 
 
@@ -841,6 +877,101 @@ public final class AviatorEvaluatorInstance {
   private void loadLib() {
     // Load internal functions
     // load sys lib
+    loadSystemFunctions();
+
+    // load string lib
+    loadStringFunctions();
+
+    // load math lib
+    loadMathFunctions();
+
+    // seq lib
+    loadSeqFunctions();
+
+    // alias
+    aliasFunction("println", "p");
+    aliasFunction("pst", "printStackTrace");
+
+    loadInternalLibs();
+  }
+
+  private void loadSeqFunctions() {
+    addFunction(SeqCollectorFunction.INSTANCE);
+    addFunction(SeqCollectorRawFunction.INSTANCE);
+    addFunction(SeqKeysFunction.INSTANCE);
+    addFunction(SeqValsFunction.INSTANCE);
+    addFunction(SeqReverseFunction.INSTANCE);
+    addFunction(SeqZipmapFunction.INSTANCE);
+    addFunction(new SeqNewArrayFunction());
+    addFunction(new SeqArrayFunction());
+    addFunction(new SeqNewListFunction());
+    addFunction(new SeqNewMapFunction());
+    addFunction(new SeqNewSetFunction());
+    addFunction(new SeqMapEntryFunction());
+    addFunction(new SeqIntoFunction());
+    addFunction(new SeqAddFunction());
+    addFunction(new SeqRemoveFunction());
+    addFunction(new SeqGetFunction());
+    addFunction(new SeqPutFunction());
+    addFunction(new SeqMinFunction());
+    addFunction(new SeqMaxFunction());
+    addFunction(new SeqMapFunction());
+    addFunction(new SeqReduceFunction());
+    addFunction(new SeqFilterFunction());
+    addFunction(new SeqSortFunction());
+    addFunction(new SeqIncludeFunction());
+    addFunction(new SeqContainsKeyFunction());
+    addFunction(new SeqCountFunction());
+    addFunction(new SeqEveryFunction());
+    addFunction(new SeqNotAnyFunction());
+    addFunction(new SeqSomeFunction());
+    addFunction(new SeqMakePredicateFunFunction("seq.eq", OperatorType.EQ));
+    addFunction(new SeqMakePredicateFunFunction("seq.neq", OperatorType.NEQ));
+    addFunction(new SeqMakePredicateFunFunction("seq.lt", OperatorType.LT));
+    addFunction(new SeqMakePredicateFunFunction("seq.le", OperatorType.LE));
+    addFunction(new SeqMakePredicateFunFunction("seq.gt", OperatorType.GT));
+    addFunction(new SeqMakePredicateFunFunction("seq.ge", OperatorType.GE));
+    addFunction(new SeqCompsitePredFunFunction("seq.and", LogicOp.AND));
+    addFunction(new SeqCompsitePredFunFunction("seq.or", LogicOp.OR));
+    addFunction(new SeqMakePredicateFunFunction("seq.true", OperatorType.EQ, AviatorBoolean.TRUE));
+    addFunction(
+        new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
+    addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
+    addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
+  }
+
+  private void loadMathFunctions() {
+    addFunction(new MathAbsFunction());
+    addFunction(new MathRoundFunction());
+    addFunction(new MathPowFunction());
+    addFunction(new MathSqrtFunction());
+    addFunction(new MathLog10Function());
+    addFunction(new MathLogFunction());
+    addFunction(new MathSinFunction());
+    addFunction(new MathCosFunction());
+    addFunction(new MathTanFunction());
+    addFunction(MathAsinFunction.INSTANCE);
+    addFunction(MathAcosFunction.INSTANCE);
+    addFunction(MathAtanFunction.INSTANCE);
+    addFunction(MathFloorFunction.INSTANCE);
+    addFunction(MathCeilFunction.INSTANCE);
+  }
+
+  private void loadStringFunctions() {
+    addFunction(new StringContainsFunction());
+    addFunction(new StringIndexOfFunction());
+    addFunction(new StringStartsWithFunction());
+    addFunction(new StringEndsWithFunction());
+    addFunction(new StringSubStringFunction());
+    addFunction(new StringLengthFunction());
+    addFunction(new StringSplitFunction());
+    addFunction(new StringJoinFunction());
+    addFunction(new StringReplaceFirstFunction());
+    addFunction(new StringReplaceAllFunction());
+  }
+
+  private void loadSystemFunctions() {
+    addFunction(ComparatorFunction.INSTANCE);
     addFunction(new CompareFunction());
     addFunction(new SysDateFunction());
     addFunction(new PrintlnFunction());
@@ -879,91 +1010,36 @@ public final class AviatorEvaluatorInstance {
     addFunction(new TypeFunction());
     addFunction(SeqFunction.INSTANCE);
     addFunction(EvalFunction.INSTANCE);
+    addFunction(IsAFunction.INSTANCE);
+  }
 
-    // module
-    // load and require
-    addFunction(new RequireFunction());
-    addFunction(new LoadFunction());
+  private void loadInternalLibs() {
+    if (internalLibFunctions == null) {
+      Map<String, AviatorFunction> funcs = new HashMap<>();
+      for (String lib : libs) {
+        try (final InputStream in = this.getClass().getResourceAsStream("/" + lib);
+            final BufferedInputStream bis = new BufferedInputStream(in);
+            final Reader reader = new InputStreamReader(bis)) {
+          Expression exp = this.compile(lib, Utils.readFully(reader), false);
+          Map<String, Object> exports = executeModule(exp, lib);
+          for (Map.Entry<String, Object> entry : exports.entrySet()) {
+            if (entry.getValue() instanceof AviatorFunction) {
+              final AviatorFunction fn = (AviatorFunction) entry.getValue();
+              addFunction(entry.getKey(), fn);
+              funcs.put(entry.getKey(), fn);
+            }
+          }
+        } catch (IOException e) {
+          throw new IllegalStateException("Fail to load internal lib: " + lib, e);
+        }
+      }
 
-    // for-loop and if statement supporting
-    addFunction(new ReducerFunction());
-    addFunction(new ReducerReturnFunction());
-    addFunction(new ReducerContFunction());
-    addFunction(new ReducerBreakFunction());
-    addFunction(new IfCallccFunction());
-
-    // try..catch
-    addFunction(new TryCatchFunction());
-    addFunction(new CatchHandlerFunction());
-    addFunction(new ThrowFunction());
-
-    // new instance
-    addFunction(new NewInstanceFunction());
-
-    // load string lib
-    addFunction(new StringContainsFunction());
-    addFunction(new StringIndexOfFunction());
-    addFunction(new StringStartsWithFunction());
-    addFunction(new StringEndsWithFunction());
-    addFunction(new StringSubStringFunction());
-    addFunction(new StringLengthFunction());
-    addFunction(new StringSplitFunction());
-    addFunction(new StringJoinFunction());
-    addFunction(new StringReplaceFirstFunction());
-    addFunction(new StringReplaceAllFunction());
-
-    // load math lib
-    addFunction(new MathAbsFunction());
-    addFunction(new MathRoundFunction());
-    addFunction(new MathPowFunction());
-    addFunction(new MathSqrtFunction());
-    addFunction(new MathLog10Function());
-    addFunction(new MathLogFunction());
-    addFunction(new MathSinFunction());
-    addFunction(new MathCosFunction());
-    addFunction(new MathTanFunction());
-
-    // seq lib
-    addFunction(new SeqNewArrayFunction());
-    addFunction(new SeqArrayFunction());
-    addFunction(new SeqNewListFunction());
-    addFunction(new SeqNewMapFunction());
-    addFunction(new SeqNewSetFunction());
-    addFunction(new SeqMapEntryFunction());
-    addFunction(new SeqIntoFunction());
-    addFunction(new SeqAddFunction());
-    addFunction(new SeqRemoveFunction());
-    addFunction(new SeqGetFunction());
-    addFunction(new SeqPutFunction());
-    addFunction(new SeqMinFunction());
-    addFunction(new SeqMaxFunction());
-    addFunction(new SeqMapFunction());
-    addFunction(new SeqReduceFunction());
-    addFunction(new SeqFilterFunction());
-    addFunction(new SeqSortFunction());
-    addFunction(new SeqIncludeFunction());
-    addFunction(new SeqContainsKeyFunction());
-    addFunction(new SeqCountFunction());
-    addFunction(new SeqEveryFunction());
-    addFunction(new SeqNotAnyFunction());
-    addFunction(new SeqSomeFunction());
-    addFunction(new SeqMakePredicateFunFunction("seq.eq", OperatorType.EQ));
-    addFunction(new SeqMakePredicateFunFunction("seq.neq", OperatorType.NEQ));
-    addFunction(new SeqMakePredicateFunFunction("seq.lt", OperatorType.LT));
-    addFunction(new SeqMakePredicateFunFunction("seq.le", OperatorType.LE));
-    addFunction(new SeqMakePredicateFunFunction("seq.gt", OperatorType.GT));
-    addFunction(new SeqMakePredicateFunFunction("seq.ge", OperatorType.GE));
-    addFunction(new SeqCompsitePredFunFunction("seq.and", LogicOp.AND));
-    addFunction(new SeqCompsitePredFunFunction("seq.or", LogicOp.OR));
-    addFunction(new SeqMakePredicateFunFunction("seq.true", OperatorType.EQ, AviatorBoolean.TRUE));
-    addFunction(
-        new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
-    addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
-    addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
-
-    // alias
-    aliasFunction("println", "p");
-    aliasFunction("pst", "printStackTrace");
+      internalLibFunctions = funcs; // cache it
+    } else {
+      for (Map.Entry<String, AviatorFunction> entry : internalLibFunctions.entrySet()) {
+        addFunction(entry.getKey(), entry.getValue());
+      }
+    }
   }
 
   /**
@@ -984,11 +1060,26 @@ public final class AviatorEvaluatorInstance {
    * Create a aviator evaluator instance.
    */
   AviatorEvaluatorInstance() {
+    fillDefaultOpts();
+    loadFeatureFunctions();
     loadLib();
     loadModule();
     addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
+  }
+
+  private void fillDefaultOpts() {
     for (Options opt : Options.values()) {
       this.options.put(opt, opt.getDefaultValueObject());
+    }
+  }
+
+  private void loadFeatureFunctions() {
+    for (Feature feat : this.options.get(Options.FEATURE_SET).featureSet) {
+      for (AviatorFunction fn : feat.getFunctions()) {
+        if (!containsFunction(fn.getName())) {
+          this.addFunction(fn);
+        }
+      }
     }
   }
 

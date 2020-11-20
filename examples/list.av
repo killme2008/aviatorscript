@@ -2,11 +2,15 @@
 
 let list = seq.list(1, 2, 3);
 
+p("list[0]=#{list[0]}");
+p("list[1]=#{list[1]}");
+p("seq.get(list, 2)=#{seq.get(list, 2)}");
+
 list[0] = 4;
 list[1] = 5;
 list[2] = 6;
 
+p(list);
 
-println(list); 
-
+## Index out of bounds
 list[3] = 7;

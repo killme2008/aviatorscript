@@ -1,6 +1,8 @@
 ## examples/new.av
 
-let d = new java.util.Date();
+use java.util.Date;
+
+let d = new Date();
 
 p(type(d));
 p(d);
@@ -8,5 +10,5 @@ p(d);
 let year = getYear(d);
 let month = getMonth(d);
 
-p("Year is: " + year);
-p("Month is: " + month);
+p("Year is: #{year}");
+p("Month is: #{month}");

@@ -22,6 +22,12 @@ public class LoadFunction extends AbstractFunction {
 
   private static final long serialVersionUID = -6860446850416005514L;
 
+  private LoadFunction() {
+
+  }
+
+  public static final LoadFunction INSTANCE = new LoadFunction();
+
   @Override
   public String getName() {
     return Constants.LOAD_FN;
