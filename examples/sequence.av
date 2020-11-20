@@ -24,6 +24,11 @@ println("count of set: " + count(s));
 println("count of map: " + count(m));
 println("count of list: " + count(n));
 
+## is_empty
+println("is_empty(array): " + is_empty(a));
+println("is_empty(seq.list()): " + is_empty(seq.list()));
+println("is_empty(nil): " + is_empty(nil));
+
 ## include
 println("array has 3: " + include(a, 3));
 println("map has an entry ('b', 2): " + include(m, seq.entry("b", 2)));
@@ -66,6 +71,9 @@ println("test mymap: " + mymap(a, lambda(x) -> x * 2 end));
 ## sort
 println("sort(list) is: " + sort(n));
 println("sort(set) is: " + sort(into(seq.list(), s)));
+
+let c = comparator(lambda(x, y) -> x > y end);
+println("sort(list, c) is: " + sort(n, c));
 
 ## filter
 let es = filter(r, lambda(x) -> x %2 == 0 end);

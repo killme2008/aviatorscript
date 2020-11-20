@@ -89,11 +89,11 @@ fn drop_while(seq, pred) {
 }
 
 fn concat(seq1, seq2) {
-  if seq == nil && seq2 == nil {
+  if seq1 == nil && seq2 == nil {
     return nil;
   }
 
-  let result = seq.collector(seq);
+  let result = seq.collector(seq1);
 
   for x in seq1 {
     seq.add(result, x);

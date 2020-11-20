@@ -1,0 +1,39 @@
+## examples/sequence2.av
+## require aviatorscript > 5.2
+
+fn is_neg(x) {
+  x < 0
+}
+
+let list = seq.list(-2, -1, 0, 1, 2, 3, 0, 99, -1000, 7);
+
+p("list is: #{list}");
+
+let result = take_while(list, is_neg);
+
+p("result of take_while: #{result}");
+
+let result = drop_while(list, is_neg);
+
+p("result of drop_while: #{result}");
+
+let result = group_by(list, is_neg);
+p("result of group_by: #{result}");
+
+let result = distinct(list);
+p("result of distinct: #{result}");
+
+let result = reverse(list);
+p("result of reverse: #{result}");
+
+
+let m = zipmap(tuple("a", "b", "c"), seq.list(1, 2, 3, 4));
+p("type of m: " + type(m));
+p("result of zipmap: #{m}");
+
+let m = zipmap(tuple("a", "b", "c"), seq.list(1,2,3,4, 5, 6));
+p("result of zipmap: #{m}");
+
+
+let c = concat(tuple("a", "b", "c"), seq.list(1, 2, 3, 4));
+p("result of concat: #{c}");

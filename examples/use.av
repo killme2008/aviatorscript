@@ -1,0 +1,51 @@
+## examples/use.av
+
+use java.util.*;
+
+let list = new ArrayList(10);
+
+seq.add(list, 1);
+seq.add(list, 2);
+
+p("list[0]=#{list[0]}");
+p("list[1]=#{list[1]}");
+
+let set = new HashSet();
+seq.add(set, "a");
+seq.add(set, "a");
+
+p("set type is: " + type(set));
+p("set is: #{set}");
+
+use java.util.concurrent.locks.{ReentrantLock, ReentrantReadWriteLock};
+use java.util.concurrent.CountDownLatch;
+
+let x = 0;
+let n = 10;
+
+let lk = new ReentrantLock();
+
+let latch = new CountDownLatch(n);
+
+for i in range(0, n) {
+  let t = new Thread(lambda() ->
+                     lock(lk);
+                     x = x + 1;
+                     unlock(lk);
+                     countDown(latch);
+                     p("thread #{i} done");
+                     end);
+  start(t);
+}
+
+await(latch);
+p("x=#{x}");
+
+
+let lk = new ReentrantReadWriteLock();
+let wlk = writeLock(lk);
+lock(wlk);
+x = x + 1;
+unlock(wlk);
+
+p("x=#{x}");
