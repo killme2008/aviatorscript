@@ -30,10 +30,9 @@
 
 # News
 
+* [5.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.0)，函数重载、可变参数函数定义、use 语句以及更多内置 sequence/math 函数等。
 * [5.1.4](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.4)，修复编译字符串插值可能存在的重复编译问题（导致 FGC）等。
 * [5.1.3](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.3)，支持幂运算符 `**`，以及 `EnvProcessor` 处理器等。
-* [5.1.2](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.2), 移除内部变量 `__exp__` 对用户 env 的污染
-* [5.1.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.1), 修复 == 和 != 运算符无法和 `a.b.c` 语法糖一起可能返回错误结果的 bug，推荐升级
 
 # Dependency
 
