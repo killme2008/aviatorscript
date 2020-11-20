@@ -15,6 +15,13 @@ fn test_take_while() {
 	j.assertEquals(2, count(ret));
 	j.assertEquals(-2, ret[0]);
 	j.assertEquals(-1, ret[1]);
+	
+    let m = seq.map("a", 1, "b", -2, "c", 100);
+	let ret = take_while(m, lambda(entry) -> entry.value > 0 end);
+	j.assertTrue(is_a(ret, java.util.HashMap));
+	j.assertEquals(2, count(ret));
+	j.assertEquals(1, ret["a"]);
+    j.assertEquals(100, ret["c"]);
 }
 
 fn test_drop_while() {
@@ -30,6 +37,12 @@ fn test_drop_while() {
 	j.assertEquals(1, ret[1]);
 	j.assertEquals(2, ret[2]);
 	j.assertEquals(3, ret[3]);
+	
+	let m = seq.map("a", 1, "b", -2, "c", 100);
+	let ret = drop_while(m, lambda(entry) -> entry.value > 0 end);
+	j.assertTrue(is_a(ret, java.util.HashMap));
+	j.assertEquals(1, count(ret));
+	j.assertEquals(-2, ret["b"]);
 }
 
 fn test_concat() {

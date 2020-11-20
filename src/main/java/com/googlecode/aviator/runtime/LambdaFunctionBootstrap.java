@@ -22,6 +22,8 @@ public class LambdaFunctionBootstrap {
   private final List<FunctionParam> params;
   private final boolean inheritEnv;
 
+  private final ThreadLocal<LambdaFunction> fnLocal = new ThreadLocal<>();
+
 
   public String getName() {
     return this.name;
@@ -45,9 +47,18 @@ public class LambdaFunctionBootstrap {
    * @return
    */
   public LambdaFunction newInstance(final Env env) {
+    LambdaFunction fn = null;
+    if (this.inheritEnv && (fn = this.fnLocal.get()) != null) {
+      fn.setContext(env);
+      return fn;
+    }
+
     // try {
-    final LambdaFunction fn = new LambdaFunction(this.name, this.params, this.expression, env);
+    fn = new LambdaFunction(this.name, this.params, this.expression, env);
     fn.setInheritEnv(this.inheritEnv);
+    if (this.inheritEnv) {
+      this.fnLocal.set(fn);
+    }
     return fn;
     // final LambdaFunction fn =
     // (LambdaFunction) this.constructor.invoke(this.params, this.expression, env);

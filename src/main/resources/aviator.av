@@ -93,7 +93,7 @@ fn concat(seq1, seq2) {
     return nil;
   }
 
-  let result = seq.collector(seq1);
+  let result = seq.list();
 
   for x in seq1 {
     seq.add(result, x);
@@ -102,7 +102,7 @@ fn concat(seq1, seq2) {
     seq.add(result, x);
   }
 
-  return seq.raw(result);
+  return result;
 }
 
 fn constantly(x) {
