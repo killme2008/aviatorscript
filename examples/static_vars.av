@@ -1,4 +1,5 @@
 ## examples/static_vars.av
+## require aviatorscript >= 5.2
 
 p("Math.PI is: " + Math.PI);
 

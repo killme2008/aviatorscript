@@ -1,4 +1,5 @@
 ## examples/repeat.av
+## require aviatorscript >= 5.2
 
 let list = repeat(10, "a");
 

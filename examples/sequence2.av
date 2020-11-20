@@ -1,5 +1,5 @@
 ## examples/sequence2.av
-## require aviatorscript > 5.2
+## require aviatorscript >= 5.2
 
 fn is_neg(x) {
   x < 0

@@ -1,4 +1,5 @@
 ## examples/function_varargs.av
+## require aviatorscript >= 5.2
 
 fn join(sep, &args) {
   let s = "";
