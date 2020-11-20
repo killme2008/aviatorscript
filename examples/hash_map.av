@@ -16,3 +16,6 @@ println("m['a'] = " + m['a']);
 
 seq.put(m, 4, 99);
 println("m.4 = " + seq.get(m, 4));
+
+p("key set: " + seq.keys(m));
+p("value set: " + seq.vals(m));
