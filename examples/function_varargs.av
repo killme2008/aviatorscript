@@ -1,0 +1,21 @@
+## examples/function_varargs.av
+## require aviatorscript >= 5.2
+
+fn join(sep, &args) {
+  let s = "";
+  let is_first = true;
+  for arg in args {
+    if is_first {
+      s = s + arg;
+      is_first = false;
+    }else {
+      s = s + sep + arg;
+    }
+  }
+
+  return s;
+}
+
+p(join(" ", "a", "b", "c"));
+p(join(",", "a", "b", "c", "d"));
+p(join(",", "a"));

@@ -1,0 +1,26 @@
+## examples/function_overload.av
+## require aviatorscript >= 5.2
+
+fn join(s1) {
+  "#{s1}"
+}
+fn join(s1, s2) {
+  "#{s1}#{s2}"
+}
+
+fn join(s1, s2, s3) {
+  "#{s1}#{s2}#{s3}"
+}
+
+p(join("hello"));
+p(join("hello", " world"));
+p(join("hello", " world", ", aviator"));
+
+## redefined join(s)
+fn join(s1) {
+  nil
+}
+
+p(join("hello"));
+p(join("hello", " world"));
+p(join("hello", " world", ", aviator"));j
