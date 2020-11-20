@@ -24,10 +24,10 @@ It compiles script to java byte code and evaluate it on the fly.
 8. Lightweight and high performance.
 
 # News
+
+* [5.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.0)，supports overload function, variadic function,use statement and more sequence/math functions.
 * [5.1.4](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.4)，fixed compiling string interpolation lexeme without caching(may cause FGC) etc.
 * [5.1.3](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.3)，supports exponenet operator `**` and `EnvProcessor` hooks etc.
-* [5.1.2](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.2), don't override  `__exp__`  to user passed-in env.
-* [5.1.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.1), Fixed `==` and  `!=`  operator working with variable syntax suger such as  `a.b.c`  may return wrong result, it's recommended to upgrade.
 
 # Dependency
 
