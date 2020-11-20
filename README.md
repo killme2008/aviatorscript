@@ -1,6 +1,6 @@
 # AviatorScript
 
-[![Build Status](https://travis-ci.org/killme2008/aviatorscript.svg?branch=master)](https://travis-ci.org/killme2008/aviator)
+[![Build Status](https://travis-ci.org/killme2008/aviatorscript.svg?branch=master)](https://travis-ci.org/killme2008/aviatorscript)
 [![Maven Central](https://img.shields.io/maven-central/v/com.googlecode.aviator/aviator.svg?label=maven%20central)](https://search.maven.org/search?q=g:com.googlecode.aviator%20AND%20aviator)
 
 [📖 English Documentation](README-EN.md) | 📖 中文文档
