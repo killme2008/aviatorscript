@@ -64,7 +64,7 @@ public class Benchmark {
     barrier.await();
     System.out.println("benchmarkBeanUtils cost: " + (System.currentTimeMillis() - start) + " ms.");
     System.out.println("c: " + c.get());
-    System.out.println(Reflector.cachedHandles);
+    System.out.println(Reflector.cachedProperties);
   }
 
   private static void benchmarkScript() throws Exception {

@@ -921,10 +921,11 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitTypeInsn(NEW, "com/googlecode/aviator/runtime/type/AviatorString");
         this.mv.visitInsn(DUP);
         this.mv.visitLdcInsn(lookhead.getValue(null));
+        this.mv.visitLdcInsn(true);
         this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/runtime/type/AviatorString",
-            CONSTRUCTOR_METHOD_NAME, "(Ljava/lang/String;)V");
-        this.pushOperand(3);
-        this.popOperand(2);
+            CONSTRUCTOR_METHOD_NAME, "(Ljava/lang/String;Z)V");
+        this.pushOperand(4);
+        this.popOperand(3);
         break;
       case Pattern:
         if (loadConstant(lookhead, inConstructor)) {
