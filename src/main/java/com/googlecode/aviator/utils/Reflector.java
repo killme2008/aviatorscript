@@ -169,14 +169,21 @@ public class Reflector {
     }
   }
 
+  /**
+   * static and instance fields property caching
+   */
   public static ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>> cachedProperties =
       new ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>>();
 
-  public static ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>> cachedMethods =
-      new ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>>();
 
   private static final ReferenceQueue<Map<String, PropertyFoundResult>> cachePropertyRq =
       new ReferenceQueue<>();
+
+  /**
+   * static method caching
+   */
+  public static ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>> cachedMethods =
+      new ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>>();
 
   private static final ReferenceQueue<Map<String, PropertyFoundResult>> cacheMethodRq =
       new ReferenceQueue<>();
@@ -188,14 +195,16 @@ public class Reflector {
   }
 
   public static enum PropertyType {
-    Getter, StaticField, StaticMethod,
+    Getter, StaticField, StaticMethod;
+
+    boolean isStaticProperty() {
+      return this == StaticField || this == StaticMethod;
+    }
   }
 
   public static Object fastGetProperty(final Object obj, final String name,
       final PropertyType type) {
-    boolean isClassProperty =
-        (type == PropertyType.StaticField || type == PropertyType.StaticMethod);
-    final Class<?> clazz = isClassProperty ? (Class<?>) obj : obj.getClass();
+    final Class<?> clazz = type.isStaticProperty() ? (Class<?>) obj : obj.getClass();
     Map<String, PropertyFoundResult> results = null;
 
     if (type == PropertyType.StaticMethod) {
@@ -230,10 +239,12 @@ public class Reflector {
         if (result.isBooleanType && !(ret instanceof Boolean)) {
           putDummyHandle(name, results);
           // fallback to properties
+          // TODO maybe throw exception?
           return getProperty(obj, name);
         }
         return ret;
       } else {
+        // TODO maybe return null?
         if (type == PropertyType.Getter) {
           return getProperty(obj, name);
         } else {
@@ -276,6 +287,7 @@ public class Reflector {
     List<Method> methods = getStaticMethods(clazz, name);
 
     if (methods != null && !methods.isEmpty()) {
+      // cast the methods into a function.
       ClassMethodFunction func = new ClassMethodFunction(clazz, true, name, name, methods);
       result = new PropertyFoundResult(func);
     } else {
