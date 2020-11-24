@@ -1,0 +1,15 @@
+## examples/static_methods.av
+
+use java.util.regex.Pattern;
+
+let p = Pattern.compile("\\d+");
+
+if "123" =~ p {
+  p("matched");
+  p($0);
+}
+
+if "a123" =~ p {
+  p("matched");
+  p($0);
+}
