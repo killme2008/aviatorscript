@@ -25,9 +25,9 @@ It compiles script to java byte code and evaluate it on the fly.
 
 # News
 
-* [5.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.0)，supports overload function, variadic function,use statement and more sequence/math functions.
+* [5.2.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.1)，Fixed memory leak in reflector, supports calling static method directly etc.
+* [5.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.0)，supports overload function, variadic function,use statement and more sequence/math functions.(Deprecated, please use 5.2.1)
 * [5.1.4](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.4)，fixed compiling string interpolation lexeme without caching(may cause FGC) etc.
-* [5.1.3](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.3)，supports exponenet operator `**` and `EnvProcessor` hooks etc.
 
 # Dependency
 
