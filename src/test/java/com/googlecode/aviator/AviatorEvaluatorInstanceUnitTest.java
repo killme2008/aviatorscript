@@ -31,6 +31,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.StringUtils;
+import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
@@ -61,6 +62,24 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertEquals(1, this.instance.execute("a[0]", env));
     assertEquals(2, this.instance.execute("a[1.1]", env));
     assertEquals(3, this.instance.execute("a[2.0M]", env));
+  }
+
+  @Test
+  public void testCompileStringSegments() {
+    StringSegments segs = this.instance.compileStringSegments("#test");
+    assertTrue(segs.isEmpty());
+
+    segs = this.instance.compileStringSegments("#test#.");
+    assertTrue(segs.isEmpty());
+
+    segs = this.instance.compileStringSegments("#test#.#");
+    assertTrue(segs.isEmpty());
+
+
+    segs = this.instance.compileStringSegments("#test#{a}");
+    assertFalse(segs.isEmpty());
+    assertEquals("#testnull", segs.toString(AviatorEvaluator.newEnv(), null));
+    assertEquals("#test1", segs.toString(AviatorEvaluator.newEnv("a", 1), null));
   }
 
   @Test

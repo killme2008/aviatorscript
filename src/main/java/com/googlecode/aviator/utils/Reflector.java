@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.FluentPropertyBeanIntrospector;
+import com.googlecode.aviator.runtime.function.ClassMethodFunction;
 
 /**
  * Some code is copied from
@@ -143,11 +144,19 @@ public class Reflector {
     return sb;
   }
 
-  static class MethodHandleResult {
+  static class PropertyFoundResult {
     MethodHandle handle;
     boolean isBooleanType;
+    ClassMethodFunction func;
 
-    public MethodHandleResult(final MethodHandle handle, final boolean isBooleanType) {
+
+
+    public PropertyFoundResult(final ClassMethodFunction func) {
+      super();
+      this.func = func;
+    }
+
+    public PropertyFoundResult(final MethodHandle handle, final boolean isBooleanType) {
       super();
       this.isBooleanType = isBooleanType;
       this.handle = handle;
@@ -156,15 +165,27 @@ public class Reflector {
     @Override
     public String toString() {
       return "MethodHandleResult [handle=" + this.handle + ", isBooleanType=" + this.isBooleanType
-          + "]";
+          + ", func=" + this.func + "]";
     }
-
   }
 
-  public static ConcurrentHashMap<Class<?>, Reference<Map<String, MethodHandleResult>>> cachedHandles =
-      new ConcurrentHashMap<Class<?>, Reference<Map<String, MethodHandleResult>>>();
+  /**
+   * static and instance fields property caching
+   */
+  public static ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>> cachedProperties =
+      new ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>>();
 
-  private static final ReferenceQueue<Map<String, MethodHandleResult>> cacheHandleRq =
+
+  private static final ReferenceQueue<Map<String, PropertyFoundResult>> cachePropertyRq =
+      new ReferenceQueue<>();
+
+  /**
+   * static method caching
+   */
+  public static ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>> cachedMethods =
+      new ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>>();
+
+  private static final ReferenceQueue<Map<String, PropertyFoundResult>> cacheMethodRq =
       new ReferenceQueue<>();
 
   private static String genGetterName(final String prefix, final String name) {
@@ -173,47 +194,75 @@ public class Reflector {
     return sb.toString();
   }
 
+  public static enum PropertyType {
+    Getter, StaticField, StaticMethod;
+
+    boolean isStaticProperty() {
+      return this == StaticField || this == StaticMethod;
+    }
+  }
+
   public static Object fastGetProperty(final Object obj, final String name,
-      final boolean isStaticField) {
-    final Class<?> clazz = isStaticField ? (Class<?>) obj : obj.getClass();
-    Map<String, MethodHandleResult> handles = getClassHandles(clazz);
+      final PropertyType type) {
+    final Class<?> clazz = type.isStaticProperty() ? (Class<?>) obj : obj.getClass();
+    Map<String, PropertyFoundResult> results = null;
+
+    if (type == PropertyType.StaticMethod) {
+      results = getClassPropertyResults(cachedMethods, cacheMethodRq, clazz);
+    } else {
+      results = getClassPropertyResults(cachedProperties, cachePropertyRq, clazz);
+    }
+
     try {
-      MethodHandleResult handleRet = handles.get(name);
-      if (handleRet == null) {
-        if (isStaticField) {
-          handleRet = retrieveStaticFieldHandle(handles, clazz, name);
-        } else {
-          handleRet = retrieveGetterHandle(handles, clazz, name);
+      PropertyFoundResult result = results.get(name);
+      if (result == null) {
+        switch (type) {
+          case StaticField:
+            result = retrieveStaticFieldHandle(results, clazz, name);
+            break;
+          case Getter:
+            result = retrieveGetterHandle(results, clazz, name);
+            break;
+          case StaticMethod:
+            result = retrieveStaticFunction(results, clazz, name);
+            break;
         }
       }
 
-      if (handleRet.handle != null) {
-        Object ret = isStaticField ? handleRet.handle.invoke() : handleRet.handle.invoke(obj);
-        if (handleRet.isBooleanType && !(ret instanceof Boolean)) {
-          putDummyHandle(name, handles);
+      if (type == PropertyType.StaticMethod) {
+        return result.func;
+      }
+
+      if (result.handle != null) {
+        Object ret =
+            type == PropertyType.StaticField ? result.handle.invoke() : result.handle.invoke(obj);
+        if (result.isBooleanType && !(ret instanceof Boolean)) {
+          putDummyHandle(name, results);
           // fallback to properties
+          // TODO maybe throw exception?
           return getProperty(obj, name);
         }
         return ret;
       } else {
-        if (isStaticField) {
-          return null;
-        } else {
+        // TODO maybe return null?
+        if (type == PropertyType.Getter) {
           return getProperty(obj, name);
+        } else {
+          return null;
         }
       }
     } catch (Throwable t) {
-      if (!handles.containsKey(name)) {
-        putDummyHandle(name, handles);
+      if (!results.containsKey(name)) {
+        putDummyHandle(name, results);
       }
       throw sneakyThrow(t);
     }
   }
 
-  private static MethodHandleResult retrieveStaticFieldHandle(
-      final Map<String, MethodHandleResult> handles, final Class<?> clazz, final String name)
+  private static PropertyFoundResult retrieveStaticFieldHandle(
+      final Map<String, PropertyFoundResult> results, final Class<?> clazz, final String name)
       throws IllegalAccessException, NoSuchFieldException {
-    MethodHandleResult handleRet;
+    PropertyFoundResult result;
     Field field = null;
     try {
       field = clazz.getDeclaredField(name);
@@ -223,18 +272,35 @@ public class Reflector {
     if (field != null && Modifier.isStatic(field.getModifiers())) {
       field.setAccessible(true);
       MethodHandle handle = MethodHandles.lookup().unreflectGetter(field);
-      handleRet = new MethodHandleResult(handle, false);
+      result = new PropertyFoundResult(handle, false);
     } else {
-      handleRet = new MethodHandleResult(null, false);
+      result = new PropertyFoundResult(null, false);
     }
-    handles.put(name, handleRet);
-    return handleRet;
+    results.put(name, result);
+    return result;
   }
 
-  private static MethodHandleResult retrieveGetterHandle(
-      final Map<String, MethodHandleResult> handles, final Class<?> clazz, final String name)
+  private static PropertyFoundResult retrieveStaticFunction(
+      final Map<String, PropertyFoundResult> results, final Class<?> clazz, final String name)
+      throws IllegalAccessException, NoSuchMethodException {
+    PropertyFoundResult result;
+    List<Method> methods = getStaticMethods(clazz, name);
+
+    if (methods != null && !methods.isEmpty()) {
+      // cast the methods into a function.
+      ClassMethodFunction func = new ClassMethodFunction(clazz, true, name, name, methods);
+      result = new PropertyFoundResult(func);
+    } else {
+      result = new PropertyFoundResult(null);
+    }
+    results.put(name, result);
+    return result;
+  }
+
+  private static PropertyFoundResult retrieveGetterHandle(
+      final Map<String, PropertyFoundResult> results, final Class<?> clazz, final String name)
       throws IllegalAccessException {
-    MethodHandleResult handleRet;
+    PropertyFoundResult result;
     List<Method> methods = getInstanceMethods(clazz, genGetterName("get", name));
     boolean isBooleanType = false;
 
@@ -253,37 +319,40 @@ public class Reflector {
       }
       method.setAccessible(true);
       MethodHandle handle = MethodHandles.lookup().unreflect(method);
-      handleRet = new MethodHandleResult(handle, isBooleanType);
+      result = new PropertyFoundResult(handle, isBooleanType);
     } else {
-      handleRet = new MethodHandleResult(null, isBooleanType);
+      result = new PropertyFoundResult(null, isBooleanType);
     }
-    handles.put(name, handleRet);
-    return handleRet;
+    results.put(name, result);
+    return result;
   }
 
   private static void putDummyHandle(final String name,
-      final Map<String, MethodHandleResult> handles) {
-    handles.put(name, new MethodHandleResult(null, false));
+      final Map<String, PropertyFoundResult> handles) {
+    handles.put(name, new PropertyFoundResult(null, false));
   }
 
-  private static Map<String, MethodHandleResult> getClassHandles(final Class<?> clazz) {
-    Reference<Map<String, MethodHandleResult>> existsHandlesRef = cachedHandles.get(clazz);
-    Map<String, MethodHandleResult> handles = Collections.emptyMap();
-    if (existsHandlesRef == null) {
-      handles = new ConcurrentHashMap<String, MethodHandleResult>();
-      existsHandlesRef = cachedHandles.putIfAbsent(clazz,
-          new WeakReference<Map<String, MethodHandleResult>>(handles, cacheHandleRq));
+  private static Map<String, PropertyFoundResult> getClassPropertyResults(
+      final ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>> cache,
+      final ReferenceQueue<Map<String, PropertyFoundResult>> rq, final Class<?> clazz) {
+    Reference<Map<String, PropertyFoundResult>> existsRef = cache.get(clazz);
+    Map<String, PropertyFoundResult> results = Collections.emptyMap();
+    if (existsRef == null) {
+      clearCache(rq, cache);
+      results = new ConcurrentHashMap<String, PropertyFoundResult>();
+      existsRef = cache.putIfAbsent(clazz,
+          new WeakReference<Map<String, PropertyFoundResult>>(results, rq));
     }
-    if (existsHandlesRef == null) {
-      return handles;
+    if (existsRef == null) {
+      return results;
     }
 
-    handles = existsHandlesRef.get();
-    if (handles != null) {
-      return handles;
+    results = existsRef.get();
+    if (results != null) {
+      return results;
     }
-    cachedHandles.remove(clazz, existsHandlesRef);
-    return getClassHandles(clazz);
+    cache.remove(clazz, existsRef);
+    return getClassPropertyResults(cache, rq, clazz);
   }
 
 

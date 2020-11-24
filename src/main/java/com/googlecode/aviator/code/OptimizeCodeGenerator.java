@@ -324,7 +324,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         break;
       case String:
         // load string
-        result = new AviatorString((String) lookhead.getValue(null));
+        result = new AviatorString((String) lookhead.getValue(null), true);
         break;
       case Pattern:
         // load pattern

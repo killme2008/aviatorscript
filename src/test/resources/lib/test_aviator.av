@@ -289,6 +289,21 @@ fn test_new_static_class() {
   j.assertEquals("java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy", (type(handler)));
 }
 
+fn test_static_methods() {
+  tests = tests + 1;
+  use java.util.regex.Pattern;
+  
+  let p = Pattern.compile("\\d+");
+  j.assertEquals("pattern", type(p));
+  j.assertTrue("3"=~p);
+  j.assertTrue("400"=~p);
+  j.assertFalse("a"=~p);
+  
+  let l = Long.parseLong("3");
+  j.assertEquals("long", type(l));
+  j.assertEquals(3, l);
+}
+
 test_take_while();
 test_drop_while();
 test_concat();
@@ -305,5 +320,6 @@ test_comparator();
 test_sort();
 test_static_fields();
 test_new_static_class();
+test_static_methods();
 
-j.assertEquals(16, tests);
+j.assertEquals(17, tests);
