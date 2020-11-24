@@ -315,8 +315,8 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
     if (this.containsDot && this.subNames == null) {
       this.subNames = AviatorJavaType.SPLIT_PAT.split(this.name);
     }
-    Object val =
-        AviatorJavaType.getValueFromEnv(this.name, this.containsDot, this.subNames, env, false);
+    Object val = AviatorJavaType.getValueFromEnv(this.name, this.containsDot, this.subNames, env,
+        false, true);
     if (val instanceof AviatorFunction) {
       return (AviatorFunction) val;
     }

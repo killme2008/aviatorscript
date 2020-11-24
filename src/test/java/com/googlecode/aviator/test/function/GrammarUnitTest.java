@@ -221,13 +221,13 @@ public class GrammarUnitTest {
     try {
       AviatorEvaluator.execute("'#{1+2'");
       fail();
-    } catch (ExpressionSyntaxErrorException e) {
+    } catch (CompileExpressionErrorException e) {
       e.printStackTrace();
     }
     try {
       AviatorEvaluator.execute("'#{1+*2'");
       fail();
-    } catch (ExpressionSyntaxErrorException e) {
+    } catch (CompileExpressionErrorException e) {
       e.printStackTrace();
     }
   }

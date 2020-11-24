@@ -34,6 +34,7 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.Contain
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
+import com.googlecode.aviator.utils.Reflector.PropertyType;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -326,7 +327,7 @@ public class AviatorJavaType extends AviatorObject {
           // cache the result
           this.subNames = SPLIT_PAT.split(name);
         }
-        return getProperty(name, this.subNames, env, throwExceptionNotFound, this);
+        return getProperty(name, this.subNames, env, throwExceptionNotFound, this, false);
       }
       return env.get(name);
     }
@@ -334,11 +335,12 @@ public class AviatorJavaType extends AviatorObject {
   }
 
   public static Object getValueFromEnv(final String name, final boolean nameContainsDot,
-      final String[] names, final Map<String, Object> env, final boolean throwExceptionNotFound) {
+      final String[] names, final Map<String, Object> env, final boolean throwExceptionNotFound,
+      final boolean tryResolveStaticMethod) {
     if (env != null) {
       if (nameContainsDot && RuntimeUtils.getInstance(env)
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
-        return getProperty(name, names, env, throwExceptionNotFound, null);
+        return getProperty(name, names, env, throwExceptionNotFound, null, tryResolveStaticMethod);
       }
       return env.get(name);
     }
@@ -422,15 +424,14 @@ public class AviatorJavaType extends AviatorObject {
 
   public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
 
-  @SuppressWarnings("unchecked")
   private static Object getProperty(final String name, String[] names,
       final Map<String, Object> env, final boolean throwExceptionNotFound,
-      final AviatorJavaType javaType) {
+      final AviatorJavaType javaType, final boolean tryResolveStaticMethod) {
     try {
       if (names == null) {
         names = SPLIT_PAT.split(name);
       }
-      return fastGetProperty(name, names, env, javaType);
+      return fastGetProperty(name, names, env, javaType, tryResolveStaticMethod);
 
     } catch (Throwable t) {
       if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
@@ -446,8 +447,10 @@ public class AviatorJavaType extends AviatorObject {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private static Object fastGetProperty(final String name, final String[] names,
-      final Map<String, Object> env, final AviatorJavaType javaType)
+      final Map<String, Object> env, final AviatorJavaType javaType,
+      final boolean tryResolveStaticMethod)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     if (javaType != null && javaType.slowPath) {
       return Reflector.getProperty(env, name);
@@ -493,7 +496,10 @@ public class AviatorJavaType extends AviatorObject {
           val = tryResolveAsClass(env, rName);
         }
       } else if (innerClazz != null) {
-        val = Reflector.fastGetProperty(innerClazz, rName, true);
+        val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticField);
+        if (tryResolveStaticMethod && val == null && names.length == 2) {
+          val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticMethod);
+        }
       } else {
         // in the format of a.b.[0].c
         if (rName.isEmpty()) {
@@ -502,7 +508,7 @@ public class AviatorJavaType extends AviatorObject {
           }
           val = targetObject;
         } else {
-          val = Reflector.fastGetProperty(targetObject, rName, false);
+          val = Reflector.fastGetProperty(targetObject, rName, PropertyType.Getter);
         }
       }
 
