@@ -19,7 +19,7 @@ public class ClassPathConfigFunctionLoader implements FunctionLoader {
 
   private static String CUSTOM_FUNCTION_LIST_FILE =
       System.getenv("com.googlecode.aviator.custom_function_config_file");
-  private static int tatalCustomFunctions = 0;
+  private static int totalCustomFunctions = 0;
   static {
     if (CUSTOM_FUNCTION_LIST_FILE == null || CUSTOM_FUNCTION_LIST_FILE.trim().length() == 0) {
       CUSTOM_FUNCTION_LIST_FILE = "aviator_functions.config";
@@ -95,8 +95,8 @@ public class ClassPathConfigFunctionLoader implements FunctionLoader {
       closeQuietly(reader);
       closeQuietly(inreader);
       closeQuietly(in);
-      if (tatalCustomFunctions > 0) {
-        info("Total " + tatalCustomFunctions + " custom functions loaded.");
+      if (totalCustomFunctions > 0) {
+        info("Total " + totalCustomFunctions + " custom functions loaded.");
       }
     }
     return ret;
@@ -110,7 +110,7 @@ public class ClassPathConfigFunctionLoader implements FunctionLoader {
       Class<AviatorFunction> clazz = (Class<AviatorFunction>) Class.forName(className);
       AviatorFunction func = clazz.newInstance();
       if (func != null) {
-        tatalCustomFunctions++;
+        totalCustomFunctions++;
       }
       return func;
     } catch (Throwable e) {
