@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -496,9 +498,14 @@ public class AviatorJavaType extends AviatorObject {
           val = tryResolveAsClass(env, rName);
         }
       } else if (innerClazz != null) {
-        val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticField);
-        if (tryResolveStaticMethod && val == null && names.length == 2) {
+        final AviatorEvaluatorInstance instance = RuntimeUtils.getInstance(env);
+        if (tryResolveStaticMethod && instance.isFeatureEnabled(Feature.StaticMethods)
+            && names.length == 2) {
           val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticMethod);
+        } else if (instance.isFeatureEnabled(Feature.StaticFields)) {
+          val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticField);
+        } else {
+          val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.Getter);
         }
       } else {
         // in the format of a.b.[0].c
