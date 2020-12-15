@@ -2,7 +2,6 @@ package com.googlecode.aviator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import com.googlecode.aviator.runtime.function.internal.CatchHandlerFunction;
@@ -18,6 +17,7 @@ import com.googlecode.aviator.runtime.function.internal.UseFunction;
 import com.googlecode.aviator.runtime.function.system.LoadFunction;
 import com.googlecode.aviator.runtime.function.system.RequireFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.utils.IdentityHashSet;
 
 /**
  * Syntax features.
@@ -93,7 +93,20 @@ public enum Feature {
    *
    * @since 5.2.0
    */
-  Use(asList(UseFunction.INSTANCE));
+  Use(asList(UseFunction.INSTANCE)),
+
+  /**
+   * Access java class's static fields by Class.FIELD
+   *
+   * @since 5.2.2
+   */
+  StaticFields,
+  /**
+   * Invoke java class's static methods by Class.method(..args)
+   *
+   * @since 5.2.2
+   */
+  StaticMethods;
 
   /**
    * Require feature sets for this feature.
@@ -142,7 +155,7 @@ public enum Feature {
    * @return feature set
    */
   public static Set<Feature> asSet(final Feature... args) {
-    Set<Feature> set = new HashSet<>();
+    Set<Feature> set = new IdentityHashSet<>();
     for (Feature f : args) {
       set.addAll(f.prequires);
       set.add(f);
