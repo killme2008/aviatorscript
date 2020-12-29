@@ -45,8 +45,8 @@ public interface Expression {
 
 
   /**
-   * Returns this expression's all variable names in order when using AviatorEvaluator.EVAL
-   * mode,else returns empty set
+   * Returns this expression's all uninitialized global variable names in order when using
+   * AviatorEvaluator.EVAL mode,else returns empty set
    *
    * @see com.googlecode.aviator.AviatorEvaluator#EVAL
    * @return
@@ -55,8 +55,8 @@ public interface Expression {
 
 
   /**
-   * Returns this expression's all variable full names in order when using AviatorEvaluator.EVAL
-   * mode,else returns empty set
+   * Returns this expression's all uninitialized global variable full names(contains dot) in order
+   * when using AviatorEvaluator.EVAL mode,else returns empty set
    *
    * @return
    */

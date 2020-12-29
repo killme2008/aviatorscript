@@ -34,6 +34,8 @@ public class Constants {
   public static final Variable THROWABLE_VAR = new Variable("Throwable", 0, -1);
   public static final String EXP_VAR = "__exp__";
   public static final Variable USE_VAR = new Variable("__use", 0, -1);
+  public static final String INIT_META = "isInitialized";
+  public static final String TYPE_META = "type";
 
   private Constants() {
 

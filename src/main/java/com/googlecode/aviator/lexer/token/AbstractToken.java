@@ -79,6 +79,14 @@ public abstract class AbstractToken<T> implements Token<T>, Serializable {
     return val;
   }
 
+  @Override
+  public <V> V getMeta(final String name) {
+    if (this.metaMap == null) {
+      return null;
+    }
+    return (V) this.metaMap.get(name);
+  }
+
 
   public AbstractToken(final String lexeme, final int lineNo, final int lineIdex) {
     super();
