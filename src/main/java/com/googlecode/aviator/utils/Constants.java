@@ -1,5 +1,6 @@
 package com.googlecode.aviator.utils;
 
+import java.util.regex.Pattern;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.function.internal.ReducerResult;
@@ -36,6 +37,7 @@ public class Constants {
   public static final Variable USE_VAR = new Variable("__use", 0, -1);
   public static final String INIT_META = "isInitialized";
   public static final String TYPE_META = "type";
+  public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
 
   private Constants() {
 

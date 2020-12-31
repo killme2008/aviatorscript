@@ -327,7 +327,7 @@ public class AviatorJavaType extends AviatorObject {
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
         if (this.subNames == null) {
           // cache the result
-          this.subNames = SPLIT_PAT.split(name);
+          this.subNames = Constants.SPLIT_PAT.split(name);
         }
         return getProperty(name, this.subNames, env, throwExceptionNotFound, this, false);
       }
@@ -424,14 +424,12 @@ public class AviatorJavaType extends AviatorObject {
     }
   }
 
-  public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
-
   private static Object getProperty(final String name, String[] names,
       final Map<String, Object> env, final boolean throwExceptionNotFound,
       final AviatorJavaType javaType, final boolean tryResolveStaticMethod) {
     try {
       if (names == null) {
-        names = SPLIT_PAT.split(name);
+        names = Constants.SPLIT_PAT.split(name);
       }
       return fastGetProperty(name, names, env, javaType, tryResolveStaticMethod);
 

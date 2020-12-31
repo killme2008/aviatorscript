@@ -18,7 +18,7 @@ import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
-import com.googlecode.aviator.runtime.type.AviatorJavaType;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
@@ -62,7 +62,7 @@ public abstract class BaseExpression implements Expression {
       Set<String> nameSet = new HashSet<>();
 
       for (String fName : this.varFullNames) {
-        String[] tmps = AviatorJavaType.SPLIT_PAT.split(fName);
+        String[] tmps = Constants.SPLIT_PAT.split(fName);
         String sName = tmps[0];
         if (!nameSet.contains(sName)) {
           this.varNames.add(sName);

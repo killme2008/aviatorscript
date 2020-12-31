@@ -9,6 +9,7 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 
 /**
@@ -313,7 +314,7 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
 
   private AviatorFunction getFunc(final Map<String, Object> env, final AviatorObject... args) {
     if (this.containsDot && this.subNames == null) {
-      this.subNames = AviatorJavaType.SPLIT_PAT.split(this.name);
+      this.subNames = Constants.SPLIT_PAT.split(this.name);
     }
     Object val = AviatorJavaType.getValueFromEnv(this.name, this.containsDot, this.subNames, env,
         false, true);
