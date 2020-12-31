@@ -87,12 +87,19 @@ public enum Options {
   MAX_LOOP_COUNT,
   /**
    * AviatorScript engine feature set, see {@link Feature}
+   *
+   * @since 5.
    */
-  FEATURE_SET;
+  FEATURE_SET,
 
-  private static final Value FULL_FEATURE_SET = new Value(Feature.getFullFeatures());
-  private static final boolean TRACE_EVAL_DEFAULT_VAL =
-      Boolean.parseBoolean(System.getProperty("aviator.trace_eval", "false"));
+  /**
+   * Allowed java class set in new statement and class's static method(fields) etc. It's null by
+   * default, it means all classes are allowed.Empty set means forbidding all classes.
+   *
+   * @since 5.2.2
+   */
+  CLASS_ALLOW_SET;
+
 
   /**
    * The option's value union
@@ -105,8 +112,17 @@ public enum Options {
     public MathContext mathContext;
     public int number;
     public Set<Feature> featureSet;
+    public Set<Class<?>> classes;
 
+    public Value() {
+      super();
+    }
 
+    static Value fromClasses(final Set<Class<?>> classes) {
+      Value v = new Value();
+      v.classes = classes;
+      return v;
+    }
 
     public Value(final Set<Feature> featureSet) {
       super();
@@ -131,10 +147,8 @@ public enum Options {
     @Override
     public String toString() {
       return "Value [bool=" + this.bool + ", mathContext=" + this.mathContext + ", number="
-          + this.number + "]";
+          + this.number + ", featureSet=" + this.featureSet + ", classes=" + this.classes + "]";
     }
-
-
   }
 
   /**
@@ -144,6 +158,9 @@ public enum Options {
    * @return
    */
   public Object intoObject(final Value val) {
+    if (val == null) {
+      return null;
+    }
     switch (this) {
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
@@ -161,6 +178,8 @@ public enum Options {
         return val.featureSet;
       case MATH_CONTEXT:
         return val.mathContext;
+      case CLASS_ALLOW_SET:
+        return val.classes;
     }
     throw new IllegalArgumentException("Fail to cast value " + val + " for option " + this);
   }
@@ -193,6 +212,8 @@ public enum Options {
       }
       case MAX_LOOP_COUNT:
         return new Value(((Number) val).intValue());
+      case CLASS_ALLOW_SET:
+        return Value.fromClasses((Set<Class<?>>) val);
       case FEATURE_SET:
         return new Value((Set<Feature>) val);
       case MATH_CONTEXT:
@@ -213,6 +234,7 @@ public enum Options {
       case CAPTURE_FUNCTION_ARGS:
         return val instanceof Boolean;
       case FEATURE_SET:
+      case CLASS_ALLOW_SET:
         return val instanceof Set;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
@@ -236,6 +258,12 @@ public enum Options {
   public static final Value EVAL_VALUE = new Value(AviatorEvaluator.EVAL);
 
   public static final Value COMPILE_VALUE = new Value(AviatorEvaluator.COMPILE);
+
+  private static final Value FULL_FEATURE_SET = new Value(Feature.getFullFeatures());
+  private static final boolean TRACE_EVAL_DEFAULT_VAL =
+      Boolean.parseBoolean(System.getProperty("aviator.trace_eval", "false"));
+
+  public static final Value EMPTY_CLASS_LIST = Value.fromClasses(null);
 
 
   /**
@@ -278,6 +306,8 @@ public enum Options {
         return ZERO_VALUE;
       case FEATURE_SET:
         return FULL_FEATURE_SET;
+      case CLASS_ALLOW_SET:
+        return EMPTY_CLASS_LIST;
     }
     return null;
   }
