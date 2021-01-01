@@ -41,7 +41,7 @@ public abstract class AbstractToken<T> implements Token<T>, Serializable {
   }
 
 
-  protected final String lexeme;
+  protected String lexeme;
   private Map<String, Object> metaMap;
 
 

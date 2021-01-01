@@ -17,6 +17,7 @@ package com.googlecode.aviator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
@@ -76,13 +77,16 @@ public abstract class ClassExpression extends BaseExpression {
   }
 
   @Override
-  protected void afterPopulateFullNames(final Map<String, VariableMeta> fullNames) {
+  protected void afterPopulateFullNames(final Map<String, VariableMeta> fullNames,
+      final Set<String> parentVars) {
     if (this.lambdaBootstraps != null) {
       for (LambdaFunctionBootstrap bootstrap : this.lambdaBootstraps.values()) {
         for (VariableMeta meta : bootstrap.getClosureOverFullVarNames()) {
           VariableMeta existsMeta = fullNames.get(meta.getName());
           if (existsMeta == null) {
-            fullNames.put(meta.getName(), meta);
+            if (!parentVars.contains(meta.getName())) {
+              fullNames.put(meta.getName(), meta);
+            }
           } else {
             // Appear first, update the meta
             if (existsMeta.getFirstIndex() > meta.getFirstIndex()) {

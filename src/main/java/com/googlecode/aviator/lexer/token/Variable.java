@@ -368,6 +368,9 @@ public class Variable extends AbstractToken<Object> {
     }
   }
 
+  public void setLexeme(final String lexeme) {
+    this.lexeme = lexeme;
+  }
 
   public Variable(final String name, final int lineNo, final int startIndex) {
     super(name, lineNo, startIndex);

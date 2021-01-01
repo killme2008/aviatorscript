@@ -72,7 +72,8 @@ public abstract class BaseExpression implements Expression {
     }
   }
 
-  protected void afterPopulateFullNames(final Map<String, VariableMeta> fullNames) {
+  protected void afterPopulateFullNames(final Map<String, VariableMeta> fullNames,
+      final Set<String> parentVars) {
 
   }
 
@@ -100,12 +101,14 @@ public abstract class BaseExpression implements Expression {
 
   public Map<String, VariableMeta> getFullNameMetas() {
     Map<String, VariableMeta> fullNames = new LinkedHashMap<>(this.vars.size());
+    Set<String> parentVars = new HashSet<>(this.vars.size());
     for (VariableMeta m : this.vars) {
       if (!m.isInit() && m.getFirstIndex() >= 0) {
         fullNames.put(m.getName(), m);
       }
+      parentVars.add(m.getName());
     }
-    afterPopulateFullNames(fullNames);
+    afterPopulateFullNames(fullNames, parentVars);
     return fullNames;
   }
 

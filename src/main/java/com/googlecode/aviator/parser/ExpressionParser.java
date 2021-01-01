@@ -365,8 +365,9 @@ public class ExpressionParser implements Parser {
           // this.back();
           // assignment
 
+          boolean isVar = false;
           if (prevToken.getType() == TokenType.Variable) {
-            prevToken.withMeta(Constants.INIT_META, true);
+            isVar = true;
           } else if (prevToken.getType() == TokenType.Char
               && ((CharToken) prevToken).getCh() == ']') {
             int depth = 1;
@@ -406,6 +407,12 @@ public class ExpressionParser implements Parser {
           }
 
           statement();
+
+          // try to find var(prevToken) in right statement, it's not initialized if presents.
+          if (isVar) {
+            checkVarIsInit(prevToken);
+          }
+
           ensureFeatureEnabled(Feature.Assignment);
           getCodeGeneratorWithTimes().onAssignment(opToken);
         }
@@ -422,6 +429,22 @@ public class ExpressionParser implements Parser {
         break;
       }
     }
+  }
+
+
+
+  private void checkVarIsInit(final Token<?> prevToken) {
+    boolean isInit = true;
+    for (Token<?> t : this.prevTokens) {
+      if (t == prevToken) {
+        break;
+      }
+      if (t.getType() == TokenType.Variable && t.getLexeme().equals(prevToken.getLexeme())) {
+        isInit = false;
+        break;
+      }
+    }
+    prevToken.withMeta(Constants.INIT_META, isInit);
   }
 
 
@@ -1156,8 +1179,9 @@ public class ExpressionParser implements Parser {
 
   private void letStatement() {
     move(true);
-    checkVariableName(this.lookhead);
-    getCodeGenerator().onConstant(this.lookhead.withMeta(Constants.INIT_META, true));
+    Token<?> var = this.lookhead;
+    checkVariableName(var);
+    getCodeGenerator().onConstant(var);
     move(true);
     if (!expectChar('=')) {
       reportSyntaxError("expect '='");
@@ -1166,6 +1190,7 @@ public class ExpressionParser implements Parser {
     if (statement() == StatementType.Empty) {
       reportSyntaxError("invalid value to define");
     }
+    checkVarIsInit(var);
     ensureFeatureEnabled(Feature.Assignment);
     getCodeGeneratorWithTimes().onAssignment(currentToken().withMeta(Constants.DEFINE_META, true));
     if (!expectChar(';')) {
