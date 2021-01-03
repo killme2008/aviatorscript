@@ -30,7 +30,8 @@ public class EvalFunction extends AbstractFunction {
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
     AviatorEvaluatorInstance instance = RuntimeUtils.getInstance(env);
     String script = FunctionUtils.getStringValue(arg1, env);
-    return AviatorRuntimeJavaType.valueOf(instance.execute(script, env, true));
+    return AviatorRuntimeJavaType
+        .valueOf(instance.execute(script, env, instance.isCachedExpressionByDefault()));
   }
 
   @SuppressWarnings("unchecked")
@@ -39,8 +40,8 @@ public class EvalFunction extends AbstractFunction {
       final AviatorObject arg2) {
     AviatorEvaluatorInstance instance = RuntimeUtils.getInstance(env);
     String script = FunctionUtils.getStringValue(arg1, env);
-    return AviatorRuntimeJavaType
-        .valueOf(instance.execute(script, (Map<String, Object>) arg2.getValue(env), true));
+    return AviatorRuntimeJavaType.valueOf(instance.execute(script,
+        (Map<String, Object>) arg2.getValue(env), instance.isCachedExpressionByDefault()));
   }
 
 

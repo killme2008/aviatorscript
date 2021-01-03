@@ -768,11 +768,26 @@ public class FunctionTest {
         + "let m = date.month(b, i); " + "if c[index] == '03' && m <= 12 {" + " n = n + 1; " + "}"
         + "index = index + 1;" + "  } return n;");
     vars = exp.getVariableNames();
-    System.out.println(vars);
     assertEquals(3, vars.size());
     assertEquals("a", vars.get(0));
     assertEquals("b", vars.get(1));
     assertEquals("c", vars.get(2));
+
+    exp = AviatorEvaluator.compile("a = seq.map(); add = lambda() -> a.b + a.c end; add()");
+    vars = exp.getVariableNames();
+    assertEquals(0, vars.size());
+    vars = exp.getVariableFullNames();
+    assertEquals(2, vars.size());
+    assertEquals("a.b", vars.get(0));
+    assertEquals("a.c", vars.get(1));
+
+    exp =
+        AviatorEvaluator.compile("a = seq.map(); a.c = 2; add = lambda() -> a.b + a.c end; add()");
+    vars = exp.getVariableNames();
+    assertEquals(0, vars.size());
+    vars = exp.getVariableFullNames();
+    assertEquals(1, vars.size());
+    assertEquals("a.b", vars.get(0));
   }
 
 

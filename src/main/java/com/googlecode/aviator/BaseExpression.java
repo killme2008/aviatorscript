@@ -61,10 +61,17 @@ public abstract class BaseExpression implements Expression {
       this.varNames = new ArrayList<>(this.varFullNames.size());
       Set<String> nameSet = new HashSet<>();
 
+      Set<String> parentInitNames = new HashSet<>();
+      for (VariableMeta m : this.vars) {
+        if (m.isInit() && !m.getName().contains(".") && m.getFirstIndex() >= 0) {
+          parentInitNames.add(m.getName());
+        }
+      }
+
       for (String fName : this.varFullNames) {
         String[] tmps = Constants.SPLIT_PAT.split(fName);
         String sName = tmps[0];
-        if (!nameSet.contains(sName)) {
+        if (!nameSet.contains(sName) && !parentInitNames.contains(sName)) {
           this.varNames.add(sName);
           nameSet.add(sName);
         }

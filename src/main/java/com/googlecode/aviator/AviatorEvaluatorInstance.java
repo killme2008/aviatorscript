@@ -460,7 +460,7 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Expression compileScript(final String path) throws IOException {
-    return this.compileScript(path, false);
+    return this.compileScript(path, this.cachedExpressionByDefault);
   }
 
 
@@ -1054,6 +1054,7 @@ public final class AviatorEvaluatorInstance {
 
   private LRUMap<String, FutureTask<Expression>> expressionLRUCache;
 
+  private boolean cachedExpressionByDefault;
 
 
   /**
@@ -1068,9 +1069,28 @@ public final class AviatorEvaluatorInstance {
   }
 
   private void fillDefaultOpts() {
+    this.cachedExpressionByDefault = false;
     for (Options opt : Options.values()) {
       this.options.put(opt, opt.getDefaultValueObject());
     }
+  }
+
+
+
+  public boolean isCachedExpressionByDefault() {
+    return this.cachedExpressionByDefault;
+  }
+
+  /**
+   * Set true to cache the compiled expression result by default when invoke
+   * {@link #compile(String)}, {@link #compileScript(String)}, {@link #execute(String)} and
+   * {@link #execute(String, Map)}. Default is false.
+   *
+   * @param cachedExpressionByDefault
+   * @since 5.2.2
+   */
+  public void setCachedExpressionByDefault(final boolean cachedExpressionByDefault) {
+    this.cachedExpressionByDefault = cachedExpressionByDefault;
   }
 
   private void loadFeatureFunctions() {
@@ -1502,7 +1522,7 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Expression compile(final String expression) {
-    return compile(expression, false);
+    return compile(expression, this.cachedExpressionByDefault);
   }
 
   /**
@@ -1585,7 +1605,7 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public Object execute(final String expression, final Map<String, Object> env) {
-    return execute(expression, env, false);
+    return execute(expression, env, this.cachedExpressionByDefault);
   }
 
 
