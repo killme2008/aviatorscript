@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -325,7 +327,7 @@ public class AviatorJavaType extends AviatorObject {
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
         if (this.subNames == null) {
           // cache the result
-          this.subNames = SPLIT_PAT.split(name);
+          this.subNames = Constants.SPLIT_PAT.split(name);
         }
         return getProperty(name, this.subNames, env, throwExceptionNotFound, this, false);
       }
@@ -422,14 +424,12 @@ public class AviatorJavaType extends AviatorObject {
     }
   }
 
-  public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
-
   private static Object getProperty(final String name, String[] names,
       final Map<String, Object> env, final boolean throwExceptionNotFound,
       final AviatorJavaType javaType, final boolean tryResolveStaticMethod) {
     try {
       if (names == null) {
-        names = SPLIT_PAT.split(name);
+        names = Constants.SPLIT_PAT.split(name);
       }
       return fastGetProperty(name, names, env, javaType, tryResolveStaticMethod);
 
@@ -496,9 +496,14 @@ public class AviatorJavaType extends AviatorObject {
           val = tryResolveAsClass(env, rName);
         }
       } else if (innerClazz != null) {
-        val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticField);
-        if (tryResolveStaticMethod && val == null && names.length == 2) {
+        final AviatorEvaluatorInstance instance = RuntimeUtils.getInstance(env);
+        if (tryResolveStaticMethod && instance.isFeatureEnabled(Feature.StaticMethods)
+            && names.length == 2) {
           val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticMethod);
+        } else if (instance.isFeatureEnabled(Feature.StaticFields)) {
+          val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticField);
+        } else {
+          val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.Getter);
         }
       } else {
         // in the format of a.b.[0].c

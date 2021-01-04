@@ -34,6 +34,8 @@ import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Feature;
+import com.googlecode.aviator.Options;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.Range;
 
@@ -163,30 +165,42 @@ public class Env implements Map<String, Object> {
   }
 
   public Class<?> resolveClassSymbol(final String name) throws ClassNotFoundException {
+    return this.resolveClassSymbol(name, true);
+  }
+
+  public Class<?> resolveClassSymbol(final String name, final boolean checkIfAllow)
+      throws ClassNotFoundException {
     Class<?> clazz = null;
     if (name.contains(".")) {
       clazz = classForName(name);
+      if (clazz != null) {
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
+      }
     } else {
       // java.lang.XXX
       clazz = classForName("java.lang." + name);
       if (clazz != null) {
-        return clazz;
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
       // from cache
       clazz = retrieveFromCache(name);
       if (clazz != null) {
-        return clazz;
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
       // from imported packages
       clazz = resolveFromImportedPackages(name);
       if (clazz != null) {
-        return clazz;
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
       // from imported classes
       clazz = resolveFromImportedSymbols(name, clazz);
+      if (clazz != null) {
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
+      }
+
       // try to find from parent env.
       if (clazz == null && this.mDefaults instanceof Env) {
-        clazz = ((Env) this.mDefaults).resolveClassSymbol(name);
+        clazz = ((Env) this.mDefaults).resolveClassSymbol(name, checkIfAllow);
       }
     }
 
@@ -194,6 +208,20 @@ public class Env implements Map<String, Object> {
       throw new ClassNotFoundException(name);
     }
 
+    return clazz;
+  }
+
+  private Class<?> checkIfClassIsAllowed(final boolean checkIfAllow, final Class<?> clazz) {
+    if (checkIfAllow) {
+      Set<Class<?>> allowedList = this.instance.getOptionValue(Options.ALLOWED_CLASS_SET).classes;
+      if (allowedList != null) {
+        // Null list means allowing all classes
+        if (!allowedList.contains(clazz)) {
+          throw new ExpressionRuntimeException(
+              "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
+        }
+      }
+    }
     return clazz;
   }
 

@@ -68,7 +68,7 @@ public class IsAFunction extends AbstractFunction {
       if (TypeUtils.PRIMITIVE_TYPES.containsKey(name)) {
         clazz = TypeUtils.PRIMITIVE_TYPES.get(name);
       } else {
-        clazz = ((Env) env).resolveClassSymbol(name);
+        clazz = ((Env) env).resolveClassSymbol(name, false);
       }
       return AviatorBoolean.valueOf(clazz.isInstance(obj));
     } catch (ClassNotFoundException e) {

@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +76,7 @@ import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
+import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
@@ -143,7 +145,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   private Map<Token<?>/* constant token */, String/* field name */> constantPool =
       Collections.emptyMap();
 
-  private Map<String, Integer/* counter */> varTokens = Collections.emptyMap();
+  private Map<String, VariableMeta/* metadata */> variables = Collections.emptyMap();
   private Map<String, Integer/* counter */> methodTokens = Collections.emptyMap();
 
   private final Map<Label, Map<String/* inner name */, Integer/* local index */>> labelNameIndexMap =
@@ -833,7 +835,7 @@ public class ASMCodeGenerator implements CodeGenerator {
       Constructor<?> constructor =
           defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class, SymbolTable.class);
       ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
-          new ArrayList<String>(this.varTokens.keySet()), this.symbolTable);
+          new ArrayList<VariableMeta>(this.variables.values()), this.symbolTable);
       exp.setLambdaBootstraps(this.lambdaBootstraps);
       exp.setFuncsArgs(this.funcsArgs);
       return exp;
@@ -972,7 +974,7 @@ public class ASMCodeGenerator implements CodeGenerator {
               this.mv.visitFieldInsn(GETFIELD, this.className, innerVarName,
                   "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;");
               // Variable is used more than once,store it to local
-              if (this.varTokens.get(outterVarName) > 1) {
+              if (this.variables.get(outterVarName).getRefs() > 1) {
                 this.mv.visitInsn(DUP);
                 int localIndex = getLocalIndex();
                 this.mv.visitVarInsn(ASTORE, localIndex);
@@ -1022,10 +1024,10 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
-  public void initVariables(final Map<String, Integer/* counter */> varTokens) {
-    this.varTokens = varTokens;
-    this.innerVars = new HashMap<>(varTokens.size());
-    for (String outterVarName : varTokens.keySet()) {
+  public void initVariables(final Map<String, VariableMeta/* counter */> vars) {
+    this.variables = vars;
+    this.innerVars = new HashMap<>(this.variables.size());
+    for (String outterVarName : this.variables.keySet()) {
       // Use inner variable name instead of outter variable name
       String innerVarName = getInnerName(outterVarName);
       this.innerVars.put(outterVarName, innerVarName);
@@ -1283,7 +1285,8 @@ public class ASMCodeGenerator implements CodeGenerator {
     // this.lambdaGenerator.compileCallMethod();
     LambdaFunctionBootstrap bootstrap = this.lambdaGenerator.getLmabdaBootstrap();
     if (this.lambdaBootstraps == null) {
-      this.lambdaBootstraps = new HashMap<String, LambdaFunctionBootstrap>();
+      // keep in order
+      this.lambdaBootstraps = new LinkedHashMap<String, LambdaFunctionBootstrap>();
     }
     this.lambdaBootstraps.put(bootstrap.getName(), bootstrap);
     visitLineNumber(lookhead);

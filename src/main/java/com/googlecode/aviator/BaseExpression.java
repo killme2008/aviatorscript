@@ -2,10 +2,13 @@ package com.googlecode.aviator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -13,7 +16,9 @@ import java.util.concurrent.FutureTask;
 import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
+import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
@@ -27,8 +32,9 @@ import com.googlecode.aviator.utils.Reflector;
 public abstract class BaseExpression implements Expression {
 
   public static final String FUNC_PARAMS_VAR = "__funcs_args__";
-  private final List<String> varNames;
-  private final List<String> varFullNames;
+  protected List<String> varNames;
+  protected List<String> varFullNames;
+  private final List<VariableMeta> vars;
   private String expression;
   protected AviatorEvaluatorInstance instance;
   private Env compileEnv;
@@ -38,21 +44,79 @@ public abstract class BaseExpression implements Expression {
   private final ConcurrentHashMap<String, FutureTask<StringSegments>> stringSegs =
       new ConcurrentHashMap<String, FutureTask<StringSegments>>();
 
-  public BaseExpression(final AviatorEvaluatorInstance instance, final List<String> varNames,
+  public BaseExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
       final SymbolTable symbolTable) {
     super();
+    this.vars = vars;
     this.symbolTable = symbolTable;
-    this.varFullNames = varNames;
     this.instance = instance;
-    LinkedHashSet<String> tmp = new LinkedHashSet<>(varNames.size());
-    // process nested names
-    for (String name : varNames) {
-      if (name.contains(".")) {
-        name = name.substring(0, name.indexOf("."));
+  }
+
+  private void populateNames() {
+    if (this.varNames == null) {
+      if (this.varFullNames == null) {
+        populateFullNames();
       }
-      tmp.add(name);
+
+      this.varNames = new ArrayList<>(this.varFullNames.size());
+      Set<String> nameSet = new HashSet<>();
+
+      Set<String> parentInitNames = new HashSet<>();
+      for (VariableMeta m : this.vars) {
+        if (m.isInit() && !m.getName().contains(".") && m.getFirstIndex() >= 0) {
+          parentInitNames.add(m.getName());
+        }
+      }
+
+      for (String fName : this.varFullNames) {
+        String[] tmps = Constants.SPLIT_PAT.split(fName);
+        String sName = tmps[0];
+        if (!nameSet.contains(sName) && !parentInitNames.contains(sName)) {
+          this.varNames.add(sName);
+          nameSet.add(sName);
+        }
+      }
     }
-    this.varNames = new ArrayList<String>(tmp);
+  }
+
+  protected void afterPopulateFullNames(final Map<String, VariableMeta> fullNames,
+      final Set<String> parentVars) {
+
+  }
+
+  private void populateFullNames() {
+    if (this.varFullNames == null) {
+      Map<String, VariableMeta> fullNames = getFullNameMetas();
+
+
+      final ArrayList<VariableMeta> metas = new ArrayList<>(fullNames.values());
+      Collections.sort(metas, new Comparator<VariableMeta>() {
+
+        @Override
+        public int compare(final VariableMeta o1, final VariableMeta o2) {
+          return Integer.compare(o1.getFirstIndex(), o2.getFirstIndex());
+        }
+
+      });
+
+      this.varFullNames = new ArrayList<>(fullNames.size());
+      for (VariableMeta meta : metas) {
+        this.varFullNames.add(meta.getName());
+      }
+    }
+  }
+
+  public Map<String, VariableMeta> getFullNameMetas() {
+    Map<String, VariableMeta> fullNames = new LinkedHashMap<>(this.vars.size());
+    Set<String> parentVars = new HashSet<>(this.vars.size());
+    for (VariableMeta m : this.vars) {
+      if (!m.isInit() && m.getFirstIndex() >= 0) {
+        fullNames.put(m.getName(), m);
+      }
+      parentVars.add(m.getName());
+    }
+    afterPopulateFullNames(fullNames, parentVars);
+    return fullNames;
   }
 
   public StringSegments getStringSegements(final String lexeme) {
@@ -197,9 +261,13 @@ public abstract class BaseExpression implements Expression {
 
   @Override
   public List<String> getVariableFullNames() {
+    populateFullNames();
     return this.varFullNames;
   }
 
+  public List<VariableMeta> getVars() {
+    return this.vars;
+  }
 
   /*
    * (non-Javadoc)
@@ -208,6 +276,7 @@ public abstract class BaseExpression implements Expression {
    */
   @Override
   public List<String> getVariableNames() {
+    populateNames();
     return this.varNames;
   }
 

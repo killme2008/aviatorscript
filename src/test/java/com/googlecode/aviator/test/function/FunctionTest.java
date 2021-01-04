@@ -708,6 +708,88 @@ public class FunctionTest {
         AviatorEvaluator.exec("99999999999999999999999999999999.99999999M"));
   }
 
+  @Test
+  public void testGetVariableNamesComplex() {
+    // lambda
+    Expression exp = AviatorEvaluator.compile("a = 1; add = lambda(x) -> x + a end; add(b)");
+    List<String> vars = exp.getVariableNames();
+    System.out.println(vars);
+    assertEquals(1, vars.size());
+
+    assertEquals("b", vars.get(0));
+
+    // lambda closure over
+    exp = AviatorEvaluator.compile("add = lambda(x) -> x + a end; add(b)");
+    vars = exp.getVariableNames();
+    assertEquals(2, vars.size());
+    assertEquals("a", vars.get(0));
+    assertEquals("b", vars.get(1));
+
+    // if.. else
+    exp = AviatorEvaluator
+        .compile("b=2; if(a > 1) { a + b } elsif( a > 10) { return a + c; } else { return 10; }");
+    vars = exp.getVariableNames();
+    assertEquals(2, vars.size());
+    assertEquals("a", vars.get(0));
+    assertEquals("c", vars.get(1));
+
+    // for..loop
+    exp = AviatorEvaluator
+        .compile("let list = seq.list(1, 2, 3); for x in list { sum = sum + x }; return sum;");
+    vars = exp.getVariableNames();
+    assertEquals(1, vars.size());
+    assertEquals("sum", vars.get(0));
+
+    // let statement in block
+    exp = AviatorEvaluator.compile("{let a = 1; let b = b + 1; p(a+b);} c-a");
+    vars = exp.getVariableNames();
+    assertEquals(3, vars.size());
+    assertEquals("b", vars.get(0));
+    assertEquals("c", vars.get(1));
+    assertEquals("a", vars.get(2));
+
+    // redfine variable
+    exp = AviatorEvaluator.compile("{let a = 1; let b = 2; let b = b + 1; p(a+b);} c-a");
+    vars = exp.getVariableNames();
+    assertEquals(2, vars.size());
+    assertEquals("c", vars.get(0));
+    assertEquals("a", vars.get(1));
+
+    // high-order function
+    exp = AviatorEvaluator.compile("map(list, lambda(v) -> v + u end)");
+    vars = exp.getVariableNames();
+    assertEquals(2, vars.size());
+    assertEquals("list", vars.get(0));
+    assertEquals("u", vars.get(1));
+
+    // a complex script
+    exp = AviatorEvaluator.compile("let n = 0;  let index =0 ; " + "for i in a {"
+        + "let t = string_to_date(i, 'yyyyMMdd'); " + "if t == nil { continue; } "
+        + "let m = date.month(b, i); " + "if c[index] == '03' && m <= 12 {" + " n = n + 1; " + "}"
+        + "index = index + 1;" + "  } return n;");
+    vars = exp.getVariableNames();
+    assertEquals(3, vars.size());
+    assertEquals("a", vars.get(0));
+    assertEquals("b", vars.get(1));
+    assertEquals("c", vars.get(2));
+
+    exp = AviatorEvaluator.compile("a = seq.map(); add = lambda() -> a.b + a.c end; add()");
+    vars = exp.getVariableNames();
+    assertEquals(0, vars.size());
+    vars = exp.getVariableFullNames();
+    assertEquals(2, vars.size());
+    assertEquals("a.b", vars.get(0));
+    assertEquals("a.c", vars.get(1));
+
+    exp =
+        AviatorEvaluator.compile("a = seq.map(); a.c = 2; add = lambda() -> a.b + a.c end; add()");
+    vars = exp.getVariableNames();
+    assertEquals(0, vars.size());
+    vars = exp.getVariableFullNames();
+    assertEquals(1, vars.size());
+    assertEquals("a.b", vars.get(0));
+  }
+
 
   @Test
   public void testGetVariableNames() {

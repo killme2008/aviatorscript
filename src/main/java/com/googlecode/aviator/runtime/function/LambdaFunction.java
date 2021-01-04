@@ -40,7 +40,6 @@ public final class LambdaFunction extends AbstractVariadicFunction {
   private final String name;
 
 
-
   public boolean isInheritEnv() {
     return this.inheritEnv;
   }
@@ -65,6 +64,10 @@ public final class LambdaFunction extends AbstractVariadicFunction {
     } else {
       this.isVariadic = false;
     }
+  }
+
+  public BaseExpression getExpression() {
+    return this.expression;
   }
 
   public void setInheritEnv(final boolean inheritEnv) {

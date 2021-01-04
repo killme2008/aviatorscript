@@ -109,7 +109,12 @@ public class SymbolTable implements Serializable {
   public Token<?> reserve(final Variable variable) {
     String lexeme = variable.getLexeme();
     if (isReserved(lexeme)) {
-      return getVariable(lexeme);
+      Variable v = getVariable(lexeme);
+      if (v.getStartIndex() < 0) {
+        return v;
+      }
+      variable.setLexeme(v.getLexeme());
+      return variable;
     } else {
       final String name = lexeme;
       this.table.put(name, variable);

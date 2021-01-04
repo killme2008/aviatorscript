@@ -36,6 +36,8 @@ public interface Token<T> {
 
   <V> V getMeta(final String name, final V defaultVal);
 
+  <V> V getMeta(final String name);
+
   T getValue(Map<String, Object> env);
 
   TokenType getType();

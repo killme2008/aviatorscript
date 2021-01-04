@@ -29,7 +29,7 @@ public class CatchHandler extends AviatorObject {
     this.exceptionClasses = new ArrayList<>(exceptionClassNames.size());
     for (String exceptionClass : exceptionClassNames) {
       try {
-        this.exceptionClasses.add(env.resolveClassSymbol(exceptionClass));
+        this.exceptionClasses.add(env.resolveClassSymbol(exceptionClass, false));
       } catch (Exception e) {
         throw Reflector.sneakyThrow(e);
       }

@@ -44,8 +44,10 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
+import com.googlecode.aviator.parser.CompileTypes;
 import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.parser.Parser;
+import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
@@ -354,7 +356,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       ;
     }
 
-    Map<String, Integer/* counter */> variables = new LinkedHashMap<String, Integer>();
+    Map<String, VariableMeta/* metadata */> variables = new LinkedHashMap<String, VariableMeta>();
     Map<String, Integer/* counter */> methods = new HashMap<String, Integer>();
     Set<Token<?>> constants = new HashSet<>();
     for (Token<?> token : this.tokenList) {
@@ -368,10 +370,13 @@ public class OptimizeCodeGenerator implements CodeGenerator {
           }
 
           String varName = token.getLexeme();
-          if (!variables.containsKey(varName)) {
-            variables.put(varName, 1);
+          VariableMeta meta = variables.get(varName);
+          if (meta == null) {
+            meta = new VariableMeta((CompileTypes) token.getMeta(Constants.TYPE_META), varName,
+                token.getMeta(Constants.INIT_META, false), token.getStartIndex());
+            variables.put(varName, meta);
           } else {
-            variables.put(varName, variables.get(varName) + 1);
+            meta.add(token);
           }
 
           break;
@@ -394,10 +399,14 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             Token<?> realToken = delegateToken.getToken();
             if (realToken.getType() == TokenType.Variable) {
               varName = token.getLexeme();
-              if (!variables.containsKey(varName)) {
-                variables.put(varName, 1);
+              VariableMeta varMeta = variables.get(varName);
+              if (varMeta == null) {
+                varMeta =
+                    new VariableMeta((CompileTypes) realToken.getMeta(Constants.TYPE_META), varName,
+                        realToken.getMeta(Constants.INIT_META, false), realToken.getStartIndex());
+                variables.put(varName, varMeta);
               } else {
-                variables.put(varName, variables.get(varName) + 1);
+                varMeta.add(realToken);
               }
             }
           }
@@ -410,13 +419,13 @@ public class OptimizeCodeGenerator implements CodeGenerator {
     // Last token is a literal token,then return a LiteralExpression
     if (this.tokenList.size() <= 1) {
       if (this.tokenList.isEmpty()) {
-        exp = new LiteralExpression(this.instance, null, new ArrayList<String>(variables.keySet()));
+        exp = new LiteralExpression(this.instance, null, new ArrayList<>(variables.values()));
       } else {
         final Token<?> lastToken = this.tokenList.get(0);
         if (ExpressionParser.isLiteralToken(lastToken, this.instance)) {
           exp = new LiteralExpression(this.instance,
               getAviatorObjectFromToken(lastToken).getValue(getCompileEnv()),
-              new ArrayList<String>(variables.keySet()));
+              new ArrayList<>(variables.values()));
         }
       }
     }
@@ -436,7 +445,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   }
 
 
-  private void callASM(final Map<String, Integer/* counter */> variables,
+  private void callASM(final Map<String, VariableMeta/* metadata */> variables,
       final Map<String, Integer/* counter */> methods, final Set<Token<?>> constants) {
     this.codeGen.initConstants(constants);
     this.codeGen.initVariables(variables);

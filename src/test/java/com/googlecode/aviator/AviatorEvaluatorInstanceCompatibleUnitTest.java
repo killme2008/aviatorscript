@@ -25,6 +25,12 @@ public class AviatorEvaluatorInstanceCompatibleUnitTest extends AviatorEvaluator
 
   @Override
   @Test
+  public void testClassAllowList() {
+    // ignore
+  }
+
+  @Override
+  @Test
   public void testDefaultOptionValues() {
     assertEquals(this.instance.getOption(Options.TRACE_EVAL), false);
     assertEquals(this.instance.getOption(Options.FEATURE_SET), Feature.getCompatibleFeatures());

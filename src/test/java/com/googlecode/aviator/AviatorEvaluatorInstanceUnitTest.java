@@ -26,8 +26,10 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayOutputStream;
 import java.math.MathContext;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.StringUtils;
@@ -53,6 +55,35 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Before
   public void setup() {
     this.instance = AviatorEvaluator.newInstance();
+  }
+
+
+  @Test
+  public void testClassAllowList() {
+    final HashSet<Object> classes = new HashSet<>();
+    classes.add(ArrayBlockingQueue.class);
+    this.instance.setOption(Options.ALLOWED_CLASS_SET, classes);
+    try {
+      this.instance.execute("new java.util.Date()");
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals(
+          "`class java.util.Date` is not in allowed class set, check Options.ALLOWED_CLASS_SET",
+          e.getMessage());
+    }
+
+    try {
+      this.instance.execute("new String()");
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals(
+          "`class java.lang.String` is not in allowed class set, check Options.ALLOWED_CLASS_SET",
+          e.getMessage());
+    }
+
+    this.instance.execute("try {} catch(IllegalArgumentException e) {}");
+    assertTrue(this.instance
+        .execute("new java.util.concurrent.ArrayBlockingQueue(10)") instanceof ArrayBlockingQueue);
   }
 
   @Test

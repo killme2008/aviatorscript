@@ -1,7 +1,12 @@
 package com.googlecode.aviator.runtime;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Env;
 
@@ -15,7 +20,7 @@ public class LambdaFunctionBootstrap {
   // the generated lambda class name
   private final String name;
   // The compiled lambda body expression
-  private final Expression expression;
+  private final BaseExpression expression;
   // The method handle to create lambda instance.
   // private final MethodHandle constructor;
   // The arguments list.
@@ -33,12 +38,37 @@ public class LambdaFunctionBootstrap {
       final List<FunctionParam> arguments, final boolean inheritEnv) {
     super();
     this.name = name;
-    this.expression = expression;
+    this.expression = (BaseExpression) expression;
     // this.constructor = constructor;
     this.params = arguments;
     this.inheritEnv = inheritEnv;
   }
 
+
+  public Collection<VariableMeta> getClosureOverFullVarNames() {
+    Map<String, VariableMeta> fullNames = this.expression.getFullNameMetas();
+
+    for (FunctionParam param : this.params) {
+      fullNames.remove(param.getName());
+    }
+
+    Iterator<Map.Entry<String, VariableMeta>> it = fullNames.entrySet().iterator();
+    while (it.hasNext()) {
+      Map.Entry<String, VariableMeta> fullName = it.next();
+      for (FunctionParam param : this.params) {
+        if (fullName.getKey().startsWith(param.getName() + ".")) {
+          it.remove();
+          break;
+        }
+      }
+    }
+
+    return fullNames.values();
+  }
+
+  public Expression getExpression() {
+    return this.expression;
+  }
 
   /**
    * Create a lambda function.

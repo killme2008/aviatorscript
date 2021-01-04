@@ -17,6 +17,7 @@ package com.googlecode.aviator;
  **/
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 
 
@@ -32,8 +33,8 @@ public class LiteralExpression extends BaseExpression {
 
 
   public LiteralExpression(final AviatorEvaluatorInstance instance, final Object result,
-      final List<String> varNames) {
-    super(instance, varNames, null);
+      final List<VariableMeta> vars) {
+    super(instance, vars, null);
     this.result = result;
   }
 
