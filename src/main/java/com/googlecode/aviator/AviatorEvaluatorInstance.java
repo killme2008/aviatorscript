@@ -1075,8 +1075,12 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
-
-
+  /**
+   * Returns true when caching compiled expression result by default.
+   * 
+   * @since 5.2.2
+   * @return
+   */
   public boolean isCachedExpressionByDefault() {
     return this.cachedExpressionByDefault;
   }

@@ -62,13 +62,13 @@ public class AviatorEvaluatorInstanceUnitTest {
   public void testClassAllowList() {
     final HashSet<Object> classes = new HashSet<>();
     classes.add(ArrayBlockingQueue.class);
-    this.instance.setOption(Options.CLASS_ALLOW_SET, classes);
+    this.instance.setOption(Options.ALLOWED_CLASS_SET, classes);
     try {
       this.instance.execute("new java.util.Date()");
       fail();
     } catch (ExpressionRuntimeException e) {
       assertEquals(
-          "`class java.util.Date` is not in class allow set, check Options.CLASS_ALLOW_SET",
+          "`class java.util.Date` is not in allowed class set, check Options.ALLOWED_CLASS_SET",
           e.getMessage());
     }
 
@@ -77,7 +77,7 @@ public class AviatorEvaluatorInstanceUnitTest {
       fail();
     } catch (ExpressionRuntimeException e) {
       assertEquals(
-          "`class java.lang.String` is not in class allow set, check Options.CLASS_ALLOW_SET",
+          "`class java.lang.String` is not in allowed class set, check Options.ALLOWED_CLASS_SET",
           e.getMessage());
     }
 

@@ -94,11 +94,11 @@ public enum Options {
 
   /**
    * Allowed java class set in new statement and class's static method(fields) etc. It's null by
-   * default, it means all classes are allowed.Empty set means forbidding all classes.
+   * default, it means all classes are allowed. Empty set means forbidding all classes.
    *
    * @since 5.2.2
    */
-  CLASS_ALLOW_SET;
+  ALLOWED_CLASS_SET;
 
 
   /**
@@ -178,7 +178,7 @@ public enum Options {
         return val.featureSet;
       case MATH_CONTEXT:
         return val.mathContext;
-      case CLASS_ALLOW_SET:
+      case ALLOWED_CLASS_SET:
         return val.classes;
     }
     throw new IllegalArgumentException("Fail to cast value " + val + " for option " + this);
@@ -212,7 +212,7 @@ public enum Options {
       }
       case MAX_LOOP_COUNT:
         return new Value(((Number) val).intValue());
-      case CLASS_ALLOW_SET:
+      case ALLOWED_CLASS_SET:
         return Value.fromClasses((Set<Class<?>>) val);
       case FEATURE_SET:
         return new Value((Set<Feature>) val);
@@ -234,7 +234,7 @@ public enum Options {
       case CAPTURE_FUNCTION_ARGS:
         return val instanceof Boolean;
       case FEATURE_SET:
-      case CLASS_ALLOW_SET:
+      case ALLOWED_CLASS_SET:
         return val instanceof Set;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
@@ -263,7 +263,7 @@ public enum Options {
   private static final boolean TRACE_EVAL_DEFAULT_VAL =
       Boolean.parseBoolean(System.getProperty("aviator.trace_eval", "false"));
 
-  public static final Value EMPTY_CLASS_LIST = Value.fromClasses(null);
+  public static final Value NULL_CLASS_SET = Value.fromClasses(null);
 
 
   /**
@@ -306,8 +306,8 @@ public enum Options {
         return ZERO_VALUE;
       case FEATURE_SET:
         return FULL_FEATURE_SET;
-      case CLASS_ALLOW_SET:
-        return EMPTY_CLASS_LIST;
+      case ALLOWED_CLASS_SET:
+        return NULL_CLASS_SET;
     }
     return null;
   }

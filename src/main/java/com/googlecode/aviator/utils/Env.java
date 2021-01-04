@@ -174,28 +174,28 @@ public class Env implements Map<String, Object> {
     if (name.contains(".")) {
       clazz = classForName(name);
       if (clazz != null) {
-        return checkIfClassIsAllow(checkIfAllow, clazz);
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
     } else {
       // java.lang.XXX
       clazz = classForName("java.lang." + name);
       if (clazz != null) {
-        return checkIfClassIsAllow(checkIfAllow, clazz);
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
       // from cache
       clazz = retrieveFromCache(name);
       if (clazz != null) {
-        return checkIfClassIsAllow(checkIfAllow, clazz);
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
       // from imported packages
       clazz = resolveFromImportedPackages(name);
       if (clazz != null) {
-        return checkIfClassIsAllow(checkIfAllow, clazz);
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
       // from imported classes
       clazz = resolveFromImportedSymbols(name, clazz);
       if (clazz != null) {
-        return checkIfClassIsAllow(checkIfAllow, clazz);
+        return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
 
       // try to find from parent env.
@@ -211,14 +211,14 @@ public class Env implements Map<String, Object> {
     return clazz;
   }
 
-  private Class<?> checkIfClassIsAllow(final boolean checkIfAllow, final Class<?> clazz) {
+  private Class<?> checkIfClassIsAllowed(final boolean checkIfAllow, final Class<?> clazz) {
     if (checkIfAllow) {
-      Set<Class<?>> allowedList = this.instance.getOptionValue(Options.CLASS_ALLOW_SET).classes;
+      Set<Class<?>> allowedList = this.instance.getOptionValue(Options.ALLOWED_CLASS_SET).classes;
       if (allowedList != null) {
         // Null list means allowing all classes
         if (!allowedList.contains(clazz)) {
           throw new ExpressionRuntimeException(
-              "`" + clazz + "` is not in class allow set, check Options.CLASS_ALLOW_SET");
+              "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
         }
       }
     }

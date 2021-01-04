@@ -439,6 +439,7 @@ public class ExpressionParser implements Parser {
       if (t == prevToken) {
         break;
       }
+      // It's in right statement, so it's not initialized.
       if (t.getType() == TokenType.Variable && t.getLexeme().equals(prevToken.getLexeme())) {
         isInit = false;
         break;
