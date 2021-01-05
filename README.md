@@ -30,9 +30,9 @@
 
 # News
 
+* [5.2.2](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.2)，修复获取未初始化全局变量方法、增加默认缓存模式以及静态访问语法开关等。
 * [5.2.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.1)，修复字符串插值某些情况下的编译错误、修复潜在内存泄漏隐患以及允许直接调用静态方法等。
 * [5.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.0)，函数重载、可变参数函数定义、use 语句以及更多内置 sequence/math 函数等（废弃，请使用 5.2.1）
-* [5.1.4](https://github.com/killme2008/aviator/releases/tag/aviator-5.1.4)，修复编译字符串插值可能存在的重复编译问题（导致 FGC）等。
 
 # Dependency
 
