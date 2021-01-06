@@ -14,9 +14,7 @@ for i in range(0, files) {
   let file = "#{temp_dir}#{File.separator}data.#{i}";
   p("Sort file #{file}");
 
-  let nums = map(io.line_seq(io.file(file)),
-                 lambda(x) -> long(x) end);
-
+  let nums = map(io.line_seq(io.file(file)), long);
   let nums = q.sort(nums);
 
   let temp_file = "#{temp_dir}#{File.separator}data.#{i}.temp";
