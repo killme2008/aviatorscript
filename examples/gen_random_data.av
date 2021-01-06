@@ -1,16 +1,17 @@
 ## examples/gen_random_data.av
-## a script to generate random numbers to files in temp dir.
+## A script to generate random numbers to files in /tmp dir.
+## They can be sorted by examples/sort_files.av .
 
 use java.io.File;
 
 let io = require('io');
 let files = count(ARGV) == 0 ? 5 : long(ARGV[0]);
 let nums = count(ARGV) < 2? 1000 : long(ARGV[1]);
-let temp_dir = System.getProperty("java.io.tmpdir");
+let temp_dir = "/tmp";
 
 for i  in range(0, files) {
   let file = "#{temp_dir}#{File.separator}data.#{i}";
-  let writer = io.writer(io.output_stream(io.file(file)));
+  let writer = io.writer(io.file(file));
   for j in range(0, nums) {
     write(writer, "#{rand(100000000)}\r\n");
   }
