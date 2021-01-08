@@ -40,6 +40,15 @@ public class AviatorString extends AviatorObject {
   private final String lexeme;
   private final boolean isLiteral;
 
+  @Override
+  public String desc(final Map<String, Object> env) {
+    Object val = this.getLexeme(env, false);
+    if (val != this) {
+      return "<" + getAviatorType() + ", " + val + ">";
+    } else {
+      return "<" + getAviatorType() + ", this>";
+    }
+  }
 
   @Override
   public AviatorType getAviatorType() {
@@ -144,6 +153,10 @@ public class AviatorString extends AviatorObject {
   }
 
   public String getLexeme(final Map<String, Object> env) {
+    return this.getLexeme(env, true);
+  }
+
+  public String getLexeme(final Map<String, Object> env, final boolean warnOnCompile) {
     AviatorEvaluatorInstance engine = RuntimeUtils.getInstance(env);
     if (!this.isLiteral || !engine.isFeatureEnabled(Feature.StringInterpolation)
         || this.lexeme == null || this.lexeme.length() < 3) {
@@ -155,7 +168,9 @@ public class AviatorString extends AviatorObject {
       segs = exp.getStringSegements(this.lexeme);
     } else {
       segs = engine.compileStringSegments(this.lexeme);
-      warnOnCompile();
+      if (warnOnCompile) {
+        warnOnCompileWithoutCaching();
+      }
     }
     assert (segs != null);
     return segs.toString(env, this.lexeme);
@@ -163,7 +178,7 @@ public class AviatorString extends AviatorObject {
 
   private static int COMPILE_TIMES = 0;
 
-  private void warnOnCompile() {
+  private void warnOnCompileWithoutCaching() {
     if (COMPILE_TIMES++ % 1000 == 0) {
       final StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
       StringBuilder sb = new StringBuilder();
