@@ -416,7 +416,7 @@ public class Env implements Map<String, Object> {
    */
   @Override
   public Object put(final String key, final Object value) {
-    Object prior;
+    Object prior = null;
     Map<String, Object> overrides = getmOverrides(false);
     if (overrides.containsKey(key)) {
       prior = overrides.put(key, value);
@@ -425,7 +425,6 @@ public class Env implements Map<String, Object> {
         prior = this.mDefaults.put(key, value);
       } else {
         overrides.put(key, value);
-        prior = this.mDefaults.get(key);
       }
     }
     return prior;

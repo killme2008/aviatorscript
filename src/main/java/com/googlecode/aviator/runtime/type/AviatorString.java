@@ -105,34 +105,33 @@ public class AviatorString extends AviatorObject {
 
   @Override
   public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
-    if (this == other) {
-      return 0;
-    }
+    final String left = getLexeme(env);
     switch (other.getAviatorType()) {
       case String:
         final AviatorString otherString = (AviatorString) other;
-        if (getLexeme(env) == null && otherString.getLexeme(env) != null) {
+        final String right = otherString.getLexeme(env);
+        if (left == null && right != null) {
           return -1;
-        } else if (getLexeme(env) != null && otherString.getLexeme(env) == null) {
+        } else if (left != null && right == null) {
           return 1;
-        } else if (getLexeme(env) == null && otherString.getLexeme(env) == null) {
+        } else if (left == null && right == null) {
           return 0;
         } else {
-          return getLexeme(env).compareTo(otherString.getLexeme(env));
+          return left.compareTo(right);
         }
       case JavaType:
         final AviatorJavaType javaType = (AviatorJavaType) other;
         final Object otherJavaValue = javaType.getValue(env);
-        if (getLexeme(env) == null && otherJavaValue == null) {
+        if (left == null && otherJavaValue == null) {
           return 0;
-        } else if (getLexeme(env) != null && otherJavaValue == null) {
+        } else if (left != null && otherJavaValue == null) {
           return 1;
         }
         if (TypeUtils.isString(otherJavaValue)) {
-          if (getLexeme(env) == null) {
+          if (left == null) {
             return -1;
           } else {
-            return getLexeme(env).compareTo(String.valueOf(otherJavaValue));
+            return left.compareTo(String.valueOf(otherJavaValue));
           }
         } else if (otherJavaValue instanceof Date) {
           return tryCompareDate(env, (Date) otherJavaValue);
@@ -141,7 +140,7 @@ public class AviatorString extends AviatorObject {
               "Could not compare " + desc(env) + " with " + other.desc(env));
         }
       case Nil:
-        if (getLexeme(env) == null) {
+        if (left == null) {
           return 0;
         } else {
           return 1;

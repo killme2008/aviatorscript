@@ -47,7 +47,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class AviatorJavaType extends AviatorObject {
   private static final long serialVersionUID = -4353225521490659987L;
-  private String name;
+  protected String name;
   private final boolean containsDot;
   private String[] subNames;
   // slow path to get nested property
@@ -68,17 +68,22 @@ public class AviatorJavaType extends AviatorObject {
 
   public AviatorJavaType(final String name, final SymbolTable symbolTable) {
     super();
-    String rName = reserveName(name);
-    if (rName != null) {
-      this.name = rName;
-    } else {
-      if (symbolTable != null) {
-        this.name = symbolTable.reserve(name).getLexeme();
+    if (name != null) {
+      String rName = reserveName(name);
+      if (rName != null) {
+        this.name = rName;
       } else {
-        this.name = name;
+        if (symbolTable != null) {
+          this.name = symbolTable.reserve(name).getLexeme();
+        } else {
+          this.name = name;
+        }
       }
+      this.containsDot = this.name.contains(".");
+    } else {
+      this.name = null;
+      this.containsDot = false;
     }
-    this.containsDot = this.name.contains(".");
   }
 
   /**
@@ -635,33 +640,33 @@ public class AviatorJavaType extends AviatorObject {
       case Long:
       case Double:
         AviatorNumber aviatorNumber = (AviatorNumber) other;
-        return -aviatorNumber.compare(this, env);
+        return -aviatorNumber.innerCompare(this, env);
       case String:
         AviatorString aviatorString = (AviatorString) other;
-        return -aviatorString.compare(this, env);
+        return -aviatorString.innerCompare(this, env);
       case Boolean:
         AviatorBoolean aviatorBoolean = (AviatorBoolean) other;
-        return -aviatorBoolean.compare(this, env);
+        return -aviatorBoolean.innerCompare(this, env);
       case JavaType:
 
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object thisValue = getValue(env);
         final Object otherValue = otherJavaType.getValue(env);
         if (thisValue == null) {
-          return AviatorNil.NIL.compare(other, env);
+          return AviatorNil.NIL.innerCompare(other, env);
         }
         if (thisValue.equals(otherValue)) {
           return 0;
         } else {
           if (thisValue instanceof Number) {
             AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(thisValue);
-            return thisAviatorNumber.compare(other, env);
+            return thisAviatorNumber.innerCompare(other, env);
           } else if (TypeUtils.isString(thisValue)) {
             AviatorString thisAviatorString = new AviatorString(String.valueOf(thisValue));
-            return thisAviatorString.compare(other, env);
+            return thisAviatorString.innerCompare(other, env);
           } else if (thisValue instanceof Boolean) {
             AviatorBoolean thisAviatorBoolean = AviatorBoolean.valueOf((Boolean) thisValue);
-            return thisAviatorBoolean.compare(other, env);
+            return thisAviatorBoolean.innerCompare(other, env);
           } else if (thisValue instanceof Date && otherValue instanceof String) {
             // This is date,other is string
             return tryCompareDate(thisValue, otherValue);
@@ -814,7 +819,7 @@ public class AviatorJavaType extends AviatorObject {
   @Override
   public String desc(final Map<String, Object> env) {
     Object value = getValue(env);
-    return "<" + getAviatorType() + ", " + this.name + ", " + value + ", "
+    return "<" + getAviatorType() + ", " + getName() + ", " + value + ", "
         + (value == null ? "null" : value.getClass().getName()) + ">";
   }
 
