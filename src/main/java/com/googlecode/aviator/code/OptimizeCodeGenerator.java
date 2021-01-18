@@ -264,8 +264,9 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             token = new NumberToken((Number) val, val.toString(), operatorToken.getLineNo(),
                 operatorToken.getStartIndex());
           } else if (val instanceof String || val instanceof Character) {
-            token = new StringToken(val.toString(), operatorToken.getLineNo(),
-                operatorToken.getStartIndex());
+            String s = val.toString();
+            token = new StringToken(s, operatorToken.getLineNo(), operatorToken.getStartIndex())
+                .withMeta(Constants.INTER_META, s.contains("#"));
           } else if (val instanceof Pattern) {
             token = new PatternToken(((Pattern) val).pattern(), operatorToken.getLineNo(),
                 operatorToken.getStartIndex());

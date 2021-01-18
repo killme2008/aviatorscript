@@ -31,6 +31,7 @@ import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.StringToken;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Variable;
+import com.googlecode.aviator.utils.Constants;
 
 
 /**
@@ -368,10 +369,15 @@ public class ExpressionLexer {
       char left = this.peek;
       int startIndex = this.iterator.getIndex();
       StringBuilder sb = new StringBuilder();
+      boolean hasInterpolation = false;
       // char prev = this.peek;
       while ((this.peek = this.iterator.next()) != left) {
-        if (this.peek == '\\') // escape
-        {
+        // It's not accurate,but acceptable.
+        if (this.peek == '#' && !hasInterpolation) {
+          hasInterpolation = true;
+        }
+
+        if (this.peek == '\\') { // escape
           nextChar();
           if (this.peek == CharacterIterator.DONE) {
             throw new CompileExpressionErrorException(
@@ -400,6 +406,7 @@ public class ExpressionLexer {
               this.peek = '\f';
               break;
             case '#':
+              hasInterpolation = hasInterpolation || true;
               if (this.instance.isFeatureEnabled(Feature.StringInterpolation)) {
                 sb.append('\\');
                 this.peek = '#';
@@ -421,7 +428,8 @@ public class ExpressionLexer {
         sb.append(this.peek);
       }
       nextChar();
-      return new StringToken(sb.toString(), this.lineNo, startIndex);
+      return new StringToken(sb.toString(), this.lineNo, startIndex).withMeta(Constants.INTER_META,
+          hasInterpolation);
     }
 
     Token<Character> token = new CharToken(this.peek, this.lineNo, this.iterator.getIndex());

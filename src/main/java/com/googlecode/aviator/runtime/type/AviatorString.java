@@ -39,6 +39,7 @@ public class AviatorString extends AviatorObject {
   private static final long serialVersionUID = -7430694306919959899L;
   private final String lexeme;
   private final boolean isLiteral;
+  private boolean hasInterpolation = true; // default must be true to avoid corner cases.
 
   @Override
   public String desc(final Map<String, Object> env) {
@@ -68,6 +69,14 @@ public class AviatorString extends AviatorObject {
     super();
     this.lexeme = lexeme;
     this.isLiteral = isLiteral;
+  }
+
+  public AviatorString(final String lexeme, final boolean isLiteral,
+      final boolean hasInterpolation) {
+    super();
+    this.lexeme = lexeme;
+    this.isLiteral = isLiteral;
+    this.hasInterpolation = hasInterpolation;
   }
 
   @Override
@@ -157,8 +166,9 @@ public class AviatorString extends AviatorObject {
 
   public String getLexeme(final Map<String, Object> env, final boolean warnOnCompile) {
     AviatorEvaluatorInstance engine = RuntimeUtils.getInstance(env);
-    if (!this.isLiteral || !engine.isFeatureEnabled(Feature.StringInterpolation)
-        || this.lexeme == null || this.lexeme.length() < 3) {
+    if (!this.isLiteral || !this.hasInterpolation
+        || !engine.isFeatureEnabled(Feature.StringInterpolation) || this.lexeme == null
+        || this.lexeme.length() < 3) {
       return this.lexeme;
     }
     StringSegments segs = null;
