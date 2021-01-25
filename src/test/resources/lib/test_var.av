@@ -1,5 +1,6 @@
 
 use com.googlecode.aviator.example.VariableExample$Foo;
+use com.googlecode.aviator.example.VariableExample$Bar;
 use java.util.Date;
 
 let foo = new VariableExample$Foo(-100, 99.9, new Date());
@@ -20,9 +21,28 @@ j.assertEquals(1, count(foo.context));
 j.assertEquals("test value", #`foo.context(test)`);
 j.assertEquals("test value", seq.get(foo.context, "test"));
 
+#`foo.context.(another)` = "test value";
+
+j.assertEquals(2, count(foo.context));
+j.assertEquals("test value", #`foo.context(another)`);
+j.assertEquals("test value", #`foo.context.(another)`);
+j.assertEquals("test value", seq.get(foo.context, "another"));
+
 foo.i = 1;
 j.assertEquals(1, foo.i);
 foo.f = 2.2;
 j.assertEquals(2.2, foo.f);
 
-foo.k = 1000;
+#`foo.bars.[0]` = new VariableExample$Bar("bar1");
+j.assertEquals("bar1", #`foo.bars.[0].name`);
+#`foo.bars[0].name` = "bar2";
+j.assertEquals("bar2", #`foo.bars.[0].name`);
+j.assertEquals("bar2", #`foo.bars[0].name`);
+p(foo);
+
+try {
+  foo.k = 1000;
+  j.fail();
+}catch(e) {
+  j.assertEquals("Setter not found for property `k` in class: class com.googlecode.aviator.example.VariableExample$Foo", getMessage(e));
+}

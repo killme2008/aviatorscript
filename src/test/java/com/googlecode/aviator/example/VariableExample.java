@@ -1,5 +1,6 @@
 package com.googlecode.aviator.example;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +13,9 @@ public class VariableExample {
       this.name = "bar";
     }
 
+    public Bar(final String name) {
+      this.name = name;
+    }
 
     public String getName() {
       return this.name;
@@ -24,6 +28,11 @@ public class VariableExample {
 
     private String name;
 
+    @Override
+    public String toString() {
+      return "Bar [name=" + this.name + "]";
+    }
+
   }
 
   public static class Foo {
@@ -33,6 +42,13 @@ public class VariableExample {
     Date date = new Date();
     Bar[] bars = new Bar[1];
     Map<String, Object> context = new HashMap<String, Object>();
+
+
+    @Override
+    public String toString() {
+      return "Foo [i=" + this.i + ", f=" + this.f + ", date=" + this.date + ", bars="
+          + Arrays.toString(this.bars) + ", context=" + this.context + "]";
+    }
 
 
     public Foo(final int i, final float f, final Date date) {

@@ -17,8 +17,8 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -29,9 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.beanutils.BeanUtilsBean;
-import org.apache.commons.beanutils.FluentPropertyBeanIntrospector;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.Feature;
+import com.googlecode.aviator.exception.NoSuchPropertyException;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
+import com.googlecode.aviator.runtime.type.AviatorJavaType;
 
 /**
  * Some code is copied from
@@ -41,10 +44,6 @@ import com.googlecode.aviator.runtime.function.ClassMethodFunction;
  *
  */
 public class Reflector {
-
-  private static final FluentPropertyBeanIntrospector INTROSPECTOR =
-      new FluentPropertyBeanIntrospector();
-
 
   /**
    * Throw even checked exceptions without being required to declare them or catch them. Suggested
@@ -175,6 +174,15 @@ public class Reflector {
   public static ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>> cachedProperties =
       new ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>>();
 
+  /**
+   * instance fields setter caching.
+   */
+  public static ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>> cachedSettters =
+      new ConcurrentHashMap<Class<?>, Reference<Map<String, PropertyFoundResult>>>();
+
+  private static final ReferenceQueue<Map<String, PropertyFoundResult>> cachedSetterRq =
+      new ReferenceQueue<>();
+
 
   private static final ReferenceQueue<Map<String, PropertyFoundResult>> cachePropertyRq =
       new ReferenceQueue<>();
@@ -238,18 +246,12 @@ public class Reflector {
             type == PropertyType.StaticField ? result.handle.invoke() : result.handle.invoke(obj);
         if (result.isBooleanType && !(ret instanceof Boolean)) {
           putDummyHandle(name, results);
-          // fallback to properties
-          // TODO maybe throw exception?
-          return getProperty(obj, name);
+          return throwNoSuchPropertyException(
+              "Property `" + name + "` not found in java bean: " + obj);
         }
         return ret;
       } else {
-        // TODO maybe return null?
-        if (type == PropertyType.Getter) {
-          return getProperty(obj, name);
-        } else {
-          return null;
-        }
+        return null;
       }
     } catch (Throwable t) {
       if (!results.containsKey(name)) {
@@ -257,6 +259,10 @@ public class Reflector {
       }
       throw sneakyThrow(t);
     }
+  }
+
+  public static Object throwNoSuchPropertyException(final String msg) {
+    throw new NoSuchPropertyException(msg);
   }
 
   private static PropertyFoundResult retrieveStaticFieldHandle(
@@ -322,6 +328,30 @@ public class Reflector {
       result = new PropertyFoundResult(handle, isBooleanType);
     } else {
       result = new PropertyFoundResult(null, isBooleanType);
+    }
+    results.put(name, result);
+    return result;
+  }
+
+  private static PropertyFoundResult retrieveSetterHandle(
+      final Map<String, PropertyFoundResult> results, final Class<?> clazz, final String name)
+      throws IllegalAccessException {
+    PropertyFoundResult result;
+    List<Method> methods = getInstanceMethods(clazz, genGetterName("set", name));
+
+    if (methods != null && !methods.isEmpty()) {
+      Method method = methods.get(0);
+      for (Method m : methods) {
+        if (method.getParameterTypes().length == 0) {
+          method = m;
+          break;
+        }
+      }
+      method.setAccessible(true);
+      MethodHandle handle = MethodHandles.lookup().unreflect(method);
+      result = new PropertyFoundResult(handle, false);
+    } else {
+      result = new PropertyFoundResult(null, false);
     }
     results.put(name, result);
     return result;
@@ -438,6 +468,28 @@ public class Reflector {
       return true;
     }
 
+  }
+
+  public static class Target {
+    Map<String, Object> innerEnv;
+    Class<?> innerClazz;
+    Object targetObject;
+
+    public Target() {
+      super();
+    }
+
+    public static Target withObject(final Object target) {
+      Target t = new Target();
+      t.targetObject = target;
+      return t;
+    }
+
+    public static Target withEnv(final Map<String, Object> env) {
+      Target t = new Target();
+      t.innerEnv = env;
+      return t;
+    }
   }
 
   static ConcurrentHashMap<MethodKey, Reference<List<Method>>> instanceMethodsCache =
@@ -594,43 +646,198 @@ public class Reflector {
     return ret;
   }
 
-  private static final ReferenceQueue<BeanUtilsBean> beansRq = new ReferenceQueue<>();
-  private static final ConcurrentHashMap<ClassLoader, Reference<BeanUtilsBean>> beansByClassLoader =
-      new ConcurrentHashMap<>();
+  @SuppressWarnings("unchecked")
+  public static Object getProperty(final Object target, final String name) {
+    final String[] names = Constants.SPLIT_PAT.split(name);
+    return fastGetProperty(name, names, null,
+        (target instanceof Map) ? Target.withEnv((Map) target) : Target.withObject(target), false,
+        0, names.length);
+  }
 
+  public static void setProperty(final Map<String, Object> env, String name, final Object val) {
+    final String[] names = Constants.SPLIT_PAT.split(name);
+    Object target =
+        fastGetProperty(name, names, null, Target.withEnv(env), false, 0, names.length - 1);
 
-  public static BeanUtilsBean getBeanUtilsBean() {
-    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    BeanUtilsBean instance = null;
-    Reference<BeanUtilsBean> ref = beansByClassLoader.get(classLoader);
-    if (ref == null) {
-      // cleanup any dead entries
-      clearCache(beansRq, beansByClassLoader);
-      instance = new BeanUtilsBean();
-      instance.getPropertyUtils().addBeanIntrospector(INTROSPECTOR);
-      ref = beansByClassLoader.putIfAbsent(classLoader,
-          new SoftReference<BeanUtilsBean>(instance, beansRq));
-      if (ref == null) {
-        // insert a new one, return the instance directly.
-        return instance;
+    if (target == null) {
+      // FIXME error msg
+      throw new NoSuchPropertyException("Property `" + name + "` not found in java bean:" + env);
+    }
+
+    name = names[names.length - 1];
+    int arrayIndex = -1;
+    String keyIndex = null;
+
+    switch (name.charAt(name.length() - 1)) {
+      case ']':
+        int idx = name.indexOf("[");
+        if (idx < 0) {
+          throw new IllegalArgumentException("Should not happen, doesn't contains '['");
+        }
+        String rawName = name;
+        name = name.substring(0, idx);
+        arrayIndex = Integer.valueOf(rawName.substring(idx + 1, rawName.length() - 1));
+        break;
+      case ')':
+        idx = name.indexOf("(");
+        if (idx < 0) {
+          throw new IllegalArgumentException("Should not happen, doesn't contains '('");
+        }
+        rawName = name;
+        name = name.substring(0, idx);
+        keyIndex = rawName.substring(idx + 1, rawName.length() - 1);
+        break;
+    }
+
+    if (arrayIndex >= 0 || keyIndex != null) {
+      if (!name.isEmpty()) {
+        target = fastGetProperty(target, name, PropertyType.Getter);
+      }
+
+      if (arrayIndex >= 0) {
+        Array.set(target, arrayIndex, boxArg(target.getClass().getComponentType(), val));
+      } else {
+        ((Map) target).put(keyIndex, val);
+      }
+
+    } else if (target instanceof Map) {
+      ((Map) target).put(name, val);
+    } else {
+      final Class<?> clazz = target.getClass();
+      Map<String, PropertyFoundResult> results =
+          getClassPropertyResults(cachedSettters, cachedSetterRq, clazz);
+
+      try {
+        PropertyFoundResult result = results.get(name);
+        if (result == null) {
+          result = retrieveSetterHandle(results, clazz, name);
+        }
+
+        if (result.handle != null) {
+          result.handle.invoke(target, boxArg(result.handle.type().parameterType(1), val));
+        } else {
+          throw new NoSuchPropertyException(
+              "Setter not found for property `" + name + "` in class: " + clazz);
+        }
+      } catch (Throwable t) {
+        if (!results.containsKey(name)) {
+          putDummyHandle(name, results);
+        }
+        throw sneakyThrow(t);
       }
     }
-    instance = ref.get();
-    if (instance != null) {
-      return instance;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Object fastGetProperty(final String name, final String[] names,
+      final Map<String, Object> env, final Target target, final boolean tryResolveStaticMethod,
+      final int offset, final int len) {
+    int max = Math.min(offset + len, names.length);
+    for (int i = offset; i < max; i++) {
+      String rName = AviatorJavaType.reserveName(names[i]);
+      rName = rName != null ? rName : names[i];
+      int arrayIndex = -1;
+      String keyIndex = null;
+
+      // compatible with PropertyUtilsBean indexed and mapped formats.
+      // https://commons.apache.org/proper/commons-beanutils/apidocs/org/apache/commons/beanutils/PropertyUtilsBean.html
+      switch (rName.charAt(rName.length() - 1)) {
+        case ']':
+          int idx = rName.indexOf("[");
+          if (idx < 0) {
+            throw new IllegalArgumentException("Should not happen, doesn't contains '['");
+          }
+          String rawName = rName;
+          rName = rName.substring(0, idx);
+          arrayIndex = Integer.valueOf(rawName.substring(idx + 1, rawName.length() - 1));
+          break;
+        case ')':
+          idx = rName.indexOf("(");
+          if (idx < 0) {
+            throw new IllegalArgumentException("Should not happen, doesn't contains '('");
+          }
+          rawName = rName;
+          rName = rName.substring(0, idx);
+          keyIndex = rawName.substring(idx + 1, rawName.length() - 1);
+          break;
+      }
+
+
+      Object val = null;
+
+      if (target.innerClazz != null) {
+        final AviatorEvaluatorInstance instance = RuntimeUtils.getInstance(env);
+        if (tryResolveStaticMethod && instance.isFeatureEnabled(Feature.StaticMethods)
+            && names.length == 2) {
+          val = fastGetProperty(target.innerClazz, rName, PropertyType.StaticMethod);
+        } else if (instance.isFeatureEnabled(Feature.StaticFields)) {
+          val = fastGetProperty(target.innerClazz, rName, PropertyType.StaticField);
+        } else {
+          val = fastGetProperty(target.innerClazz, rName, PropertyType.Getter);
+        }
+      } else {
+        // in the format of a.b.[0].c
+        if (rName.isEmpty()) {
+          if (!(arrayIndex >= 0 || keyIndex != null)) {
+            throw new IllegalArgumentException("Invalid format");
+          }
+          if (target.innerEnv != null) {
+            val = target.innerEnv;
+          } else {
+            val = target.targetObject;
+          }
+        } else {
+          if (target.innerEnv != null) {
+            val = target.innerEnv.get(rName);
+            if (val == null && i == 0 && env instanceof Env) {
+              val = AviatorJavaType.tryResolveAsClass(env, rName);
+            }
+          } else {
+            val = fastGetProperty(target.targetObject, rName, PropertyType.Getter);
+          }
+        }
+      }
+
+      if (arrayIndex >= 0) {
+        if (val.getClass().isArray()) {
+          val = Array.get(val, arrayIndex);
+        } else if (val instanceof List) {
+          val = ((List) val).get(arrayIndex);
+        } else if (val instanceof CharSequence) {
+          val = ((CharSequence) val).charAt(arrayIndex);
+        } else {
+          throw new IllegalArgumentException("Can't access " + val + " with index `" + arrayIndex
+              + "`, it's not an array, list or CharSequence");
+        }
+      }
+      if (keyIndex != null) {
+        if (Map.class.isAssignableFrom(val.getClass())) {
+          val = ((Map) val).get(keyIndex);
+        } else {
+          throw new IllegalArgumentException(
+              "Can't access " + val + " with key `" + keyIndex + "`, it's not a map");
+        }
+      }
+
+      if (i == max - 1) {
+        return val;
+      }
+      if (val instanceof Map) {
+        target.innerEnv = (Map<String, Object>) val;
+        target.innerClazz = null;
+        target.targetObject = null;
+      } else if (val instanceof Class<?>) {
+        target.innerClazz = (Class<?>) val;
+        target.innerEnv = null;
+        target.targetObject = null;
+      } else if (val == null) {
+        throw new NullPointerException(rName);
+      } else {
+        target.targetObject = val;
+        target.innerEnv = null;
+        target.innerClazz = null;
+      }
     }
-    // Already be GC, remove it from cache, and try again.
-    beansByClassLoader.remove(classLoader, ref);
-    return getBeanUtilsBean();
-  }
-
-  public static Object getProperty(final Object bean, final String name)
-      throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    return getBeanUtilsBean().getPropertyUtils().getProperty(bean, name);
-  }
-
-  public static void setProperty(final Object bean, final String name, final Object value)
-      throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    getBeanUtilsBean().setProperty(bean, name, value);
+    return throwNoSuchPropertyException("Variable `" + name + "` not found in env: " + env);
   }
 }

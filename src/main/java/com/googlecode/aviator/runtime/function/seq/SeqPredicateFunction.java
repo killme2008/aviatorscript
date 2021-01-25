@@ -14,15 +14,15 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import org.apache.commons.beanutils.PropertyUtils;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.NoSuchPropertyException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.utils.Reflector;
 
 
 /**
@@ -57,9 +57,9 @@ public class SeqPredicateFunction extends AbstractFunction {
       String propertyNameStr = this.propertyName.stringValue(env);
       Object target = arg1.getValue(env);
       try {
-        Object property = PropertyUtils.getNestedProperty(target, propertyNameStr);
+        Object property = Reflector.getProperty(target, propertyNameStr);
         arg1 = AviatorRuntimeJavaType.valueOf(property);
-      } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+      } catch (NoSuchPropertyException e) {
         throw new IllegalArgumentException(
             "Fail to get property <" + propertyNameStr + "> from <" + arg1.desc(env) + ">", e);
       }
