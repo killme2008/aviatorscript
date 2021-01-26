@@ -99,10 +99,10 @@ public class PerfBenchmark {
         ((Data) this.paras.get("A")).getIvalue() + ((Data) this.paras.get("B")).getIvalue());
     result.put("f3", ((Data) this.paras.get("C")).getIvalue());
     result
-    .put("f4",
-        (((Data) this.paras.get("A")).getIvalue() + ((Data) this.paras.get("B")).getIvalue()
-            - ((Data) this.paras.get("C")).getIvalue())
-        * ((Data) this.paras.get("D")).getIvalue());
+        .put("f4",
+            (((Data) this.paras.get("A")).getIvalue() + ((Data) this.paras.get("B")).getIvalue()
+                - ((Data) this.paras.get("C")).getIvalue())
+                * ((Data) this.paras.get("D")).getIvalue());
   }
 
   @Benchmark
@@ -202,8 +202,7 @@ public class PerfBenchmark {
   }
 
   private void initAviator() {
-    this.arithExp =
-        AviatorEvaluator.getInstance().compile("(A.ivalue+B.ivalue-C.ivalue)*D.ivalue");
+    this.arithExp = AviatorEvaluator.getInstance().compile("(A.ivalue+B.ivalue-C.ivalue)*D.ivalue");
     this.objectExp = AviatorEvaluator.getInstance().compile(
         "let object=seq.map('f1', A.ivalue, 'f2', A.ivalue+B.ivalue, 'f3', C.ivalue, 'f4', (A.ivalue+B.ivalue-C.ivalue)*D.ivalue); return object;");
     this.condExp = AviatorEvaluator.getInstance().compile(
