@@ -1,23 +1,26 @@
-package com.googlecode.aviator.runtime.function.seq.util;
+package com.googlecode.aviator.runtime.function.seq.set;
 
 import com.googlecode.aviator.runtime.function.AbstractFunction;
-import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
- * Are the two sets the same
+ * Union
  *
  * @author bluecrush
  */
-public class SeqIsEqualFunction extends AbstractFunction {
+public class SetUnionFunction extends AbstractFunction {
     @Override
     public String getName() {
-        return "seqUtil.isEqual";
+        return "set.union";
     }
 
 
@@ -33,23 +36,18 @@ public class SeqIsEqualFunction extends AbstractFunction {
         }
         Collection collection1 = (Collection) seq1;
         Collection collection2 = (Collection) seq2;
-        if(collection1.size() != collection2.size()) {
-            return AviatorBoolean.FALSE;
-        } else {
-            Map map1 = SeqUtil.getCardinalityMap(collection1);
-            Map map2 = SeqUtil.getCardinalityMap(collection2);
-            if(map1.size() != map2.size()) {
-                return AviatorBoolean.FALSE;
-            } else {
-                Iterator it = map1.keySet().iterator();
-                while(it.hasNext()) {
-                    Object obj = it.next();
-                    if(SeqUtil.getFreq(obj,map1) != SeqUtil.getFreq(obj,map2)) {
-                        return AviatorBoolean.FALSE;
-                    }
-                }
-                return AviatorBoolean.TRUE;
+        Map map1 = SetUtil.getCardinalityMap(collection1);
+        Map map2 = SetUtil.getCardinalityMap(collection2);
+        Set set1 = new HashSet(collection1);
+        set1.addAll(collection2);
+        ArrayList list = new ArrayList();
+        Iterator iterator = set1.iterator();
+        while (iterator.hasNext()) {
+            Object obj = iterator.next();
+            for (int i = 0, m = Math.max(SetUtil.getFreq(obj, map1), SetUtil.getFreq(obj, map2)); i < m; i++) {
+                list.add(obj);
             }
         }
+        return AviatorRuntimeJavaType.valueOf(list);
     }
 }

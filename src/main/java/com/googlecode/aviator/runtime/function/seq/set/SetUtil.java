@@ -1,4 +1,4 @@
-package com.googlecode.aviator.runtime.function.seq.util;
+package com.googlecode.aviator.runtime.function.seq.set;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * CollectionUtil
  */
-class SeqUtil {
+class SetUtil {
     /**
      * Constant to avoid repeated object creation
      */

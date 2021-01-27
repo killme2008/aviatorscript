@@ -1,21 +1,27 @@
-package com.googlecode.aviator.runtime.function.seq.util;
+package com.googlecode.aviator.runtime.function.seq.set;
 
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
- * Union
+ *
+ * Complement of intersection
  *
  * @author bluecrush
  */
-public class SeqUnionFunction extends AbstractFunction {
+public class SetDisjunctionFunction extends AbstractFunction {
     @Override
     public String getName() {
-        return "seqUtil.union";
+        return "set.disjunction";
     }
 
 
@@ -31,18 +37,21 @@ public class SeqUnionFunction extends AbstractFunction {
         }
         Collection collection1 = (Collection) seq1;
         Collection collection2 = (Collection) seq2;
-        Map map1 = SeqUtil.getCardinalityMap(collection1);
-        Map map2 = SeqUtil.getCardinalityMap(collection2);
+        Map map1 = SetUtil.getCardinalityMap(collection1);
+        Map map2 = SetUtil.getCardinalityMap(collection2);
         Set set1 = new HashSet(collection1);
         set1.addAll(collection2);
         ArrayList list = new ArrayList();
         Iterator iterator = set1.iterator();
         while (iterator.hasNext()) {
             Object obj = iterator.next();
-            for (int i = 0, m = Math.max(SeqUtil.getFreq(obj, map1), SeqUtil.getFreq(obj, map2)); i < m; i++) {
+            for (int i = 0, m = ((Math.max(SetUtil.getFreq(obj, map1), SetUtil.getFreq(obj, map2))) - (Math.min(SetUtil.getFreq(obj, map1), SetUtil.getFreq(obj, map2)))); i < m; i++) {
                 list.add(obj);
             }
         }
         return AviatorRuntimeJavaType.valueOf(list);
     }
+
+
+
 }

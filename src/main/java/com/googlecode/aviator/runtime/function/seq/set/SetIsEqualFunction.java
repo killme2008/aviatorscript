@@ -1,24 +1,23 @@
-package com.googlecode.aviator.runtime.function.seq.util;
+package com.googlecode.aviator.runtime.function.seq.set;
 
 import com.googlecode.aviator.runtime.function.AbstractFunction;
+import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
 
 /**
- * Subtract
+ * Are the two sets the same
  *
  * @author bluecrush
  */
-public class SeqSubtractFunction extends AbstractFunction {
+public class SetIsEqualFunction extends AbstractFunction {
     @Override
     public String getName() {
-        return "seqUtil.subtract";
+        return "set.isEqual";
     }
 
 
@@ -34,10 +33,23 @@ public class SeqSubtractFunction extends AbstractFunction {
         }
         Collection collection1 = (Collection) seq1;
         Collection collection2 = (Collection) seq2;
-        ArrayList list = new ArrayList( collection1 );
-        for (Iterator it = collection2.iterator(); it.hasNext();) {
-            list.remove(it.next());
+        if(collection1.size() != collection2.size()) {
+            return AviatorBoolean.FALSE;
+        } else {
+            Map map1 = SetUtil.getCardinalityMap(collection1);
+            Map map2 = SetUtil.getCardinalityMap(collection2);
+            if(map1.size() != map2.size()) {
+                return AviatorBoolean.FALSE;
+            } else {
+                Iterator it = map1.keySet().iterator();
+                while(it.hasNext()) {
+                    Object obj = it.next();
+                    if(SetUtil.getFreq(obj,map1) != SetUtil.getFreq(obj,map2)) {
+                        return AviatorBoolean.FALSE;
+                    }
+                }
+                return AviatorBoolean.TRUE;
+            }
         }
-        return AviatorRuntimeJavaType.valueOf(list);
     }
 }
