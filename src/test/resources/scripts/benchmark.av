@@ -46,7 +46,7 @@ fn rand_list(n) {
 }
 
 
-let n = 20000;
+let n = 100000;
 {
   ## warm up
   for i in range(0, 10000) {

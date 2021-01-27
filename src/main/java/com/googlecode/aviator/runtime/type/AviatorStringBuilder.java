@@ -24,7 +24,7 @@ public class AviatorStringBuilder extends AviatorString {
   }
 
   @Override
-  public String getLexeme(final Map<String, Object> env) {
+  public String getLexeme(final Map<String, Object> env, final boolean warnOnCompile) {
     return this.sb.toString();
   }
 

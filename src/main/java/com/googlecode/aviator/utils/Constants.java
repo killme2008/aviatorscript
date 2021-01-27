@@ -37,6 +37,10 @@ public class Constants {
   public static final Variable USE_VAR = new Variable("__use", 0, -1);
   public static final String INIT_META = "isInitialized";
   public static final String TYPE_META = "type";
+  /**
+   * Whether string has interpolation point.
+   */
+  public static final String INTER_META = "hasInterpolation";
   public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
 
   private Constants() {

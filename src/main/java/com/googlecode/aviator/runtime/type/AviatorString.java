@@ -39,7 +39,17 @@ public class AviatorString extends AviatorObject {
   private static final long serialVersionUID = -7430694306919959899L;
   private final String lexeme;
   private final boolean isLiteral;
+  private boolean hasInterpolation = true; // default must be true to avoid corner cases.
 
+  @Override
+  public String desc(final Map<String, Object> env) {
+    Object val = this.getLexeme(env, false);
+    if (val != this) {
+      return "<" + getAviatorType() + ", " + val + ">";
+    } else {
+      return "<" + getAviatorType() + ", this>";
+    }
+  }
 
   @Override
   public AviatorType getAviatorType() {
@@ -59,6 +69,14 @@ public class AviatorString extends AviatorObject {
     super();
     this.lexeme = lexeme;
     this.isLiteral = isLiteral;
+  }
+
+  public AviatorString(final String lexeme, final boolean isLiteral,
+      final boolean hasInterpolation) {
+    super();
+    this.lexeme = lexeme;
+    this.isLiteral = isLiteral;
+    this.hasInterpolation = hasInterpolation;
   }
 
   @Override
@@ -96,34 +114,33 @@ public class AviatorString extends AviatorObject {
 
   @Override
   public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
-    if (this == other) {
-      return 0;
-    }
+    final String left = getLexeme(env);
     switch (other.getAviatorType()) {
       case String:
         final AviatorString otherString = (AviatorString) other;
-        if (getLexeme(env) == null && otherString.getLexeme(env) != null) {
+        final String right = otherString.getLexeme(env);
+        if (left == null && right != null) {
           return -1;
-        } else if (getLexeme(env) != null && otherString.getLexeme(env) == null) {
+        } else if (left != null && right == null) {
           return 1;
-        } else if (getLexeme(env) == null && otherString.getLexeme(env) == null) {
+        } else if (left == null && right == null) {
           return 0;
         } else {
-          return getLexeme(env).compareTo(otherString.getLexeme(env));
+          return left.compareTo(right);
         }
       case JavaType:
         final AviatorJavaType javaType = (AviatorJavaType) other;
         final Object otherJavaValue = javaType.getValue(env);
-        if (getLexeme(env) == null && otherJavaValue == null) {
+        if (left == null && otherJavaValue == null) {
           return 0;
-        } else if (getLexeme(env) != null && otherJavaValue == null) {
+        } else if (left != null && otherJavaValue == null) {
           return 1;
         }
         if (TypeUtils.isString(otherJavaValue)) {
-          if (getLexeme(env) == null) {
+          if (left == null) {
             return -1;
           } else {
-            return getLexeme(env).compareTo(String.valueOf(otherJavaValue));
+            return left.compareTo(String.valueOf(otherJavaValue));
           }
         } else if (otherJavaValue instanceof Date) {
           return tryCompareDate(env, (Date) otherJavaValue);
@@ -132,7 +149,7 @@ public class AviatorString extends AviatorObject {
               "Could not compare " + desc(env) + " with " + other.desc(env));
         }
       case Nil:
-        if (getLexeme(env) == null) {
+        if (left == null) {
           return 0;
         } else {
           return 1;
@@ -144,9 +161,14 @@ public class AviatorString extends AviatorObject {
   }
 
   public String getLexeme(final Map<String, Object> env) {
+    return this.getLexeme(env, true);
+  }
+
+  public String getLexeme(final Map<String, Object> env, final boolean warnOnCompile) {
     AviatorEvaluatorInstance engine = RuntimeUtils.getInstance(env);
-    if (!this.isLiteral || !engine.isFeatureEnabled(Feature.StringInterpolation)
-        || this.lexeme == null || this.lexeme.length() < 3) {
+    if (!this.isLiteral || !this.hasInterpolation
+        || !engine.isFeatureEnabled(Feature.StringInterpolation) || this.lexeme == null
+        || this.lexeme.length() < 3) {
       return this.lexeme;
     }
     StringSegments segs = null;
@@ -155,7 +177,9 @@ public class AviatorString extends AviatorObject {
       segs = exp.getStringSegements(this.lexeme);
     } else {
       segs = engine.compileStringSegments(this.lexeme);
-      warnOnCompile();
+      if (warnOnCompile) {
+        warnOnCompileWithoutCaching();
+      }
     }
     assert (segs != null);
     return segs.toString(env, this.lexeme);
@@ -163,7 +187,7 @@ public class AviatorString extends AviatorObject {
 
   private static int COMPILE_TIMES = 0;
 
-  private void warnOnCompile() {
+  private void warnOnCompileWithoutCaching() {
     if (COMPILE_TIMES++ % 1000 == 0) {
       final StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
       StringBuilder sb = new StringBuilder();

@@ -304,6 +304,18 @@ fn test_static_methods() {
   j.assertEquals(3, l);
 }
 
+fn test_is_distinct() {
+   tests = tests + 1;
+
+   j.assertTrue(is_distinct(nil));
+   j.assertTrue(is_distinct(seq.list()));
+   j.assertTrue(is_distinct(tuple()));
+   j.assertTrue(is_distinct(tuple("a")));
+   j.assertTrue(is_distinct(tuple(1, 2, 3)));
+   j.assertFalse(is_distinct(tuple(1, 2, 3, 1)));
+   j.assertFalse(is_distinct(seq.list(-1, 1, 2, -1, 100)));
+}
+
 test_take_while();
 test_drop_while();
 test_concat();
@@ -321,5 +333,6 @@ test_sort();
 test_static_fields();
 test_new_static_class();
 test_static_methods();
+test_is_distinct();
 
-j.assertEquals(17, tests);
+j.assertEquals(18, tests);

@@ -36,6 +36,23 @@ fn distinct(seq) {
   return seq.raw(result);
 }
 
+fn is_distinct(seq) {
+  if seq == nil {
+    return true;
+  }
+
+  let seen = seq.set();
+  for x in seq {
+    if !include(seen, x) {
+      seq.add(seen, x);
+    } else {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 fn repeat(n, x) {
   let result = seq.list();
 
@@ -122,3 +139,4 @@ exports.distinct = distinct;
 exports.concat = concat;
 exports.constantly = constantly;
 exports.is_empty = is_empty;
+exports.is_distinct = is_distinct;

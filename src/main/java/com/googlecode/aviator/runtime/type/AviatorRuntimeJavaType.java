@@ -63,7 +63,7 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
    */
   @Deprecated
   public AviatorRuntimeJavaType(final Object object) {
-    super(genName());
+    super(null);
     this.object = object;
   }
 
@@ -77,6 +77,14 @@ public class AviatorRuntimeJavaType extends AviatorJavaType {
 
   public static String genName() {
     return TEMP_VAR_GEN.get().gen();
+  }
+
+  @Override
+  public String getName() {
+    if (this.name == null) {
+      this.name = genName();
+    }
+    return this.name;
   }
 
   @Override

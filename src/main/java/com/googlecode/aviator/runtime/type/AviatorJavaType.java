@@ -16,15 +16,12 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
-import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -36,7 +33,6 @@ import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.Contain
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
-import com.googlecode.aviator.utils.Reflector.PropertyType;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -47,11 +43,9 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class AviatorJavaType extends AviatorObject {
   private static final long serialVersionUID = -4353225521490659987L;
-  private String name;
+  protected String name;
   private final boolean containsDot;
   private String[] subNames;
-  // slow path to get nested property
-  private boolean slowPath = false;
 
   @Override
   public AviatorType getAviatorType() {
@@ -68,17 +62,22 @@ public class AviatorJavaType extends AviatorObject {
 
   public AviatorJavaType(final String name, final SymbolTable symbolTable) {
     super();
-    String rName = reserveName(name);
-    if (rName != null) {
-      this.name = rName;
-    } else {
-      if (symbolTable != null) {
-        this.name = symbolTable.reserve(name).getLexeme();
+    if (name != null) {
+      String rName = reserveName(name);
+      if (rName != null) {
+        this.name = rName;
       } else {
-        this.name = name;
+        if (symbolTable != null) {
+          this.name = symbolTable.reserve(name).getLexeme();
+        } else {
+          this.name = name;
+        }
       }
+      this.containsDot = this.name.contains(".");
+    } else {
+      this.name = null;
+      this.containsDot = false;
     }
-    this.containsDot = this.name.contains(".");
   }
 
   /**
@@ -87,7 +86,7 @@ public class AviatorJavaType extends AviatorObject {
    * @param name
    * @return
    */
-  private static String reserveName(final String name) {
+  public static String reserveName(final String name) {
     if (Constants.ENV_VAR.equals(name)) {
       return Constants.ENV_VAR;
     } else if (Constants.ReducerEmptyVal.getLexeme().equals(name)) {
@@ -329,7 +328,7 @@ public class AviatorJavaType extends AviatorObject {
           // cache the result
           this.subNames = Constants.SPLIT_PAT.split(name);
         }
-        return getProperty(name, this.subNames, env, throwExceptionNotFound, this, false);
+        return getProperty(name, this.subNames, env, throwExceptionNotFound, false);
       }
       return env.get(name);
     }
@@ -342,7 +341,7 @@ public class AviatorJavaType extends AviatorObject {
     if (env != null) {
       if (nameContainsDot && RuntimeUtils.getInstance(env)
           .getOptionValue(Options.ENABLE_PROPERTY_SYNTAX_SUGAR).bool) {
-        return getProperty(name, names, env, throwExceptionNotFound, null, tryResolveStaticMethod);
+        return getProperty(name, names, env, throwExceptionNotFound, tryResolveStaticMethod);
       }
       return env.get(name);
     }
@@ -415,7 +414,7 @@ public class AviatorJavaType extends AviatorObject {
         if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
           t.printStackTrace();
         }
-        throw new ExpressionRuntimeException("Can't assign value to " + this.name, t);
+        throw Reflector.sneakyThrow(t);
       }
       return AviatorRuntimeJavaType.valueOf(v);
     } else {
@@ -424,14 +423,14 @@ public class AviatorJavaType extends AviatorObject {
     }
   }
 
-  private static Object getProperty(final String name, String[] names,
-      final Map<String, Object> env, final boolean throwExceptionNotFound,
-      final AviatorJavaType javaType, final boolean tryResolveStaticMethod) {
+  public static Object getProperty(final String name, String[] names, final Map<String, Object> env,
+      final boolean throwExceptionNotFound, final boolean tryResolveStaticMethod) {
     try {
       if (names == null) {
         names = Constants.SPLIT_PAT.split(name);
       }
-      return fastGetProperty(name, names, env, javaType, tryResolveStaticMethod);
+      return Reflector.fastGetProperty(name, names, env, Reflector.Target.withEnv(env),
+          tryResolveStaticMethod, 0, names.length);
 
     } catch (Throwable t) {
       if (RuntimeUtils.getInstance(env).getOptionValue(Options.TRACE_EVAL).bool) {
@@ -447,123 +446,7 @@ public class AviatorJavaType extends AviatorObject {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private static Object fastGetProperty(final String name, final String[] names,
-      final Map<String, Object> env, final AviatorJavaType javaType,
-      final boolean tryResolveStaticMethod)
-      throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    if (javaType != null && javaType.slowPath) {
-      return Reflector.getProperty(env, name);
-    }
-
-    Map<String, Object> innerEnv = env;
-    Class<?> innerClazz = null;
-    Object targetObject = null;
-    for (int i = 0; i < names.length; i++) {
-      String rName = reserveName(names[i]);
-      rName = rName != null ? rName : names[i];
-      int arrayIndex = -1;
-      String keyIndex = null;
-
-      // compatible with PropertyUtilsBean indexed and mapped formats.
-      // https://commons.apache.org/proper/commons-beanutils/apidocs/org/apache/commons/beanutils/PropertyUtilsBean.html
-      switch (rName.charAt(rName.length() - 1)) {
-        case ']':
-          int idx = rName.indexOf("[");
-          if (idx < 0) {
-            throw new IllegalArgumentException("Should not happen, doesn't contains '['");
-          }
-          String rawName = rName;
-          rName = rName.substring(0, idx);
-          arrayIndex = Integer.valueOf(rawName.substring(idx + 1, rawName.length() - 1));
-          break;
-        case ')':
-          idx = rName.indexOf("(");
-          if (idx < 0) {
-            throw new IllegalArgumentException("Should not happen, doesn't contains '('");
-          }
-          rawName = rName;
-          rName = rName.substring(0, idx);
-          keyIndex = rawName.substring(idx + 1, rawName.length() - 1);
-          break;
-      }
-
-
-      Object val = null;
-      if (innerEnv != null) {
-        val = innerEnv.get(rName);
-        if (val == null && i == 0 && env instanceof Env) {
-          val = tryResolveAsClass(env, rName);
-        }
-      } else if (innerClazz != null) {
-        final AviatorEvaluatorInstance instance = RuntimeUtils.getInstance(env);
-        if (tryResolveStaticMethod && instance.isFeatureEnabled(Feature.StaticMethods)
-            && names.length == 2) {
-          val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticMethod);
-        } else if (instance.isFeatureEnabled(Feature.StaticFields)) {
-          val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.StaticField);
-        } else {
-          val = Reflector.fastGetProperty(innerClazz, rName, PropertyType.Getter);
-        }
-      } else {
-        // in the format of a.b.[0].c
-        if (rName.isEmpty()) {
-          if (!(arrayIndex >= 0 || keyIndex != null)) {
-            throw new IllegalArgumentException("Invalid format");
-          }
-          val = targetObject;
-        } else {
-          val = Reflector.fastGetProperty(targetObject, rName, PropertyType.Getter);
-        }
-      }
-
-      if (arrayIndex >= 0) {
-        if (val.getClass().isArray()) {
-          val = Array.get(val, arrayIndex);
-        } else if (val instanceof List) {
-          val = ((List) val).get(arrayIndex);
-        } else if (val instanceof CharSequence) {
-          val = ((CharSequence) val).charAt(arrayIndex);
-        } else {
-          throw new IllegalArgumentException("Can't access " + val + " with index `" + arrayIndex
-              + "`, it's not an array, list or CharSequence");
-        }
-      }
-      if (keyIndex != null) {
-        if (Map.class.isAssignableFrom(val.getClass())) {
-          val = ((Map) val).get(keyIndex);
-        } else {
-          throw new IllegalArgumentException(
-              "Can't access " + val + " with key `" + keyIndex + "`, it's not a map");
-        }
-      }
-
-      if (i == names.length - 1) {
-        return val;
-      }
-      if (val instanceof Map) {
-        innerEnv = (Map<String, Object>) val;
-        innerClazz = null;
-        targetObject = null;
-      } else if (val instanceof Class<?>) {
-        innerClazz = (Class<?>) val;
-        innerEnv = null;
-        targetObject = null;
-      } else if (val == null) {
-        throw new NullPointerException(rName);
-      } else {
-        targetObject = val;
-        innerEnv = null;
-        innerClazz = null;
-      }
-    }
-    if (javaType != null) {
-      javaType.slowPath = true;
-    }
-    return Reflector.getProperty(env, name);
-  }
-
-  private static Object tryResolveAsClass(final Map<String, Object> env, final String rName) {
+  public static Object tryResolveAsClass(final Map<String, Object> env, final String rName) {
     try {
       return ((Env) env).resolveClassSymbol(rName);
     } catch (ClassNotFoundException e) {
@@ -635,33 +518,33 @@ public class AviatorJavaType extends AviatorObject {
       case Long:
       case Double:
         AviatorNumber aviatorNumber = (AviatorNumber) other;
-        return -aviatorNumber.compare(this, env);
+        return -aviatorNumber.innerCompare(this, env);
       case String:
         AviatorString aviatorString = (AviatorString) other;
-        return -aviatorString.compare(this, env);
+        return -aviatorString.innerCompare(this, env);
       case Boolean:
         AviatorBoolean aviatorBoolean = (AviatorBoolean) other;
-        return -aviatorBoolean.compare(this, env);
+        return -aviatorBoolean.innerCompare(this, env);
       case JavaType:
 
         AviatorJavaType otherJavaType = (AviatorJavaType) other;
         final Object thisValue = getValue(env);
         final Object otherValue = otherJavaType.getValue(env);
         if (thisValue == null) {
-          return AviatorNil.NIL.compare(other, env);
+          return AviatorNil.NIL.innerCompare(other, env);
         }
         if (thisValue.equals(otherValue)) {
           return 0;
         } else {
           if (thisValue instanceof Number) {
             AviatorNumber thisAviatorNumber = AviatorNumber.valueOf(thisValue);
-            return thisAviatorNumber.compare(other, env);
+            return thisAviatorNumber.innerCompare(other, env);
           } else if (TypeUtils.isString(thisValue)) {
             AviatorString thisAviatorString = new AviatorString(String.valueOf(thisValue));
-            return thisAviatorString.compare(other, env);
+            return thisAviatorString.innerCompare(other, env);
           } else if (thisValue instanceof Boolean) {
             AviatorBoolean thisAviatorBoolean = AviatorBoolean.valueOf((Boolean) thisValue);
-            return thisAviatorBoolean.compare(other, env);
+            return thisAviatorBoolean.innerCompare(other, env);
           } else if (thisValue instanceof Date && otherValue instanceof String) {
             // This is date,other is string
             return tryCompareDate(thisValue, otherValue);
@@ -814,7 +697,7 @@ public class AviatorJavaType extends AviatorObject {
   @Override
   public String desc(final Map<String, Object> env) {
     Object value = getValue(env);
-    return "<" + getAviatorType() + ", " + this.name + ", " + value + ", "
+    return "<" + getAviatorType() + ", " + getName() + ", " + value + ", "
         + (value == null ? "null" : value.getClass().getName()) + ">";
   }
 

@@ -16,8 +16,8 @@ public class Benchmark {
   public static void main(final String[] args) throws Exception {
     // benchCompile();
     // benchCaptureGroupsOptions();
-    // benchmarkScript();
-    benchmarkBeanUtils();
+    benchmarkScript();
+    // benchmarkBeanUtils();
   }
 
   /**
