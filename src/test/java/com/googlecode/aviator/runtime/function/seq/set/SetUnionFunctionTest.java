@@ -1,15 +1,13 @@
-package com.googlecode.aviator.runtime.function.seq.util;
+package com.googlecode.aviator.runtime.function.seq.set;
 
 import com.googlecode.aviator.AviatorEvaluator;
-import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class SeqDisjunctionFunctionTest {
+public class SetUnionFunctionTest {
 
     @Test
     public void call() {
@@ -25,9 +23,7 @@ public class SeqDisjunctionFunctionTest {
         Map env = new HashMap();
         env.put("set1",set1);
         env.put("set2",set2);
-        Collection union = CollectionUtils.union(set1, set2);
-        System.out.println(union);
-        Object execute = AviatorEvaluator.execute("seqUtil.disjunction(set1,set2)", env);
+        Object execute = AviatorEvaluator.execute("set.union(set1,set2)", env);
         System.out.println(execute);
     }
 }
