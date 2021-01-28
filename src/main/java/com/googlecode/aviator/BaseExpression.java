@@ -44,6 +44,17 @@ public abstract class BaseExpression implements Expression {
   private final ConcurrentHashMap<String, FutureTask<StringSegments>> stringSegs =
       new ConcurrentHashMap<String, FutureTask<StringSegments>>();
 
+  protected String sourceFile;
+
+
+  public String getSourceFile() {
+    return this.sourceFile;
+  }
+
+  public void setSourceFile(final String sourceFile) {
+    this.sourceFile = sourceFile;
+  }
+
   public BaseExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
       final SymbolTable symbolTable) {
     super();
@@ -119,14 +130,14 @@ public abstract class BaseExpression implements Expression {
     return fullNames;
   }
 
-  public StringSegments getStringSegements(final String lexeme) {
+  public StringSegments getStringSegements(final String lexeme, final int lineNo) {
     FutureTask<StringSegments> task = this.stringSegs.get(lexeme);
     if (task == null) {
       task = new FutureTask<>(new Callable<StringSegments>() {
         @Override
         public StringSegments call() throws Exception {
-          final StringSegments compiledSegs =
-              BaseExpression.this.instance.compileStringSegments(lexeme);
+          final StringSegments compiledSegs = BaseExpression.this.instance
+              .compileStringSegments(lexeme, BaseExpression.this.sourceFile, lineNo);
           return compiledSegs;
         }
       });

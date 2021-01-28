@@ -43,6 +43,14 @@ public interface Expression {
    */
   Object execute();
 
+  /**
+   * Returns the source file name.
+   *
+   * @since 5.2.3
+   * @return the source file name
+   */
+  public String getSourceFile();
+
 
   /**
    * Returns this expression's all uninitialized global variable names in order when using

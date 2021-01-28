@@ -327,7 +327,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         break;
       case String:
         // load string
-        result = new AviatorString((String) lookhead.getValue(null), true);
+        result =
+            new AviatorString((String) lookhead.getValue(null), true, true, lookhead.getLineNo());
         break;
       case Pattern:
         // load pattern
@@ -343,7 +344,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
         }
         break;
       case Char:
-        result = new AviatorString(String.valueOf(lookhead.getValue(null)));
+        result = new AviatorString(String.valueOf(lookhead.getValue(null)), true, true,
+            lookhead.getLineNo());
         break;
     }
     return result;
@@ -441,6 +443,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
     if (exp instanceof BaseExpression) {
       ((BaseExpression) exp).setCompileEnv(getCompileEnv());
+      ((BaseExpression) exp).setSourceFile(this.sourceFile);
     }
     return exp;
   }

@@ -838,6 +838,7 @@ public class ASMCodeGenerator implements CodeGenerator {
           new ArrayList<VariableMeta>(this.variables.values()), this.symbolTable);
       exp.setLambdaBootstraps(this.lambdaBootstraps);
       exp.setFuncsArgs(this.funcsArgs);
+      exp.setSourceFile(this.sourceFile);
       return exp;
     } catch (ExpressionRuntimeException e) {
       throw e;
@@ -925,10 +926,11 @@ public class ASMCodeGenerator implements CodeGenerator {
         this.mv.visitLdcInsn(lookhead.getValue(null));
         this.mv.visitLdcInsn(true);
         this.mv.visitLdcInsn(lookhead.getMeta(Constants.INTER_META, true));
+        this.mv.visitLdcInsn(lookhead.getLineNo());
         this.mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/runtime/type/AviatorString",
-            CONSTRUCTOR_METHOD_NAME, "(Ljava/lang/String;ZZ)V");
-        this.pushOperand(5);
-        this.popOperand(4);
+            CONSTRUCTOR_METHOD_NAME, "(Ljava/lang/String;ZZI)V");
+        this.pushOperand(6);
+        this.popOperand(5);
         break;
       case Pattern:
         if (loadConstant(lookhead, inConstructor)) {

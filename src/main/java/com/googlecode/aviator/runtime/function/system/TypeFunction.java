@@ -17,16 +17,16 @@ public class TypeFunction extends AbstractFunction {
 
 
   private static final long serialVersionUID = 501798543495705123L;
-  private static final AviatorString STRING_TYPE = new AviatorString("string", true);
-  private static final AviatorString PATTERN_TYPE = new AviatorString("pattern", true);
-  private static final AviatorString RANGE_TYPE = new AviatorString("range", true);
-  private static final AviatorString NIL_TYPE = new AviatorString("nil", true);
-  private static final AviatorString LONG_TYPE = new AviatorString("long", true);
-  private static final AviatorString FUNC_TYPE = new AviatorString("function", true);
-  private static final AviatorString DOUBLE_TYPE = new AviatorString("double", true);
-  private static final AviatorString DECIMAL_TYPE = new AviatorString("decimal", true);
-  private static final AviatorString BOOL_TYPE = new AviatorString("boolean", true);
-  private static final AviatorString BIGINT_TYPE = new AviatorString("bigint", true);
+  private static final AviatorString STRING_TYPE = new AviatorString("string", true, false, 0);
+  private static final AviatorString PATTERN_TYPE = new AviatorString("pattern", true, false, 0);
+  private static final AviatorString RANGE_TYPE = new AviatorString("range", true, false, 0);
+  private static final AviatorString NIL_TYPE = new AviatorString("nil", true, false, 0);
+  private static final AviatorString LONG_TYPE = new AviatorString("long", true, false, 0);
+  private static final AviatorString FUNC_TYPE = new AviatorString("function", true, false, 0);
+  private static final AviatorString DOUBLE_TYPE = new AviatorString("double", true, false, 0);
+  private static final AviatorString DECIMAL_TYPE = new AviatorString("decimal", true, false, 0);
+  private static final AviatorString BOOL_TYPE = new AviatorString("boolean", true, false, 0);
+  private static final AviatorString BIGINT_TYPE = new AviatorString("bigint", true, false, 0);
 
   @Override
   public String getName() {

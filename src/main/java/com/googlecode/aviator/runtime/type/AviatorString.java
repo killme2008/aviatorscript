@@ -39,7 +39,8 @@ public class AviatorString extends AviatorObject {
   private static final long serialVersionUID = -7430694306919959899L;
   private final String lexeme;
   private final boolean isLiteral;
-  private boolean hasInterpolation = true; // default must be true to avoid corner cases.
+  private boolean hasInterpolation = true; // default must be true to avoid corner cases;
+  private int lineNo;
 
   @Override
   public String desc(final Map<String, Object> env) {
@@ -71,12 +72,13 @@ public class AviatorString extends AviatorObject {
     this.isLiteral = isLiteral;
   }
 
-  public AviatorString(final String lexeme, final boolean isLiteral,
-      final boolean hasInterpolation) {
+  public AviatorString(final String lexeme, final boolean isLiteral, final boolean hasInterpolation,
+      final int lineNo) {
     super();
     this.lexeme = lexeme;
     this.isLiteral = isLiteral;
     this.hasInterpolation = hasInterpolation;
+    this.lineNo = lineNo;
   }
 
   @Override
@@ -174,7 +176,7 @@ public class AviatorString extends AviatorObject {
     StringSegments segs = null;
     BaseExpression exp = (BaseExpression) (env == null ? null : env.get(Constants.EXP_VAR));
     if (exp != null) {
-      segs = exp.getStringSegements(this.lexeme);
+      segs = exp.getStringSegements(this.lexeme, this.lineNo);
     } else {
       segs = engine.compileStringSegments(this.lexeme);
       if (warnOnCompile) {
