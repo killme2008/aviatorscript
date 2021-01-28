@@ -25,9 +25,9 @@ It compiles script to java byte code and evaluate it on the fly.
 
 # News
 
+* [5.2.3](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.3)，Removed commons-beantuils dependency, performance turning and fixed  `AviatorString#toString` print warn log etc.
 * [5.2.2](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.2)，Fixed `Expression#getVariableNames()` returns wrong result, added `Feature.StaticMethods`, `Feature.StaticFields` etc.
 * [5.2.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.1)，Fixed memory leak in reflector, supports calling static method directly etc.
-* [5.2.0](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.0)，supports overload function, variadic function,use statement and more sequence/math functions.(Deprecated, please use 5.2.1)
 
 # Dependency
 
