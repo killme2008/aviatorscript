@@ -80,6 +80,10 @@ public class ExpressionLexer {
   }
 
 
+  public void setLineNo(final int lineNo) {
+    this.lineNo = lineNo;
+  }
+
   public int getLineNo() {
     return this.lineNo;
   }

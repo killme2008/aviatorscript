@@ -1077,7 +1077,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Returns true when caching compiled expression result by default.
-   * 
+   *
    * @since 5.2.2
    * @return
    */
@@ -1695,6 +1695,20 @@ public final class AviatorEvaluatorInstance {
    * @return
    */
   public StringSegments compileStringSegments(final String lexeme) {
+    return this.compileStringSegments(lexeme, null, 1);
+  }
+
+  /**
+   * Compile a string to string segments, if string doesn't have a interpolation,returns an empty
+   * list.
+   *
+   * @param lexeme
+   * @param sourceFile
+   * @param lineNo;
+   * @return
+   */
+  public StringSegments compileStringSegments(final String lexeme, final String sourceFile,
+      final int lineNo) {
     List<StringSegment> segs = new ArrayList<StringSegment>();
     boolean hasInterpolationOrEscaped = false;
     StringCharacterIterator it = new StringCharacterIterator(lexeme);
@@ -1723,8 +1737,9 @@ public final class AviatorEvaluatorInstance {
 
             try {
               ExpressionLexer lexer = new ExpressionLexer(this, lexeme.substring(i));
+              lexer.setLineNo(lineNo);
               ExpressionParser parser =
-                  new ExpressionParser(this, lexer, newCodeGenerator(null, false));
+                  new ExpressionParser(this, lexer, newCodeGenerator(sourceFile, false));
 
               Expression exp = parser.parse(false);
               final Token<?> lookhead = parser.getLookhead();
