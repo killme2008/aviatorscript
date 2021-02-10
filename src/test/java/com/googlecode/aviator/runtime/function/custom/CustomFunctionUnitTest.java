@@ -92,8 +92,8 @@ public class CustomFunctionUnitTest {
 
   @Test
   public void testMyAddFunction() {
-    assertEquals(10, AviatorEvaluator.execute("myadd(3,7)"));
-    assertEquals(10, AviatorEvaluator.exec("myadd(a,b)", 6, 4));
+    assertEquals(10L, AviatorEvaluator.execute("myadd(3,7)"));
+    assertEquals(10L, AviatorEvaluator.exec("myadd(a,b)", 6, 4));
   }
 
 }

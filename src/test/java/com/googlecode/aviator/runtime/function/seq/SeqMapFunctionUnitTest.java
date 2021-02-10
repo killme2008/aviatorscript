@@ -28,7 +28,7 @@ public class SeqMapFunctionUnitTest {
         new AviatorJavaType("string.length"));
     Object[] array = (Object[]) result.getValue(null);
     for (Object i : array) {
-      assertEquals(5, i);
+      assertEquals(5L, i);
     }
   }
 
@@ -45,7 +45,7 @@ public class SeqMapFunctionUnitTest {
         fun.call(env, AviatorRuntimeJavaType.valueOf(strs), new AviatorJavaType("string.length"));
     LinkedList array = (LinkedList) result.getValue(env);
     for (Object i : array) {
-      assertEquals(5, i);
+      assertEquals(5L, i);
     }
   }
 
@@ -60,7 +60,7 @@ public class SeqMapFunctionUnitTest {
     List list = (List) result.getValue(null);
     assertEquals(5, list.size());
     for (Object val : list) {
-      assertEquals(val, 1);
+      assertEquals(1L, val);
     }
   }
 

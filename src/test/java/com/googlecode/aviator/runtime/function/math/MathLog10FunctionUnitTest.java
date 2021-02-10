@@ -19,14 +19,16 @@ public class MathLog10FunctionUnitTest extends BaseMathFunctionUnitTestForOneArg
   public void testCall() {
     assertEquals(2.0, this.function.call(null, AviatorNumber.valueOf(100)).getValue(null));
     assertEquals(3.0, this.function.call(null, AviatorNumber.valueOf(1000)).getValue(null));
-    assertEquals(2.60, this.function.call(null, AviatorNumber.valueOf(400)).getValue(null));
+    assertEquals(2.60, (double) this.function.call(null, AviatorNumber.valueOf(400)).getValue(null),
+        0.01);
 
     Map<String, Object> env = new HashMap<String, Object>();
     env.put("a", 10000);
     env.put("b", 9.0);
 
     assertEquals(4.0, this.function.call(env, new AviatorJavaType("a")).getValue(null));
-    assertEquals(0.9542, this.function.call(env, new AviatorJavaType("b")).getValue(null));
+    assertEquals(0.9542, (double) this.function.call(env, new AviatorJavaType("b")).getValue(null),
+        0.0001);
   }
 
 }

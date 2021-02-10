@@ -211,7 +211,6 @@ public class AviatorNumberUnitTest {
 
   @Test
   public void testSubWithJavaType() {
-
     this.doArithOperationWithJavaType(OperatorType.Sub);
   }
 
@@ -267,7 +266,7 @@ public class AviatorNumberUnitTest {
         a = AviatorNumber.valueOf(1000);
         assertEquals(1004.3, a.add(doubleType, env).getValue(null));
         a = AviatorNumber.valueOf(1000);
-        assertEquals(1004.3, a.add(floatType, env).getValue(null));
+        assertEquals(1004.3, (double) a.add(floatType, env).getValue(null), 0.1);
         break;
       case Sub:
         a = AviatorNumber.valueOf(1000);
@@ -281,7 +280,7 @@ public class AviatorNumberUnitTest {
         a = AviatorNumber.valueOf(1000);
         assertEquals(995.7d, a.sub(doubleType, env).getValue(null));
         a = AviatorNumber.valueOf(1000);
-        assertEquals(995.7d, a.sub(floatType, env).getValue(null));
+        assertEquals(995.7d, (double) a.sub(floatType, env).getValue(null), 0.1);
         break;
 
       case Mod:
@@ -379,25 +378,25 @@ public class AviatorNumberUnitTest {
     switch (operatorType) {
       case Add:
         this.reset();
-        assertEquals(6.3, this.a.add(this.b, env).getValue(env));
+        assertEquals(6.3, (double) this.a.add(this.b, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(6.3, this.b.add(this.a, env).getValue(env));
+        assertEquals(6.3, (double) this.b.add(this.a, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(7.6, this.a.add(this.d, env).getValue(env));
+        assertEquals(7.6, (double) this.a.add(this.d, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(7.6, this.d.add(this.a, env).getValue(env));
+        assertEquals(7.6, (double) this.d.add(this.a, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(1003, this.b.add(this.c, env).getValue(env));
+        assertEquals(1003L, this.b.add(this.c, env).getValue(env));
         this.reset();
-        assertEquals(1003, this.c.add(this.b, env).getValue(env));
+        assertEquals(1003L, this.c.add(this.b, env).getValue(env));
         this.reset();
-        assertEquals(7.3, this.b.add(this.d, env).getValue(env));
+        assertEquals(7.3, (double) this.b.add(this.d, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(7.3, this.d.add(this.b, env).getValue(env));
+        assertEquals(7.3, (double) this.d.add(this.b, env).getValue(env), 0.1);
 
         assertEquals(new BigInteger("92233720368547758074"), this.b.add(this.e, env).getValue(env));
         assertEquals(new BigInteger("92233720368547759071"), this.c.add(this.e, env).getValue(env));
-        assertEquals(9.223372036854776E18, this.a.add(this.e, env).getValue(env));
+        assertEquals(9.223372036854776E19, (double) this.a.add(this.e, env).getValue(env), 1E17);
 
         assertEquals(new BigDecimal("92233720368547758074.1001"),
             this.b.add(this.f, env).getValue(env));
@@ -407,21 +406,21 @@ public class AviatorNumberUnitTest {
         break;
       case Sub:
         this.reset();
-        assertEquals(0.3, this.a.sub(this.b, env).getValue(env));
+        assertEquals(0.3, (double) this.a.sub(this.b, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(-0.3, this.b.sub(this.a, env).getValue(env));
+        assertEquals(-0.3, (double) this.b.sub(this.a, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(-1.0, this.a.sub(this.d, env).getValue(env));
+        assertEquals(-1.0, (double) this.a.sub(this.d, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(1.0, this.d.sub(this.a, env).getValue(env));
+        assertEquals(1.0, (double) this.d.sub(this.a, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(-997, this.b.sub(this.c, env).getValue(env));
+        assertEquals(-997L, this.b.sub(this.c, env).getValue(env));
         this.reset();
-        assertEquals(997, this.c.sub(this.b, env).getValue(env));
+        assertEquals(997L, this.c.sub(this.b, env).getValue(env));
         this.reset();
-        assertEquals(-1.3, this.b.sub(this.d, env).getValue(env));
+        assertEquals(-1.3, (double) this.b.sub(this.d, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(1.3, this.d.sub(this.b, env).getValue(env));
+        assertEquals(1.3, (double) this.d.sub(this.b, env).getValue(env), 0.1);
 
         assertEquals(new BigInteger("-92233720368547758068"),
             this.b.sub(this.e, env).getValue(env));
@@ -437,33 +436,33 @@ public class AviatorNumberUnitTest {
         break;
       case Mult:
         this.reset();
-        assertEquals(9.9, this.a.mult(this.b, env).getValue(env));
+        assertEquals(9.9, (double) this.a.mult(this.b, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(9.9, this.b.mult(this.a, env).getValue(env));
+        assertEquals(9.9, (double) this.b.mult(this.a, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(14.19, this.a.mult(this.d, env).getValue(env));
+        assertEquals(14.19, (double) this.a.mult(this.d, env).getValue(env), 0.01);
         this.reset();
-        assertEquals(14.19, this.d.mult(this.a, env).getValue(env));
+        assertEquals(14.19, (double) this.d.mult(this.a, env).getValue(env), 0.01);
         this.reset();
-        assertEquals(3000, this.b.mult(this.c, env).getValue(env));
+        assertEquals(3000L, this.b.mult(this.c, env).getValue(env));
         this.reset();
-        assertEquals(3000, this.c.mult(this.b, env).getValue(env));
+        assertEquals(3000L, this.c.mult(this.b, env).getValue(env));
         this.reset();
-        assertEquals(12.9, this.b.mult(this.d, env).getValue(env));
+        assertEquals(12.9, (double) this.b.mult(this.d, env).getValue(env), 0.1);
         this.reset();
-        assertEquals(12.9, this.d.mult(this.b, env).getValue(env));
+        assertEquals(12.9, (double) this.d.mult(this.b, env).getValue(env), 0.1);
 
         assertEquals(new BigInteger("276701161105643274213"),
             this.b.mult(this.e, env).getValue(env));
         assertEquals(new BigInteger("92233720368547758071000"),
             this.c.mult(this.e, env).getValue(env));
-        assertEquals(3.043712772162076E20, this.a.mult(this.e, env).getValue(env));
+        assertEquals(3.043712772162076E20, (double) this.a.mult(this.e, env).getValue(env), 1e13);
 
         assertEquals(new BigDecimal("276701161105643274213.3003"),
             this.b.mult(this.f, env).getValue(env));
         assertEquals(new BigDecimal("92233720368547758071100.1000"),
             this.c.mult(this.f, env).getValue(env));
-        assertEquals(3.043712772162076E20, this.a.mult(this.f, env).getValue(env));
+        assertEquals(3.043712772162076E20, (double) this.a.mult(this.f, env).getValue(env), 1e13);
         break;
 
       case Div:
@@ -477,9 +476,9 @@ public class AviatorNumberUnitTest {
         this.reset();
         assertEquals(1.30303030, (Double) this.d.div(this.a, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(0, this.b.div(this.c, env).getValue(env));
+        assertEquals(0L, this.b.div(this.c, env).getValue(env));
         this.reset();
-        assertEquals(333, this.c.div(this.b, env).getValue(env));
+        assertEquals(333L, this.c.div(this.b, env).getValue(env));
         this.reset();
         assertEquals(0.6976744, (Double) this.b.div(this.d, env).getValue(env), 0.001);
         this.reset();
@@ -487,13 +486,13 @@ public class AviatorNumberUnitTest {
 
         assertEquals(new BigInteger("30744573456182586023"), this.e.div(this.b, env).getValue(env));
         assertEquals(new BigInteger("92233720368547758"), this.e.div(this.c, env).getValue(env));
-        assertEquals(2.794961223289326E19, this.e.div(this.a, env).getValue(env));
+        assertEquals(2.794961223289326E19, (double) this.e.div(this.a, env).getValue(env), 1e12);
 
         assertEquals(new BigDecimal("3.252606517456513302336211867796323E-20"),
             this.b.div(this.f, env).getValue(env));
         assertEquals(new BigDecimal("1.084202172485504434112070622598774E-17"),
             this.c.div(this.f, env).getValue(env));
-        assertEquals(3.577867169202164E-20, this.a.div(this.f, env).getValue(env));
+        assertEquals(3.577867169202164E-20, (double) this.a.div(this.f, env).getValue(env), 1e-27);
         break;
       case Mod:
         this.reset();
@@ -505,9 +504,9 @@ public class AviatorNumberUnitTest {
         this.reset();
         assertEquals(1.0, (Double) this.d.mod(this.a, env).getValue(env), 0.001);
         this.reset();
-        assertEquals(3, this.b.mod(this.c, env).getValue(env));
+        assertEquals(3L, this.b.mod(this.c, env).getValue(env));
         this.reset();
-        assertEquals(1, this.c.mod(this.b, env).getValue(env));
+        assertEquals(1L, this.c.mod(this.b, env).getValue(env));
         this.reset();
         assertEquals(3.0, (Double) this.b.mod(this.d, env).getValue(env), 0.001);
         this.reset();
@@ -515,15 +514,15 @@ public class AviatorNumberUnitTest {
 
         assertEquals(new BigInteger("2"), this.e.mod(this.b, env).getValue(env));
         assertEquals(new BigInteger("71"), this.e.mod(this.c, env).getValue(env));
-        assertEquals(0.0, this.e.mod(this.a, env).getValue(env));
+        assertEquals(0.9, (double) this.e.mod(this.a, env).getValue(env), 0.1);
 
         assertEquals(new BigDecimal("3"), this.b.mod(this.f, env).getValue(env));
         assertEquals(new BigDecimal("1000"), this.c.mod(this.f, env).getValue(env));
-        assertEquals(3.3, this.a.mod(this.f, env).getValue(env));
+        assertEquals(3.3, (double) this.a.mod(this.f, env).getValue(env), 0.1);
 
         assertEquals(new BigDecimal("2.1001"), this.f.mod(this.b, env).getValue(env));
         assertEquals(new BigDecimal("71.1001"), this.f.mod(this.c, env).getValue(env));
-        assertEquals(0.0, this.f.mod(this.a, env).getValue(env));
+        assertEquals(0.9, (double) this.f.mod(this.a, env).getValue(env), 0.1);
         break;
     }
   }

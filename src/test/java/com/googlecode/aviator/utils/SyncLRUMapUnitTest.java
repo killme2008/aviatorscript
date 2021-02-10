@@ -24,7 +24,7 @@ public class SyncLRUMapUnitTest {
     for (int i = 0; i < 5; i++) {
       assertNull(this.map.get(i));
       this.map.put(i, i);
-      assertEquals(i, this.map.get(i));
+      assertEquals(i, this.map.get(i).intValue());
     }
     assertEquals(5, map.size());
   }
@@ -35,13 +35,13 @@ public class SyncLRUMapUnitTest {
     for (int i = 0; i < 20; i++) {
       assertNull(this.map.get(i));
       this.map.put(i, i);
-      assertEquals(i, this.map.get(i));
+      assertEquals(i, this.map.get(i).intValue());
     }
     assertEquals(10, map.size());
     for (int i = 0; i < 10; i++)
       assertNull(this.map.get(0));
     for (int i = 10; i < 11; i++)
-      assertEquals(i, this.map.get(i));
+      assertEquals(i, this.map.get(i).intValue());
     assertEquals(10, map.size());
 
   }

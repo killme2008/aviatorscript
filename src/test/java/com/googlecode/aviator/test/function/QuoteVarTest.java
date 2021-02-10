@@ -94,6 +94,6 @@ public class QuoteVarTest {
 
     assertEquals("bar", AviatorEvaluator.execute("#foo.bars[0].name", env));
     assertEquals("hello,bar", AviatorEvaluator.execute("'hello,' + #foo.bars[0].name", env));
-    assertEquals(3, AviatorEvaluator.execute("string.length(#foo.bars[0].name)", env));
+    assertEquals(3L, AviatorEvaluator.execute("string.length(#foo.bars[0].name)", env));
   }
 }

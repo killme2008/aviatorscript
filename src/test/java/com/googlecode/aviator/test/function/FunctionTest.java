@@ -1078,16 +1078,16 @@ public class FunctionTest {
 
   @Test
   public void testTuple() {
-    assertArrayEquals(new Object[] {1, "hello", 3.2},
+    assertArrayEquals(new Object[] {1L, "hello", 3.2},
         (Object[]) AviatorEvaluator.execute("tuple(1,'hello',3.2)"));
-    assertArrayEquals(new Object[] {1, 2}, (Object[]) AviatorEvaluator.execute("tuple(1,2)"));
+    assertArrayEquals(new Object[] {1L, 2L}, (Object[]) AviatorEvaluator.execute("tuple(1,2)"));
     assertArrayEquals(new Object[] {}, (Object[]) AviatorEvaluator.execute("tuple()"));
     assertEquals(3, AviatorEvaluator.execute("count(tuple(1,'hello',3.2))"));
     assertEquals(3.2, AviatorEvaluator.execute("tuple(1,'hello',3.2)[2]"));
-    assertArrayEquals(new Object[] {2, 3, 4},
+    assertArrayEquals(new Object[] {2L, 3L, 4L},
         (Object[]) AviatorEvaluator.execute("map(tuple(1,2,3), lambda(x) -> x +1 end)"));
 
-    assertEquals(1, AviatorEvaluator.execute("seq.get(tuple(1,'hello',3.2), 0)"));
+    assertEquals(1L, AviatorEvaluator.execute("seq.get(tuple(1,'hello',3.2), 0)"));
     assertEquals("hello", AviatorEvaluator.execute("seq.get(tuple(1,'hello',3.2), 1)"));
     assertEquals(3.2, AviatorEvaluator.execute("seq.get(tuple(1,'hello',3.2), 2)"));
 

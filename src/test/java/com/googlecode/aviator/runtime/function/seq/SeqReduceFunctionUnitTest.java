@@ -36,7 +36,7 @@ public class SeqReduceFunctionUnitTest {
         (AviatorObject) AviatorEvaluator.execute("lambda(x, y) -> x + long(y.value) end"),
         AviatorRuntimeJavaType.valueOf(5));
     assertNotNull(result);
-    assertEquals(8, result.getValue(null));
+    assertEquals(8L, result.getValue(null));
   }
 
   @Test
@@ -50,7 +50,7 @@ public class SeqReduceFunctionUnitTest {
     AviatorObject result = fun.call(this.env, AviatorRuntimeJavaType.valueOf(a),
         new AviatorJavaType("+"), AviatorRuntimeJavaType.valueOf(0));
     assertNotNull(result);
-    assertEquals(45, result.getValue(null));
+    assertEquals(45L, result.getValue(null));
 
   }
 
@@ -82,7 +82,7 @@ public class SeqReduceFunctionUnitTest {
     AviatorObject result = fun.call(this.env, AviatorRuntimeJavaType.valueOf(a),
         new AviatorJavaType("+"), AviatorRuntimeJavaType.valueOf(0));
     assertNotNull(result);
-    assertEquals(45, result.getValue(null));
+    assertEquals(45L, result.getValue(null));
 
   }
 

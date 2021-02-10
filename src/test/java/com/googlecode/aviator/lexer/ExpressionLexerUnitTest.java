@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import com.googlecode.aviator.lexer.token.NumberToken;
 import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
@@ -46,7 +47,7 @@ public class ExpressionLexerUnitTest {
     this.lexer = new ExpressionLexer(this.instance, "1+2");
     Token<?> token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(1, token.getValue(null));
+    assertEquals(1L, token.getValue(null));
     assertEquals(0, token.getStartIndex());
 
     token = this.lexer.scan();
@@ -56,7 +57,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(2, token.getValue(null));
+    assertEquals(2L, token.getValue(null));
     assertEquals(2, token.getStartIndex());
 
     assertNull(this.lexer.scan());
@@ -87,7 +88,7 @@ public class ExpressionLexerUnitTest {
     this.lexer = new ExpressionLexer(this.instance, "0X0a2B");
     Token<?> token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(2603, token.getValue(null));
+    assertEquals(2603L, token.getValue(null));
     assertEquals(0, token.getStartIndex());
   }
 
@@ -115,21 +116,21 @@ public class ExpressionLexerUnitTest {
   @Test
   public void testParseScientificNotationBiggerSmaller() {
     this.lexer = new ExpressionLexer(this.instance, "3e10");
-    Token<?> token = this.lexer.scan();
+    NumberToken token = (NumberToken) this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(3e10, token.getValue(null));
+    assertEquals(3e10, token.getValue(null).doubleValue(), 0.1);
     assertEquals(0, token.getStartIndex());
 
     this.lexer = new ExpressionLexer(this.instance, "3e100");
-    token = this.lexer.scan();
+    token = (NumberToken) this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(3e100, token.getValue(null));
+    assertEquals(3e100, token.getValue(null).doubleValue(), 1e86);
     assertEquals(0, token.getStartIndex());
 
     this.lexer = new ExpressionLexer(this.instance, "3e-100");
-    token = this.lexer.scan();
+    token = (NumberToken) this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(3e-100, token.getValue(null));
+    assertEquals(3e-100, token.getValue(null).doubleValue(), 1e-114);
     assertEquals(0, token.getStartIndex());
   }
 
@@ -169,7 +170,7 @@ public class ExpressionLexerUnitTest {
     this.lexer = new ExpressionLexer(this.instance, "3E2M");
     Token<?> token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(new BigDecimal("300"), token.getValue(null));
+    assertEquals(new BigDecimal("3E2"), token.getValue(null));
     assertEquals(0, token.getStartIndex());
   }
 
@@ -194,9 +195,9 @@ public class ExpressionLexerUnitTest {
   @Test
   public void testParseScientificNotation8() {
     this.lexer = new ExpressionLexer(this.instance, "2.3456e3");
-    Token<?> token = this.lexer.scan();
+    NumberToken token = (NumberToken) this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(2345.6, token.getValue(null));
+    assertEquals(2345.6, token.getValue(null).doubleValue(), 0.01);
     assertEquals(0, token.getStartIndex());
   }
 
@@ -235,7 +236,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(1, token.getValue(null));
+    assertEquals(1L, token.getValue(null));
     assertEquals(7, token.getStartIndex());
 
     token = this.lexer.scan();
@@ -286,7 +287,7 @@ public class ExpressionLexerUnitTest {
     this.lexer = new ExpressionLexer(this.instance, "0344");
     Token<?> token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(344, token.getValue(null));
+    assertEquals(344L, token.getValue(null));
     assertEquals(0, token.getStartIndex());
   }
 
@@ -296,7 +297,7 @@ public class ExpressionLexerUnitTest {
     this.lexer = new ExpressionLexer(this.instance, "3+0xAF");
     Token<?> token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(3, token.getValue(null));
+    assertEquals(3L, token.getValue(null));
     assertEquals(0, token.getStartIndex());
 
     token = this.lexer.scan();
@@ -306,7 +307,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(175, token.getValue(null));
+    assertEquals(175L, token.getValue(null));
     assertEquals(2, token.getStartIndex());
 
     assertNull(this.lexer.scan());
@@ -318,7 +319,7 @@ public class ExpressionLexerUnitTest {
     this.lexer = new ExpressionLexer(this.instance, " 1 + 2 ");
     Token<?> token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(1, token.getValue(null));
+    assertEquals(1L, token.getValue(null));
     assertEquals(1, token.getStartIndex());
 
     token = this.lexer.scan();
@@ -328,7 +329,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(2, token.getValue(null));
+    assertEquals(2L, token.getValue(null));
     assertEquals(5, token.getStartIndex());
 
     assertNull(this.lexer.scan());
@@ -350,7 +351,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(4, token.getValue(null));
+    assertEquals(4L, token.getValue(null));
     assertEquals(4, token.getStartIndex());
 
     token = this.lexer.scan();
@@ -477,7 +478,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(3, token.getValue(null));
+    assertEquals(3L, token.getValue(null));
 
     token = this.lexer.scan();
     assertEquals(TokenType.Char, token.getType());
@@ -489,7 +490,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(1, token.getValue(null));
+    assertEquals(1L, token.getValue(null));
 
     token = this.lexer.scan();
     assertEquals(TokenType.Char, token.getType());
@@ -549,7 +550,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(3, token.getValue(null));
+    assertEquals(3L, token.getValue(null));
 
     token = this.lexer.scan();
     assertEquals(TokenType.Char, token.getType());
@@ -679,7 +680,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(2, token.getValue(null));
+    assertEquals(2L, token.getValue(null));
     assertEquals(5, token.getStartIndex());
 
     token = this.lexer.scan();
@@ -689,7 +690,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(2, token.getValue(null));
+    assertEquals(2L, token.getValue(null));
     assertEquals(7, token.getStartIndex());
 
     token = this.lexer.scan();
@@ -704,7 +705,7 @@ public class ExpressionLexerUnitTest {
 
     token = this.lexer.scan();
     assertEquals(TokenType.Number, token.getType());
-    assertEquals(99, token.getValue(null));
+    assertEquals(99L, token.getValue(null));
     assertEquals(10, token.getStartIndex());
 
     assertNull(this.lexer.scan());

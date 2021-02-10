@@ -383,7 +383,7 @@ public class ASMCodeGeneratorUnitTest {
     this.codeGenerator.onConstant(new NumberToken(-3L, "-3"));
     this.codeGenerator.onBitNot(null);
     Object result = eval(new HashMap<String, Object>());
-    assertEquals(2, result);
+    assertEquals(2L, result);
   }
 
   @Test
@@ -559,7 +559,7 @@ public class ASMCodeGeneratorUnitTest {
     env.put("y", 3);
     Object result = eval(env);
     assertTrue(result instanceof LambdaFunction);
-    assertEquals(5, ((LambdaFunction) result)
+    assertEquals(5L, ((LambdaFunction) result)
         .call(env, new AviatorJavaType("x"), new AviatorJavaType("y")).getValue(env));
     assertNull(this.codeGenerator.getLambdaGenerator());
   }

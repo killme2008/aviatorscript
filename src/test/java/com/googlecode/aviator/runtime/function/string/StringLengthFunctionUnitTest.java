@@ -30,10 +30,10 @@ public class StringLengthFunctionUnitTest {
     env.put("s1", "hello");
     env.put("s2", "hello world");
 
-    assertEquals(5, function.call(null, new AviatorString("hello")).getValue(null));
-    assertEquals(11, function.call(null, new AviatorString("hello world")).getValue(null));
-    assertEquals(5, function.call(env, new AviatorJavaType("s1")).getValue(null));
-    assertEquals(11, function.call(env, new AviatorJavaType("s2")).getValue(null));
+    assertEquals(5L, function.call(null, new AviatorString("hello")).getValue(null));
+    assertEquals(11L, function.call(null, new AviatorString("hello world")).getValue(null));
+    assertEquals(5L, function.call(env, new AviatorJavaType("s1")).getValue(null));
+    assertEquals(11L, function.call(env, new AviatorJavaType("s2")).getValue(null));
 
   }
 

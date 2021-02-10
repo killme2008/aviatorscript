@@ -8,7 +8,7 @@ let foo = new VariableExample$Foo(-100, 99.9, new Date());
 j.assertNotNull(foo);
 j.assertTrue(is_a(foo, VariableExample$Foo));
 j.assertEquals(-100, foo.i);
-j.assertEquals(99.9, foo.f);
+j.assertEquals(99.9, foo.f,0.01);
 j.assertTrue(is_a(foo.date, Date));
 j.assertNotNull(foo.bars);
 j.assertNotNull(foo.bars[0]);
@@ -31,7 +31,7 @@ j.assertEquals("test value", seq.get(foo.context, "another"));
 foo.i = 1;
 j.assertEquals(1, foo.i);
 foo.f = 2.2;
-j.assertEquals(2.2, foo.f);
+j.assertEquals(2.2, foo.f, 0.01);
 
 #`foo.bars.[0]` = new VariableExample$Bar("bar1");
 j.assertEquals("bar1", #`foo.bars.[0].name`);

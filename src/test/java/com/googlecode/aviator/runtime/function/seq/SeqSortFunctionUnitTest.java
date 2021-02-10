@@ -27,7 +27,7 @@ public class SeqSortFunctionUnitTest {
     Integer[] dup = (Integer[]) result.getValue(null);
     assertFalse(Arrays.equals(a, dup));
     for (Integer i : dup) {
-      assertEquals(i, index++);
+      assertEquals(i.intValue(), index++);
     }
   }
 
@@ -48,7 +48,7 @@ public class SeqSortFunctionUnitTest {
     System.out.println(a);
     System.out.println(dup);
     for (Integer i : dup) {
-      assertEquals(i, index++);
+      assertEquals(i.intValue(), index++);
     }
   }
 

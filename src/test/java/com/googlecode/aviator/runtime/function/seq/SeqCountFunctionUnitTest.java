@@ -15,7 +15,7 @@ public class SeqCountFunctionUnitTest {
     args[0] = AviatorRuntimeJavaType.valueOf(new String[10]);
     SeqCountFunction fun = new SeqCountFunction();
     AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf(new String[10]));
-    assertEquals(10, result.getValue(null));
+    assertEquals(10L, result.getValue(null));
   }
 
 
@@ -24,7 +24,7 @@ public class SeqCountFunctionUnitTest {
 
     SeqCountFunction fun = new SeqCountFunction();
     AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf(new String[0]));
-    assertEquals(0, result.getValue(null));
+    assertEquals(0L, result.getValue(null));
   }
 
 
@@ -36,7 +36,7 @@ public class SeqCountFunctionUnitTest {
 
     SeqCountFunction fun = new SeqCountFunction();
     AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf(set));
-    assertEquals(2, result.getValue(null));
+    assertEquals(2L, result.getValue(null));
   }
 
 
@@ -44,7 +44,7 @@ public class SeqCountFunctionUnitTest {
   public void testCount_String() {
     SeqCountFunction fun = new SeqCountFunction();
     AviatorObject result = fun.call(null, AviatorRuntimeJavaType.valueOf("hello"));
-    assertEquals(5, result.getValue(null));
+    assertEquals(5L, result.getValue(null));
   }
 
 }

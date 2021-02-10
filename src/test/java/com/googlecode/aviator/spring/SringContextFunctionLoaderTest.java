@@ -21,7 +21,7 @@ public class SringContextFunctionLoaderTest {
 
   @Test
   public void testAdd() {
-    assertEquals(100, AviatorEvaluator.exec("springAdd(x,y)", 1, 99));
+    assertEquals(100.0, AviatorEvaluator.exec("springAdd(x,y)", 1, 99));
   }
 
   @AfterClass

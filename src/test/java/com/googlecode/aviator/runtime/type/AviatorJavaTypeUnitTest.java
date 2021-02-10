@@ -85,10 +85,10 @@ public class AviatorJavaTypeUnitTest {
 
     switch (operatorType) {
       case Add:
-        assertEquals(7, byteType.add(n1, env).getValue(null));
-        assertEquals(7, shortType.add(n1, env).getValue(null));
-        assertEquals(7, intType.add(n1, env).getValue(null));
-        assertEquals(7, longType.add(n1, env).getValue(null));
+        assertEquals(7L, byteType.add(n1, env).getValue(null));
+        assertEquals(7L, shortType.add(n1, env).getValue(null));
+        assertEquals(7L, intType.add(n1, env).getValue(null));
+        assertEquals(7L, longType.add(n1, env).getValue(null));
         assertEquals(7.4, (Double) floatType.add(n1, env).getValue(null), 0.001);
         assertEquals(7.4, (Double) doubleType.add(n1, env).getValue(null), 0.001);
         assertEquals(8L, byteType.add(intType, env).getValue(null));
@@ -98,10 +98,10 @@ public class AviatorJavaTypeUnitTest {
         assertEquals(7.7, (Double) n2.add(doubleType, env).getValue(null), 0.001);
         break;
       case Sub:
-        assertEquals(1, byteType.sub(n1, env).getValue(null));
-        assertEquals(1, shortType.sub(n1, env).getValue(null));
-        assertEquals(1, intType.sub(n1, env).getValue(null));
-        assertEquals(1, longType.sub(n1, env).getValue(null));
+        assertEquals(1L, byteType.sub(n1, env).getValue(null));
+        assertEquals(1L, shortType.sub(n1, env).getValue(null));
+        assertEquals(1L, intType.sub(n1, env).getValue(null));
+        assertEquals(1L, longType.sub(n1, env).getValue(null));
         assertEquals(1.4, (Double) floatType.sub(n1, env).getValue(null), 0.001);
         assertEquals(1.4, (Double) doubleType.sub(n1, env).getValue(null), 0.001);
         assertEquals(0L, byteType.sub(intType, env).getValue(null));
@@ -113,10 +113,10 @@ public class AviatorJavaTypeUnitTest {
 
       case Mult:
         // 4 4.4 3 3.3
-        assertEquals(12, byteType.mult(n1, env).getValue(null));
-        assertEquals(12, shortType.mult(n1, env).getValue(null));
-        assertEquals(12, intType.mult(n1, env).getValue(null));
-        assertEquals(12, longType.mult(n1, env).getValue(null));
+        assertEquals(12L, byteType.mult(n1, env).getValue(null));
+        assertEquals(12L, shortType.mult(n1, env).getValue(null));
+        assertEquals(12L, intType.mult(n1, env).getValue(null));
+        assertEquals(12L, longType.mult(n1, env).getValue(null));
         assertEquals(13.2, (Double) floatType.mult(n1, env).getValue(null), 0.001);
         assertEquals(13.2, (Double) doubleType.mult(n1, env).getValue(null), 0.001);
         assertEquals(16L, byteType.mult(intType, env).getValue(null));
@@ -126,10 +126,10 @@ public class AviatorJavaTypeUnitTest {
         assertEquals(14.52, (Double) n2.mult(doubleType, env).getValue(null), 0.001);
         break;
       case Div:
-        assertEquals(1, byteType.div(n1, env).getValue(null));
-        assertEquals(1, shortType.div(n1, env).getValue(null));
-        assertEquals(1, intType.div(n1, env).getValue(null));
-        assertEquals(1, longType.div(n1, env).getValue(null));
+        assertEquals(1L, byteType.div(n1, env).getValue(null));
+        assertEquals(1L, shortType.div(n1, env).getValue(null));
+        assertEquals(1L, intType.div(n1, env).getValue(null));
+        assertEquals(1L, longType.div(n1, env).getValue(null));
         assertEquals(1.466667, (Double) floatType.div(n1, env).getValue(null), 0.001);
         assertEquals(1.466667, (Double) doubleType.div(n1, env).getValue(null), 0.001);
         assertEquals(1L, byteType.div(intType, env).getValue(null));
@@ -139,10 +139,10 @@ public class AviatorJavaTypeUnitTest {
         assertEquals(0.75, (Double) n2.div(doubleType, env).getValue(null), 0.001);
         break;
       case Mod:
-        assertEquals(1, byteType.mod(n1, env).getValue(null));
-        assertEquals(1, shortType.mod(n1, env).getValue(null));
-        assertEquals(1, intType.mod(n1, env).getValue(null));
-        assertEquals(1, longType.mod(n1, env).getValue(null));
+        assertEquals(1L, byteType.mod(n1, env).getValue(null));
+        assertEquals(1L, shortType.mod(n1, env).getValue(null));
+        assertEquals(1L, intType.mod(n1, env).getValue(null));
+        assertEquals(1L, longType.mod(n1, env).getValue(null));
         assertEquals(1.4, (Double) floatType.mod(n1, env).getValue(null), 0.001);
         assertEquals(1.4, (Double) doubleType.mod(n1, env).getValue(null), 0.001);
         assertEquals(0L, byteType.mod(intType, env).getValue(null));

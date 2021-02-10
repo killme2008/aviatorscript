@@ -37,8 +37,8 @@ public class VariableExample {
 
   public static class Foo {
 
-    int i;
-    float f;
+    long i;
+    double f;
     Date date = new Date();
     Bar[] bars = new Bar[1];
     Map<String, Object> context = new HashMap<String, Object>();
@@ -82,7 +82,7 @@ public class VariableExample {
     }
 
 
-    public int getI() {
+    public long getI() {
       return this.i;
     }
 
@@ -92,7 +92,7 @@ public class VariableExample {
     }
 
 
-    public float getF() {
+    public double getF() {
       return this.f;
     }
 

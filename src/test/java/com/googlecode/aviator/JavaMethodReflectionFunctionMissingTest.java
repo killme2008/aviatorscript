@@ -21,10 +21,10 @@ public class JavaMethodReflectionFunctionMissingTest {
 
   @Test
   public void testFunctionMissing() {
-    assertEquals(2, this.instance.execute("indexOf('hello','l')"));
+    assertEquals(2L, this.instance.execute("indexOf('hello','l')"));
     assertEquals("heeeo", this.instance.execute("replaceAll('hello','l','e')"));
     assertEquals("hello", this.instance.execute("trim(' hello ')"));
-    assertEquals(1, this.instance.execute("signum(3M)"));
+    assertEquals(1L, this.instance.execute("signum(3M)"));
     assertEquals("hello world",
         this.instance.execute("execute(__instance__, '\"hello\" + \" world\"')"));
     assertEquals(101L, this.instance.execute("execute(__instance__, '1+100')"));

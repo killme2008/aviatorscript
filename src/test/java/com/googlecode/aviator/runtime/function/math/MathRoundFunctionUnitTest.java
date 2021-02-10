@@ -18,18 +18,18 @@ public class MathRoundFunctionUnitTest extends BaseMathFunctionUnitTestForOneArg
 
   @Test
   public void testCall() {
-    assertEquals(Math.round(30),
+    assertEquals((long) Math.round(30),
         this.function.call(null, AviatorNumber.valueOf(30)).getValue(null));
     assertEquals(Math.round(1020.999),
         this.function.call(null, AviatorNumber.valueOf(1020.999)).getValue(null));
-    assertEquals(Math.round(400),
+    assertEquals((long) Math.round(400),
         this.function.call(null, AviatorNumber.valueOf(400)).getValue(null));
 
     Map<String, Object> env = new HashMap<String, Object>();
     env.put("a", 10000);
     env.put("b", 9.0);
 
-    assertEquals(Math.round(10000),
+    assertEquals((long) Math.round(10000),
         this.function.call(env, new AviatorJavaType("a")).getValue(null));
     assertEquals(Math.round(9.0), this.function.call(env, new AviatorJavaType("b")).getValue(null));
   }
