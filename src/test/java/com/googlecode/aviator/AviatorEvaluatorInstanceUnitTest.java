@@ -84,6 +84,36 @@ public class AviatorEvaluatorInstanceUnitTest {
     this.instance.execute("try {} catch(IllegalArgumentException e) {}");
     assertTrue(this.instance
         .execute("new java.util.concurrent.ArrayBlockingQueue(10)") instanceof ArrayBlockingQueue);
+
+    // recover default value of option ALLOWED_CLASS_SET after test
+    this.instance.getOptionValue(Options.ALLOWED_CLASS_SET).classes = null;
+  }
+
+  @Test
+  public void testAssignableClazzWhiteList() {
+    final HashSet<Object> classes = new HashSet<>();
+    classes.add(List.class);
+    this.instance.setOption(Options.ASSIGNABLE_ALLOWED_CLASS_SET, classes);
+
+    try {
+      this.instance.execute("new java.util.Date()");
+      fail();
+    } catch (ExpressionRuntimeException e) {
+      assertEquals(
+          "`class java.util.Date` is not in allowed class set, check Options.ALLOWED_CLASS_SET",
+          e.getMessage());
+    }
+
+    List res = (List) this.instance.execute("l = new java.util.ArrayList();seq.add(l,1);l");
+    assertEquals(1, res.size());
+    assertEquals(Integer.valueOf(1), res.get(0));
+
+    List res2 = (List) this.instance.execute("l = new java.util.LinkedList();seq.add(l,1);l");
+    assertEquals(1, res2.size());
+    assertEquals(Integer.valueOf(1), res2.get(0));
+
+    // recover default value of option ALLOWED_CLASS_SET after test
+    this.instance.getOptionValue(Options.ASSIGNABLE_ALLOWED_CLASS_SET).classes = null;
   }
 
   @Test

@@ -221,6 +221,17 @@ public class Env implements Map<String, Object> {
               "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
         }
       }
+      Set<Class<?>> assignableList =
+          this.instance.getOptionValue(Options.ASSIGNABLE_ALLOWED_CLASS_SET).classes;
+      if (assignableList != null) {
+        for (Class<?> aClass : assignableList) {
+          if (aClass.isAssignableFrom(clazz)) {
+            return clazz;
+          }
+        }
+        throw new ExpressionRuntimeException(
+            "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
+      }
     }
     return clazz;
   }

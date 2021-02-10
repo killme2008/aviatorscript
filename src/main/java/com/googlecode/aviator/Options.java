@@ -94,11 +94,21 @@ public enum Options {
 
   /**
    * Allowed java class set in new statement and class's static method(fields) etc. It's null by
-   * default, it means all classes are allowed. Empty set means forbidding all classes.
+   * default. Null ALLOWED_CLASS_SET and ASSIGNABLE_ALLOWED_CLASS_SET means all classes are allowed
+   * (default); Empty ALLOWED_CLASS_SET or ASSIGNABLE_ALLOWED_CLASS_SET means forbidding all
+   * classes.
    *
    * @since 5.2.2
    */
-  ALLOWED_CLASS_SET;
+  ALLOWED_CLASS_SET,
+
+  /**
+   * Allowed assignable java class set in new statement and class's static method(fields) etc. It's
+   * null by default. Null ALLOWED_CLASS_SET and ASSIGNABLE_ALLOWED_CLASS_SET means all classes are
+   * allowed (default); Empty ALLOWED_CLASS_SET or ASSIGNABLE_ALLOWED_CLASS_SET means forbidding all
+   * classes.
+   */
+  ASSIGNABLE_ALLOWED_CLASS_SET;
 
 
   /**
@@ -179,6 +189,7 @@ public enum Options {
       case MATH_CONTEXT:
         return val.mathContext;
       case ALLOWED_CLASS_SET:
+      case ASSIGNABLE_ALLOWED_CLASS_SET:
         return val.classes;
     }
     throw new IllegalArgumentException("Fail to cast value " + val + " for option " + this);
@@ -213,6 +224,7 @@ public enum Options {
       case MAX_LOOP_COUNT:
         return new Value(((Number) val).intValue());
       case ALLOWED_CLASS_SET:
+      case ASSIGNABLE_ALLOWED_CLASS_SET:
         return Value.fromClasses((Set<Class<?>>) val);
       case FEATURE_SET:
         return new Value((Set<Feature>) val);
@@ -235,6 +247,7 @@ public enum Options {
         return val instanceof Boolean;
       case FEATURE_SET:
       case ALLOWED_CLASS_SET:
+      case ASSIGNABLE_ALLOWED_CLASS_SET:
         return val instanceof Set;
       case OPTIMIZE_LEVEL:
         return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
@@ -307,6 +320,7 @@ public enum Options {
       case FEATURE_SET:
         return FULL_FEATURE_SET;
       case ALLOWED_CLASS_SET:
+      case ASSIGNABLE_ALLOWED_CLASS_SET:
         return NULL_CLASS_SET;
     }
     return null;
