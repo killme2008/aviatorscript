@@ -1,5 +1,8 @@
 package com.googlecode.aviator;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
@@ -33,6 +36,27 @@ public class TestUtils {
     }
   }
 
+  public static void assertListEquals(final List<?> expected, final List<?> real) {
+    if (expected.size() != real.size()) {
+      throw new AssertionFailedError("Expect " + expected + " , but actual was " + real);
+    }
+
+    for (int i = 0; i < expected.size(); i++) {
+      assertEquals(expected.get(i), real.get(i));
+    }
+  }
+
+  public static void assertArrayEquals(final Object[] expected, final Object[] real) {
+    if (expected.length != real.length) {
+      throw new AssertionFailedError(
+          "Expect " + Arrays.toString(expected) + " , but actual was " + Arrays.toString(real));
+    }
+
+    for (int i = 0; i < expected.length; i++) {
+      assertEquals(expected[i], real[i]);
+    }
+  }
+
   public static void assertEquals(final Object expected, final Object real) {
     if (expected instanceof Number && real instanceof Number) {
       if (TypeUtils.isDouble(expected) && TypeUtils.isDouble(real)) {
@@ -47,6 +71,12 @@ public class TestUtils {
           return;
         }
       }
+
+      if (TypeUtils.isDecimal(expected) && TypeUtils.isDecimal(real)) {
+        if (((BigDecimal) expected).compareTo((BigDecimal) real) == 0) {
+          return;
+        }
+      }
     }
 
     if (Objects.equals(expected, real)) {
@@ -54,5 +84,33 @@ public class TestUtils {
     }
     throw new AssertionFailedError("Expect " + expected + "(" + expected.getClass()
         + "), but actual was " + real + "(" + real.getClass() + ")");
+  }
+
+  public static void assertTrue(final Boolean bool) {
+    if (!bool) {
+      throw new AssertionFailedError("Expect true, but actual was false");
+    }
+  }
+
+  public static void assertFalse(final Boolean bool) {
+    if (bool) {
+      throw new AssertionFailedError("Expect false, but actual was true");
+    }
+  }
+
+  public static void assertNull(final Object obj) {
+    if (obj != null) {
+      throw new AssertionFailedError("Expect null, but actual was not");
+    }
+  }
+
+  public static void assertNotNull(final Object obj) {
+    if (obj == null) {
+      throw new AssertionFailedError("Expect not null, but actual was null");
+    }
+  }
+
+  public static void fail() {
+    throw new AssertionFailedError("Expect not run here");
   }
 }

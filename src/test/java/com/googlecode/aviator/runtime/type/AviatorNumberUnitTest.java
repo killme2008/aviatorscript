@@ -15,7 +15,7 @@
  **/
 package com.googlecode.aviator.runtime.type;
 
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -457,13 +457,13 @@ public class AviatorNumberUnitTest {
             this.b.mult(this.e, env).getValue(env));
         assertEquals(new BigInteger("92233720368547758071000"),
             this.c.mult(this.e, env).getValue(env));
-        assertEquals(3.043712772162076E20, this.a.mult(this.e, env).getValue(env));
+        assertEquals(3.043712728181611E20, this.a.mult(this.e, env).getValue(env));
 
         assertEquals(new BigDecimal("276701161105643274213.3003"),
             this.b.mult(this.f, env).getValue(env));
         assertEquals(new BigDecimal("92233720368547758071100.1000"),
             this.c.mult(this.f, env).getValue(env));
-        assertEquals(3.043712772162076E20, this.a.mult(this.f, env).getValue(env));
+        assertEquals(3.043712728181611E20, this.a.mult(this.f, env).getValue(env));
         break;
 
       case Div:

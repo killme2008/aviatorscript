@@ -1,6 +1,6 @@
 package com.googlecode.aviator.runtime.function.seq;
 
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import java.util.HashSet;
 import org.junit.Test;
 import com.googlecode.aviator.runtime.type.AviatorObject;

@@ -15,7 +15,7 @@
  **/
 package com.googlecode.aviator.runtime.type;
 
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import static org.junit.Assert.assertTrue;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

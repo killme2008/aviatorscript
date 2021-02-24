@@ -1,6 +1,7 @@
 package com.googlecode.aviator.runtime.function.custom;
 
-import static org.junit.Assert.*;
+import static com.googlecode.aviator.TestUtils.assertEquals;
+import static org.junit.Assert.assertSame;
 import java.util.HashMap;
 import org.junit.BeforeClass;
 import org.junit.Test;

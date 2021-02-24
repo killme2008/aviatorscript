@@ -1,6 +1,6 @@
 package com.googlecode.aviator.spring;
 
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class SringContextFunctionLoaderTest {
 
   @Test
   public void testAdd() {
-    assertEquals(100, AviatorEvaluator.exec("springAdd(x,y)", 1, 99));
+    assertEquals(100.0, AviatorEvaluator.exec("springAdd(x,y)", 1, 99));
   }
 
   @AfterClass

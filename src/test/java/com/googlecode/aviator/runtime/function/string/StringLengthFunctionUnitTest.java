@@ -1,11 +1,11 @@
 package com.googlecode.aviator.runtime.function.string;
 
 import static org.junit.Assert.*;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import com.googlecode.aviator.runtime.function.string.StringLengthFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
