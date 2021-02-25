@@ -15,7 +15,7 @@
 package com.googlecode.aviator.test.function;
 
 import static com.googlecode.aviator.TestUtils.assertEquals;
-import static org.junit.Assert.assertArrayEquals;
+import static com.googlecode.aviator.TestUtils.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.Assert;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
@@ -1207,10 +1208,10 @@ public class FunctionTest {
     assertArrayEquals(new String[] {},
         (String[]) AviatorEvaluator.execute("seq.array(java.lang.String)"));
 
-    assertArrayEquals(new long[] {1, 2, 3},
+    Assert.assertArrayEquals(new long[] {1, 2, 3},
         (long[]) AviatorEvaluator.execute("seq.array(long, 1,2,3)"));
 
-    assertArrayEquals(new short[] {-2, 3, 100},
+    Assert.assertArrayEquals(new short[] {-2, 3, 100},
         (short[]) AviatorEvaluator.execute("seq.array(short, -2, 3, 100)"));
 
     assertEquals(101,

@@ -1,6 +1,5 @@
 package com.googlecode.aviator;
 
-import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -8,6 +7,7 @@ import org.junit.Test;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.runtime.JavaMethodReflectionFunctionMissing;
 import com.googlecode.aviator.utils.TestUtils;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 
 public class JavaMethodReflectionFunctionMissingTest {
 

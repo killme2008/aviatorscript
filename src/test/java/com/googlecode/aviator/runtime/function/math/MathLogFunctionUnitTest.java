@@ -1,6 +1,6 @@
 package com.googlecode.aviator.runtime.function.math;
 
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.junit.Before;
@@ -25,9 +25,9 @@ public class MathLogFunctionUnitTest extends BaseMathFunctionUnitTestForOneArgum
     assertEquals(4.394, this.function.call(env, AviatorNumber.valueOf(81)).getValue(null));
     assertEquals(5.991, this.function.call(env, AviatorNumber.valueOf(400)).getValue(null));
 
-    assertEquals(new BigDecimal("5.991"),
+    assertEquals(new BigDecimal("5.991464547107981986870447152285084"),
         this.function.call(env, AviatorNumber.valueOf(new BigInteger("400"))).getValue(null));
-    assertEquals(new BigDecimal("6.907755268982137"),
+    assertEquals(new BigDecimal("6.907755268982137002053974030719759"),
         this.function.call(env, AviatorNumber.valueOf(new BigDecimal("999.99999"))).getValue(null));
 
     env.put("a", 400);

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import com.googlecode.aviator.TestUtils;
 import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
@@ -28,7 +29,7 @@ public class TestScripts {
   @Before
   public void setup() throws Exception {
     this.instance = AviatorEvaluator.newInstance();
-    this.instance.addStaticFunctions("j", org.junit.Assert.class);
+    this.instance.addStaticFunctions("j", TestUtils.class);
     this.instance.setFunctionMissing(JavaMethodReflectionFunctionMissing.getInstance());
   }
 

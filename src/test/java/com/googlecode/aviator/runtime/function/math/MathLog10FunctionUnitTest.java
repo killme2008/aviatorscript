@@ -1,6 +1,6 @@
 package com.googlecode.aviator.runtime.function.math;
 
-import static org.junit.Assert.*;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;

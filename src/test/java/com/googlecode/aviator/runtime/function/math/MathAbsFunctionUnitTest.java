@@ -1,6 +1,6 @@
 package com.googlecode.aviator.runtime.function.math;
 
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.junit.Before;
@@ -28,7 +28,7 @@ public class MathAbsFunctionUnitTest extends BaseMathFunctionUnitTestForOneArgum
         this.function
             .call(env, AviatorNumber.valueOf(new BigInteger("-300000000000000000000000000000000")))
             .getValue(null));
-    assertEquals(new BigDecimal("300000000000000000000000000000000.0000002223333"),
+    assertEquals(new BigDecimal("300000000000000000000000000000000"),
         this.function
             .call(env,
                 AviatorNumber
@@ -45,7 +45,7 @@ public class MathAbsFunctionUnitTest extends BaseMathFunctionUnitTestForOneArgum
     assertEquals(3.14, this.function.call(env, new AviatorJavaType("b")).getValue(null));
     assertEquals(new BigInteger("300000000000000000000000000000000"),
         this.function.call(env, new AviatorJavaType("c")).getValue(null));
-    assertEquals(new BigDecimal("300000000000000000000000000000000.0000002223333"),
+    assertEquals(new BigDecimal("300000000000000000000000000000000"),
         this.function.call(env, new AviatorJavaType("d")).getValue(null));
   }
 }

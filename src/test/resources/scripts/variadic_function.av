@@ -88,10 +88,10 @@ fn dummy(&args) {
   return args;
 }
 
-j.assertEquals(tuple(), dummy());
-j.assertEquals(tuple(1), dummy(1));
-j.assertEquals(tuple("hello"), dummy("hello"));
-j.assertEquals(tuple(1,2,3), dummy(1, 2, 3));
+j.assertArrayEquals(tuple(), dummy());
+j.assertArrayEquals(tuple(1), dummy(1));
+j.assertArrayEquals(tuple("hello"), dummy("hello"));
+j.assertArrayEquals(tuple(1,2,3), dummy(1, 2, 3));
 
 
 

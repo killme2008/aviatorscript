@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
-import static org.junit.Assert.assertEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 
 
 public class QuoteVarTest {

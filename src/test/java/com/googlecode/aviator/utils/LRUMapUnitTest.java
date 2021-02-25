@@ -4,6 +4,7 @@ package com.googlecode.aviator.utils;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 
 
 public class LRUMapUnitTest {

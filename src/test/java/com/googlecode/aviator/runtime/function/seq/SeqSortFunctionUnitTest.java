@@ -9,6 +9,7 @@ import java.util.Set;
 import org.junit.Test;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 
 
 public class SeqSortFunctionUnitTest {
