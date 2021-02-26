@@ -25,6 +25,7 @@ public final class Range extends AviatorObject implements Sequence<Number> {
   private final AviatorNumber step;
   private final AviatorNumber start;
   private final AviatorNumber end;
+  final boolean forward;
 
 
   public Range(final AviatorNumber start, final AviatorNumber end, final AviatorNumber step) {
@@ -32,6 +33,7 @@ public final class Range extends AviatorObject implements Sequence<Number> {
     this.start = start;
     this.end = end;
     this.step = step;
+    this.forward = Range.this.step.compare(ZERO, Env.EMPTY_ENV) >= 0;
   }
 
   @Override
@@ -81,7 +83,9 @@ public final class Range extends AviatorObject implements Sequence<Number> {
   }
 
   public int size() {
-    return ((Number) this.end.sub(this.start, null).div(this.step, null).getValue(null)).intValue();
+    int size =
+        ((Number) this.end.sub(this.start, null).div(this.step, null).getValue(null)).intValue();
+    return size < 0 ? 0 : size;
   }
 
   @Override
@@ -125,7 +129,7 @@ public final class Range extends AviatorObject implements Sequence<Number> {
 
       @Override
       public boolean hasNext() {
-        if (Range.this.step.compare(ZERO, Env.EMPTY_ENV) >= 0) {
+        if (Range.this.forward) {
           return this.current.compare(Range.this.end, Env.EMPTY_ENV) < 0;
         } else {
           return this.current.compare(Range.this.end, Env.EMPTY_ENV) > 0;
