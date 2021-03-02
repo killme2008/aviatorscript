@@ -24,6 +24,7 @@ import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
@@ -31,7 +32,9 @@ import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.DelegateToken;
 import com.googlecode.aviator.lexer.token.DelegateToken.DelegateTokenType;
+import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.PatternToken;
+import com.googlecode.aviator.lexer.token.StringToken;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
@@ -1630,6 +1633,41 @@ public class ExpressionParser implements Parser {
     }
   }
 
+  private void withMetaBegin() {
+    getCodeGeneratorWithTimes().onMethodName(Constants.WithMetaFn);
+  }
+
+  private void withMetaEnd(final Object key, final Object val) {
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onConstant(value2token(key));
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+
+    getCodeGeneratorWithTimes().onConstant(value2token(val));
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+  }
+
+
+
+  private Token<?> value2token(final Object val) {
+    if (val instanceof Token) {
+      return (Token<?>) val;
+    } else if (val == null) {
+      return Variable.NIL;
+    } else if (val instanceof String) {
+      return (new StringToken((String) val, this.lexer.getLineNo(), this.lookhead.getStartIndex()));
+    } else if (val instanceof Number) {
+      return (new NumberToken((Number) val, val.toString(), this.lexer.getLineNo(),
+          this.lookhead.getStartIndex()));
+    } else if (val instanceof Boolean) {
+      return (((boolean) val) ? Variable.TRUE : Variable.FALSE);
+    } else {
+      throw new ExpressionRuntimeException(
+          "Unsupported compiled-time metadata type: " + val.getClass());
+    }
+  }
+
 
   /**
    * <pre>
@@ -1652,9 +1690,23 @@ public class ExpressionParser implements Parser {
   private void forStatement() {
     move(true);
 
-    Token<?> reducerArg = this.lookhead;
-    checkVariableName(this.lookhead);
-    move(true);
+    List<Token<?>> reducerArgs = new ArrayList<>(2);
+
+    while (true) {
+      if (reducerArgs.size() > 2) {
+        reportSyntaxError("Too many variables in for statement: " + reducerArgs.size());
+      }
+      reducerArgs.add(this.lookhead);
+      checkVariableName(this.lookhead);
+      move(true);
+      if (expectChar(',')) {
+        move(true);
+        continue;
+      } else {
+        break;
+      }
+    }
+
     if (this.lookhead == Variable.IN) {
       move(true);
       // prepare to call __reducer_callcc(seq, iterator, statements)
@@ -1675,13 +1727,18 @@ public class ExpressionParser implements Parser {
 
         // create a lambda function wraps for-loop body(iterator)
         {
+          withMetaBegin();
           getCodeGeneratorWithTimes().onLambdaDefineStart(
               getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
-          getCodeGeneratorWithTimes().onLambdaArgument(reducerArg,
-              new FunctionParam(0, reducerArg.getLexeme(), false));
+
+          for (Token<?> reducerArg : reducerArgs) {
+            getCodeGeneratorWithTimes().onLambdaArgument(reducerArg,
+                new FunctionParam(0, reducerArg.getLexeme(), false));
+          }
           getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
           statements();
           getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+          withMetaEnd(Constants.ARITIES_META, Long.valueOf(reducerArgs.size()));
           getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
         }
 

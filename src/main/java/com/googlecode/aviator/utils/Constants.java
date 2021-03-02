@@ -14,6 +14,7 @@ public class Constants {
   public static final Token<?> ReducerContFn = new Variable("__reducer_cont", 0, -1);
   public static final Token<?> ReducerReturnFn = new Variable("__reducer_return", 0, -1);
   public static final Variable ReducerFn = new Variable("__reducer_callcc", 0, -1);
+  public static final Variable WithMetaFn = new Variable("with_meta", 0, -1);
   public static final String PARAMS_META = "params";
   public static final String SCOPE_META = "newLexicalScope";
   public static final String INHERIT_ENV_META = "inheritEnv";
@@ -42,6 +43,9 @@ public class Constants {
    */
   public static final String INTER_META = "hasInterpolation";
   public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
+
+  // runtime metadata keys
+  public static final String ARITIES_META = "arities";
 
   private Constants() {
 

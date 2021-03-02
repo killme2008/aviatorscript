@@ -273,6 +273,8 @@ public class TestScripts {
       assertEquals(9, testScript("for5.av"));
     }
 
+    testScript("for6.av");
+
     {
       // for null sequence
       assertEquals(10, testScript("for_null.av"));
