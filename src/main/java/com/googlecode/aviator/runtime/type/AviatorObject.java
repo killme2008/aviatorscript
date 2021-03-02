@@ -16,6 +16,8 @@
 package com.googlecode.aviator.runtime.type;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompareNotSupportedException;
@@ -34,6 +36,31 @@ import com.googlecode.aviator.utils.Utils;
  *
  */
 public abstract class AviatorObject implements Serializable {
+
+  protected Map<Object, Object> metadata = Collections.emptyMap();
+
+  public Map<Object, Object> getMetadata() {
+    return this.metadata;
+  }
+
+  public AviatorObject withMeta(final Object key, final Object value) {
+    if (this.metadata.isEmpty()) {
+      this.metadata = new HashMap<Object, Object>();
+    }
+    this.metadata.put(key, value);
+    return this;
+  }
+
+  public Object meta(final Object key) {
+    return this.metadata.get(key);
+  }
+
+  public AviatorObject withoutMeta(final Object key) {
+    this.metadata.remove(key);
+    return this;
+  }
+
+
   private static final long serialVersionUID = -6006961429175160001L;
 
   public int compare(final AviatorObject other, final Map<String, Object> env) {

@@ -36,6 +36,19 @@ public class TestUtils {
     }
   }
 
+  static public void assertSame(final String message, final Object expect, final Object actual) {
+    if (expect != actual) {
+      throw new AssertionFailedError(message);
+    }
+  }
+
+  static public void assertSame(final Object expect, final Object actual) {
+    if (expect != actual) {
+      throw new AssertionFailedError(
+          "Expect " + expect + " the same with " + actual + ", but it's not.");
+    }
+  }
+
   public static void assertListEquals(final List<?> expected, final List<?> real) {
     if (expected.size() != real.size()) {
       throw new AssertionFailedError("Expect " + expected + " , but actual was " + real);
@@ -82,8 +95,9 @@ public class TestUtils {
     if (Objects.equals(expected, real)) {
       return;
     }
-    throw new AssertionFailedError("Expect " + expected + "(" + expected.getClass()
-        + "), but actual was " + real + "(" + real.getClass() + ")");
+    throw new AssertionFailedError(
+        "Expect " + expected + "(" + (expected == null ? null : expected.getClass())
+            + "), but actual was " + real + "(" + (real == null ? null : real.getClass()) + ")");
   }
 
   public static void assertTrue(final Boolean bool) {
