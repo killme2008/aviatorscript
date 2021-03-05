@@ -713,6 +713,8 @@ public class ExpressionParser implements Parser {
       if (prev.getType() == TokenType.Variable && expectChar('(')) {
         if (prev == Variable.LAMBDA) {
           lambda(false);
+        } else if (prev == Variable.FN) {
+          lambda(true);
         } else {
           method(prev);
         }
@@ -1206,17 +1208,24 @@ public class ExpressionParser implements Parser {
   private void fnStatement() {
     move(true);
 
-    checkVariableName(this.lookhead);
-    checkFunctionName(this.lookhead, true);
-    getCodeGeneratorWithTimes().onConstant(this.lookhead.withMeta(Constants.INIT_META, true)
-        .withMeta(Constants.TYPE_META, CompileTypes.Function));
-    move(true);
-    if (!expectChar('(')) {
-      reportSyntaxError("expect '(' after function name");
+    if (expectChar('(')) {
+      // Anonymous function
+      lambda(true);
+    } else {
+
+      checkVariableName(this.lookhead);
+      checkFunctionName(this.lookhead, true);
+      getCodeGeneratorWithTimes().onConstant(this.lookhead.withMeta(Constants.INIT_META, true)
+          .withMeta(Constants.TYPE_META, CompileTypes.Function));
+      move(true);
+      if (!expectChar('(')) {
+        reportSyntaxError("expect '(' after function name");
+      }
+      lambda(true);
+      ensureFeatureEnabled(Feature.Assignment);
+      getCodeGeneratorWithTimes()
+          .onAssignment(currentToken().withMeta(Constants.DEFINE_META, true));
     }
-    lambda(true);
-    ensureFeatureEnabled(Feature.Assignment);
-    getCodeGeneratorWithTimes().onAssignment(currentToken().withMeta(Constants.DEFINE_META, true));
   }
 
   private void checkFunctionName(final Token<?> token, final boolean warnOnExists) {

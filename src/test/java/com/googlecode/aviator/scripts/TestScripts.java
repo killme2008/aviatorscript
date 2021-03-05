@@ -69,6 +69,11 @@ public class TestScripts {
   }
 
   @Test
+  public void testLambda() {
+    testScript("lambda.av");
+  }
+
+  @Test
   public void testArray() {
     testScript("array.av");
   }
