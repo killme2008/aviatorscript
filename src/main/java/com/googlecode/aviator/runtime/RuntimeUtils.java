@@ -6,6 +6,7 @@ import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.runtime.function.internal.UnpackingArgsFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -41,6 +42,19 @@ public final class RuntimeUtils {
     }
     return AviatorEvaluator.getInstance();
 
+  }
+
+  /**
+   * Wrap the function to unpacking-arguments function.
+   *
+   * @param fn
+   * @return
+   */
+  public static final AviatorFunction unpackArgsFunction(final AviatorFunction fn) {
+    if (fn instanceof UnpackingArgsFunction) {
+      return fn;
+    }
+    return new UnpackingArgsFunction(fn);
   }
 
   /**

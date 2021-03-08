@@ -1,0 +1,48 @@
+fn add(a, b) {
+ a + b
+}
+
+let list = seq.list(1, 2);
+j.assertEquals(3, add(*list));
+
+let a = tuple(3, 4);
+j.assertEquals(7, add(*a));
+
+try{
+  add(a);
+  j.fail();
+} catch(e) {
+  pst(e);
+}
+
+fn fun(a, b, c, d) {
+  a*b + c*d
+}
+
+try{
+  fun(a, list);
+  j.fail();
+} catch(e) {
+  pst(e);
+}
+
+j.assertEquals(14, fun(*a, *list));
+
+fn test(a, b, &args) {
+  let sum = a + b;
+  
+  for arg in args {
+    sum  = sum + arg;
+  }
+  return sum;
+}
+
+j.assertEquals(10, test(1, 2, *a));
+j.assertEquals(6, test(1, 2, *list));
+
+try{
+  test(1, 2, a);
+  j.fail();
+} catch(e) {
+  pst(e);
+}

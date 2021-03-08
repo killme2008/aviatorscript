@@ -39,9 +39,12 @@ public class Constants {
   public static final String INIT_META = "isInitialized";
   public static final String TYPE_META = "type";
   /**
-   * Whether string has interpolation point.
+   * Compiled-time metadata
    */
+
+  // Whether string has interpolation point.
   public static final String INTER_META = "hasInterpolation";
+  public static final String UNPACK_ARGS = "unpackingArgs";
   public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
 
   // runtime metadata keys

@@ -912,27 +912,68 @@ public class ExpressionParser implements Parser {
       move(true);
       int paramIndex = 0;
       List<FunctionArgument> params = null;
+      boolean unpackArguments = false;
       if (this.captureFuncArgs) {
         params = new ArrayList<>();
       }
       int lastTokenIndex = getLookheadStartIndex();
       if (!expectChar(')')) {
+
+        boolean isPackArgs = false;
+        if (expectChar('*')) {
+          move(true);
+          if (expectChar('*') || expectChar(',')) {
+            // binary operation as argument
+            back();
+          } else {
+            unpackArguments = true;
+            withMetaBegin();
+            isPackArgs = true;
+          }
+        }
+
         ternary();
+
+        if (isPackArgs) {
+          withMetaEnd(Constants.UNPACK_ARGS, true);
+        }
+
         getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
         if (this.captureFuncArgs) {
           params.add(new FunctionArgument(paramIndex++, getParamExp(lastTokenIndex)));
         }
         while (expectChar(',')) {
           move(true);
+          isPackArgs = false;
           lastTokenIndex = getLookheadStartIndex();
+          if (expectChar('*')) {
+            move(true);
+            if (expectChar('*') || expectChar(',')) {
+              // binary operation as argument
+              back();
+            } else {
+              unpackArguments = true;
+              withMetaBegin();
+              isPackArgs = true;
+            }
+          }
+
           if (!ternary()) {
             reportSyntaxError("invalid argument");
           }
+
+          if (isPackArgs) {
+            withMetaEnd(Constants.UNPACK_ARGS, true);
+          }
+
           getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
           if (this.captureFuncArgs) {
             params.add(new FunctionArgument(paramIndex++, getParamExp(lastTokenIndex)));
           }
         }
+      }
+      if (unpackArguments) {
+        methodName.withMeta(Constants.UNPACK_ARGS, true);
       }
       if (expectChar(')')) {
         getCodeGeneratorWithTimes()

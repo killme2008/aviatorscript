@@ -1332,6 +1332,12 @@ public class ASMCodeGenerator implements CodeGenerator {
           "wrapTrace",
           "(Lcom/googlecode/aviator/runtime/type/AviatorFunction;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
     }
+
+    if (lookhead.getMeta(Constants.UNPACK_ARGS, false)) {
+      this.mv.visitMethodInsn(INVOKESTATIC, RUNTIME_UTILS, "unpackArgsFunction",
+          "(Lcom/googlecode/aviator/runtime/type/AviatorFunction;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
+    }
+
     loadEnv();
     this.methodMetaDataStack.push(new MethodMetaData(outtterMethodName));
   }
