@@ -357,6 +357,7 @@ public class TestScripts {
     assertEquals(55, testScript("fibonacci.av", "n", 10));
     assertEquals(610, testScript("fibonacci.av", "n", 15));
     assertEquals(6765, testScript("fibonacci.av", "n", 20));
+    testScript("unpacking_arguments.av");
   }
 
   @Test

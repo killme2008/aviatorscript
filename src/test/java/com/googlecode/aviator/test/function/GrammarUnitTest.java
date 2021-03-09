@@ -393,7 +393,7 @@ public class GrammarUnitTest {
   @Test
   public void testIssue87() {
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, true);
-    assertEquals(1, (long) AviatorEvaluator.execute("long(1.2)"));
+    assertEquals(1L, (long) AviatorEvaluator.execute("long(1.2)"));
     AviatorEvaluator.setOption(Options.ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL, false);
   }
 

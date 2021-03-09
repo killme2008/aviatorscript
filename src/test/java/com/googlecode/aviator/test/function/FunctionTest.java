@@ -14,8 +14,8 @@
  **/
 package com.googlecode.aviator.test.function;
 
-import static com.googlecode.aviator.TestUtils.assertEquals;
 import static com.googlecode.aviator.TestUtils.assertArrayEquals;
+import static com.googlecode.aviator.TestUtils.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -1214,7 +1214,7 @@ public class FunctionTest {
     Assert.assertArrayEquals(new short[] {-2, 3, 100},
         (short[]) AviatorEvaluator.execute("seq.array(short, -2, 3, 100)"));
 
-    assertEquals(101,
+    assertEquals(101L,
         (long) AviatorEvaluator.execute("reduce(seq.array(short, -2, 3, 100), +, 0)"));
   }
 
