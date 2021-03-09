@@ -1,0 +1,30 @@
+## examples/unpacking_args.av
+
+fn add(a, b) {
+ a + b
+}
+
+let list = seq.list(1, 2);
+p(add(*list));
+
+fn test(a, b, c, d) {
+  a * b + c * d
+}
+let a = tuple(1, 2);
+let list = seq.list(3, 4);
+
+p(test(*a, *list));
+
+fn average(&args) {
+    return sum(*args) / count(args);
+}
+
+fn sum(&args) {
+    s = 0.0;
+    for arg in args {
+        s = s + arg;
+    }
+    return s;
+}
+
+p(average(1, 2, 3, 4));

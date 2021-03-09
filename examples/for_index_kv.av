@@ -1,0 +1,23 @@
+## examples/for_index_kv.av
+
+let a = tuple(1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+for i, x in a {
+  assert(i + 1 == x);
+  p("a[#{i}] = #{x}");
+}
+
+let m = seq.map("a", 1, "b", 2, "c", 3);
+
+for k, v in m {
+  p("#{k} = #{v}");
+  if k == "a" {
+    assert(v == 1);
+  }elsif k == 'b' {
+    assert(v == 2);
+  }elsif k == 'c' {
+    assert(v == 3);
+  }else {
+    throw "should not happen";
+  }
+}

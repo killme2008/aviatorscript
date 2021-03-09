@@ -26,3 +26,25 @@ println("after assignment:");
 for x in a {
   println(x);
 }
+
+
+## create multidimensional array
+
+let a = seq.array_of(long, 3, 2);
+
+assert(3 == count(a));
+assert(2 == count(a[0]));
+
+let x = 0;
+for i in range(0, 3) {
+  for j in range(0, 2) {
+     a[i][j] = x;
+     x = x + 1;
+  }
+}
+
+for i in range(0, 3) {
+  for j in range(0, 2) {
+    p("a[#{i}][#{j}] = #{a[i][j]}");
+  }
+}

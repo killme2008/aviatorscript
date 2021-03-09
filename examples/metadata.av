@@ -1,0 +1,13 @@
+let a = 1;
+
+## retrieve meta ,null if not found
+p(meta(a));
+
+## associate key/value metadata to any objects by with_meta(obj, key, value)
+a = with_meta(a, "key", seq.list(1, 2, 3));
+p(meta(a));  ## {"key" => [1, 2, 3]}
+p(meta(a, "key")); ## [1, 2, 3]
+
+## remove metadata by without_meta(obj, key)
+a = without_meta(a, "key");
+p(meta(a));

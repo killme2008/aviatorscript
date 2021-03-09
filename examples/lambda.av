@@ -4,9 +4,14 @@ let three = (lambda (x,y) -> x + y end)(1, 2);
 println(three);
 
 let add = lambda (x,y) ->
-  x + y 
+  x + y
 end;
 
 three = add(1, 2);
 println(three);
 
+## defined by fn syntax(only valid since 5.2.4)
+
+let add = fn(x, y) { x + y };
+
+p(add(99, 1));
