@@ -30,9 +30,9 @@
 
 # News
 
+* [5.2.4](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.4)，unpacking arguments（类 python 语法）、使用 `fn` 定义匿名函数和改进 for 语句支持索引、KV 键值等。
 * [5.2.3](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.3)，移除 commons-beantuils、性能优化和修复 `AviatorString#toString` 打印警告日志等。
 * [5.2.2](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.2)，修复获取未初始化全局变量方法、增加默认缓存模式以及静态访问语法开关等。
-* [5.2.1](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.1)，修复字符串插值某些情况下的编译错误、修复潜在内存泄漏隐患以及允许直接调用静态方法等。
 
 # Dependency
 
