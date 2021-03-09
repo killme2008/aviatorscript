@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import com.googlecode.aviator.TestUtils;
 import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.TestUtils;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.StandardError;
 import com.googlecode.aviator.runtime.JavaMethodReflectionFunctionMissing;
@@ -66,6 +66,16 @@ public class TestScripts {
     testLib("math");
     testLib("map");
     testLib("var");
+  }
+
+  @Test
+  public void testLambda() {
+    testScript("lambda.av");
+  }
+
+  @Test
+  public void testArray() {
+    testScript("array.av");
   }
 
   @Test
@@ -267,6 +277,8 @@ public class TestScripts {
       // for statement values
       assertEquals(9, testScript("for5.av"));
     }
+
+    testScript("for6.av");
 
     {
       // for null sequence

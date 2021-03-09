@@ -20,6 +20,7 @@ fi
 ORIGINAL_PWD="$PWD"
 
 export AVIATOR_HOME=${AVIATOR_HOME:-"$HOME/.aviatorscript"}
+export AVIATOR_DEPS=${AVIATOR_DEPS:-"$AVIATOR_HOME/deps"}
 
 if [ "$OSTYPE" = "cygwin" ]; then
     export AVIATOR_HOME=`cygpath -w $AVIATOR_HOME`
@@ -48,7 +49,11 @@ done
 BIN_DIR="$(dirname "$SCRIPT")"
 
 # Not running from a checkout
-CLASSPATH="$CLASSPATH:$AVIATOR_JAR"
+CLASSPATH="$CLASSPATH:$AVIATOR_JAR:$ORIGINAL_PWD"
+
+if [ -d "$AVIATOR_DEPS" ]; then
+    CLASSPATH="$CLASSPATH:$(ls $AVIATOR_DEPS/*.jar 2> /dev/null | tr '\n' :)"
+fi
 
 if [ ! -r "$AVIATOR_JAR" -a "$1" != "self-install" ]; then
     "$0" self-install
@@ -81,6 +86,7 @@ if [ "$1" = "self-install" ]; then
     echo "Downloading AviatorScript now..."
     AVIATOR_DIR=`dirname "$AVIATOR_JAR"`
     mkdir -p "$AVIATOR_DIR"
+    mkdir -p "$AVIATOR_DEPS"
     AVIATOR_URL="https://github.com/killme2008/aviator/raw/master/downloads/aviator-$AVIATOR_VERSION.jar"
     $HTTP_CLIENT "$AVIATOR_JAR" "$AVIATOR_URL"
     if [ $? != 0 ]; then

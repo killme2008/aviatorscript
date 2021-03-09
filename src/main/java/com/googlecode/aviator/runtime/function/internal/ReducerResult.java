@@ -37,6 +37,7 @@ public class ReducerResult extends AviatorRuntimeJavaType {
     super(obj);
     this.state = state;
     this.obj = obj;
+    this.metadata = obj.getMetadata();
   }
 
   @Override

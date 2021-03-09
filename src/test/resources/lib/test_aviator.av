@@ -316,6 +316,30 @@ fn test_is_distinct() {
    j.assertFalse(is_distinct(seq.list(-1, 1, 2, -1, 100)));
 }
 
+fn test_meta(){
+   tests = tests + 1;
+   
+  j.assertNull(meta(1));
+  let a = 1;
+  j.assertNull(meta(a));
+  
+  j.assertEquals("test", meta(with_meta(1, "a", "test"), "a"));
+  j.assertNull(meta(a));
+  j.assertSame(a, with_meta(a, "a key", 100));
+  j.assertEquals(100,  meta(a, "a key"));
+  j.assertNull(meta(a, "another key"));
+  
+  let m  = meta(a);
+  j.assertTrue(is_a(m, java.util.HashMap));
+  j.assertEquals(1, count(m));
+  j.assertEquals(100, m["a key"]);
+  
+  j.assertSame(a, without_meta(a, "a key"));
+  j.assertNull(meta(a));
+  j.assertNull(meta(a, "a key"));
+  j.assertSame(a, without_meta(a, "not exists"));
+}
+
 test_take_while();
 test_drop_while();
 test_concat();
@@ -334,5 +358,6 @@ test_static_fields();
 test_new_static_class();
 test_static_methods();
 test_is_distinct();
+test_meta();
 
-j.assertEquals(18, tests);
+j.assertEquals(19, tests);

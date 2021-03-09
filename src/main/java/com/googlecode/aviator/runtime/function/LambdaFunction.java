@@ -160,6 +160,12 @@ public final class LambdaFunction extends AbstractVariadicFunction {
       assert (parentEnv == this.context);
       env = (Env) parentEnv;
     }
+
+    if (args.length != this.params.size()) {
+      throw new IllegalArgumentException("Wrong number of args(" + args.length + ") passed to "
+          + getName() + "(" + this.params.size() + ")");
+    }
+
     for (int i = 0; i < this.params.size(); i++) {
       FunctionParam param = this.params.get(i);
       final AviatorObject arg = args[i];

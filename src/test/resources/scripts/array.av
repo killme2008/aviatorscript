@@ -1,0 +1,41 @@
+let a = seq.array_of(long, 3);
+
+j.assertEquals(3, count(a));
+
+let x = 0;
+for i in a {
+  j.assertEquals("long", type(i));
+  j.assertEquals(0, i);
+  x = x + 1;
+}
+j.assertEquals(3, x);
+
+
+let a = seq.array_of(long, 3, 2);
+
+j.assertEquals(3, count(a));
+j.assertEquals(2, count(a[0]));
+
+let x = 0;
+for i in range(0, 3) {
+  for j in range(0, 2) {
+     a[i][j] = x;
+     x = x + 1;
+  }
+}
+j.assertEquals(6, x);
+
+let x = 0;
+for i in range(0, 3) {
+  for j in range(0, 2) {
+     j.assertEquals(x, a[i][j]);
+     x = x + 1;
+  }
+}
+j.assertEquals(6, x);
+
+let a = seq.array_of(long, 3, 2, 4, 5);
+
+j.assertEquals(3, count(a));
+j.assertEquals(2, count(a[0]));
+j.assertEquals(4, count(a[0][0]));

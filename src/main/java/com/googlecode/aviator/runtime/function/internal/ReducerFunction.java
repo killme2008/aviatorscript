@@ -6,6 +6,7 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.Range;
@@ -44,9 +45,25 @@ public class ReducerFunction extends AbstractFunction {
     long c = 0;
 
     if (coll != Range.LOOP) {
+
+      long arities = (long) arg2.meta(Constants.ARITIES_META);
+      long index = 0;
+      boolean unboxEntry =
+          arities == 2 && coll != null && Map.class.isAssignableFrom(coll.getClass());
       // for..in loop
       for (Object obj : RuntimeUtils.seq(coll, env)) {
-        result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
+        if (arities == 1) {
+          result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(obj));
+        } else {
+          if (unboxEntry) {
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>) obj;
+            result = iteratorFn.call(env, AviatorRuntimeJavaType.valueOf(entry.getKey()),
+                AviatorRuntimeJavaType.valueOf(entry.getValue()));
+          } else {
+            result = iteratorFn.call(env, AviatorLong.valueOf(index++),
+                AviatorRuntimeJavaType.valueOf(obj));
+          }
+        }
         if (!(result instanceof ReducerResult)) {
           continue;
         }

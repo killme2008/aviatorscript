@@ -1,3 +1,19 @@
+let r = range(10, 0);
+assert(count(r) == 0);
+
+for x in r {
+  throw "should not happen";
+}
+
+let r = range(10, 0, -1);
+assert(count(r) == 10);
+
+let i = 10;
+for x in r {
+  assert(x == i);
+  i = i - 1;
+}
+
 let r = range(0, 10);
 
 assert(count(r) == 10);

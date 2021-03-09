@@ -139,6 +139,7 @@ import com.googlecode.aviator.runtime.function.system.IsAFunction;
 import com.googlecode.aviator.runtime.function.system.IsDefFunction;
 import com.googlecode.aviator.runtime.function.system.LongFunction;
 import com.googlecode.aviator.runtime.function.system.MaxFunction;
+import com.googlecode.aviator.runtime.function.system.MetaFunction;
 import com.googlecode.aviator.runtime.function.system.MinFunction;
 import com.googlecode.aviator.runtime.function.system.NowFunction;
 import com.googlecode.aviator.runtime.function.system.PrintFunction;
@@ -153,6 +154,8 @@ import com.googlecode.aviator.runtime.function.system.SysDateFunction;
 import com.googlecode.aviator.runtime.function.system.TupleFunction;
 import com.googlecode.aviator.runtime.function.system.TypeFunction;
 import com.googlecode.aviator.runtime.function.system.UndefFunction;
+import com.googlecode.aviator.runtime.function.system.WithMetaFunction;
+import com.googlecode.aviator.runtime.function.system.WithoutMetaFunction;
 import com.googlecode.aviator.runtime.module.IoModule;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -1011,6 +1014,9 @@ public final class AviatorEvaluatorInstance {
     addFunction(SeqFunction.INSTANCE);
     addFunction(EvalFunction.INSTANCE);
     addFunction(IsAFunction.INSTANCE);
+    addFunction(MetaFunction.INSTANCE);
+    addFunction(WithMetaFunction.INSTANCE);
+    addFunction(WithoutMetaFunction.INSTANCE);
   }
 
   private void loadInternalLibs() {

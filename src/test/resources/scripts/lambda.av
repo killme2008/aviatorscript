@@ -1,0 +1,25 @@
+##lambda syntax
+
+let three = (lambda (x,y) -> x + y end)(1, 2);
+
+j.assertEquals(3, three);
+
+let add = lambda (x,y) ->
+  x + y 
+end;
+
+three = add(1, 2);
+j.assertEquals(3, three);
+
+## fn syntax
+
+let three = (fn(x,y) { x + y })(1, 2);
+
+j.assertEquals(3, three);
+
+let add = fn(x,y) {
+  x + y 
+};
+
+three = add(1, 2);
+j.assertEquals(3, three);

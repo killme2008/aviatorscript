@@ -1,0 +1,32 @@
+let a = tuple(1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+let index = 0;
+for i, x in a {
+  j.assertEquals(i, index);
+  index = index + 1;
+  j.assertEquals(i + 1, x);
+}
+
+let m = seq.map("a", 1, "b", 2, "c", 3);
+
+for k, v in m {
+	if k == "a" {
+	  j.assertEquals(1, v);
+	}elsif k == 'b' {
+	  j.assertEquals(2, v); 
+	}elsif k == 'c' {
+	  j.assertEquals(3, v);
+	}else {
+	  j.fail();
+	}
+}
+
+
+let a = seq.list(1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+let index = 0;
+for i, x in a {
+  j.assertEquals(i, index);
+  index = index + 1;
+  j.assertEquals(i + 1, x);
+}
