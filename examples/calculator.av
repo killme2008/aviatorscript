@@ -118,7 +118,6 @@ fn factor(parser, tokens) {
 
   let t = parser.lookhead;
 
-
   if t.val == '(' {
     parser.move();
     expr(parser, tokens);
@@ -147,6 +146,10 @@ fn parse(s) {
   };
 
   expr(parser, tokens);
+
+  if parser.lookhead.type != EOF {
+    error(parser.lookhead);
+  }
 
   return tokens;
 }
