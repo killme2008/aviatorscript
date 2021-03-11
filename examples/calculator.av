@@ -157,7 +157,7 @@ fn calculate(s) {
   let operands = new Stack();
 
   for top in s {
-##p("#{top}: #{operands}");
+    ## p("#{top}: #{operands}");
 
     if top.type == NUMBER {
       push(operands, top.val);
