@@ -1,0 +1,201 @@
+## An example to cacluate string expression
+## examples/calculator.av
+
+use java.util.Stack;
+use java.text.{CharacterIterator, StringCharacterIterator};
+
+let NUMBER = 1;
+let CHAR = 2;
+let OP = 3;
+let EOF = 4;
+
+fn token(type, val, index) {
+  return seq.map("type", type, "val", val, "index", index);
+}
+
+let OP_ADD = token(OP, '+', -1);
+let OP_SUB = token(OP, '-', -1);
+let OP_MULTI = token(OP, '*', -1);
+let OP_DIV = token(OP, '/', -1);
+let OP_NEG = token(OP, 'neg', -1);
+
+fn is_digit(ch) {
+  return ch=~/\d/;
+}
+
+fn lexer(s) {
+  let it = new StringCharacterIterator(s);
+  let peek = current(it);
+  return fn() {
+    while true {
+      if peek == CharacterIterator.DONE {
+        return token(EOF, nil, getIndex(it));
+      }
+
+      if peek == ' ' || peek == '\t' {
+        peek  = next(it);
+        continue;
+      }
+      break;
+    }
+
+    if is_digit(peek) {
+      let index = getIndex(it);
+      let s = '' + peek;
+
+      peek = next(it);
+      while is_digit(peek) {
+        s = s + peek;
+        peek = next(it);
+      }
+
+      return token(NUMBER, Integer.parseInt(s), index);
+    } else {
+      let ch = peek;
+      let index = getIndex(it);
+      peek = next(it);
+      return token(CHAR, ch, index);
+    }
+  };
+}
+
+fn error(t) {
+  throw "syntax error at #{t}";
+}
+
+fn expr(parser, tokens) {
+  term(parser, tokens);
+
+  while true {
+    let t = parser.lookhead;
+
+    if t.val == '+' {
+      parser.move();
+      term(parser, tokens);
+      seq.add(tokens, OP_ADD);
+    } elsif t.val == '-' {
+      parser.move();
+      term(parser, tokens);
+      seq.add(tokens, OP_SUB);
+    } else {
+      break;
+    }
+  }
+}
+
+fn term(parser, tokens) {
+  unary(parser, tokens);
+
+  while true {
+    let t = parser.lookhead;
+
+    if t.val == '*' {
+      parser.move();
+      unary(parser, tokens);
+      seq.add(tokens, OP_MULTI);
+    } elsif t.val == '/' {
+      parser.move();
+      unary(parser, tokens);
+      seq.add(tokens, OP_DIV);
+    } else {
+      break;
+    }
+  }
+}
+
+fn unary(parser, tokens) {
+  let t = parser.lookhead;
+  if t.val == '-' {
+    parser.move();
+    unary(parser, tokens);
+    seq.add(tokens, OP_NEG);
+  } else {
+    factor(parser, tokens);
+  }
+}
+
+fn factor(parser, tokens) {
+
+  let t = parser.lookhead;
+
+
+  if t.val == '(' {
+    parser.move();
+    expr(parser, tokens);
+    t = parser.lookhead;
+    if t.val != ')'{
+      error(t);
+    }
+    parser.move();
+  } elsif t.type == NUMBER {
+    seq.add(tokens, t);
+    parser.move();
+  } else {
+    error(t);
+  }
+}
+
+fn parse(s) {
+  let tokens = seq.list();
+  let lexer = lexer(s);
+
+  let parser = seq.map();
+  parser.lookhead = lexer();
+
+  parser.move = fn() {
+    parser.lookhead = lexer();
+  };
+
+  expr(parser, tokens);
+
+  return tokens;
+}
+
+fn calculate(s) {
+  let s = parse(s);
+
+  let operands = new Stack();
+
+  for top in s {
+##p("#{top}: #{operands}");
+
+    if top.type == NUMBER {
+      push(operands, top.val);
+    }elsif top.type == EOF {
+      break;
+    } else {
+      assert(top.type == OP);
+
+      if top == OP_NEG {
+        let arg = pop(operands);
+        push(operands,  -arg);
+      } else{
+        let arg2 = pop(operands);
+        let arg1 = pop(operands);
+
+        if top == OP_ADD {
+          push(operands, arg1 + arg2);
+        } elsif top == OP_SUB {
+          push(operands, arg1 - arg2);
+        } elsif top == OP_MULTI {
+          push(operands, arg1 * arg2);
+        }else {
+          push(operands, arg1 / arg2);
+        }
+      }
+    }
+  }
+
+  if is_empty(operands) {
+    return nil;
+  } else {
+    return pop(operands);
+  }
+}
+
+p(calculate("1 + 12 * 3"));
+p(calculate("1 - 12 * 3"));
+p(calculate("(1 - 12) * 3"));
+p(calculate( "(1+(4+5+2)-3)+(6+8)"));
+p(calculate(" 2-1 + 2"));
+p(calculate(" 2--1 + -2"));
