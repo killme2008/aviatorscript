@@ -1,4 +1,4 @@
-# Aviator
+# AviatorScript
 
 [![Build Status](https://travis-ci.org/killme2008/aviatorscript.svg?branch=master)](https://travis-ci.org/killme2008/aviatorscript)
 [![Code Quality: Java](https://img.shields.io/lgtm/grade/java/g/killme2008/aviator.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/killme2008/aviator/context:java)
@@ -8,7 +8,7 @@
 
 ----------------------------------------
 
-`Aviator` is a lightweight, high performance scripting language hosted on the JVM.
+`AviatorScript` is a lightweight, high performance scripting language hosted on the JVM.
 It compiles script to java byte code and evaluate it on the fly.
 
 # Feature Intro
