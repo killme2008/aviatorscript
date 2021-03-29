@@ -318,7 +318,7 @@ public class Reflector {
     if (methods != null && !methods.isEmpty()) {
       Method method = methods.get(0);
       for (Method m : methods) {
-        if (method.getParameterTypes().length == 0) {
+        if (m.getParameterTypes().length == 0) {
           method = m;
           break;
         }
@@ -342,7 +342,7 @@ public class Reflector {
     if (methods != null && !methods.isEmpty()) {
       Method method = methods.get(0);
       for (Method m : methods) {
-        if (method.getParameterTypes().length == 0) {
+        if (m.getParameterTypes().length == 1) {
           method = m;
           break;
         }
