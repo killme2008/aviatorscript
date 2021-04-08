@@ -535,7 +535,8 @@ public class Env implements Map<String, Object> {
       if (readOnly) {
         return EMPTY_ENV;
       }
-      this.mOverrides = new HashMap<>();
+      this.mOverrides = new ArrayHashMap<>();
+      // this.mOverrides = new HashMap<>();
     }
     return this.mOverrides;
   }
