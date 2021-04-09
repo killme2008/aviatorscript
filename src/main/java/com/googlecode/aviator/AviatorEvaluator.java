@@ -17,6 +17,7 @@ package com.googlecode.aviator;
 
 import java.io.OutputStream;
 import java.math.MathContext;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.Options.Value;
@@ -112,7 +113,10 @@ public final class AviatorEvaluator {
     if (args != null && args.length % 2 != 0) {
       throw new IllegalArgumentException("Expect arguments number is even.");
     }
-    Map<String, Object> env = new ArrayHashMap<String, Object>();
+    Map<String, Object> env =
+        (args != null && args.length <= 16) ? new ArrayHashMap<String, Object>()
+            : new HashMap<String, Object>(args != null ? args.length : 16);
+
     if (args != null) {
       for (int i = 0; i < args.length; i += 2) {
         String key = (String) args[i];

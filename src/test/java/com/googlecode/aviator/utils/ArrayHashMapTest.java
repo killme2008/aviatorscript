@@ -4,10 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +21,62 @@ public class ArrayHashMapTest {
   @Before
   public void setup() {
     this.map = new ArrayHashMap<>();
+  }
+
+  @Test
+  public void testRandomKeys() {
+    List<String> keys = new ArrayList<String>();
+    Map<String, Integer> map = new ArrayHashMap<>();
+
+    for (int i = 0; i < 100; i++) {
+      String k = randKey();
+      map.put(k, i);
+      keys.add(k);
+      assertTrue(map.containsKey(k));
+      assertEquals(i, (int) map.get(k));
+    }
+
+    assertEquals(100, map.size());
+
+    Set<String> kset = map.keySet();
+    assertEquals(kset, new HashSet<>(keys));
+
+    for (int i = 0; i < 100; i++) {
+      String k = keys.get(i);
+      assertTrue(map.containsKey(k));
+      assertEquals(i, (int) map.get(k));
+
+      map.remove(k);
+      assertFalse(map.containsKey(k));
+      assertNull(map.get(k));
+    }
+    assertEquals(0, map.size());
+    for (int i = 0; i < 100; i++) {
+      assertNull(map.get(keys.get(i)));
+    }
+
+
+    keys.clear();
+    for (int i = 0; i < 10; i++) {
+      String k = randKey();
+      map.put(k, i);
+      keys.add(k);
+      assertTrue(map.containsKey(k));
+      assertEquals(i, (int) map.get(k));
+    }
+    assertEquals(10, map.size());
+    map.clear();
+    assertEquals(0, map.size());
+
+    for (int i = 0; i < 10; i++) {
+      assertNull(map.get(keys.get(i)));
+    }
+  }
+
+  private String randKey() {
+    byte[] bs = new byte[16];
+    ThreadLocalRandom.current().nextBytes(bs);
+    return new String(bs);
   }
 
   @Test
