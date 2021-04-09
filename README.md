@@ -30,9 +30,9 @@
 
 # News
 
+* [5.2.5](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.5)，调用 java 方法数值装箱类型自动转换、修复 bug 等。
 * [5.2.4](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.4)，unpacking arguments（类 python 语法）、使用 `fn` 定义匿名函数和改进 for 语句支持索引、KV 键值等。
 * [5.2.3](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.3)，移除 commons-beantuils、性能优化和修复 `AviatorString#toString` 打印警告日志等。
-* [5.2.2](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.2)，修复获取未初始化全局变量方法、增加默认缓存模式以及静态访问语法开关等。
 
 # Dependency
 

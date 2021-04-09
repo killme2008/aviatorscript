@@ -25,9 +25,9 @@ It compiles script to java byte code and evaluate it on the fly.
 
 # News
 
+* [5.2.5](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.5)，auto convert boxing types into aviator number types when invoking java methods and bug fixes etc.
 * [5.2.4](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.4)，unpacking arguments, define anonymous by `fn` and improve `for` statement etc.
 * [5.2.3](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.3)，Removed commons-beantuils dependency, performance turning and fixed  `AviatorString#toString` print warn log etc.
-* [5.2.2](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.2)，Fixed `Expression#getVariableNames()` returns wrong result, added `Feature.StaticMethods`, `Feature.StaticFields` etc.
 
 # Dependency
 
