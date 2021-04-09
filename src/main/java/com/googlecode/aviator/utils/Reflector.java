@@ -318,7 +318,7 @@ public class Reflector {
     if (methods != null && !methods.isEmpty()) {
       Method method = methods.get(0);
       for (Method m : methods) {
-        if (method.getParameterTypes().length == 0) {
+        if (m.getParameterTypes().length == 0) {
           method = m;
           break;
         }
@@ -342,7 +342,7 @@ public class Reflector {
     if (methods != null && !methods.isEmpty()) {
       Method method = methods.get(0);
       for (Method m : methods) {
-        if (method.getParameterTypes().length == 0) {
+        if (m.getParameterTypes().length == 1) {
           method = m;
           break;
         }
@@ -549,6 +549,23 @@ public class Reflector {
 
   public static Object boxArg(final Class<?> paramType, final Object arg) {
     if (!paramType.isPrimitive()) {
+      // processing box types
+      if (arg instanceof Number) {
+        Number n = (Number) arg;
+        if (paramType == Integer.class) {
+          return n.intValue();
+        } else if (paramType == Float.class) {
+          return n.floatValue();
+        } else if (paramType == Double.class) {
+          return n.doubleValue();
+        } else if (paramType == Long.class) {
+          return n.longValue();
+        } else if (paramType == Short.class) {
+          return n.shortValue();
+        } else if (paramType == Byte.class) {
+          return n.byteValue();
+        }
+      }
       return paramType.cast(arg);
     } else if (paramType == boolean.class) {
       return Boolean.class.cast(arg);

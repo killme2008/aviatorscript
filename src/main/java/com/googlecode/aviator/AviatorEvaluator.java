@@ -24,6 +24,7 @@ import com.googlecode.aviator.Options.Value;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
+import com.googlecode.aviator.utils.ArrayHashMap;
 import com.googlecode.aviator.utils.Utils;
 
 
@@ -112,7 +113,10 @@ public final class AviatorEvaluator {
     if (args != null && args.length % 2 != 0) {
       throw new IllegalArgumentException("Expect arguments number is even.");
     }
-    Map<String, Object> env = new HashMap<String, Object>(args != null ? args.length : 10);
+    Map<String, Object> env =
+        (args != null && args.length <= 16) ? new ArrayHashMap<String, Object>()
+            : new HashMap<String, Object>(args != null ? args.length : 16);
+
     if (args != null) {
       for (int i = 0; i < args.length; i += 2) {
         String key = (String) args[i];

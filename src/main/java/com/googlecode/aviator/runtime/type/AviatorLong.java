@@ -79,13 +79,15 @@ public class AviatorLong extends AviatorNumber {
 
   @Override
   public int innerCompare(final Map<String, Object> env, final AviatorNumber other) {
+    if (other.getAviatorType() == AviatorType.Long) {
+      return TypeUtils.comapreLong(longValue(), other.longValue());
+    }
+
     switch (other.getAviatorType()) {
       case BigInt:
         return toBigInt().compareTo(other.toBigInt());
       case Decimal:
         return toDecimal(env).compareTo(other.toDecimal(env));
-      case Long:
-        return TypeUtils.comapreLong(longValue(), other.longValue());
       case Double:
         return Double.compare(doubleValue(), other.doubleValue());
       default:

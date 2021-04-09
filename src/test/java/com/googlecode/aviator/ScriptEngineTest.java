@@ -13,6 +13,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.SimpleScriptContext;
 import org.junit.Before;
 import org.junit.Test;
+import com.googlecode.aviator.script.AviatorScriptEngine;
 
 public class ScriptEngineTest {
 
@@ -103,6 +104,15 @@ public class ScriptEngineTest {
 
     // execute the same script - but this time pass a different script context
     assertEquals("world", this.engine.eval("identity(x)", newContext));
+  }
+
+  @Test
+  public void testModule() throws Exception {
+    ((AviatorScriptEngine) this.engine).getEngine().addModule(PrintModule.class);
+    ScriptContext newContext = new SimpleScriptContext();
+    Bindings bindings = newContext.getBindings(ScriptContext.ENGINE_SCOPE);
+    bindings.put("x", 10);
+    this.engine.eval("let p=require('print'); p.print(x); p.print(10);", bindings);
   }
 
 }

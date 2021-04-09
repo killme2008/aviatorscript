@@ -71,6 +71,10 @@ public class ReducerFunction extends AbstractFunction {
         boolean breakOut = false;
         ReducerResult midResult = (ReducerResult) result;
         result = midResult.obj;
+
+        if (midResult.state == ReducerState.Empty) {
+          continue;
+        }
         switch (midResult.state) {
           case Break:
             breakOut = true;
@@ -97,6 +101,10 @@ public class ReducerFunction extends AbstractFunction {
         boolean breakOut = false;
         ReducerResult midResult = (ReducerResult) result;
         result = midResult.obj;
+
+        if (midResult.state == ReducerState.Empty) {
+          continue;
+        }
         switch (midResult.state) {
           case Break:
             breakOut = true;

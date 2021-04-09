@@ -85,11 +85,11 @@ public class AviatorString extends AviatorObject {
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {
     final StringBuilder sb = new StringBuilder(getLexeme(env));
 
-    if (other.getAviatorType() == AviatorType.Pattern) {
+    if (other.getAviatorType() != AviatorType.Pattern) {
+      sb.append(other.getValue(env));
+    } else {
       final AviatorPattern otherPatterh = (AviatorPattern) other;
       sb.append(otherPatterh.pattern.pattern());
-    } else {
-      sb.append(other.getValue(env));
     }
     return new AviatorStringBuilder(sb);
   }
@@ -117,19 +117,22 @@ public class AviatorString extends AviatorObject {
   @Override
   public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
     final String left = getLexeme(env);
+
+    if (other.getAviatorType() == AviatorType.String) {
+      final AviatorString otherString = (AviatorString) other;
+      final String right = otherString.getLexeme(env);
+      if (left != null && right != null) {
+        return left.compareTo(right);
+      } else if (left == null && right != null) {
+        return -1;
+      } else if (left != null && right == null) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
     switch (other.getAviatorType()) {
-      case String:
-        final AviatorString otherString = (AviatorString) other;
-        final String right = otherString.getLexeme(env);
-        if (left == null && right != null) {
-          return -1;
-        } else if (left != null && right == null) {
-          return 1;
-        } else if (left == null && right == null) {
-          return 0;
-        } else {
-          return left.compareTo(right);
-        }
       case JavaType:
         final AviatorJavaType javaType = (AviatorJavaType) other;
         final Object otherJavaValue = javaType.getValue(env);

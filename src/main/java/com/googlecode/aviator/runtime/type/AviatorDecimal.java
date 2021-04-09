@@ -43,12 +43,11 @@ public class AviatorDecimal extends AviatorNumber {
 
   @Override
   public AviatorObject innerSub(final Map<String, Object> env, final AviatorNumber other) {
-    switch (other.getAviatorType()) {
-      case Double:
-        return AviatorDouble.valueOf(doubleValue() - other.doubleValue());
-      default:
-        return AviatorDecimal.valueOf(
-            toDecimal(env).subtract(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    if (other.getAviatorType() != AviatorType.Double) {
+      return AviatorDecimal
+          .valueOf(toDecimal(env).subtract(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    } else {
+      return AviatorDouble.valueOf(doubleValue() - other.doubleValue());
     }
   }
 
@@ -61,61 +60,55 @@ public class AviatorDecimal extends AviatorNumber {
 
   @Override
   public AviatorObject innerMult(final Map<String, Object> env, final AviatorNumber other) {
-    switch (other.getAviatorType()) {
-      case Double:
-        return AviatorDouble.valueOf(doubleValue() * other.doubleValue());
-      default:
-        return AviatorDecimal.valueOf(
-            toDecimal(env).multiply(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    if (other.getAviatorType() != AviatorType.Double) {
+      return AviatorDecimal
+          .valueOf(toDecimal(env).multiply(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    } else {
+      return AviatorDouble.valueOf(doubleValue() * other.doubleValue());
     }
   }
 
 
   @Override
   public AviatorObject innerMod(final Map<String, Object> env, final AviatorNumber other) {
-    switch (other.getAviatorType()) {
-      case Double:
-        return AviatorDouble.valueOf(doubleValue() % other.doubleValue());
-      default:
-        return AviatorDecimal.valueOf(
-            toDecimal(env).remainder(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    if (other.getAviatorType() != AviatorType.Double) {
+      return AviatorDecimal.valueOf(
+          toDecimal(env).remainder(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    } else {
+      return AviatorDouble.valueOf(doubleValue() % other.doubleValue());
     }
   }
 
 
   @Override
   public AviatorObject innerDiv(final Map<String, Object> env, final AviatorNumber other) {
-    switch (other.getAviatorType()) {
-      case Double:
-        return AviatorDouble.valueOf(doubleValue() / other.doubleValue());
-      default:
-        return AviatorDecimal
-            .valueOf(toDecimal(env).divide(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    if (other.getAviatorType() != AviatorType.Double) {
+      return AviatorDecimal
+          .valueOf(toDecimal(env).divide(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    } else {
+      return AviatorDouble.valueOf(doubleValue() / other.doubleValue());
     }
   }
 
 
   @Override
   public AviatorNumber innerAdd(final Map<String, Object> env, final AviatorNumber other) {
-    switch (other.getAviatorType()) {
-      case Double:
-        return AviatorDouble.valueOf(doubleValue() + other.doubleValue());
-      default:
-        return AviatorDecimal
-            .valueOf(toDecimal(env).add(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    if (other.getAviatorType() != AviatorType.Double) {
+      return AviatorDecimal
+          .valueOf(toDecimal(env).add(other.toDecimal(env), RuntimeUtils.getMathContext(env)));
+    } else {
+      return AviatorDouble.valueOf(doubleValue() + other.doubleValue());
     }
   }
 
 
   @Override
   public int innerCompare(final Map<String, Object> env, final AviatorNumber other) {
-    switch (other.getAviatorType()) {
-      case Double:
-        return Double.compare(doubleValue(), other.doubleValue());
-      default:
-        return toDecimal(env).compareTo(other.toDecimal(env));
+    if (other.getAviatorType() != AviatorType.Double) {
+      return toDecimal(env).compareTo(other.toDecimal(env));
+    } else {
+      return Double.compare(doubleValue(), other.doubleValue());
     }
-
   }
 
 
