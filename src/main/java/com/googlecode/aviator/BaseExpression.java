@@ -18,7 +18,6 @@ import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
-import com.googlecode.aviator.utils.ArrayHashMap;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
@@ -296,7 +295,7 @@ public abstract class BaseExpression implements Expression {
   protected Env newEnv(final Map<String, Object> map, final boolean direct) {
     Env env;
     if (direct) {
-      env = new Env(map, map == Collections.EMPTY_MAP ? new ArrayHashMap<String, Object>() : map);
+      env = new Env(map, map == Collections.EMPTY_MAP ? new HashMap<String, Object>() : map);
     } else {
       env = new Env(map);
     }
