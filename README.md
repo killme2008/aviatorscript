@@ -98,8 +98,9 @@ The month is: 3
 
 # Links
 
-* downloads: <https://github.com/killme2008/aviator/releases>
-* documents: <https://www.yuque.com/boyan-avfmj/aviatorscript>
-* javadoc: <http://fnil.net/aviator/apidocs/>
-* author:  dennis (killme2008@gmail.com)
-* spring boot: <https://github.com/mengxiangrui007/spring-boot-rule-jsr94>
+* Releases: <https://github.com/killme2008/aviator/releases>
+* Documents: <https://www.yuque.com/boyan-avfmj/aviatorscript>
+* Changelog: <https://www.yuque.com/boyan-avfmj/aviatorscript/bggwx2>
+* Javadoc: <http://fnil.net/aviator/apidocs/>
+* Spring boot rule: <https://github.com/mengxiangrui007/spring-boot-rule-jsr94>
+* Idea plugin: <https://github.com/yanchangyou/aviatorscript-ideaplugin>
