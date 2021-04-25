@@ -39,6 +39,16 @@ public final class LambdaFunction extends AbstractVariadicFunction {
 
   private final String name;
 
+  // Whether to be installed in dispatch function.
+  private boolean installed;
+
+  public boolean isInstalled() {
+    return this.installed;
+  }
+
+  public void setInstalled(final boolean installed) {
+    this.installed = installed;
+  }
 
   public boolean isInheritEnv() {
     return this.inheritEnv;
@@ -89,27 +99,37 @@ public final class LambdaFunction extends AbstractVariadicFunction {
     return this.isVariadic;
   }
 
-
-
   @Override
   public AviatorObject call(final Map<String, Object> env) {
+    if (this.isVariadic && !this.installed) {
+      return variadicCall(env, true);
+    }
     return AviatorRuntimeJavaType.valueOf(this.expression.executeDirectly(newEnv(env)));
   }
 
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
+    if (this.isVariadic && !this.installed) {
+      return variadicCall(env, true, arg1);
+    }
     return AviatorRuntimeJavaType.valueOf(this.expression.executeDirectly(newEnv(env, arg1)));
   }
 
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2) {
+    if (this.isVariadic && !this.installed) {
+      return variadicCall(env, true, arg1, arg2);
+    }
     return AviatorRuntimeJavaType.valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2)));
   }
 
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2, final AviatorObject arg3) {
+    if (this.isVariadic && !this.installed) {
+      return variadicCall(env, true, arg1, arg2, arg3);
+    }
     return AviatorRuntimeJavaType
         .valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3)));
   }
@@ -117,6 +137,9 @@ public final class LambdaFunction extends AbstractVariadicFunction {
   @Override
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4) {
+    if (this.isVariadic && !this.installed) {
+      return variadicCall(env, true, arg1, arg2, arg3, arg4);
+    }
     return AviatorRuntimeJavaType
         .valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3, arg4)));
   }
@@ -125,6 +148,9 @@ public final class LambdaFunction extends AbstractVariadicFunction {
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
       final AviatorObject arg5) {
+    if (this.isVariadic && !this.installed) {
+      return variadicCall(env, true, arg1, arg2, arg3, arg4, arg5);
+    }
     return AviatorRuntimeJavaType
         .valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3, arg4, arg5)));
   }
@@ -134,6 +160,9 @@ public final class LambdaFunction extends AbstractVariadicFunction {
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
       final AviatorObject arg5, final AviatorObject arg6) {
+    if (this.isVariadic && !this.installed) {
+      return variadicCall(env, true, arg1, arg2, arg3, arg4, arg5, arg6);
+    }
     return AviatorRuntimeJavaType
         .valueOf(this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3, arg4, arg5, arg6)));
   }
@@ -143,6 +172,9 @@ public final class LambdaFunction extends AbstractVariadicFunction {
   public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
       final AviatorObject arg2, final AviatorObject arg3, final AviatorObject arg4,
       final AviatorObject arg5, final AviatorObject arg6, final AviatorObject arg7) {
+    if (this.isVariadic && !this.installed) {
+      return variadicCall(env, true, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    }
     return AviatorRuntimeJavaType.valueOf(
         this.expression.executeDirectly(newEnv(env, arg1, arg2, arg3, arg4, arg5, arg6, arg7)));
   }
@@ -180,9 +212,18 @@ public final class LambdaFunction extends AbstractVariadicFunction {
     return env;
   }
 
+  public AviatorObject variadicCall(final Map<String, Object> env, final boolean processArgs,
+      AviatorObject... args) {
+    if (processArgs) {
+      args = DispatchFunction.processVariadicArgs(env, args.length, this, args);
+    }
+
+    return AviatorRuntimeJavaType.valueOf(this.expression.executeDirectly(newEnv(env, args)));
+  }
+
   @Override
   public AviatorObject variadicCall(final Map<String, Object> env, final AviatorObject... args) {
-    return AviatorRuntimeJavaType.valueOf(this.expression.executeDirectly(newEnv(env, args)));
+    return this.variadicCall(env, false, args);
   }
 
 }

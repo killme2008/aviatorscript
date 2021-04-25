@@ -130,6 +130,12 @@ fn is_empty(s) {
   count(s) == 0
 }
 
+fn partial(f, &args) {
+  return fn(&remaining) {
+    return f(*args, *remaining);
+  };
+}
+
 exports.take_while = take_while;
 exports.drop_while = drop_while;
 exports.repeat = repeat;
@@ -140,3 +146,4 @@ exports.concat = concat;
 exports.constantly = constantly;
 exports.is_empty = is_empty;
 exports.is_distinct = is_distinct;
+exports.partial = partial;

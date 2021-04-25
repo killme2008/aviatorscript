@@ -340,6 +340,23 @@ fn test_meta(){
   j.assertSame(a, without_meta(a, "not exists"));
 }
 
+fn add(&args) {
+  reduce(args, +, 0)
+}
+
+fn test_partial() {
+  tests = tests + 1;
+  let add_3 = partial(+, 3);
+  j.assertEquals(7, add_3(4));
+  j.assertEquals(103, add_3(100));
+  
+  let t = partial(add, 1, 2, 3);
+  j.assertEquals(6, t());
+  j.assertEquals(10, t(4));
+  j.assertEquals(15, t(4, 5));
+  j.assertEquals(21, t(4, 5, 6));  
+}
+
 test_take_while();
 test_drop_while();
 test_concat();
@@ -359,5 +376,6 @@ test_new_static_class();
 test_static_methods();
 test_is_distinct();
 test_meta();
+test_partial();
 
-j.assertEquals(19, tests);
+j.assertEquals(20, tests);
