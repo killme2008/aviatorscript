@@ -23,3 +23,6 @@ let add = fn(x,y) {
 
 three = add(1, 2);
 j.assertEquals(3, three);
+
+
+j.assertEquals(3, fn(x, y) { x + y} (1,2));
