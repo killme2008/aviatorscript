@@ -30,6 +30,11 @@ public class AviatorEvaluatorInstanceCompatibleUnitTest extends AviatorEvaluator
   }
 
   @Override
+  public void testAssignableClazzWhiteList() {
+    // ignore
+  }
+
+  @Override
   @Test
   public void testDefaultOptionValues() {
     assertEquals(this.instance.getOption(Options.TRACE_EVAL), false);
