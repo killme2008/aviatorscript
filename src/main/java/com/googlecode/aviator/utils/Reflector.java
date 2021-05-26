@@ -16,7 +16,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -371,7 +370,7 @@ public class Reflector {
       clearCache(rq, cache);
       results = new ConcurrentHashMap<String, PropertyFoundResult>();
       existsRef = cache.putIfAbsent(clazz,
-          new WeakReference<Map<String, PropertyFoundResult>>(results, rq));
+          new SoftReference<Map<String, PropertyFoundResult>>(results, rq));
     }
     if (existsRef == null) {
       return results;
