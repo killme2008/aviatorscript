@@ -154,10 +154,10 @@ public enum OperatorType {
         // swap arguments
         return args[1].match(args[0], env);
       case AND:
-        return args[0].booleanValue(env) && args[1].booleanValue(env) ? AviatorBoolean.TRUE
+        return (args[0].booleanValue(env) && args[1].booleanValue(env)) ? AviatorBoolean.TRUE
             : AviatorBoolean.FALSE;
       case OR:
-        return args[0].booleanValue(env) || args[1].booleanValue(env) ? AviatorBoolean.TRUE
+        return (args[0].booleanValue(env) || args[1].booleanValue(env)) ? AviatorBoolean.TRUE
             : AviatorBoolean.FALSE;
       case FUNC:
         // TODO
