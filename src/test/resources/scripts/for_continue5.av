@@ -1,0 +1,11 @@
+let y = 0;
+for x in range(0, a) {
+  if(x<10) {
+    continue;
+  }else {
+    let z = x;
+    z = z + 1;
+  }
+  y = y + x;
+}
+y

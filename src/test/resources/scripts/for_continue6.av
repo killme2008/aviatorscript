@@ -1,0 +1,14 @@
+let x = 0;
+for i in range(0, 10) {
+  if (i>3) {
+    if (i==4){
+	  continue;
+	}else {
+	  let y = i;
+	  y = y + 1;
+	}
+  }
+  x = x + i;
+}
+
+return x;

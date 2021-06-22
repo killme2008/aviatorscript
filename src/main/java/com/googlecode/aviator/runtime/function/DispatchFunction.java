@@ -41,6 +41,7 @@ public class DispatchFunction extends AbstractVariadicFunction {
     } else {
       this.functions.put(fn.getArity(), fn);
     }
+    fn.setInstalled(true);
   }
 
   @Override
@@ -67,25 +68,7 @@ public class DispatchFunction extends AbstractVariadicFunction {
     assert (arity + 1 >= arity);
 
     if (fn.isVariadic()) {
-      if (arity + 1 == fn.getArity()) {
-        AviatorObject[] newArgs = new AviatorObject[arity + 1];
-        System.arraycopy(args, 0, newArgs, 0, arity);
-        newArgs[arity] = AviatorRuntimeJavaType.valueOf(EMPTY_VAR_ARGS);
-
-        args = newArgs;
-      } else {
-        AviatorObject[] newArgs = new AviatorObject[fn.getArity()];
-        System.arraycopy(args, 0, newArgs, 0, fn.getArity() - 1);
-        Object[] varArgs = new Object[arity - fn.getArity() + 1];
-
-        for (int i = 0; i < varArgs.length; i++) {
-          varArgs[i] = args[fn.getArity() - 1 + i].getValue(env);
-        }
-
-        newArgs[fn.getArity() - 1] = AviatorRuntimeJavaType.valueOf(varArgs);
-
-        args = newArgs;
-      }
+      args = processVariadicArgs(env, arity, fn, args);
     }
 
     switch (fn.getArity()) {
@@ -155,6 +138,30 @@ public class DispatchFunction extends AbstractVariadicFunction {
             args[17], args[18], args[19], remainingArgs);
     }
 
+  }
+
+  static AviatorObject[] processVariadicArgs(final Map<String, Object> env, final int arity,
+      final LambdaFunction fn, AviatorObject[] args) {
+    if (arity + 1 == fn.getArity()) {
+      AviatorObject[] newArgs = new AviatorObject[arity + 1];
+      System.arraycopy(args, 0, newArgs, 0, arity);
+      newArgs[arity] = AviatorRuntimeJavaType.valueOf(EMPTY_VAR_ARGS);
+
+      args = newArgs;
+    } else {
+      AviatorObject[] newArgs = new AviatorObject[fn.getArity()];
+      System.arraycopy(args, 0, newArgs, 0, fn.getArity() - 1);
+      Object[] varArgs = new Object[arity - fn.getArity() + 1];
+
+      for (int i = 0; i < varArgs.length; i++) {
+        varArgs[i] = args[fn.getArity() - 1 + i].getValue(env);
+      }
+
+      newArgs[fn.getArity() - 1] = AviatorRuntimeJavaType.valueOf(varArgs);
+
+      args = newArgs;
+    }
+    return args;
   }
 
 }
