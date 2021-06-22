@@ -35,7 +35,8 @@ public class SeqGetFunction extends AbstractFunction {
     Object coll = arg1.getValue(env);
     Object key = arg2.getValue(env);
     if (coll == null) {
-      throw new NullPointerException("the collection of seq.get is null, which the value of key/index is `" + key + "`");
+      throw new NullPointerException(
+          "the collection of seq.get is null, which the value of key/index is `" + key + "`");
     }
     Class<?> clazz = coll.getClass();
 
