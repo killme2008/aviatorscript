@@ -247,6 +247,7 @@ public class TestScripts {
       assertEquals(100, testScript("for_break4.av", "a", 101));
       assertEquals(4, testScript("for_break5.av", "a", 5));
       assertEquals(100, testScript("for_break5.av", "a", 101));
+      assertEquals(3, testScript("for_break6.av", "a", 101));
     }
 
     {
@@ -263,6 +264,10 @@ public class TestScripts {
       assertEquals(108, testScript("for_continue4.av", "a", 51));
       assertEquals(10, testScript("for_continue4.av", "a", 11));
       assertEquals(21, testScript("for_continue4.av", "a", 12));
+
+      assertEquals(10, testScript("for_continue5.av", "a", 11));
+      assertEquals(21, testScript("for_continue5.av", "a", 12));
+      assertEquals(41, testScript("for_continue6.av"));
     }
 
     {
