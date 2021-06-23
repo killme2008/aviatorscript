@@ -1,7 +1,7 @@
 ## examples/load_qsort.av
 
-let q = load('examples/qsort.av');
-let q = load('examples/qsort.av');
+let q = load(__MODULE__.dir + '/qsort.av');
+let q = load(__MODULE__.dir + '/qsort.av');
 
 fn rand_list(n) {
   let a = seq.list();
