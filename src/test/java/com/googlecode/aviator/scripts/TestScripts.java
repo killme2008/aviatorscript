@@ -284,6 +284,7 @@ public class TestScripts {
     }
 
     testScript("for6.av");
+    testScript("for7.av");
 
     {
       // for null sequence
