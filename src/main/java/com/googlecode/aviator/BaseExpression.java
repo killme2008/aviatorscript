@@ -70,7 +70,8 @@ public abstract class BaseExpression implements Expression {
         populateFullNames();
       }
 
-      this.varNames = new ArrayList<>(this.varFullNames.size());
+      List<String> newVarNames = new ArrayList<>(this.varFullNames.size());
+
       Set<String> nameSet = new HashSet<>();
 
       Set<String> parentInitNames = new HashSet<>();
@@ -84,10 +85,11 @@ public abstract class BaseExpression implements Expression {
         String[] tmps = Constants.SPLIT_PAT.split(fName);
         String sName = tmps[0];
         if (!nameSet.contains(sName) && !parentInitNames.contains(sName)) {
-          this.varNames.add(sName);
+          newVarNames.add(sName);
           nameSet.add(sName);
         }
       }
+      this.varNames = newVarNames;
     }
   }
 
@@ -111,10 +113,13 @@ public abstract class BaseExpression implements Expression {
 
       });
 
-      this.varFullNames = new ArrayList<>(fullNames.size());
+      List<String> newFullNames = new ArrayList<>(fullNames.size());
       for (VariableMeta meta : metas) {
-        this.varFullNames.add(meta.getName());
+        newFullNames.add(meta.getName());
       }
+
+
+      this.varFullNames = newFullNames;
     }
   }
 
