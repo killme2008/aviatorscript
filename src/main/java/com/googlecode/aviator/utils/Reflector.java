@@ -250,7 +250,11 @@ public class Reflector {
         }
         return ret;
       } else {
-        return null;
+        if (type == PropertyType.StaticMethod) {
+          return null;
+        }
+        return throwNoSuchPropertyException(
+            "Property `" + name + "` not found in java bean: " + obj);
       }
     } catch (Throwable t) {
       if (!results.containsKey(name)) {

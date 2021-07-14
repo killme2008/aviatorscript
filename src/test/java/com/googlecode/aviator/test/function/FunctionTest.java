@@ -32,6 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
@@ -707,6 +709,39 @@ public class FunctionTest {
         new BigDecimal("99999999999999999999999999999999.99999999",
             RuntimeUtils.getMathContext(env)),
         AviatorEvaluator.exec("99999999999999999999999999999999.99999999M"));
+  }
+
+  @Test
+  public void testGetVariableNamesConcurrently() throws Exception {
+    final Expression exp = AviatorEvaluator.compile("{let a = 1; let b = b + 1; p(a+b);} c-a");
+
+    int threads = 30;
+
+    final CyclicBarrier barrier = new CyclicBarrier(threads + 1);
+    final AtomicInteger c = new AtomicInteger(0);
+    for (int i = 0; i < threads; i++) {
+      new Thread() {
+        @Override
+        public void run() {
+          try {
+            barrier.await();
+            List<String> vars = exp.getVariableNames();
+            assertEquals(3, vars.size());
+            assertEquals("b", vars.get(0));
+            assertEquals("c", vars.get(1));
+            assertEquals("a", vars.get(2));
+            c.incrementAndGet();
+            barrier.await();
+          } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+          }
+        }
+      }.start();
+    }
+    barrier.await();
+    barrier.await();
+    assertEquals(threads, c.get());
   }
 
   @Test
