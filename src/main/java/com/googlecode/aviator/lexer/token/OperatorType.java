@@ -90,17 +90,17 @@ public enum OperatorType {
 
   public final String token;
 
-  public final int operandCount;
+  public final int arity;
 
 
   OperatorType(final String token, final int operandCount) {
     this.token = token;
-    this.operandCount = operandCount;
+    this.arity = operandCount;
   }
 
   public AviatorObject eval(final AviatorObject[] args, final Map<String, Object> env) {
-    if (args.length < this.operandCount) {
-      throw new IllegalArityException("Expect " + this.operandCount + " parameters for " + name()
+    if (args.length < this.arity) {
+      throw new IllegalArityException("Expect " + this.arity + " parameters for " + name()
           + ", but have " + args.length + " arguments.");
     }
     switch (this) {
@@ -191,7 +191,7 @@ public enum OperatorType {
   }
 
 
-  public int getOperandCount() {
-    return this.operandCount;
+  public int getArity() {
+    return this.arity;
   }
 }

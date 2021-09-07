@@ -142,7 +142,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       if (token.getType() == TokenType.Operator) {
         final OperatorToken op = (OperatorToken) token;
         final OperatorType operatorType = op.getOperatorType();
-        final int operandCount = operatorType.getOperandCount();
+        final int operandCount = operatorType.getArity();
         switch (operatorType) {
           case FUNC:
           case INDEX:

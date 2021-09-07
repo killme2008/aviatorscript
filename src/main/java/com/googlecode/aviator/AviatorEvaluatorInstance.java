@@ -51,6 +51,7 @@ import com.googlecode.aviator.annotation.Import;
 import com.googlecode.aviator.annotation.ImportScope;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.code.InterpretCodeGenerator;
 import com.googlecode.aviator.code.NoneCodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
@@ -1052,11 +1053,11 @@ public final class AviatorEvaluatorInstance {
    * Compiled Expression cache
    */
   private final ConcurrentHashMap<String/* text expression */, FutureTask<Expression>/*
-                                                                                      * Compiled
-                                                                                      * expression
-                                                                                      * task
-                                                                                      */> expressionCache =
-      new ConcurrentHashMap<String, FutureTask<Expression>>();
+   * Compiled
+   * expression
+   * task
+   */> expressionCache =
+   new ConcurrentHashMap<String, FutureTask<Expression>>();
 
   private LRUMap<String, FutureTask<Expression>> expressionLRUCache;
 
@@ -1514,11 +1515,14 @@ public final class AviatorEvaluatorInstance {
     switch (getOptimizeLevel()) {
       case AviatorEvaluator.COMPILE:
         ASMCodeGenerator asmCodeGenerator =
-            new ASMCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
+        new ASMCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
         asmCodeGenerator.start();
         return asmCodeGenerator;
       case AviatorEvaluator.EVAL:
         return new OptimizeCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
+      case AviatorEvaluator.INTERPRET:
+        // TODO
+        return new InterpretCodeGenerator(this, null);
       default:
         throw new IllegalArgumentException("Unknow option " + getOptimizeLevel());
     }

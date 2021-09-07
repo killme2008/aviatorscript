@@ -217,6 +217,8 @@ public enum Options {
         int level = (int) val;
         if (level == AviatorEvaluator.EVAL) {
           return EVAL_VALUE;
+        } else if (level == AviatorEvaluator.INTERPRET) {
+          return INTERPRET_VALUE;
         } else {
           return COMPILE_VALUE;
         }
@@ -250,8 +252,9 @@ public enum Options {
       case ASSIGNABLE_ALLOWED_CLASS_SET:
         return val instanceof Set;
       case OPTIMIZE_LEVEL:
-        return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
-            || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
+        final int level = ((Integer) val).intValue();
+        return val instanceof Integer && (level == AviatorEvaluator.EVAL
+            || level == AviatorEvaluator.COMPILE || level == AviatorEvaluator.INTERPRET);
       case MAX_LOOP_COUNT:
         return val instanceof Long || val instanceof Integer;
       case MATH_CONTEXT:
@@ -271,6 +274,8 @@ public enum Options {
   public static final Value EVAL_VALUE = new Value(AviatorEvaluator.EVAL);
 
   public static final Value COMPILE_VALUE = new Value(AviatorEvaluator.COMPILE);
+
+  public static final Value INTERPRET_VALUE = new Value(AviatorEvaluator.INTERPRET);
 
   private static final Value FULL_FEATURE_SET = new Value(Feature.getFullFeatures());
   private static final boolean TRACE_EVAL_DEFAULT_VAL =
