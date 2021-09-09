@@ -3,6 +3,7 @@ package com.googlecode.aviator.code.interpreter;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
+import com.googlecode.aviator.InterpretExpression;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
 
@@ -18,11 +19,17 @@ public class Context {
   private int pcIndex = -1;
   private List<IR> instruments = Collections.emptyList();
   private final Env env;
+  private final InterpretExpression expression;
 
-  public Context(final List<IR> instruments, final Env env) {
+  public Context(final InterpretExpression exp, final List<IR> instruments, final Env env) {
+    this.expression = exp;
     this.instruments = instruments;
     this.env = env;
     next();
+  }
+
+  public InterpretExpression getExpression() {
+    return this.expression;
   }
 
   public Env getEnv() {

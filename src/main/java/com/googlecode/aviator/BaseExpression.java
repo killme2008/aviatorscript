@@ -14,10 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
+import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
+import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
@@ -45,6 +48,7 @@ public abstract class BaseExpression implements Expression {
       new ConcurrentHashMap<String, FutureTask<StringSegments>>();
 
   protected String sourceFile;
+  protected Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
 
 
   @Override
@@ -326,6 +330,22 @@ public abstract class BaseExpression implements Expression {
 
   protected Env newEnv(final Map<String, Object> map) {
     return newEnv(map, false);
+  }
+
+  public Map<String, LambdaFunctionBootstrap> getLambdaBootstraps() {
+    return this.lambdaBootstraps;
+  }
+
+  public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
+    this.lambdaBootstraps = lambdaBootstraps;
+  }
+
+  public LambdaFunction newLambda(final Env env, final String name) {
+    LambdaFunctionBootstrap bootstrap = this.lambdaBootstraps.get(name);
+    if (bootstrap == null) {
+      throw new ExpressionNotFoundException("Lambda " + name + " not found");
+    }
+    return bootstrap.newInstance(env);
   }
 
 }

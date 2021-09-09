@@ -57,7 +57,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.ClassExpression;
+import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.asm.ClassWriter;
@@ -834,7 +834,7 @@ public class ASMCodeGenerator implements CodeGenerator {
           ClassDefiner.defineClass(this.className, Expression.class, bytes, this.classLoader);
       Constructor<?> constructor =
           defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class, SymbolTable.class);
-      ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
+      BaseExpression exp = (BaseExpression) constructor.newInstance(this.instance,
           new ArrayList<VariableMeta>(this.variables.values()), this.symbolTable);
       exp.setLambdaBootstraps(this.lambdaBootstraps);
       exp.setFuncsArgs(this.funcsArgs);
@@ -1208,13 +1208,17 @@ public class ASMCodeGenerator implements CodeGenerator {
     this.pushOperand(1);
   }
 
-  private static class MethodMetaData {
-    int parameterCount = 0;
-    int variadicListIndex = -1;
+  public static class MethodMetaData {
+    public int parameterCount = 0;
+
+    public int variadicListIndex = -1;
+
+    public String methodName;
 
 
     public MethodMetaData(final String methodName) {
       super();
+      this.methodName = methodName;
     }
   }
 

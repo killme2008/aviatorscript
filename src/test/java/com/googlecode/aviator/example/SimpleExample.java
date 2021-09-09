@@ -8,7 +8,8 @@ import com.googlecode.aviator.Expression;
 
 public class SimpleExample {
   public static void main(final String[] args) throws Exception {
-    Long result = (Long) AviatorEvaluator.execute("1+2+3");
+    AviatorEvaluator.setOptimize(AviatorEvaluator.INTERPRET);
+    Long result = (Long) AviatorEvaluator.execute("1^3");
     System.out.println(result);
 
     String hello = (String) AviatorEvaluator.execute("'hello,' + name",

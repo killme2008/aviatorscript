@@ -8,11 +8,11 @@ import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.utils.Env;
 
-public class InterpreExpression extends BaseExpression {
+public class InterpretExpression extends BaseExpression {
 
   private final List<IR> instruments;
 
-  public InterpreExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
+  public InterpretExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
       final SymbolTable symbolTable, final List<IR> instruments) {
     super(instance, vars, symbolTable);
     this.instruments = instruments;
@@ -21,7 +21,7 @@ public class InterpreExpression extends BaseExpression {
 
   @Override
   public Object executeDirectly(final Map<String, Object> env) {
-    Context ctx = new Context(this.instruments, (Env) env);
+    Context ctx = new Context(this, this.instruments, (Env) env);
     IR ir = null;
     while ((ir = ctx.getPc()) != null) {
       ir.eval(ctx);
