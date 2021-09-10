@@ -355,7 +355,8 @@ public class InterpretCodeGenerator implements CodeGenerator {
 
   @Override
   public void onMethodName(final Token<?> lookhead) {
-    this.methodMetaDataStack.push(new MethodMetaData(lookhead.getLexeme()));
+    this.methodMetaDataStack.push(
+        new MethodMetaData(lookhead.getType() == TokenType.Delegate ? null : lookhead.getLexeme()));
   }
 
   @Override

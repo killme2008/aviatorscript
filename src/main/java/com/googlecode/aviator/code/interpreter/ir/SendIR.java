@@ -94,7 +94,13 @@ public class SendIR implements IR {
 
   @Override
   public void eval(final InterpretContext context) {
-    final AviatorFunction fn = RuntimeUtils.getFunction(context.getEnv(), this.name);
+    final AviatorFunction fn;
+    if (this.name == null) {
+      // anonymous function, pop from stack
+      fn = (AviatorFunction) context.pop();
+    } else {
+      fn = RuntimeUtils.getFunction(context.getEnv(), this.name);
+    }
 
     int i = this.arity;
     AviatorObject[] args = new AviatorObject[this.arity];

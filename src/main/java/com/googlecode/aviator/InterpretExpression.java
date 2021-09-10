@@ -36,7 +36,7 @@ public class InterpretExpression extends BaseExpression {
     InterpretContext ctx = new InterpretContext(this, this.instruments, (Env) env);
     IR ir = null;
     while ((ir = ctx.getPc()) != null) {
-      System.out.println(ir + " " + ctx.getOperands());
+      // System.out.println(ir + " " + ctx.getOperands());
       ir.eval(ctx);
       if (ir instanceof JumpIR) {
         if (ir != ctx.getPc()) {
