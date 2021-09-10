@@ -1,16 +1,19 @@
 package com.googlecode.aviator.code.interpreter.ir;
 
 
-import com.googlecode.aviator.code.interpreter.Context;
 import com.googlecode.aviator.code.interpreter.IR;
+import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.Token;
+import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.runtime.type.AviatorBigInt;
+import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorDecimal;
 import com.googlecode.aviator.runtime.type.AviatorDouble;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorLong;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorPattern;
 import com.googlecode.aviator.runtime.type.AviatorString;
 import com.googlecode.aviator.utils.TypeUtils;
@@ -30,7 +33,7 @@ public class LoadIR implements IR {
   }
 
   @Override
-  public void eval(final Context context) {
+  public void eval(final InterpretContext context) {
     if (this.token == null) {
       return;
     }
@@ -45,7 +48,7 @@ public class LoadIR implements IR {
         if (TypeUtils.isBigInt(number)) {
           context.push(AviatorBigInt.valueOf(this.token.getLexeme()));
         } else if (TypeUtils.isDecimal(number)) {
-          context.push(AviatorDecimal.valueOf(this.token.getLexeme()));
+          context.push(AviatorDecimal.valueOf(context.getEnv(), this.token.getLexeme()));
         } else if (TypeUtils.isDouble(number)) {
           context.push(AviatorDouble.valueOf(number.doubleValue()));
         } else {
@@ -59,11 +62,23 @@ public class LoadIR implements IR {
         context.push(new AviatorPattern((String) this.token.getValue(null)));
         break;
       case Variable:
-        context.push(new AviatorJavaType(this.token.getLexeme()));
+        if (this.token == Variable.TRUE) {
+          context.push(AviatorBoolean.TRUE);
+        } else if (this.token == Variable.FALSE) {
+          context.push(AviatorBoolean.FALSE);
+        } else if (this.token == Variable.NIL) {
+          context.push(AviatorNil.NIL);
+        } else {
+          context.push(new AviatorJavaType(this.token.getLexeme()));
+        }
         break;
       default:
         throw new ExpressionRuntimeException("Can't load " + this.token);
     }
+  }
 
+  @Override
+  public String toString() {
+    return "load " + this.token.getLexeme() + "[" + this.token.getType() + "]";
   }
 }

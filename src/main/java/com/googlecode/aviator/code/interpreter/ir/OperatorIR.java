@@ -1,7 +1,7 @@
 package com.googlecode.aviator.code.interpreter.ir;
 
-import com.googlecode.aviator.code.interpreter.Context;
 import com.googlecode.aviator.code.interpreter.IR;
+import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -76,7 +76,7 @@ public class OperatorIR implements IR {
   }
 
   @Override
-  public void eval(final Context context) {
+  public void eval(final InterpretContext context) {
     assert (this.op != OperatorType.FUNC);
     int arity = this.op.getArity();
 
@@ -88,4 +88,9 @@ public class OperatorIR implements IR {
     context.push(this.op.eval(args, context.getEnv()));
   }
 
+
+  @Override
+  public String toString() {
+    return this.op.name();
+  }
 }

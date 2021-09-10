@@ -7,5 +7,5 @@ package com.googlecode.aviator.code.interpreter;
  *
  */
 public interface IR {
-  void eval(Context context);
+  void eval(InterpretContext context);
 }

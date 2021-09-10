@@ -3,26 +3,25 @@ package com.googlecode.aviator.code.interpreter.ir;
 import com.googlecode.aviator.code.interpreter.IR;
 import com.googlecode.aviator.code.interpreter.InterpretContext;
 
-public class NewLambdaIR implements IR {
+public class VisitLabelIR implements IR {
+  private final Label label;
 
-  private final String lambdaName;
-
-
-
-  public NewLambdaIR(final String lambdaName) {
+  public VisitLabelIR(final Label label) {
     super();
-    this.lambdaName = lambdaName;
+    this.label = label;
   }
 
-
+  public Label getLabel() {
+    return this.label;
+  }
 
   @Override
   public void eval(final InterpretContext context) {
-    context.push(context.getExpression().newLambda(context.getEnv(), this.lambdaName));
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public String toString() {
-    return "new_lambda " + this.lambdaName;
+    return "visit_label " + this.label;
   }
 }

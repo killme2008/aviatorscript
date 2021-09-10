@@ -1,7 +1,7 @@
 package com.googlecode.aviator.code.interpreter.ir;
 
-import com.googlecode.aviator.code.interpreter.Context;
 import com.googlecode.aviator.code.interpreter.IR;
+import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -93,7 +93,7 @@ public class SendIR implements IR {
 
 
   @Override
-  public void eval(final Context context) {
+  public void eval(final InterpretContext context) {
     final AviatorFunction fn = RuntimeUtils.getFunction(context.getEnv(), this.name);
 
     int i = this.arity;
@@ -104,6 +104,11 @@ public class SendIR implements IR {
     }
 
     context.push(callFn(fn, args, this.arity, context.getEnv()));
+  }
+
+  @Override
+  public String toString() {
+    return "send " + this.name + ", " + this.arity;
   }
 
 }
