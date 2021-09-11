@@ -505,10 +505,8 @@ public class ASMCodeGenerator implements EvalCodeGenerator {
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
       this.mv.visitInsn(DUP);
       loadEnv();
-      String first = "TRUE";
       String second = "FALSE";
       if (opType == OperatorType.OR) {
-        first = "FALSE";
         second = "TRUE";
       }
 

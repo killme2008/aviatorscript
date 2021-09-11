@@ -7,16 +7,14 @@ import com.googlecode.aviator.EvalMode;
 import com.googlecode.aviator.Options;
 
 public class GrammarUnitTestWithInterpreter extends GrammarUnitTest {
-  private static EvalMode oldMode;
 
   @BeforeClass
   public static void setup() {
-    oldMode = AviatorEvaluator.getOptionValue(Options.EVAL_MODE).evalMode;
     AviatorEvaluator.setOption(Options.EVAL_MODE, EvalMode.INTERPRETER);
   }
 
   @AfterClass
   public static void tearDown() {
-    AviatorEvaluator.setOption(Options.EVAL_MODE, oldMode);
+    AviatorEvaluator.setOption(Options.EVAL_MODE, EvalMode.ASM);
   }
 }

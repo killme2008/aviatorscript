@@ -28,11 +28,12 @@ public class InterpretExpression extends BaseExpression {
   public Object executeDirectly(final Map<String, Object> env) {
     final boolean trace = RuntimeUtils.isTracedEval(env);
     if (trace) {
-      int lineNo = 0;
+      int pc = 0;
       RuntimeUtils.printlnTrace(env, "Expression instruments: ");
       for (IR ir : this.instruments) {
-        RuntimeUtils.printlnTrace(env, "    " + (lineNo++) + " " + ir.toString());
+        RuntimeUtils.printlnTrace(env, "    " + (pc++) + " " + ir.toString());
       }
+      RuntimeUtils.printlnTrace(env, "    " + pc + " return");
       RuntimeUtils.printlnTrace(env, "Execute instruments: ");
     }
 
@@ -53,8 +54,12 @@ public class InterpretExpression extends BaseExpression {
         break;
       }
     }
+    if (trace) {
+      RuntimeUtils.printlnTrace(env, "    return    <Stack, " + ctx.getOperands() + ">");
+    }
 
-    // assert (ctx.getOperands().size() <= 1);
+
+    assert (ctx.getOperands().size() <= 1);
     AviatorObject result = ctx.peek();
     if (result == null) {
       return null;

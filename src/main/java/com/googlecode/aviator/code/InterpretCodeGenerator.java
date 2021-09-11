@@ -103,7 +103,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
 
   private void visitLabel(final Label label) {
     this.currLabel = label;
-    this.instruments.add(new VisitLabelIR(label));
+    emit(new VisitLabelIR(label));
   }
 
   private void pushLabel0(final Label label) {
@@ -173,7 +173,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
 
   @Override
   public void genNewLambdaCode(final LambdaFunctionBootstrap bootstrap) {
-    this.instruments.add(new NewLambdaIR(bootstrap.getName()));
+    emit(new NewLambdaIR(bootstrap.getName()));
   }
 
   public InterpretCodeGenerator(final AviatorEvaluatorInstance instance, final String sourceFile,
@@ -187,9 +187,9 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
   @Override
   public void onAssignment(final Token<?> lookhead) {
     if (lookhead.getMeta(Constants.DEFINE_META, false)) {
-      this.instruments.add(OperatorIR.DEF);
+      emit(OperatorIR.DEF);
     } else {
-      this.instruments.add(OperatorIR.ASSIGN);
+      emit(OperatorIR.ASSIGN);
     }
   }
 
@@ -200,78 +200,83 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
 
   @Override
   public void onShiftRight(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.SHIFT_RIGHT);
+    emit(OperatorIR.SHIFT_RIGHT);
   }
 
   @Override
   public void onShiftLeft(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.SHIFT_LEFT);
+    emit(OperatorIR.SHIFT_LEFT);
   }
 
   @Override
   public void onUnsignedShiftRight(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.UNSIGNED_SHIFT_RIGHT);
+    emit(OperatorIR.UNSIGNED_SHIFT_RIGHT);
   }
 
   @Override
   public void onBitOr(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.BIT_OR);
+    emit(OperatorIR.BIT_OR);
   }
 
   @Override
   public void onBitAnd(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.BIT_AND);
+    emit(OperatorIR.BIT_AND);
   }
 
   @Override
   public void onBitXor(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.BIT_XOR);
+    emit(OperatorIR.BIT_XOR);
   }
 
   @Override
   public void onBitNot(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.BIT_NOT);
+    emit(OperatorIR.BIT_NOT);
   }
 
   @Override
   public void onAdd(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.ADD);
+    emit(OperatorIR.ADD);
   }
 
   @Override
   public void onSub(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.SUB);
+    emit(OperatorIR.SUB);
 
   }
 
   @Override
   public void onMult(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.MULT);
+    emit(OperatorIR.MULT);
   }
 
   @Override
   public void onExponent(final Token<?> loohead) {
-    this.instruments.add(OperatorIR.EXP);
+    emit(OperatorIR.EXP);
   }
 
   @Override
   public void onDiv(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.DIV);
+    emit(OperatorIR.DIV);
 
   }
 
   @Override
   public void onAndLeft(final Token<?> lookhead) {
-    this.instruments.add(new AssertTypeIR(AssertTypes.Bool));
+    emit(new AssertTypeIR(AssertTypes.Bool));
     Label label = makeLabel();
     pushLabel0(label);
     this.instruments
         .add(new BranchUnlessIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
+    emit(PopIR.INSTANCE);
+  }
+
+  private void emit(final IR ir) {
+    this.instruments.add(ir);
   }
 
   @Override
   public void onAndRight(final Token<?> lookhead) {
-    this.instruments.add(new AssertTypeIR(AssertTypes.Bool));
+    emit(new AssertTypeIR(AssertTypes.Bool));
     Label label = popLabel0();
     visitLabel(label);
   }
@@ -284,7 +289,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
     pushLabel1(label1);
     this.instruments
         .add(new BranchUnlessIR(label0, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
-    this.instruments.add(PopIR.INSTANCE);
+    emit(PopIR.INSTANCE);
   }
 
   @Override
@@ -292,10 +297,10 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
     this.instruments
         .add(new GotoIR(peekLabel1(), new SourceInfo(this.sourceFile, lookhead.getLineNo())));
 
-    this.instruments.add(PopIR.INSTANCE);
+    emit(PopIR.INSTANCE);
     Label label0 = popLabel0();
     visitLabel(label0);
-    this.instruments.add(PopIR.INSTANCE);
+    emit(PopIR.INSTANCE);
   }
 
   @Override
@@ -306,73 +311,74 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
 
   @Override
   public void onTernaryEnd(final Token<?> lookhead) {
-    this.instruments.add(ClearIR.INSTANCE);
+    emit(ClearIR.INSTANCE);
   }
 
   @Override
   public void onJoinLeft(final Token<?> lookhead) {
-    this.instruments.add(new AssertTypeIR(AssertTypes.Bool));
+    emit(new AssertTypeIR(AssertTypes.Bool));
     Label label = makeLabel();
     pushLabel0(label);
     this.instruments
         .add(new BranchIfIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
+    emit(PopIR.INSTANCE);
   }
 
   @Override
   public void onJoinRight(final Token<?> lookhead) {
-    this.instruments.add(new AssertTypeIR(AssertTypes.Bool));
+    emit(new AssertTypeIR(AssertTypes.Bool));
     Label label = popLabel0();
     visitLabel(label);
   }
 
   @Override
   public void onEq(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.EQ);
+    emit(OperatorIR.EQ);
   }
 
   @Override
   public void onMatch(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.MATCH);
+    emit(OperatorIR.MATCH);
   }
 
   @Override
   public void onNeq(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.NE);
+    emit(OperatorIR.NE);
   }
 
   @Override
   public void onLt(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.LT);
+    emit(OperatorIR.LT);
   }
 
   @Override
   public void onLe(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.LE);
+    emit(OperatorIR.LE);
   }
 
   @Override
   public void onGt(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.GT);
+    emit(OperatorIR.GT);
   }
 
   @Override
   public void onGe(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.GE);
+    emit(OperatorIR.GE);
   }
 
   @Override
   public void onMod(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.MOD);
+    emit(OperatorIR.MOD);
   }
 
   @Override
   public void onNot(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.NOT);
+    emit(OperatorIR.NOT);
   }
 
   @Override
   public void onNeg(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.NEG);
+    emit(OperatorIR.NEG);
   }
 
   @Override
@@ -434,7 +440,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
   @Override
   public void onConstant(final Token<?> lookhead) {
     if (LOAD_CONSTANTS_TYPE.contains(lookhead.getType())) {
-      this.instruments.add(new LoadIR(this.sourceFile, lookhead));
+      emit(new LoadIR(this.sourceFile, lookhead));
     }
   }
 
@@ -466,7 +472,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
       methodMetaData.funcId = funcId;
     }
 
-    this.instruments.add(new SendIR(methodMetaData.methodName, methodMetaData.parameterCount,
+    emit(new SendIR(methodMetaData.methodName, methodMetaData.parameterCount,
         methodMetaData.token.getMeta(Constants.UNPACK_ARGS, false), methodMetaData.funcId,
         new SourceInfo(this.sourceFile, methodMetaData.token.getLineNo())));
   }
@@ -524,7 +530,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
 
   @Override
   public void onArrayIndexEnd(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.INDEX);
+    emit(OperatorIR.INDEX);
   }
 
 }
