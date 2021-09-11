@@ -7,7 +7,7 @@ public class PopNIR implements IR {
   private final int times;
 
 
-  private PopNIR(final int times) {
+  public PopNIR(final int times) {
     this.times = times;
   }
 

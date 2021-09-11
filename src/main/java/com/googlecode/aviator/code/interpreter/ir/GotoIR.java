@@ -34,7 +34,7 @@ public class GotoIR implements IR, JumpIR {
 
   @Override
   public String toString() {
-    return "goto " + this.pc + "[" + this.label + "]";
+    return "goto " + this.pc + "  [" + this.label + "]";
   }
 
 }

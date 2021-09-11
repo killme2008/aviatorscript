@@ -19,23 +19,26 @@ public class InterpretExpression extends BaseExpression {
       final SymbolTable symbolTable, final List<IR> instruments) {
     super(instance, vars, symbolTable);
     this.instruments = instruments;
-
   }
 
   @Override
   public Object executeDirectly(final Map<String, Object> env) {
-
-
-    if (RuntimeUtils.isTracedEval(env)) {
+    final boolean trace = RuntimeUtils.isTracedEval(env);
+    if (trace) {
       int lineNo = 0;
+      RuntimeUtils.printlnTrace(env, "Expression instruments: ");
       for (IR ir : this.instruments) {
-        System.out.println((lineNo++) + " " + ir.toString());
+        RuntimeUtils.printlnTrace(env, "    " + (lineNo++) + " " + ir.toString());
       }
+      RuntimeUtils.printlnTrace(env, "Execute instruments: ");
     }
 
     InterpretContext ctx = new InterpretContext(this, this.instruments, (Env) env);
     IR ir = null;
     while ((ir = ctx.getPc()) != null) {
+      if (trace) {
+        RuntimeUtils.printlnTrace(env, "    " + ir + "  <Stack, " + ctx.getOperands() + ">");
+      }
       // System.out.println(ir + " " + ctx.getOperands());
       ir.eval(ctx);
       if (ir instanceof JumpIR) {

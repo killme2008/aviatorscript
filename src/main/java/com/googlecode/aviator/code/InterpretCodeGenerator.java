@@ -221,6 +221,7 @@ public class InterpretCodeGenerator implements CodeGenerator {
     this.instruments.add(PopIR.INSTANCE);
     Label label0 = popLabel0();
     visitLabel(label0);
+    this.instruments.add(PopIR.INSTANCE);
   }
 
   @Override
@@ -305,13 +306,19 @@ public class InterpretCodeGenerator implements CodeGenerator {
     // System.out.println(ir);
     // }
 
+    optimize(instruments);
     resolveLabels(instruments);
 
     final InterpretExpression exp = new InterpretExpression(this.instance,
         Collections.<VariableMeta>emptyList(), null, instruments);
     exp.setLambdaBootstraps(this.lambdaBootstraps);
+    exp.setSourceFile(this.sourceFile);
 
     return exp;
+  }
+
+  private void optimize(final List<IR> instruments) {
+    // TODO
   }
 
   private void resolveLabels(final List<IR> instruments) {

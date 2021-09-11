@@ -1,7 +1,7 @@
 package com.googlecode.aviator.code.interpreter.ir;
 
-import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.code.interpreter.IR;
+import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 public class BranchIfIR implements IR, JumpIR {
@@ -38,7 +38,7 @@ public class BranchIfIR implements IR, JumpIR {
 
   @Override
   public String toString() {
-    return "branch_if " + this.pc + "[" + this.label + "]";
+    return "branch_if " + this.pc + "  [" + this.label + "]";
   }
 
 }

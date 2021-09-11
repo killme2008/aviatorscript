@@ -1,7 +1,7 @@
 package com.googlecode.aviator.code.interpreter.ir;
 
-import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.code.interpreter.IR;
+import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 public class BranchUnlessIR implements IR, JumpIR {
@@ -38,6 +38,6 @@ public class BranchUnlessIR implements IR, JumpIR {
 
   @Override
   public String toString() {
-    return "branch_unless " + this.pc + "[" + this.label + "]";
+    return "branch_unless " + this.pc + "  [" + this.label + "]";
   }
 }

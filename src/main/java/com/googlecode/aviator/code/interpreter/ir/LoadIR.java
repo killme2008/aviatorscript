@@ -79,6 +79,6 @@ public class LoadIR implements IR {
 
   @Override
   public String toString() {
-    return "load " + this.token.getLexeme() + "[" + this.token.getType() + "]";
+    return "load " + this.token.getLexeme() + "  [" + this.token.getType() + "]";
   }
 }

@@ -22,6 +22,6 @@ public class VisitLabelIR implements IR {
 
   @Override
   public String toString() {
-    return "visit_label " + this.label;
+    return this.label + ":";
   }
 }
