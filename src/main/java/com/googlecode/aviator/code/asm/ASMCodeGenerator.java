@@ -1215,6 +1215,10 @@ public class ASMCodeGenerator implements CodeGenerator {
 
     public String methodName;
 
+    public boolean unpackArgs;
+
+    public int funcId = -1;
+
 
     public MethodMetaData(final String methodName) {
       super();

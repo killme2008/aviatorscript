@@ -16,6 +16,7 @@ import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorPattern;
 import com.googlecode.aviator.runtime.type.AviatorString;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -56,7 +57,8 @@ public class LoadIR implements IR {
         }
         break;
       case String:
-        context.push(new AviatorString((String) this.token.getValue(null)));
+        context.push(new AviatorString((String) this.token.getValue(null), true,
+            this.token.getMeta(Constants.INTER_META, true), this.token.getLineNo()));
         break;
       case Pattern:
         context.push(new AviatorPattern((String) this.token.getValue(null)));

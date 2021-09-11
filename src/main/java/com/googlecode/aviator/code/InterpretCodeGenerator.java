@@ -3,6 +3,7 @@ package com.googlecode.aviator.code;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Stack;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.InterpretExpression;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator.MethodMetaData;
 import com.googlecode.aviator.code.interpreter.IR;
 import com.googlecode.aviator.code.interpreter.ir.BranchIfIR;
@@ -33,6 +35,7 @@ import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.VariableMeta;
+import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.utils.Constants;
@@ -76,6 +79,24 @@ public class InterpretCodeGenerator implements CodeGenerator {
   private final Stack<Label> labels1 = new Stack<>();
 
   private Label currLabel;
+
+  /**
+   * function params info.
+   */
+  private Map<Integer/* internal function id */, List<FunctionArgument>> funcsArgs;
+
+  private int funcInvocationId = 0;
+
+  private Map<Integer/* internal function id */, List<FunctionArgument>> getFuncsArgs() {
+    if (this.funcsArgs == null) {
+      this.funcsArgs = new HashMap<>();
+    }
+    return this.funcsArgs;
+  }
+
+  private int getNextFuncInvocationId() {
+    return this.funcInvocationId++;
+  }
 
   private void visitLabel(final Label label) {
     this.currLabel = label;
@@ -313,6 +334,7 @@ public class InterpretCodeGenerator implements CodeGenerator {
         Collections.<VariableMeta>emptyList(), null, instruments);
     exp.setLambdaBootstraps(this.lambdaBootstraps);
     exp.setSourceFile(this.sourceFile);
+    exp.setFuncsArgs(this.funcsArgs);
 
     return exp;
   }
@@ -362,8 +384,10 @@ public class InterpretCodeGenerator implements CodeGenerator {
 
   @Override
   public void onMethodName(final Token<?> lookhead) {
-    this.methodMetaDataStack.push(
-        new MethodMetaData(lookhead.getType() == TokenType.Delegate ? null : lookhead.getLexeme()));
+    final MethodMetaData metadata =
+        new MethodMetaData(lookhead.getType() == TokenType.Delegate ? null : lookhead.getLexeme());
+    metadata.unpackArgs = lookhead.getMeta(Constants.UNPACK_ARGS, false);
+    this.methodMetaDataStack.push(metadata);
   }
 
   @Override
@@ -374,8 +398,21 @@ public class InterpretCodeGenerator implements CodeGenerator {
 
   @Override
   public void onMethodInvoke(final Token<?> lookhead) {
+
     final MethodMetaData methodMetaData = this.methodMetaDataStack.pop();
-    this.instruments.add(new SendIR(methodMetaData.methodName, methodMetaData.parameterCount));
+    @SuppressWarnings("unchecked")
+    final List<FunctionArgument> params = lookhead != null
+        ? (List<FunctionArgument>) lookhead.getMeta(Constants.PARAMS_META, Collections.EMPTY_LIST)
+        : Collections.<FunctionArgument>emptyList();
+
+    if (this.instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool) {
+      int funcId = getNextFuncInvocationId();
+      getFuncsArgs().put(funcId, Collections.unmodifiableList(params));
+      methodMetaData.funcId = funcId;
+    }
+
+    this.instruments.add(new SendIR(methodMetaData.methodName, methodMetaData.parameterCount,
+        methodMetaData.unpackArgs, methodMetaData.funcId));
   }
 
   @Override

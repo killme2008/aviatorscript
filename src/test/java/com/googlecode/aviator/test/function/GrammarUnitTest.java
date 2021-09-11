@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
@@ -53,6 +54,10 @@ import junit.framework.Assert;
  */
 public class GrammarUnitTest {
 
+  @Before
+  public void setup() {
+    AviatorEvaluator.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.INTERPRET);
+  }
 
   @Test
   public void testMultilineExpressions() {

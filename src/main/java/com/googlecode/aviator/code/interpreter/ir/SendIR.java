@@ -1,8 +1,10 @@
 package com.googlecode.aviator.code.interpreter.ir;
 
+import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.code.interpreter.IR;
 import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.function.TraceFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
@@ -11,18 +13,20 @@ public class SendIR implements IR {
 
   private final String name;
   private final int arity;
+  private final boolean unpackArgs;
+  private int funcId = -1;
 
 
-
-  public SendIR(final String name, final int arity) {
+  public SendIR(final String name, final int arity, final boolean unpackArgs, final int funcId) {
     super();
     this.name = name;
     this.arity = arity;
+    this.unpackArgs = unpackArgs;
+    this.funcId = funcId;
   }
 
   private AviatorObject callFn(final AviatorFunction fn, final AviatorObject[] args,
       final int arity, final Env env) {
-
     switch (arity) {
       case 0:
         return fn.call(env);
@@ -94,7 +98,7 @@ public class SendIR implements IR {
 
   @Override
   public void eval(final InterpretContext context) {
-    final AviatorFunction fn;
+    AviatorFunction fn;
     if (this.name == null) {
       // anonymous function, pop from stack
       fn = (AviatorFunction) context.pop();
@@ -107,6 +111,20 @@ public class SendIR implements IR {
 
     while (--i >= 0) {
       args[i] = context.pop();
+    }
+
+
+    if (RuntimeUtils.isTracedEval(context.getEnv())) {
+      fn = TraceFunction.wrapTrace(fn);
+    }
+
+    if (this.unpackArgs) {
+      fn = RuntimeUtils.unpackArgsFunction(fn);
+    }
+
+    if (this.funcId >= 0) {
+      // put function arguments ref id to env.
+      context.getEnv().put(ASMCodeGenerator.FUNC_ARGS_INNER_VAR, this.funcId);
     }
 
     context.push(callFn(fn, args, this.arity, context.getEnv()));
