@@ -47,11 +47,6 @@ public final class AviatorEvaluator {
   public static final int EVAL = 1;
 
   /**
-   * Evaluate expression in interpret mode.
-   */
-  public static final int INTERPRET = 2;
-
-  /**
    * Aviator version
    */
   public static final String VERSION = Utils.getAviatorScriptVersion();

@@ -1,0 +1,7 @@
+let sub = seq.map("name", "dennis");
+
+let obj = seq.map("admins", tuple("dennis", "catty", "lucy"));
+
+j.assertTrue(sub.name in obj.admins);
+
+j.assertFalse(sub.x in obj.admins);

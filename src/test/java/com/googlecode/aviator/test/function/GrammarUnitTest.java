@@ -53,11 +53,6 @@ import junit.framework.Assert;
  */
 public class GrammarUnitTest {
 
-  // @Before
-  // public void setup() {
-  // AviatorEvaluator.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.INTERPRET);
-  // }
-
   @Test
   public void testMultilineExpressions() {
     assertEquals(7, AviatorEvaluator.execute("a=3;\r\na+4"));

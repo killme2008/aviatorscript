@@ -1,0 +1,9 @@
+let b = "a" in tuple("a", "b", "c");
+
+j.assertTrue(b);
+
+let b = 1 in  tuple("a", "b", "c");
+j.assertFalse(b);
+j.assertEquals(1, ("a" in tuple("a", "b", "c")) ? 1 : 2);
+
+j.assertTrue(true in tuple("a" in tuple("a", "b", "c")));

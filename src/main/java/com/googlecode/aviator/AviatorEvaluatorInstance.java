@@ -51,6 +51,7 @@ import com.googlecode.aviator.annotation.Import;
 import com.googlecode.aviator.annotation.ImportScope;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.code.EvalCodeGenerator;
 import com.googlecode.aviator.code.InterpretCodeGenerator;
 import com.googlecode.aviator.code.NoneCodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
@@ -1499,6 +1500,10 @@ public final class AviatorEvaluatorInstance {
     return exp;
   }
 
+  private EvalMode getEvalMode() {
+    return getOptionValue(Options.EVAL_MODE).evalMode;
+  }
+
   private int getOptimizeLevel() {
     return getOptionValue(Options.OPTIMIZE_LEVEL).number;
   }
@@ -1510,19 +1515,28 @@ public final class AviatorEvaluatorInstance {
 
   }
 
+  public EvalCodeGenerator newEvalCodeGenerator(final AviatorClassLoader classLoader,
+      final String sourceFile) {
+    switch (getEvalMode()) {
+      case ASM:
+        return new ASMCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
+      case INTERPRETER:
+        return new InterpretCodeGenerator(this, sourceFile, classLoader);
+      default:
+        throw new IllegalArgumentException("Unknown eval mode: " + getEvalMode());
+
+    }
+  }
+
   public CodeGenerator newCodeGenerator(final AviatorClassLoader classLoader,
       final String sourceFile) {
     switch (getOptimizeLevel()) {
       case AviatorEvaluator.COMPILE:
-        ASMCodeGenerator asmCodeGenerator =
-            new ASMCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
-        asmCodeGenerator.start();
-        return asmCodeGenerator;
+        final EvalCodeGenerator codeGen = newEvalCodeGenerator(classLoader, sourceFile);
+        codeGen.start();
+        return codeGen;
       case AviatorEvaluator.EVAL:
         return new OptimizeCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
-      case AviatorEvaluator.INTERPRET:
-        // TODO
-        return new InterpretCodeGenerator(this, sourceFile, classLoader);
       default:
         throw new IllegalArgumentException("Unknow option " + getOptimizeLevel());
     }

@@ -7,11 +7,13 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 public class BranchUnlessIR implements IR, JumpIR {
   private int pc;
   private final Label label;
+  private final SourceInfo sourceInfo;
 
 
-  public BranchUnlessIR(final Label label) {
+  public BranchUnlessIR(final Label label, final SourceInfo sourceInfo) {
     super();
     this.label = label;
+    this.sourceInfo = sourceInfo;
   }
 
   public int getPc() {
@@ -38,6 +40,6 @@ public class BranchUnlessIR implements IR, JumpIR {
 
   @Override
   public String toString() {
-    return "branch_unless " + this.pc + "  [" + this.label + "]";
+    return "branch_unless " + this.pc + "  [" + this.label + "]      " + this.sourceInfo;
   }
 }

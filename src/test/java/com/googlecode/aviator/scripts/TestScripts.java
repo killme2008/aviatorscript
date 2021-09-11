@@ -24,7 +24,7 @@ import com.googlecode.aviator.utils.Reflector;
 
 public class TestScripts {
 
-  private AviatorEvaluatorInstance instance;
+  protected AviatorEvaluatorInstance instance;
 
   @Before
   public void setup() throws Exception {

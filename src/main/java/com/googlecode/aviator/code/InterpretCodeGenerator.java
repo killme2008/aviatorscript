@@ -17,6 +17,8 @@ import com.googlecode.aviator.InterpretExpression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator.MethodMetaData;
 import com.googlecode.aviator.code.interpreter.IR;
+import com.googlecode.aviator.code.interpreter.ir.AssertTypeIR;
+import com.googlecode.aviator.code.interpreter.ir.AssertTypeIR.AssertTypes;
 import com.googlecode.aviator.code.interpreter.ir.BranchIfIR;
 import com.googlecode.aviator.code.interpreter.ir.BranchUnlessIR;
 import com.googlecode.aviator.code.interpreter.ir.ClearIR;
@@ -28,6 +30,7 @@ import com.googlecode.aviator.code.interpreter.ir.NewLambdaIR;
 import com.googlecode.aviator.code.interpreter.ir.OperatorIR;
 import com.googlecode.aviator.code.interpreter.ir.PopIR;
 import com.googlecode.aviator.code.interpreter.ir.SendIR;
+import com.googlecode.aviator.code.interpreter.ir.SourceInfo;
 import com.googlecode.aviator.code.interpreter.ir.VisitLabelIR;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.token.Token;
@@ -47,7 +50,7 @@ import com.googlecode.aviator.utils.IdentityHashSet;
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class InterpretCodeGenerator implements CodeGenerator {
+public class InterpretCodeGenerator implements EvalCodeGenerator {
   private final List<IR> instruments = new ArrayList<>();
   private final AviatorEvaluatorInstance instance;
 
@@ -130,6 +133,47 @@ public class InterpretCodeGenerator implements CodeGenerator {
 
   private Label makeLabel() {
     return new Label(this.labelNum++);
+  }
+
+
+
+  @Override
+  public void start() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void initVariables(final Map<String, VariableMeta> vars) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void initConstants(final Set<Token<?>> constants) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void initMethods(final Map<String, Integer> methods) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
+    this.lambdaBootstraps = lambdaBootstraps;
+  }
+
+  @Override
+  public AviatorClassLoader getClassLoader() {
+    return this.classLoader;
+  }
+
+  @Override
+  public void genNewLambdaCode(final LambdaFunctionBootstrap bootstrap) {
+    this.instruments.add(new NewLambdaIR(bootstrap.getName()));
   }
 
   public InterpretCodeGenerator(final AviatorEvaluatorInstance instance, final String sourceFile,
@@ -218,13 +262,16 @@ public class InterpretCodeGenerator implements CodeGenerator {
 
   @Override
   public void onAndLeft(final Token<?> lookhead) {
+    this.instruments.add(new AssertTypeIR(AssertTypes.Bool));
     Label label = makeLabel();
     pushLabel0(label);
-    this.instruments.add(new BranchUnlessIR(label));
+    this.instruments
+        .add(new BranchUnlessIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
   }
 
   @Override
   public void onAndRight(final Token<?> lookhead) {
+    this.instruments.add(new AssertTypeIR(AssertTypes.Bool));
     Label label = popLabel0();
     visitLabel(label);
   }
@@ -235,13 +282,15 @@ public class InterpretCodeGenerator implements CodeGenerator {
     pushLabel0(label0);
     Label label1 = makeLabel();
     pushLabel1(label1);
-    this.instruments.add(new BranchUnlessIR(label0));
+    this.instruments
+        .add(new BranchUnlessIR(label0, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
     this.instruments.add(PopIR.INSTANCE);
   }
 
   @Override
   public void onTernaryLeft(final Token<?> lookhead) {
-    this.instruments.add(new GotoIR(peekLabel1()));
+    this.instruments
+        .add(new GotoIR(peekLabel1(), new SourceInfo(this.sourceFile, lookhead.getLineNo())));
 
     this.instruments.add(PopIR.INSTANCE);
     Label label0 = popLabel0();
@@ -262,13 +311,16 @@ public class InterpretCodeGenerator implements CodeGenerator {
 
   @Override
   public void onJoinLeft(final Token<?> lookhead) {
+    this.instruments.add(new AssertTypeIR(AssertTypes.Bool));
     Label label = makeLabel();
     pushLabel0(label);
-    this.instruments.add(new BranchIfIR(label));
+    this.instruments
+        .add(new BranchIfIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
   }
 
   @Override
   public void onJoinRight(final Token<?> lookhead) {
+    this.instruments.add(new AssertTypeIR(AssertTypes.Bool));
     Label label = popLabel0();
     visitLabel(label);
   }
@@ -416,7 +468,7 @@ public class InterpretCodeGenerator implements CodeGenerator {
 
     this.instruments.add(new SendIR(methodMetaData.methodName, methodMetaData.parameterCount,
         methodMetaData.token.getMeta(Constants.UNPACK_ARGS, false), methodMetaData.funcId,
-        this.sourceFile, methodMetaData.token.getLineNo()));
+        new SourceInfo(this.sourceFile, methodMetaData.token.getLineNo())));
   }
 
   @Override
@@ -454,7 +506,7 @@ public class InterpretCodeGenerator implements CodeGenerator {
       this.lambdaBootstraps = new LinkedHashMap<String, LambdaFunctionBootstrap>();
     }
     this.lambdaBootstraps.put(bootstrap.getName(), bootstrap);
-    this.instruments.add(new NewLambdaIR(bootstrap.getName()));
+    genNewLambdaCode(bootstrap);
     this.parser.restoreScope(this.lambdaGenerator.getScopeInfo());
     this.lambdaGenerator = null;
     this.parser.setCodeGenerator(this.parentCodeGenerator);

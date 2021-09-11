@@ -40,12 +40,12 @@ public class InterpretExpression extends BaseExpression {
     IR ir = null;
     while ((ir = ctx.getPc()) != null) {
       if (trace) {
-        RuntimeUtils.printlnTrace(env, "    " + ir + "  <Stack, " + ctx.getOperands() + ">");
+        RuntimeUtils.printlnTrace(env, "    " + ir + "    <Stack, " + ctx.getOperands() + ">");
       }
-      // System.out.println(ir + " " + ctx.getOperands());
       ir.eval(ctx);
       if (ir instanceof JumpIR) {
         if (ir != ctx.getPc()) {
+          // jump successfully, we don't move pc to next.
           continue;
         }
       }
@@ -54,7 +54,7 @@ public class InterpretExpression extends BaseExpression {
       }
     }
 
-    assert (ctx.getOperands().size() <= 1);
+    // assert (ctx.getOperands().size() <= 1);
     AviatorObject result = ctx.peek();
     if (result == null) {
       return null;

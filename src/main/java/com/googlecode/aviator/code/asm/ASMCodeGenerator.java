@@ -65,6 +65,7 @@ import com.googlecode.aviator.asm.Label;
 import com.googlecode.aviator.asm.MethodVisitor;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.code.EvalCodeGenerator;
 import com.googlecode.aviator.code.LambdaGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -92,7 +93,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  * @author dennis
  *
  */
-public class ASMCodeGenerator implements CodeGenerator {
+public class ASMCodeGenerator implements EvalCodeGenerator {
 
   private static final String RUNTIME_UTILS = "com/googlecode/aviator/runtime/RuntimeUtils";
   private static final String OBJECT_DESC = "Lcom/googlecode/aviator/runtime/type/AviatorObject;";
@@ -220,6 +221,7 @@ public class ASMCodeGenerator implements CodeGenerator {
 
 
 
+  @Override
   public AviatorClassLoader getClassLoader() {
     return this.classLoader;
   }
@@ -230,6 +232,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
   public void start() {
     makeConstructor();
     startVisitMethodCode();
@@ -500,6 +503,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   private void visitRightBranch(final Token<?> lookhead, final int ints,
       final OperatorType opType) {
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
+      this.mv.visitInsn(DUP);
       loadEnv();
       String first = "TRUE";
       String second = "FALSE";
@@ -509,10 +513,8 @@ public class ASMCodeGenerator implements CodeGenerator {
       }
 
       visitBoolean();
-      this.mv.visitJumpInsn(ints, peekLabel0());
-      // Result is true
-      this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", first,
-          "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
+      this.mv.visitInsn(POP);
+
       Label l1 = makeLabel();
       visitLineNumber(lookhead);
       this.mv.visitJumpInsn(GOTO, l1);
@@ -1022,11 +1024,13 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
   public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
     this.lambdaBootstraps = lambdaBootstraps;
   }
 
 
+  @Override
   public void initVariables(final Map<String, VariableMeta/* counter */> vars) {
     this.variables = vars;
     this.innerVars = new HashMap<>(this.variables.size());
@@ -1045,6 +1049,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    *
    * @param constants
    */
+  @Override
   public void initConstants(final Set<Token<?>> constants) {
     if (constants.isEmpty()) {
       return;
@@ -1060,6 +1065,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
   public void initMethods(final Map<String, Integer/* counter */> methods) {
     this.methodTokens = methods;
     this.innerMethodMap = new HashMap<>(methods.size());
@@ -1310,6 +1316,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
   public void genNewLambdaCode(final LambdaFunctionBootstrap bootstrap) {
     this.mv.visitVarInsn(ALOAD, 0);
     loadEnv();

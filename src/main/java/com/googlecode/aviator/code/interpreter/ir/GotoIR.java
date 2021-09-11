@@ -6,11 +6,13 @@ import com.googlecode.aviator.code.interpreter.InterpretContext;
 public class GotoIR implements IR, JumpIR {
   private int pc;
   private final Label label;
+  private final SourceInfo sourceInfo;
 
 
-  public GotoIR(final Label label) {
+  public GotoIR(final Label label, final SourceInfo sourceInfo) {
     super();
     this.label = label;
+    this.sourceInfo = sourceInfo;
   }
 
   public int getPc() {
@@ -34,7 +36,7 @@ public class GotoIR implements IR, JumpIR {
 
   @Override
   public String toString() {
-    return "goto " + this.pc + "  [" + this.label + "]";
+    return "goto " + this.pc + "  [" + this.label + "]      " + this.sourceInfo;
   }
 
 }

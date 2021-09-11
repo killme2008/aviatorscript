@@ -1,0 +1,7 @@
+if a in range(0, 10){
+  return 10;
+}elsif a in range(10, 100) {
+  return 100;
+} else {
+  return -1;
+}

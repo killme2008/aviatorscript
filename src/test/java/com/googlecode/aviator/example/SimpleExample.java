@@ -1,14 +1,15 @@
 package com.googlecode.aviator.example;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.EvalMode;
 import com.googlecode.aviator.Options;
 
 
 public class SimpleExample {
   public static void main(final String[] args) throws Exception {
-    AviatorEvaluator.setOptimize(AviatorEvaluator.INTERPRET);
+    AviatorEvaluator.setOption(Options.EVAL_MODE, EvalMode.INTERPRETER);
     AviatorEvaluator.setOption(Options.TRACE_EVAL, true);
-    Object result = AviatorEvaluator.execute("false || p(1)");
+    Object result = AviatorEvaluator.execute("true || p(1)");
     System.out.println(result);
     System.out.println(1 == 1 && 2 != 2 ? 1 : 2 == 3 ? 4 : 5);
 

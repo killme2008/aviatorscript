@@ -108,7 +108,11 @@ public enum Options {
    * allowed (default); Empty ALLOWED_CLASS_SET or ASSIGNABLE_ALLOWED_CLASS_SET means forbidding all
    * classes.
    */
-  ASSIGNABLE_ALLOWED_CLASS_SET;
+  ASSIGNABLE_ALLOWED_CLASS_SET,
+  /**
+   * Script engine evaluate mode, default is ASM mode.
+   */
+  EVAL_MODE;
 
 
   /**
@@ -123,6 +127,12 @@ public enum Options {
     public int number;
     public Set<Feature> featureSet;
     public Set<Class<?>> classes;
+    public EvalMode evalMode;
+
+    public Value(final EvalMode evalMode) {
+      super();
+      this.evalMode = evalMode;
+    }
 
     public Value() {
       super();
@@ -191,6 +201,8 @@ public enum Options {
       case ALLOWED_CLASS_SET:
       case ASSIGNABLE_ALLOWED_CLASS_SET:
         return val.classes;
+      case EVAL_MODE:
+        return val.evalMode;
     }
     throw new IllegalArgumentException("Fail to cast value " + val + " for option " + this);
   }
@@ -217,8 +229,6 @@ public enum Options {
         int level = (int) val;
         if (level == AviatorEvaluator.EVAL) {
           return EVAL_VALUE;
-        } else if (level == AviatorEvaluator.INTERPRET) {
-          return INTERPRET_VALUE;
         } else {
           return COMPILE_VALUE;
         }
@@ -232,6 +242,8 @@ public enum Options {
         return new Value((Set<Feature>) val);
       case MATH_CONTEXT:
         return new Value((MathContext) val);
+      case EVAL_MODE:
+        return new Value((EvalMode) val);
     }
     throw new IllegalArgumentException("Fail to cast value " + val + " for option " + this);
   }
@@ -253,12 +265,14 @@ public enum Options {
         return val instanceof Set;
       case OPTIMIZE_LEVEL:
         final int level = ((Integer) val).intValue();
-        return val instanceof Integer && (level == AviatorEvaluator.EVAL
-            || level == AviatorEvaluator.COMPILE || level == AviatorEvaluator.INTERPRET);
+        return val instanceof Integer
+            && (level == AviatorEvaluator.EVAL || level == AviatorEvaluator.COMPILE);
       case MAX_LOOP_COUNT:
         return val instanceof Long || val instanceof Integer;
       case MATH_CONTEXT:
         return val instanceof MathContext;
+      case EVAL_MODE:
+        return val instanceof EvalMode;
     }
     return false;
   }
@@ -275,11 +289,13 @@ public enum Options {
 
   public static final Value COMPILE_VALUE = new Value(AviatorEvaluator.COMPILE);
 
-  public static final Value INTERPRET_VALUE = new Value(AviatorEvaluator.INTERPRET);
-
   private static final Value FULL_FEATURE_SET = new Value(Feature.getFullFeatures());
   private static final boolean TRACE_EVAL_DEFAULT_VAL =
       Boolean.parseBoolean(System.getProperty("aviator.trace_eval", "false"));
+
+  public static final Value ASM_MODE = new Value(EvalMode.ASM);
+
+  public static final Value INTERPRETER_MODE = new Value(EvalMode.INTERPRETER);
 
   public static final Value NULL_CLASS_SET = Value.fromClasses(null);
 
@@ -327,6 +343,8 @@ public enum Options {
       case ALLOWED_CLASS_SET:
       case ASSIGNABLE_ALLOWED_CLASS_SET:
         return NULL_CLASS_SET;
+      case EVAL_MODE:
+        return ASM_MODE;
     }
     return null;
   }

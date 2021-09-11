@@ -7,11 +7,12 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 public class BranchIfIR implements IR, JumpIR {
   private int pc;
   private final Label label;
+  private final SourceInfo sourceInfo;
 
-
-  public BranchIfIR(final Label label) {
+  public BranchIfIR(final Label label, final SourceInfo sourceInfo) {
     super();
     this.label = label;
+    this.sourceInfo = sourceInfo;
   }
 
   public int getPc() {
@@ -38,7 +39,7 @@ public class BranchIfIR implements IR, JumpIR {
 
   @Override
   public String toString() {
-    return "branch_if " + this.pc + "  [" + this.label + "]";
+    return "branch_if " + this.pc + "  [" + this.label + "]      " + this.sourceInfo;
   }
 
 }
