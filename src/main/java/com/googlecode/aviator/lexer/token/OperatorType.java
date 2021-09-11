@@ -20,7 +20,6 @@ import com.googlecode.aviator.exception.IllegalArityException;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -114,13 +113,13 @@ public enum OperatorType {
         if (!(args[0] instanceof AviatorJavaType)) {
           throw new IllegalArgumentException(args[0].desc(env) + " can't be as a left value.");
         }
-        ((Env) env).override(((AviatorJavaType) args[0]).getName(), args[1].getValue(env));
+        args[0].defineValue(args[1], env);
         return args[1];
       case ASSIGNMENT:
         if (!(args[0] instanceof AviatorJavaType)) {
           throw new IllegalArgumentException(args[0].desc(env) + " can't be as a left value.");
         }
-        env.put(((AviatorJavaType) args[0]).getName(), args[1].getValue(env));
+        args[0].setValue(args[1], env);
         return args[1];
       case DIV:
         return args[0].div(args[1], env);

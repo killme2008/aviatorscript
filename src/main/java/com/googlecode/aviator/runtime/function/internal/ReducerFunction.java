@@ -7,6 +7,7 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorLong;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.Range;
@@ -41,7 +42,7 @@ public class ReducerFunction extends AbstractFunction {
     AviatorFunction iteratorFn = (AviatorFunction) arg2;
 
     int maxLoopCount = RuntimeUtils.getInstance(env).getOptionValue(Options.MAX_LOOP_COUNT).number;
-    AviatorObject result = null;
+    AviatorObject result = AviatorNil.NIL;
     long c = 0;
 
     if (coll != Range.LOOP) {

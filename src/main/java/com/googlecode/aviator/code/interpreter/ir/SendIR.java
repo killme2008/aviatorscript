@@ -15,14 +15,19 @@ public class SendIR implements IR {
   private final int arity;
   private final boolean unpackArgs;
   private int funcId = -1;
+  private final String sourceFile;
+  private final int lineNo;
 
 
-  public SendIR(final String name, final int arity, final boolean unpackArgs, final int funcId) {
+  public SendIR(final String name, final int arity, final boolean unpackArgs, final int funcId,
+      final String sourceFile, final int lineNo) {
     super();
     this.name = name;
     this.arity = arity;
     this.unpackArgs = unpackArgs;
     this.funcId = funcId;
+    this.sourceFile = sourceFile;
+    this.lineNo = lineNo;
   }
 
   private AviatorObject callFn(final AviatorFunction fn, final AviatorObject[] args,
@@ -98,11 +103,8 @@ public class SendIR implements IR {
 
   @Override
   public void eval(final InterpretContext context) {
-    AviatorFunction fn;
-    if (this.name == null) {
-      // anonymous function, pop from stack
-      fn = (AviatorFunction) context.pop();
-    } else {
+    AviatorFunction fn = null;
+    if (this.name != null) {
       fn = RuntimeUtils.getFunction(context.getEnv(), this.name);
     }
 
@@ -111,6 +113,10 @@ public class SendIR implements IR {
 
     while (--i >= 0) {
       args[i] = context.pop();
+    }
+
+    if (this.name == null) {
+      fn = (AviatorFunction) context.pop();
     }
 
 
@@ -126,13 +132,14 @@ public class SendIR implements IR {
       // put function arguments ref id to env.
       context.getEnv().put(ASMCodeGenerator.FUNC_ARGS_INNER_VAR, this.funcId);
     }
-
+    System.out.println(this);
     context.push(callFn(fn, args, this.arity, context.getEnv()));
   }
 
   @Override
   public String toString() {
-    return "send " + this.name + ", " + this.arity;
+    return "send " + (this.name == null ? "<top>" : this.name) + ", " + this.arity + ", "
+        + this.unpackArgs + "    (" + this.sourceFile + ":" + this.lineNo + ")";
   }
 
 }

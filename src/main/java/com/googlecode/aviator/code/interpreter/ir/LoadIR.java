@@ -27,10 +27,12 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class LoadIR implements IR {
   private final Token<?> token;
+  private final String sourceFile;
 
-  public LoadIR(final Token<?> token) {
+  public LoadIR(final String sourceFile, final Token<?> token) {
     super();
     this.token = token;
+    this.sourceFile = sourceFile;
   }
 
   @Override
@@ -81,6 +83,7 @@ public class LoadIR implements IR {
 
   @Override
   public String toString() {
-    return "load " + this.token.getLexeme() + "  [" + this.token.getType() + "]";
+    return "load " + this.token.getLexeme() + "  [" + this.token.getType() + "]    ("
+        + this.sourceFile + ":" + this.token.getLineNo() + ")";
   }
 }

@@ -1213,15 +1213,17 @@ public class ASMCodeGenerator implements CodeGenerator {
 
     public int variadicListIndex = -1;
 
-    public String methodName;
+    public final Token<?> token;
 
-    public boolean unpackArgs;
+    public final String methodName;
 
     public int funcId = -1;
 
 
-    public MethodMetaData(final String methodName) {
+
+    public MethodMetaData(final Token<?> token, final String methodName) {
       super();
+      this.token = token;
       this.methodName = methodName;
     }
   }
@@ -1340,14 +1342,14 @@ public class ASMCodeGenerator implements CodeGenerator {
           "wrapTrace",
           "(Lcom/googlecode/aviator/runtime/type/AviatorFunction;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
     }
-
+    // FIXME it will not work in compile mode.
     if (lookhead.getMeta(Constants.UNPACK_ARGS, false)) {
       this.mv.visitMethodInsn(INVOKESTATIC, RUNTIME_UTILS, "unpackArgsFunction",
           "(Lcom/googlecode/aviator/runtime/type/AviatorFunction;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
     }
 
     loadEnv();
-    this.methodMetaDataStack.push(new MethodMetaData(outtterMethodName));
+    this.methodMetaDataStack.push(new MethodMetaData(lookhead, outtterMethodName));
   }
 
 

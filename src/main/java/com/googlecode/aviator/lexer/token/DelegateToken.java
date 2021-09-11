@@ -52,6 +52,9 @@ public class DelegateToken extends AbstractToken<Token<?>> {
         token != null ? token.getStartIndex() : -1);
     this.token = token;
     this.delegateTokenType = type;
+    if (token != null) {
+      setMetaMap(token.getMetaMap());
+    }
   }
 
 

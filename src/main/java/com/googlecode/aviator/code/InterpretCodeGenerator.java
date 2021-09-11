@@ -142,7 +142,11 @@ public class InterpretCodeGenerator implements CodeGenerator {
 
   @Override
   public void onAssignment(final Token<?> lookhead) {
-    this.instruments.add(OperatorIR.ASSIGN);
+    if (lookhead.getMeta(Constants.DEFINE_META, false)) {
+      this.instruments.add(OperatorIR.DEF);
+    } else {
+      this.instruments.add(OperatorIR.ASSIGN);
+    }
   }
 
   @Override
@@ -331,7 +335,7 @@ public class InterpretCodeGenerator implements CodeGenerator {
     resolveLabels(instruments);
 
     final InterpretExpression exp = new InterpretExpression(this.instance,
-        Collections.<VariableMeta>emptyList(), null, instruments);
+        Collections.<VariableMeta>emptyList(), null, instruments, unboxObject);
     exp.setLambdaBootstraps(this.lambdaBootstraps);
     exp.setSourceFile(this.sourceFile);
     exp.setFuncsArgs(this.funcsArgs);
@@ -378,15 +382,14 @@ public class InterpretCodeGenerator implements CodeGenerator {
   @Override
   public void onConstant(final Token<?> lookhead) {
     if (LOAD_CONSTANTS_TYPE.contains(lookhead.getType())) {
-      this.instruments.add(new LoadIR(lookhead));
+      this.instruments.add(new LoadIR(this.sourceFile, lookhead));
     }
   }
 
   @Override
   public void onMethodName(final Token<?> lookhead) {
-    final MethodMetaData metadata =
-        new MethodMetaData(lookhead.getType() == TokenType.Delegate ? null : lookhead.getLexeme());
-    metadata.unpackArgs = lookhead.getMeta(Constants.UNPACK_ARGS, false);
+    final MethodMetaData metadata = new MethodMetaData(lookhead,
+        lookhead.getType() == TokenType.Delegate ? null : lookhead.getLexeme());
     this.methodMetaDataStack.push(metadata);
   }
 
@@ -412,7 +415,8 @@ public class InterpretCodeGenerator implements CodeGenerator {
     }
 
     this.instruments.add(new SendIR(methodMetaData.methodName, methodMetaData.parameterCount,
-        methodMetaData.unpackArgs, methodMetaData.funcId));
+        methodMetaData.token.getMeta(Constants.UNPACK_ARGS, false), methodMetaData.funcId,
+        this.sourceFile, methodMetaData.token.getLineNo()));
   }
 
   @Override

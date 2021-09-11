@@ -15,10 +15,13 @@ public class InterpretExpression extends BaseExpression {
 
   private final List<IR> instruments;
 
+  private final boolean unboxObject;
+
   public InterpretExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
-      final SymbolTable symbolTable, final List<IR> instruments) {
+      final SymbolTable symbolTable, final List<IR> instruments, final boolean unboxObject) {
     super(instance, vars, symbolTable);
     this.instruments = instruments;
+    this.unboxObject = unboxObject;
   }
 
   @Override
@@ -50,10 +53,17 @@ public class InterpretExpression extends BaseExpression {
         break;
       }
     }
-    final AviatorObject top = ctx.peek();
-    if (top == null) {
+
+    assert (ctx.getOperands().size() <= 1);
+    AviatorObject result = ctx.peek();
+    if (result == null) {
       return null;
     }
-    return top.getValue(env);
+
+    if (this.unboxObject) {
+      return result.getValue(env);
+    } else {
+      return result.deref(env);
+    }
   }
 }
