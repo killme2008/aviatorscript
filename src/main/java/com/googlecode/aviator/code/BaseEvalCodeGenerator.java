@@ -13,6 +13,7 @@ import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
+import com.googlecode.aviator.utils.Env;
 
 public abstract class BaseEvalCodeGenerator implements EvalCodeGenerator {
 
@@ -37,6 +38,10 @@ public abstract class BaseEvalCodeGenerator implements EvalCodeGenerator {
    */
   protected Map<Integer/* internal function id */, List<FunctionArgument>> funcsArgs;
   private int funcInvocationId = 0;
+  /**
+   * Compile environment only has the *instance*.
+   */
+  protected final Env compileEnv;
 
   protected Map<Integer/* internal function id */, List<FunctionArgument>> getFuncsArgs() {
     if (this.funcsArgs == null) {
@@ -55,10 +60,22 @@ public abstract class BaseEvalCodeGenerator implements EvalCodeGenerator {
     this.symbolTable = this.parser.getSymbolTable();
   }
 
+  @Override
+  public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
+    this.lambdaBootstraps = lambdaBootstraps;
+  }
+
+  @Override
+  public AviatorClassLoader getClassLoader() {
+    return this.classLoader;
+  }
+
   public BaseEvalCodeGenerator(final AviatorEvaluatorInstance instance, final String sourceFile,
       final AviatorClassLoader classLoader) {
     super();
     this.instance = instance;
+    this.compileEnv = new Env();
+    this.compileEnv.setInstance(this.instance);
     this.sourceFile = sourceFile;
     this.classLoader = classLoader;
   }

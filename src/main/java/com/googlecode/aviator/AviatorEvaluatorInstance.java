@@ -206,9 +206,11 @@ public final class AviatorEvaluatorInstance {
   /** internal libs in main resources */
   private static final String[] libs = new String[] {"aviator.av"};
 
-  /** cached compiled internal lib functions */
-  private static volatile Map<String, AviatorFunction> internalLibFunctions;
+  /** cached compiled internal ASM lib functions */
+  private static volatile Map<String, AviatorFunction> internalASMLibFunctions;
 
+  /** cached compiled internal interpred lib functions */
+  private static volatile Map<String, AviatorFunction> internalInterpretedLibFunctions;
 
   /**
    * Adds a function loader
@@ -1022,32 +1024,46 @@ public final class AviatorEvaluatorInstance {
   }
 
   private void loadInternalLibs() {
-    if (internalLibFunctions == null) {
-      Map<String, AviatorFunction> funcs = new HashMap<>();
-      for (String lib : libs) {
-        try (final InputStream in = this.getClass().getResourceAsStream("/" + lib);
-            final BufferedInputStream bis = new BufferedInputStream(in);
-            final Reader reader = new InputStreamReader(bis)) {
-          Expression exp = this.compile(lib, Utils.readFully(reader), false);
-          Map<String, Object> exports = executeModule(exp, lib);
-          for (Map.Entry<String, Object> entry : exports.entrySet()) {
-            if (entry.getValue() instanceof AviatorFunction) {
-              final AviatorFunction fn = (AviatorFunction) entry.getValue();
-              addFunction(entry.getKey(), fn);
-              funcs.put(entry.getKey(), fn);
-            }
-          }
-        } catch (IOException e) {
-          throw new IllegalStateException("Fail to load internal lib: " + lib, e);
+    if (getEvalMode() == EvalMode.ASM) {
+      if (internalASMLibFunctions == null) {
+        internalASMLibFunctions = loadInternalFunctions(); // cache it
+      } else {
+        for (Map.Entry<String, AviatorFunction> entry : internalASMLibFunctions.entrySet()) {
+          addFunction(entry.getKey(), entry.getValue());
         }
       }
-
-      internalLibFunctions = funcs; // cache it
     } else {
-      for (Map.Entry<String, AviatorFunction> entry : internalLibFunctions.entrySet()) {
-        addFunction(entry.getKey(), entry.getValue());
+      if (internalInterpretedLibFunctions == null) {
+        internalInterpretedLibFunctions = loadInternalFunctions(); // cache it
+      } else {
+        for (Map.Entry<String, AviatorFunction> entry : internalInterpretedLibFunctions
+            .entrySet()) {
+          addFunction(entry.getKey(), entry.getValue());
+        }
       }
     }
+  }
+
+  private Map<String, AviatorFunction> loadInternalFunctions() {
+    Map<String, AviatorFunction> funcs = new HashMap<>();
+    for (String lib : libs) {
+      try (final InputStream in = this.getClass().getResourceAsStream("/" + lib);
+          final BufferedInputStream bis = new BufferedInputStream(in);
+          final Reader reader = new InputStreamReader(bis)) {
+        Expression exp = this.compile(lib, Utils.readFully(reader), false);
+        Map<String, Object> exports = executeModule(exp, lib);
+        for (Map.Entry<String, Object> entry : exports.entrySet()) {
+          if (entry.getValue() instanceof AviatorFunction) {
+            final AviatorFunction fn = (AviatorFunction) entry.getValue();
+            addFunction(entry.getKey(), fn);
+            funcs.put(entry.getKey(), fn);
+          }
+        }
+      } catch (IOException e) {
+        throw new IllegalStateException("Fail to load internal lib: " + lib, e);
+      }
+    }
+    return funcs;
   }
 
   /**

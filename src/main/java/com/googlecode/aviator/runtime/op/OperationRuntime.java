@@ -56,7 +56,7 @@ public class OperationRuntime {
     if (func == null) {
       return opType.eval(args, env);
     } else {
-      switch (args.length) {
+      switch (opType.getArity()) {
         case 1:
           return func.call(env, args[0]);
         case 2:
@@ -146,8 +146,12 @@ public class OperationRuntime {
 
   public static final boolean hasRuntimeContext(final Map<String, Object> env,
       final OperatorType opType) {
-    return RuntimeUtils.getInstance(env).getOpsMap().containsKey(opType)
-        || RuntimeUtils.isTracedEval(env);
+    return containsOpFunction(env, opType) || RuntimeUtils.isTracedEval(env);
+  }
+
+  public static boolean containsOpFunction(final Map<String, Object> env,
+      final OperatorType opType) {
+    return RuntimeUtils.getInstance(env).getOpsMap().containsKey(opType);
   }
 
   private static final String WHITE_SPACE = " ";

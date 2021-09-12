@@ -37,6 +37,10 @@ public class OperatorIR implements IR {
 
   public static final OperatorIR MATCH = OperatorIR.valueOf(OperatorType.MATCH);
 
+  public static final OperatorIR AND = OperatorIR.valueOf(OperatorType.AND);
+
+  public static final OperatorIR OR = OperatorIR.valueOf(OperatorType.OR);
+
   public static final OperatorIR NOT = OperatorIR.valueOf(OperatorType.NOT);
 
   public static final OperatorIR NEG = OperatorIR.valueOf(OperatorType.NEG);

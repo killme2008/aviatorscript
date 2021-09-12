@@ -80,7 +80,6 @@ import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.utils.Constants;
-import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
 
@@ -100,10 +99,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   private static final String OBJECT_OWNER = "com/googlecode/aviator/runtime/type/AviatorObject";
   public static final String FUNC_ARGS_INNER_VAR = "__fas__";
   private static final String FIELD_PREFIX = "f";
-  /**
-   * Compile environment only has the *instance*.
-   */
-  private final Env compileEnv;
   // Class Writer to generate class
   // private final ClassWriter clazzWriter;
   // Trace visitor
@@ -151,8 +146,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   public ASMCodeGenerator(final AviatorEvaluatorInstance instance, final String sourceFile,
       final AviatorClassLoader classLoader, final OutputStream traceOut) {
     super(instance, sourceFile, classLoader);
-    this.compileEnv = new Env();
-    this.compileEnv.setInstance(this.instance);
     // Generate inner class name
     this.className = "Script_" + System.currentTimeMillis() + "_" + CLASS_COUNTER.getAndIncrement();
     // Auto compute frames
@@ -165,14 +158,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     // }
     visitClass();
   }
-
-
-
-  @Override
-  public AviatorClassLoader getClassLoader() {
-    return this.classLoader;
-  }
-
 
   LambdaGenerator getLambdaGenerator() {
     return this.lambdaGenerator;
@@ -967,13 +952,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     }
     return false;
   }
-
-
-  @Override
-  public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
-    this.lambdaBootstraps = lambdaBootstraps;
-  }
-
 
   @Override
   public void initVariables(final Map<String, VariableMeta/* counter */> vars) {

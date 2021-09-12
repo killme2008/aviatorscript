@@ -32,6 +32,7 @@ import com.googlecode.aviator.code.interpreter.ir.SendIR;
 import com.googlecode.aviator.code.interpreter.ir.SourceInfo;
 import com.googlecode.aviator.code.interpreter.ir.VisitLabelIR;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
+import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
@@ -39,6 +40,7 @@ import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
+import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.IdentityHashSet;
 
@@ -118,16 +120,6 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   public void initMethods(final Map<String, Integer> methods) {
     // TODO Auto-generated method stub
 
-  }
-
-  @Override
-  public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
-    this.lambdaBootstraps = lambdaBootstraps;
-  }
-
-  @Override
-  public AviatorClassLoader getClassLoader() {
-    return this.classLoader;
   }
 
   @Override
@@ -213,12 +205,14 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
 
   @Override
   public void onAndLeft(final Token<?> lookhead) {
-    emit(new AssertTypeIR(AssertTypes.Bool));
-    Label label = makeLabel();
-    pushLabel0(label);
-    this.instruments
-        .add(new BranchUnlessIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
-    emit(PopIR.INSTANCE);
+    if (!OperationRuntime.containsOpFunction(this.compileEnv, OperatorType.AND)) {
+      emit(new AssertTypeIR(AssertTypes.Bool));
+      Label label = makeLabel();
+      pushLabel0(label);
+      this.instruments
+          .add(new BranchUnlessIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
+      emit(PopIR.INSTANCE);
+    }
   }
 
   private void emit(final IR ir) {
@@ -227,9 +221,13 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
 
   @Override
   public void onAndRight(final Token<?> lookhead) {
-    emit(new AssertTypeIR(AssertTypes.Bool));
-    Label label = popLabel0();
-    visitLabel(label);
+    if (!OperationRuntime.containsOpFunction(this.compileEnv, OperatorType.AND)) {
+      emit(new AssertTypeIR(AssertTypes.Bool));
+      Label label = popLabel0();
+      visitLabel(label);
+    } else {
+      emit(OperatorIR.AND);
+    }
   }
 
   @Override
@@ -267,19 +265,25 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
 
   @Override
   public void onJoinLeft(final Token<?> lookhead) {
-    emit(new AssertTypeIR(AssertTypes.Bool));
-    Label label = makeLabel();
-    pushLabel0(label);
-    this.instruments
-        .add(new BranchIfIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
-    emit(PopIR.INSTANCE);
+    if (!OperationRuntime.containsOpFunction(this.compileEnv, OperatorType.AND)) {
+      emit(new AssertTypeIR(AssertTypes.Bool));
+      Label label = makeLabel();
+      pushLabel0(label);
+      this.instruments
+          .add(new BranchIfIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
+      emit(PopIR.INSTANCE);
+    }
   }
 
   @Override
   public void onJoinRight(final Token<?> lookhead) {
-    emit(new AssertTypeIR(AssertTypes.Bool));
-    Label label = popLabel0();
-    visitLabel(label);
+    if (!OperationRuntime.containsOpFunction(this.compileEnv, OperatorType.AND)) {
+      emit(new AssertTypeIR(AssertTypes.Bool));
+      Label label = popLabel0();
+      visitLabel(label);
+    } else {
+      emit(OperatorIR.OR);
+    }
   }
 
   @Override

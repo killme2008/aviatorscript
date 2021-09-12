@@ -42,6 +42,7 @@ import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
+import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -1453,6 +1454,43 @@ public class FunctionTest {
       assertEquals("Could not compare <String, hello> with <JavaType, a, 1, java.lang.Integer>",
           e.getMessage());
     }
+  }
+
+  @Test
+  public void testOverloadLogicOperator() {
+    // AviatorEvaluator.setOption(Options.TRACE_EVAL, true);
+    AviatorEvaluator.addOpFunction(OperatorType.AND, new AbstractFunction() {
+
+      @Override
+      public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+          final AviatorObject arg2) {
+        return arg1.add(arg2, env);
+      }
+
+      @Override
+      public String getName() {
+        return "&&";
+      }
+    });
+    AviatorEvaluator.addOpFunction(OperatorType.OR, new AbstractFunction() {
+
+      @Override
+      public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+          final AviatorObject arg2) {
+        return arg1.sub(arg2, env);
+      }
+
+      @Override
+      public String getName() {
+        return "||";
+      }
+    });
+    assertEquals(3, AviatorEvaluator.execute("1 && 2"));
+    assertEquals(6, AviatorEvaluator.execute("1 && 2 && 3"));
+    assertEquals(0, AviatorEvaluator.execute("1 && 2 || 3"));
+    assertEquals(-4, AviatorEvaluator.execute("1 || 2 || 3"));
+    AviatorEvaluator.removeOpFunction(OperatorType.AND);
+    AviatorEvaluator.removeOpFunction(OperatorType.OR);
   }
 
   @Test
