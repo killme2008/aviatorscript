@@ -9,7 +9,7 @@ public class SimpleExample {
   public static void main(final String[] args) throws Exception {
     AviatorEvaluator.setOption(Options.EVAL_MODE, EvalMode.INTERPRETER);
     AviatorEvaluator.setOption(Options.TRACE_EVAL, true);
-    Object result = AviatorEvaluator.execute("true || p(1)");
+    Object result = AviatorEvaluator.execute("a=1; '#{a+100}'");
     System.out.println(result);
     System.out.println(1 == 1 && 2 != 2 ? 1 : 2 == 3 ? 4 : 5);
 

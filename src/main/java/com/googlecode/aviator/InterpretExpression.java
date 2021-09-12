@@ -1,5 +1,6 @@
 package com.googlecode.aviator;
 
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.code.interpreter.IR;
@@ -8,6 +9,7 @@ import com.googlecode.aviator.code.interpreter.ir.JumpIR;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
 
@@ -17,11 +19,22 @@ public class InterpretExpression extends BaseExpression {
 
   private final boolean unboxObject;
 
+  private final Map<VariableMeta, AviatorJavaType> variables =
+      new IdentityHashMap<VariableMeta, AviatorJavaType>();
+
+
   public InterpretExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
       final SymbolTable symbolTable, final List<IR> instruments, final boolean unboxObject) {
     super(instance, vars, symbolTable);
     this.instruments = instruments;
     this.unboxObject = unboxObject;
+    for (VariableMeta v : vars) {
+      this.variables.put(v, new AviatorJavaType(v.getName(), this.symbolTable));
+    }
+  }
+
+  public AviatorJavaType loadVar(final VariableMeta v) {
+    return this.variables.get(v);
   }
 
   @Override
@@ -36,6 +49,7 @@ public class InterpretExpression extends BaseExpression {
       RuntimeUtils.printlnTrace(env, "    " + pc + " return");
       RuntimeUtils.printlnTrace(env, "Execute instruments: ");
     }
+
 
     InterpretContext ctx = new InterpretContext(this, this.instruments, (Env) env);
     IR ir = null;

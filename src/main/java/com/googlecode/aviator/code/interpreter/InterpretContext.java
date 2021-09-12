@@ -4,6 +4,8 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import com.googlecode.aviator.InterpretExpression;
+import com.googlecode.aviator.parser.VariableMeta;
+import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
 
@@ -28,6 +30,10 @@ public class InterpretContext {
     this.instruments = instruments;
     this.env = env;
     next();
+  }
+
+  public AviatorJavaType loadVar(final VariableMeta v) {
+    return this.expression.loadVar(v);
   }
 
   public boolean isReachEnd() {

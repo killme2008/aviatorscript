@@ -33,6 +33,7 @@ import com.googlecode.aviator.code.interpreter.ir.SendIR;
 import com.googlecode.aviator.code.interpreter.ir.SourceInfo;
 import com.googlecode.aviator.code.interpreter.ir.VisitLabelIR;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
+import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
@@ -54,6 +55,10 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
   private final List<IR> instruments = new ArrayList<>();
   private final AviatorEvaluatorInstance instance;
 
+  private Map<String, VariableMeta/* metadata */> variables = Collections.emptyMap();
+
+  private final Map<Token<?>/* constant token */, String/* field name */> constantPool =
+      Collections.emptyMap();
 
   private final String sourceFile;
 
@@ -62,6 +67,8 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
   private final AviatorClassLoader classLoader;
 
   private Parser parser;
+
+  private SymbolTable symbolTable;
 
   /**
    * parent code generator when compiling lambda.
@@ -139,19 +146,19 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
 
   @Override
   public void start() {
-    // TODO Auto-generated method stub
-
+    // not implemented yet
   }
 
   @Override
   public void initVariables(final Map<String, VariableMeta> vars) {
-    // TODO Auto-generated method stub
-
+    this.variables = vars;
   }
 
   @Override
   public void initConstants(final Set<Token<?>> constants) {
-    // TODO Auto-generated method stub
+    if (constants.isEmpty()) {
+      return;
+    }
 
   }
 
@@ -196,6 +203,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
   @Override
   public void setParser(final Parser parser) {
     this.parser = parser;
+    this.symbolTable = this.parser.getSymbolTable();
   }
 
   @Override
@@ -392,8 +400,9 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
     optimize(instruments);
     resolveLabels(instruments);
 
-    final InterpretExpression exp = new InterpretExpression(this.instance,
-        Collections.<VariableMeta>emptyList(), null, instruments, unboxObject);
+    final InterpretExpression exp =
+        new InterpretExpression(this.instance, new ArrayList<VariableMeta>(this.variables.values()),
+            this.symbolTable, instruments, unboxObject);
     exp.setLambdaBootstraps(this.lambdaBootstraps);
     exp.setSourceFile(this.sourceFile);
     exp.setFuncsArgs(this.funcsArgs);
@@ -440,7 +449,13 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
   @Override
   public void onConstant(final Token<?> lookhead) {
     if (LOAD_CONSTANTS_TYPE.contains(lookhead.getType())) {
-      emit(new LoadIR(this.sourceFile, lookhead));
+      VariableMeta meta = null;
+
+      if (lookhead.getType() == TokenType.Variable) {
+        meta = this.variables.get(lookhead.getLexeme());
+      }
+
+      emit(new LoadIR(this.sourceFile, lookhead, meta));
     }
   }
 

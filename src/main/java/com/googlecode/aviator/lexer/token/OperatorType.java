@@ -16,6 +16,7 @@
 package com.googlecode.aviator.lexer.token;
 
 import java.util.Map;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.IllegalArityException;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -117,7 +118,8 @@ public enum OperatorType {
         return args[1];
       case ASSIGNMENT:
         if (!(args[0] instanceof AviatorJavaType)) {
-          throw new IllegalArgumentException(args[0].desc(env) + " can't be as a left value.");
+          throw new ExpressionRuntimeException(
+              args[0].desc(env) + " can't be a left value for assignment.");
         }
         args[0].setValue(args[1], env);
         return args[1];

@@ -1068,8 +1068,9 @@ public final class AviatorEvaluatorInstance {
   /**
    * Create a aviator evaluator instance.
    */
-  AviatorEvaluatorInstance() {
+  AviatorEvaluatorInstance(final EvalMode evalMode) {
     fillDefaultOpts();
+    setOption(Options.EVAL_MODE, evalMode);
     loadFeatureFunctions();
     loadLib();
     loadModule();

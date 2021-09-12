@@ -7,6 +7,7 @@ import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.token.NumberToken;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Variable;
+import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.type.AviatorBigInt;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorDecimal;
@@ -27,12 +28,14 @@ import com.googlecode.aviator.utils.TypeUtils;
  */
 public class LoadIR implements IR {
   private final Token<?> token;
+  private final VariableMeta meta;
   private final String sourceFile;
 
-  public LoadIR(final String sourceFile, final Token<?> token) {
+  public LoadIR(final String sourceFile, final Token<?> token, final VariableMeta meta) {
     super();
     this.token = token;
     this.sourceFile = sourceFile;
+    this.meta = meta;
   }
 
   @Override
@@ -73,7 +76,14 @@ public class LoadIR implements IR {
         } else if (this.token == Variable.NIL) {
           context.push(AviatorNil.NIL);
         } else {
-          context.push(new AviatorJavaType(this.token.getLexeme()));
+          AviatorJavaType var;
+          if (this.meta != null) {
+            var = context.loadVar(this.meta);
+            assert (var != null);
+          } else {
+            var = new AviatorJavaType(this.token.getLexeme());
+          }
+          context.push(var);
         }
         break;
       default:

@@ -2,6 +2,7 @@ package com.googlecode.aviator;
 
 import java.math.MathContext;
 import java.util.Set;
+import com.googlecode.aviator.utils.Utils;
 
 
 /**
@@ -309,7 +310,6 @@ public enum Options {
     return intoObject(getDefaultValueObject());
   }
 
-
   /**
    * Returns the default value object of option.
    *
@@ -344,7 +344,7 @@ public enum Options {
       case ASSIGNABLE_ALLOWED_CLASS_SET:
         return NULL_CLASS_SET;
       case EVAL_MODE:
-        return ASM_MODE;
+        return Utils.isAndroid() ? INTERPRETER_MODE : ASM_MODE;
     }
     return null;
   }
