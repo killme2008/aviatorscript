@@ -15,6 +15,7 @@ import com.googlecode.aviator.runtime.type.AviatorDouble;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorNil;
+import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorPattern;
 import com.googlecode.aviator.runtime.type.AviatorString;
 import com.googlecode.aviator.utils.Constants;
@@ -30,17 +31,27 @@ public class LoadIR implements IR {
   private final Token<?> token;
   private final VariableMeta meta;
   private final String sourceFile;
+  private final boolean inConstantPool;
 
-  public LoadIR(final String sourceFile, final Token<?> token, final VariableMeta meta) {
+  public LoadIR(final String sourceFile, final Token<?> token, final VariableMeta meta,
+      final boolean inConstantPool) {
     super();
     this.token = token;
     this.sourceFile = sourceFile;
     this.meta = meta;
+    this.inConstantPool = inConstantPool;
   }
 
   @Override
   public void eval(final InterpretContext context) {
     if (this.token == null) {
+      return;
+    }
+
+    if (this.inConstantPool) {
+      final AviatorObject constant = context.loadConstant(this.token);
+      assert (constant != null);
+      context.push(constant);
       return;
     }
 

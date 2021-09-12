@@ -45,7 +45,6 @@ import static com.googlecode.aviator.asm.Opcodes.RETURN;
 import static com.googlecode.aviator.asm.Opcodes.SWAP;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,8 +63,7 @@ import com.googlecode.aviator.asm.ClassWriter;
 import com.googlecode.aviator.asm.Label;
 import com.googlecode.aviator.asm.MethodVisitor;
 import com.googlecode.aviator.asm.Opcodes;
-import com.googlecode.aviator.code.CodeGenerator;
-import com.googlecode.aviator.code.EvalCodeGenerator;
+import com.googlecode.aviator.code.BaseEvalCodeGenerator;
 import com.googlecode.aviator.code.LambdaGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -76,7 +74,6 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
-import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.FunctionParam;
@@ -93,7 +90,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  * @author dennis
  *
  */
-public class ASMCodeGenerator implements EvalCodeGenerator {
+public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   private static final String RUNTIME_UTILS = "com/googlecode/aviator/runtime/RuntimeUtils";
   private static final String OBJECT_DESC = "Lcom/googlecode/aviator/runtime/type/AviatorObject;";
@@ -103,9 +100,6 @@ public class ASMCodeGenerator implements EvalCodeGenerator {
   private static final String OBJECT_OWNER = "com/googlecode/aviator/runtime/type/AviatorObject";
   public static final String FUNC_ARGS_INNER_VAR = "__fas__";
   private static final String FIELD_PREFIX = "f";
-  // evaluator instance
-  private final AviatorEvaluatorInstance instance;
-  private SymbolTable symbolTable;
   /**
    * Compile environment only has the *instance*.
    */
@@ -120,13 +114,6 @@ public class ASMCodeGenerator implements EvalCodeGenerator {
   private MethodVisitor mv;
   // Class name
   private final String className;
-  // Class loader to define generated class
-  private final AviatorClassLoader classLoader;
-  // lambda function generator
-  private LambdaGenerator lambdaGenerator;
-  // parser
-  private Parser parser;
-
   private static final AtomicLong CLASS_COUNTER = new AtomicLong();
 
   /**
@@ -146,40 +133,13 @@ public class ASMCodeGenerator implements EvalCodeGenerator {
   private Map<Token<?>/* constant token */, String/* field name */> constantPool =
       Collections.emptyMap();
 
-  private Map<String, VariableMeta/* metadata */> variables = Collections.emptyMap();
   private Map<String, Integer/* counter */> methodTokens = Collections.emptyMap();
 
   private final Map<Label, Map<String/* inner name */, Integer/* local index */>> labelNameIndexMap =
       new IdentityHashMap<>();
-  /**
-   * function params info.
-   */
-  private Map<Integer/* internal function id */, List<FunctionArgument>> funcsArgs;
-
-  private int funcInvocationId = 0;
-
-  /**
-   * Compiled lambda functions.
-   */
-  private Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
-
   private static final Label START_LABEL = new Label();
 
   private Label currentLabel = START_LABEL;
-
-
-  /**
-   * parent code generator when compiling lambda.
-   */
-  private CodeGenerator parentCodeGenerator;
-
-  private final String sourceFile;
-
-  @Override
-  public void setParser(final Parser parser) {
-    this.parser = parser;
-    this.symbolTable = parser.getSymbolTable();
-  }
 
 
   private void setMaxStacks(final int newMaxStacks) {
@@ -188,23 +148,10 @@ public class ASMCodeGenerator implements EvalCodeGenerator {
     }
   }
 
-  private Map<Integer/* internal function id */, List<FunctionArgument>> getFuncsArgs() {
-    if (this.funcsArgs == null) {
-      this.funcsArgs = new HashMap<>();
-    }
-    return this.funcsArgs;
-  }
-
-  private int getNextFuncInvocationId() {
-    return this.funcInvocationId++;
-  }
-
   public ASMCodeGenerator(final AviatorEvaluatorInstance instance, final String sourceFile,
       final AviatorClassLoader classLoader, final OutputStream traceOut) {
-    this.classLoader = classLoader;
-    this.instance = instance;
+    super(instance, sourceFile, classLoader);
     this.compileEnv = new Env();
-    this.sourceFile = sourceFile;
     this.compileEnv.setInstance(this.instance);
     // Generate inner class name
     this.className = "Script_" + System.currentTimeMillis() + "_" + CLASS_COUNTER.getAndIncrement();
@@ -1231,9 +1178,6 @@ public class ASMCodeGenerator implements EvalCodeGenerator {
       this.methodName = methodName;
     }
   }
-
-  private final ArrayDeque<MethodMetaData> methodMetaDataStack = new ArrayDeque<>();
-
 
   @Override
   public void onArray(final Token<?> lookhead) {

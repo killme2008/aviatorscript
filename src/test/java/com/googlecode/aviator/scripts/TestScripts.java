@@ -13,6 +13,7 @@ import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.TestUtils;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.StandardError;
@@ -62,10 +63,12 @@ public class TestScripts {
 
   @Test
   public void testLibs() {
+    this.instance.setOption(Options.TRACE_EVAL, true);
     testLib("aviator");
     testLib("math");
     testLib("map");
     testLib("var");
+    this.instance.setOption(Options.TRACE_EVAL, true);
   }
 
   @Test

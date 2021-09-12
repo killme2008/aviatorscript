@@ -99,7 +99,23 @@ public abstract class BaseExpression implements Expression {
 
   protected void afterPopulateFullNames(final Map<String, VariableMeta> fullNames,
       final Set<String> parentVars) {
-
+    if (this.lambdaBootstraps != null && !this.lambdaBootstraps.isEmpty()) {
+      for (LambdaFunctionBootstrap bootstrap : this.lambdaBootstraps.values()) {
+        for (VariableMeta meta : bootstrap.getClosureOverFullVarNames()) {
+          VariableMeta existsMeta = fullNames.get(meta.getName());
+          if (existsMeta == null) {
+            if (!parentVars.contains(meta.getName())) {
+              fullNames.put(meta.getName(), meta);
+            }
+          } else {
+            // Appear first, update the meta
+            if (existsMeta.getFirstIndex() > meta.getFirstIndex()) {
+              fullNames.put(meta.getName(), meta);
+            }
+          }
+        }
+      }
+    }
   }
 
   private void populateFullNames() {

@@ -164,23 +164,15 @@ public class OperationRuntime {
   private static void trace(final Map<String, Object> env, final OperatorType opType,
       final AviatorObject result, final AviatorObject... args) {
 
-    switch (args.length) {
-      case 1:
-        RuntimeUtils.printlnTrace(env,
-            TRACE_PREFIX + opType.token + desc(args[0], env) + " => " + desc(result, env));
-        break;
-      case 2:
-        RuntimeUtils.printlnTrace(env, TRACE_PREFIX + desc(args[0], env) + WHITE_SPACE
-            + opType.token + WHITE_SPACE + desc(args[1], env) + " => " + desc(result, env));
-        break;
-      case 3:
-        RuntimeUtils.printlnTrace(env,
-            TRACE_PREFIX + desc(args[0], env) + WHITE_SPACE + "?" + WHITE_SPACE + desc(args[0], env)
-                + WHITE_SPACE + ":" + WHITE_SPACE + desc(args[1], env) + " => "
-                + desc(result, env));
-        break;
-      default:
-        throw new UnsupportedOperationException("Impossible");
+    StringBuilder argsDec = new StringBuilder();
+    argsDec.append(desc(args[0], env));
+    for (int i = 1; i < args.length; i++) {
+      if (args[i] != null) {
+        argsDec.append(WHITE_SPACE).append(opType.token).append(WHITE_SPACE)
+            .append(desc(args[i], env));
+      }
     }
+
+    RuntimeUtils.printlnTrace(env, TRACE_PREFIX + argsDec + " => " + desc(result, env));
   }
 }

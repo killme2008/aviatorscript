@@ -1,9 +1,7 @@
-package com.googlecode.aviator.code;
+package com.googlecode.aviator.code.interpreter;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,8 +13,9 @@ import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.InterpretExpression;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.code.BaseEvalCodeGenerator;
+import com.googlecode.aviator.code.LambdaGenerator;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator.MethodMetaData;
-import com.googlecode.aviator.code.interpreter.IR;
 import com.googlecode.aviator.code.interpreter.ir.AssertTypeIR;
 import com.googlecode.aviator.code.interpreter.ir.AssertTypeIR.AssertTypes;
 import com.googlecode.aviator.code.interpreter.ir.BranchIfIR;
@@ -33,11 +32,9 @@ import com.googlecode.aviator.code.interpreter.ir.SendIR;
 import com.googlecode.aviator.code.interpreter.ir.SourceInfo;
 import com.googlecode.aviator.code.interpreter.ir.VisitLabelIR;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
-import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.parser.AviatorClassLoader;
-import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.FunctionParam;
@@ -51,36 +48,9 @@ import com.googlecode.aviator.utils.IdentityHashSet;
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class InterpretCodeGenerator implements EvalCodeGenerator {
+public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   private final List<IR> instruments = new ArrayList<>();
-  private final AviatorEvaluatorInstance instance;
-
-  private Map<String, VariableMeta/* metadata */> variables = Collections.emptyMap();
-
-  private final Map<Token<?>/* constant token */, String/* field name */> constantPool =
-      Collections.emptyMap();
-
-  private final String sourceFile;
-
-  private LambdaGenerator lambdaGenerator;
-
-  private final AviatorClassLoader classLoader;
-
-  private Parser parser;
-
-  private SymbolTable symbolTable;
-
-  /**
-   * parent code generator when compiling lambda.
-   */
-  private CodeGenerator parentCodeGenerator;
-
-  /**
-   * Compiled lambda functions.
-   */
-  private Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
-
-  private final ArrayDeque<MethodMetaData> methodMetaDataStack = new ArrayDeque<>();
+  private Set<Token<?>> constantPool = Collections.emptySet();
 
   private int labelNum;
 
@@ -89,24 +59,6 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
   private final Stack<Label> labels1 = new Stack<>();
 
   private Label currLabel;
-
-  /**
-   * function params info.
-   */
-  private Map<Integer/* internal function id */, List<FunctionArgument>> funcsArgs;
-
-  private int funcInvocationId = 0;
-
-  private Map<Integer/* internal function id */, List<FunctionArgument>> getFuncsArgs() {
-    if (this.funcsArgs == null) {
-      this.funcsArgs = new HashMap<>();
-    }
-    return this.funcsArgs;
-  }
-
-  private int getNextFuncInvocationId() {
-    return this.funcInvocationId++;
-  }
 
   private void visitLabel(final Label label) {
     this.currLabel = label;
@@ -159,7 +111,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
     if (constants.isEmpty()) {
       return;
     }
-
+    this.constantPool = constants;
   }
 
   @Override
@@ -185,10 +137,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
 
   public InterpretCodeGenerator(final AviatorEvaluatorInstance instance, final String sourceFile,
       final AviatorClassLoader classLoader) {
-    super();
-    this.instance = instance;
-    this.sourceFile = sourceFile;
-    this.classLoader = classLoader;
+    super(instance, sourceFile, classLoader);
   }
 
   @Override
@@ -198,12 +147,6 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
     } else {
       emit(OperatorIR.ASSIGN);
     }
-  }
-
-  @Override
-  public void setParser(final Parser parser) {
-    this.parser = parser;
-    this.symbolTable = this.parser.getSymbolTable();
   }
 
   @Override
@@ -402,7 +345,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
 
     final InterpretExpression exp =
         new InterpretExpression(this.instance, new ArrayList<VariableMeta>(this.variables.values()),
-            this.symbolTable, instruments, unboxObject);
+            this.constantPool, this.symbolTable, instruments, unboxObject);
     exp.setLambdaBootstraps(this.lambdaBootstraps);
     exp.setSourceFile(this.sourceFile);
     exp.setFuncsArgs(this.funcsArgs);
@@ -455,7 +398,7 @@ public class InterpretCodeGenerator implements EvalCodeGenerator {
         meta = this.variables.get(lookhead.getLexeme());
       }
 
-      emit(new LoadIR(this.sourceFile, lookhead, meta));
+      emit(new LoadIR(this.sourceFile, lookhead, meta, this.constantPool.contains(lookhead)));
     }
   }
 

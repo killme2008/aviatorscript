@@ -324,6 +324,7 @@ fn test_meta(){
   j.assertNull(meta(a));
   
   j.assertEquals("test", meta(with_meta(1, "a", "test"), "a"));
+  j.assertEquals(1, without_meta(1, "a"));
   j.assertNull(meta(a));
   j.assertSame(a, with_meta(a, "a key", 100));
   j.assertEquals(100,  meta(a, "a key"));

@@ -51,7 +51,6 @@ import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
 
-
 public class FunctionTest {
 
   @Test

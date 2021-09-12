@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import com.googlecode.aviator.InterpretExpression;
+import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -34,6 +35,10 @@ public class InterpretContext {
 
   public AviatorJavaType loadVar(final VariableMeta v) {
     return this.expression.loadVar(v);
+  }
+
+  public AviatorObject loadConstant(final Token<?> token) {
+    return this.expression.loadConstant(token);
   }
 
   public boolean isReachEnd() {
@@ -95,5 +100,18 @@ public class InterpretContext {
 
   public AviatorObject pop() {
     return this.operands.pop();
+  }
+
+  public String descOperandsStack() {
+    StringBuilder sb = new StringBuilder("<Stack, [");
+    int i = this.operands.size();
+    for (AviatorObject obj : this.operands) {
+      sb.append(obj.desc(this.env));
+      if (--i > 0) {
+        sb.append(", ");
+      }
+    }
+    sb.append("]>");
+    return sb.toString();
   }
 }

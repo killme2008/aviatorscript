@@ -17,11 +17,9 @@ package com.googlecode.aviator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.parser.VariableMeta;
-import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
@@ -52,28 +50,6 @@ public abstract class ClassExpression extends BaseExpression {
       throw e;
     } catch (Throwable t) {
       throw Reflector.sneakyThrow(t);
-    }
-  }
-
-  @Override
-  protected void afterPopulateFullNames(final Map<String, VariableMeta> fullNames,
-      final Set<String> parentVars) {
-    if (this.lambdaBootstraps != null) {
-      for (LambdaFunctionBootstrap bootstrap : this.lambdaBootstraps.values()) {
-        for (VariableMeta meta : bootstrap.getClosureOverFullVarNames()) {
-          VariableMeta existsMeta = fullNames.get(meta.getName());
-          if (existsMeta == null) {
-            if (!parentVars.contains(meta.getName())) {
-              fullNames.put(meta.getName(), meta);
-            }
-          } else {
-            // Appear first, update the meta
-            if (existsMeta.getFirstIndex() > meta.getFirstIndex()) {
-              fullNames.put(meta.getName(), meta);
-            }
-          }
-        }
-      }
     }
   }
 
