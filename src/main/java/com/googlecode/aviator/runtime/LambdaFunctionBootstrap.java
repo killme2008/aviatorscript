@@ -16,7 +16,7 @@ import com.googlecode.aviator.utils.Env;
  * @author dennis
  *
  */
-public class LambdaFunctionBootstrap {
+public class LambdaFunctionBootstrap implements Comparable<LambdaFunctionBootstrap> {
   // the generated lambda class name
   private final String name;
   // The compiled lambda body expression
@@ -29,6 +29,11 @@ public class LambdaFunctionBootstrap {
 
   private final ThreadLocal<LambdaFunction> fnLocal = new ThreadLocal<>();
 
+
+  @Override
+  public int compareTo(final LambdaFunctionBootstrap o) {
+    return this.name.compareTo(o.name);
+  }
 
   public String getName() {
     return this.name;

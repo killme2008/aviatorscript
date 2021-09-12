@@ -1,5 +1,7 @@
 package com.googlecode.aviator;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import com.googlecode.aviator.code.interpreter.ir.LoadIR;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.VariableMeta;
+import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -61,19 +64,42 @@ public class InterpretExpression extends BaseExpression {
     return this.constantPool.get(token);
   }
 
+  public void printInstruments() {
+    traceInstruments(Collections.<String, Object>emptyMap(), null, true);
+  }
+
+  private void traceInstruments(final Map<String, Object> env, final String name,
+      final boolean traceLambda) {
+    int pc = 0;
+    RuntimeUtils.printlnTrace(env, (name == null ? this.sourceFile : name) + " instruments: ");
+    for (IR ir : this.instruments) {
+      RuntimeUtils.printlnTrace(env, "    " + (pc++) + " " + ir.toString());
+    }
+    RuntimeUtils.printlnTrace(env, "    " + pc + " return");
+
+    if (this.lambdaBootstraps != null) {
+      final List<LambdaFunctionBootstrap> bootstraps =
+          new ArrayList<>(this.lambdaBootstraps.values());
+      Collections.sort(bootstraps);
+      for (LambdaFunctionBootstrap bootstrap : bootstraps) {
+        final Expression exp = bootstrap.getExpression();
+        if (exp instanceof InterpretExpression) {
+          InterpretExpression iexp = (InterpretExpression) exp;
+          iexp.traceInstruments(env, bootstrap.getName(), traceLambda);
+        } else {
+          RuntimeUtils.printlnTrace(env, bootstrap.getName() + " instruments: " + exp);
+        }
+      }
+    }
+  }
+
   @Override
   public Object executeDirectly(final Map<String, Object> env) {
     final boolean trace = RuntimeUtils.isTracedEval(env);
     if (trace) {
-      int pc = 0;
-      RuntimeUtils.printlnTrace(env, "Expression instruments: ");
-      for (IR ir : this.instruments) {
-        RuntimeUtils.printlnTrace(env, "    " + (pc++) + " " + ir.toString());
-      }
-      RuntimeUtils.printlnTrace(env, "    " + pc + " return");
+      traceInstruments(env, null, false);
       RuntimeUtils.printlnTrace(env, "Execute instruments: ");
     }
-
 
     InterpretContext ctx = new InterpretContext(this, this.instruments, (Env) env);
     IR ir = null;

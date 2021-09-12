@@ -95,6 +95,6 @@ public class OperatorIR implements IR {
 
   @Override
   public String toString() {
-    return this.op.name();
+    return this.op.name().toLowerCase();
   }
 }
