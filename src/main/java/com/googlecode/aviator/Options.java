@@ -344,8 +344,46 @@ public enum Options {
       case ASSIGNABLE_ALLOWED_CLASS_SET:
         return NULL_CLASS_SET;
       case EVAL_MODE:
-        return Utils.isAndroid() ? INTERPRETER_MODE : ASM_MODE;
+        return getDefaultEvalMode();
     }
     return null;
+  }
+
+  private Value getDefaultEvalMode() {
+    if (SYS_EVAL_MODE != null) {
+      return SYS_EVAL_MODE;
+    }
+
+    return Utils.isAndroid() ? INTERPRETER_MODE : ASM_MODE;
+  }
+
+
+  public static Value SYS_EVAL_MODE = getSystemEvalMode();
+
+  private static Value getSystemEvalMode() {
+    String sysProperty = System.getProperty("aviator.eval.mode");
+    Value result = null;
+    if (sysProperty != null && sysProperty.trim().length() > 0) {
+      try {
+        EvalMode mode = EvalMode.valueOf(sysProperty.trim().toUpperCase());
+        switch (mode) {
+          case ASM:
+            result = ASM_MODE;
+            break;
+          case INTERPRETER:
+            result = INTERPRETER_MODE;
+            break;
+          default:
+            break;
+        }
+      } catch (Throwable t) {
+        // ignore
+      }
+    }
+    if (result != null) {
+      System.out.println("[Aviator INFO] Using " + result.evalMode.name()
+          + " eval mode by system property setting aviator.eval.mode");
+    }
+    return result;
   }
 }
