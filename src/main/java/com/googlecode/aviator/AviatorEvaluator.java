@@ -80,7 +80,7 @@ public final class AviatorEvaluator {
 
   /**
    * Create a aviator script engine instance with eval mode
-   * 
+   *
    * @since 5.3
    * @return the script engine
    */
@@ -94,12 +94,12 @@ public final class AviatorEvaluator {
    * @return the script engine
    */
   public static AviatorEvaluatorInstance newInstance() {
-    return newInstance(Options.EVAL_MODE.getDefaultValueObject().evalMode);
+    return newInstance(Options.getDefaultEvalMode().evalMode);
   }
 
   private static class StaticHolder {
     private static AviatorEvaluatorInstance INSTANCE =
-        new AviatorEvaluatorInstance(Options.EVAL_MODE.getDefaultValueObject().evalMode);
+        new AviatorEvaluatorInstance(Options.getDefaultEvalMode().evalMode);
   }
 
   /**

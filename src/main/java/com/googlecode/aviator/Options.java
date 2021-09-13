@@ -349,7 +349,7 @@ public enum Options {
     return null;
   }
 
-  private Value getDefaultEvalMode() {
+  public static Value getDefaultEvalMode() {
     if (SYS_EVAL_MODE != null) {
       return SYS_EVAL_MODE;
     }
