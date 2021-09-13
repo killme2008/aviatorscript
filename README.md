@@ -28,11 +28,13 @@
 4. 集合数据 ELT 等
 ……
 
+**推荐使用版本 5.2.6 及以上**
+
 # News
 
+* [5.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.7)，修复 `Expression#getVariableNames` 和 `Expression#getVariableFullNames` 方法存在的并发 bug等。
 * [5.2.6](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.6)，**强烈推荐升级**，修复 continue 语句无法在 if/else 或者嵌套 if 语句里正常工作的 work，增加 `partial(f, &args)` 函数等。
-* [5.2.5](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.5)，调用 java 方法数值装箱类型自动转换、修复 bug 等。
-* [5.2.4](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.4)，unpacking arguments（类 python 语法）、使用 `fn` 定义匿名函数和改进 for 语句支持索引、KV 键值等。
+
 
 # Dependency
 

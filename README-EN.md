@@ -23,11 +23,13 @@ It compiles script to java byte code and evaluate it on the fly.
 7. A wide range of customization options to be used as a secure runtime scripting sandbox or full-featured scripting language.
 8. Lightweight and high performance.
 
+
+**Recommend version 5.2.6 and above.**
+
 # News
 
+* [5.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.7)，fixed a concurrent issue in `Expression#getVariableNames` and `Expression#getVariableFullNames` etc.
 * [5.2.6](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.6)，**A strongly recommended upgrading**，fixed `continue` statement not work with if/else or nested if statements etc.
-* [5.2.5](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.5)，auto convert boxing types into aviator number types when invoking java methods and bug fixes etc.
-* [5.2.4](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.4)，unpacking arguments, define anonymous by `fn` and improve `for` statement etc.
 
 # Dependency
 
