@@ -246,7 +246,7 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
     this.instruments
         .add(new GotoIR(peekLabel1(), new SourceInfo(this.sourceFile, lookhead.getLineNo())));
 
-    emit(PopIR.INSTANCE);
+    // emit(PopIR.INSTANCE);
     Label label0 = popLabel0();
     visitLabel(label0);
     emit(PopIR.INSTANCE);
