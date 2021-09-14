@@ -6,8 +6,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.AviatorEvaluatorInstance;
+import com.googlecode.aviator.EvalMode;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorLong;
@@ -16,23 +19,30 @@ import com.googlecode.aviator.runtime.type.AviatorString;
 
 public class OperatorFunctionTest {
 
+  protected AviatorEvaluatorInstance instance;
+
+  @Before
+  public void setup() {
+    this.instance = AviatorEvaluator.newInstance(EvalMode.ASM);
+  }
+
   @After
   public void tearDown() {
-    AviatorEvaluator.OPS_MAP.clear();
+    this.instance.getOpsMap().clear();
   }
 
   @Test
   public void testCustomArrayIndexOperator() {
     Map<String, Object> env = new HashMap<>();
     env.put("a", Arrays.asList(4, 5, 6));
-    assertEquals(4, AviatorEvaluator.execute("a[0]", env));
+    assertEquals(4, this.instance.execute("a[0]", env));
     try {
-      assertEquals(6, AviatorEvaluator.execute("a[3]", env));
+      assertEquals(6, this.instance.execute("a[3]", env));
       fail();
     } catch (Exception e) {
 
     }
-    AviatorEvaluator.addOpFunction(OperatorType.INDEX, new AbstractFunction() {
+    this.instance.addOpFunction(OperatorType.INDEX, new AbstractFunction() {
 
       @Override
       public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
@@ -46,11 +56,11 @@ public class OperatorFunctionTest {
       }
     });
 
-    assertEquals(6, AviatorEvaluator.execute("a[3]", env));
-    assertEquals(5, AviatorEvaluator.execute("a[2]", env));
-    assertEquals(4, AviatorEvaluator.execute("a[1]", env));
+    assertEquals(6, this.instance.execute("a[3]", env));
+    assertEquals(5, this.instance.execute("a[2]", env));
+    assertEquals(4, this.instance.execute("a[1]", env));
     try {
-      assertEquals(4, AviatorEvaluator.execute("a[0]", env));
+      assertEquals(4, this.instance.execute("a[0]", env));
       fail();
     } catch (Exception e) {
 
@@ -60,11 +70,11 @@ public class OperatorFunctionTest {
   @Test
   public void testCustomUnaryOperatorFunction() {
     try {
-      assertEquals("3", AviatorEvaluator.exec("!3"));
+      assertEquals("3", this.instance.exec("!3"));
       fail();
     } catch (Exception e) {
     }
-    AviatorEvaluator.addOpFunction(OperatorType.NOT, new AbstractFunction() {
+    this.instance.addOpFunction(OperatorType.NOT, new AbstractFunction() {
 
       @Override
       public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1) {
@@ -77,19 +87,19 @@ public class OperatorFunctionTest {
       }
     });
 
-    assertEquals("3", AviatorEvaluator.exec("!3"));
-    assertEquals("4", AviatorEvaluator.exec("!a", 4));
-    assertEquals("3.2", AviatorEvaluator.exec("!3.2"));
+    assertEquals("3", this.instance.exec("!3"));
+    assertEquals("4", this.instance.exec("!a", 4));
+    assertEquals("3.2", this.instance.exec("!3.2"));
   }
 
   @Test
   public void testCustomBinOperatorFunction() {
     try {
-      assertEquals("hello world", AviatorEvaluator.execute("'hello' & ' world'"));
+      assertEquals("hello world", this.instance.execute("'hello' & ' world'"));
       fail();
     } catch (Exception e) {
     }
-    AviatorEvaluator.addOpFunction(OperatorType.BIT_AND, new AbstractFunction() {
+    this.instance.addOpFunction(OperatorType.BIT_AND, new AbstractFunction() {
 
       @Override
       public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
@@ -103,13 +113,13 @@ public class OperatorFunctionTest {
       }
     });
 
-    assertEquals("43", AviatorEvaluator.exec("a&3", 4));
-    assertEquals("43", AviatorEvaluator.exec("4&3", 4));
-    assertEquals("hello world", AviatorEvaluator.execute("'hello' & ' world'"));
-    assertEquals("hello world", AviatorEvaluator.exec("a&' world'", "hello"));
-    assertEquals("hello3 world", AviatorEvaluator.exec("a & 3 & ' world'", "hello"));
+    assertEquals("43", this.instance.exec("a&3", 4));
+    assertEquals("43", this.instance.exec("4&3", 4));
+    assertEquals("hello world", this.instance.execute("'hello' & ' world'"));
+    assertEquals("hello world", this.instance.exec("a&' world'", "hello"));
+    assertEquals("hello3 world", this.instance.exec("a & 3 & ' world'", "hello"));
     Map<String, Object> env = new HashMap<>();
     env.put("list", Arrays.asList(1, 2, 3));
-    assertEquals("123", AviatorEvaluator.execute("reduce(list, &, '')", env));
+    assertEquals("123", this.instance.execute("reduce(list, &, '')", env));
   }
 }

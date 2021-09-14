@@ -41,6 +41,7 @@ import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
+import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.IdentityHashSet;
 
@@ -215,7 +216,17 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
     }
   }
 
-  private void emit(final IR ir) {
+  private void emit(IR ir) {
+    if (ir instanceof OperatorIR) {
+      // check if operator is override.
+      final OperatorType op = ((OperatorIR) ir).getOp();
+      AviatorFunction fn = this.instance.getOpFunction(op);
+      if (fn != null) {
+        // replace it with new IR
+        ir = new OperatorIR(op, fn);
+      }
+    }
+
     this.instruments.add(ir);
   }
 

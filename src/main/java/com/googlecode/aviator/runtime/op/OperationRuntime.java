@@ -56,16 +56,21 @@ public class OperationRuntime {
     if (func == null) {
       return opType.eval(args, env);
     } else {
-      switch (opType.getArity()) {
-        case 1:
-          return func.call(env, args[0]);
-        case 2:
-          return func.call(env, args[0], args[1]);
-        case 3:
-          return func.call(env, args[0], args[1], args[2]);
-      }
-      throw new IllegalArityException("Too many arguments.");
+      return evalOpFunction(env, args, opType, func);
     }
+  }
+
+  public static AviatorObject evalOpFunction(final Map<String, Object> env,
+      final AviatorObject[] args, final OperatorType opType, final AviatorFunction func) {
+    switch (opType.getArity()) {
+      case 1:
+        return func.call(env, args[0]);
+      case 2:
+        return func.call(env, args[0], args[1]);
+      case 3:
+        return func.call(env, args[0], args[1], args[2]);
+    }
+    throw new IllegalArityException("Too many arguments.");
   }
 
   /**

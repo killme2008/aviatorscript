@@ -3,6 +3,8 @@ package com.googlecode.aviator.code.interpreter.ir;
 import com.googlecode.aviator.code.interpreter.IR;
 import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.lexer.token.OperatorType;
+import com.googlecode.aviator.runtime.op.OperationRuntime;
+import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 /**
@@ -13,6 +15,8 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  */
 public class OperatorIR implements IR {
   private final OperatorType op;
+
+  private AviatorFunction fn;
 
 
   public static final OperatorIR ADD = OperatorIR.valueOf(OperatorType.ADD);
@@ -74,6 +78,11 @@ public class OperatorIR implements IR {
     return new OperatorIR(op);
   }
 
+  public OperatorIR(final OperatorType op, final AviatorFunction func) {
+    this.fn = func;
+    this.op = op;
+  }
+
   private OperatorIR(final OperatorType op) {
     super();
     this.op = op;
@@ -89,10 +98,21 @@ public class OperatorIR implements IR {
       args[i] = context.pop();
     }
 
-    context.push(this.op.eval(args, context.getEnv()));
+    AviatorObject result;
+    if (this.fn == null) {
+      result = this.op.eval(args, context.getEnv());
+    } else {
+      result = OperationRuntime.evalOpFunction(context.getEnv(), args, this.op, this.fn);
+    }
+    context.push(result);
     context.dispatch();
   }
 
+
+
+  public OperatorType getOp() {
+    return this.op;
+  }
 
   @Override
   public String toString() {
