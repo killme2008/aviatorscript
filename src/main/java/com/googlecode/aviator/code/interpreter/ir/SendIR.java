@@ -131,6 +131,7 @@ public class SendIR implements IR {
       context.getEnv().put(ASMCodeGenerator.FUNC_ARGS_INNER_VAR, this.funcId);
     }
     context.push(callFn(fn, args, this.arity, context.getEnv()));
+    context.dispatch();
   }
 
   @Override

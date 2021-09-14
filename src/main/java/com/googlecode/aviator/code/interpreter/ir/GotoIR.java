@@ -32,6 +32,7 @@ public class GotoIR implements IR, JumpIR {
   @Override
   public void eval(final InterpretContext context) {
     context.jumpTo(this.pc);
+    context.dispatch(false);
   }
 
   @Override

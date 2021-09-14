@@ -90,6 +90,7 @@ public class OperatorIR implements IR {
     }
 
     context.push(this.op.eval(args, context.getEnv()));
+    context.dispatch();
   }
 
 

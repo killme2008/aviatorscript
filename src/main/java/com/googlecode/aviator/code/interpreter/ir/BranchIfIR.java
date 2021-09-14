@@ -34,6 +34,9 @@ public class BranchIfIR implements IR, JumpIR {
     AviatorObject top = context.peek();
     if (top.booleanValue(context.getEnv())) {
       context.jumpTo(this.pc);
+      context.dispatch(false);
+    } else {
+      context.dispatch();
     }
   }
 

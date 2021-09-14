@@ -29,6 +29,7 @@ public class AssertTypeIR implements IR {
         context.peek().stringValue(context.getEnv());
         break;
     }
+    context.dispatch();
   }
 
   @Override

@@ -1,11 +1,11 @@
 package com.googlecode.aviator.code.interpreter;
 
 import java.util.ArrayDeque;
-import java.util.Collections;
 import java.util.List;
 import com.googlecode.aviator.InterpretExpression;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.VariableMeta;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Env;
@@ -20,16 +20,19 @@ public class InterpretContext {
   private final ArrayDeque<AviatorObject> operands = new ArrayDeque<>();
   private IR pc;
   private int pcIndex = -1;
-  private List<IR> instruments = Collections.emptyList();
+  private IR[] instruments = new IR[0];
   private final Env env;
   private final InterpretExpression expression;
   private boolean reachEnd;
+  private final boolean trace;
+
 
   public InterpretContext(final InterpretExpression exp, final List<IR> instruments,
       final Env env) {
     this.expression = exp;
-    this.instruments = instruments;
+    this.instruments = instruments.toArray(this.instruments);
     this.env = env;
+    this.trace = RuntimeUtils.isTracedEval(env);
     next();
   }
 
@@ -54,14 +57,14 @@ public class InterpretContext {
   }
 
   public void jumpTo(final int tpc) {
-    if (tpc == this.instruments.size()) {
+    if (tpc == this.instruments.length) {
       this.pc = null;
       this.pcIndex = -1;
       this.reachEnd = true;
       return;
     }
     this.pcIndex = tpc;
-    this.pc = this.instruments.get(this.pcIndex);
+    this.pc = this.instruments[this.pcIndex];
   }
 
   public InterpretExpression getExpression() {
@@ -77,8 +80,8 @@ public class InterpretContext {
       return false;
     }
     this.pcIndex++;
-    if (this.pcIndex < this.instruments.size()) {
-      this.pc = this.instruments.get(this.pcIndex);
+    if (this.pcIndex < this.instruments.length) {
+      this.pc = this.instruments[this.pcIndex];
       return true;
     }
     return false;
@@ -113,5 +116,30 @@ public class InterpretContext {
     }
     sb.append("]>");
     return sb.toString();
+  }
+
+  /**
+   * Move pc to next and execute it.
+   */
+  public void dispatch() {
+    this.dispatch(true);
+  }
+
+  /**
+   * dispatch next IR execution.
+   *
+   * @param whether to move pc next.
+   */
+  public void dispatch(final boolean next) {
+    if (next && !next()) {
+      return;
+    }
+
+    if (this.pc != null) {
+      if (this.trace) {
+        RuntimeUtils.printlnTrace(this.env, "    " + this.pc + "    " + descOperandsStack());
+      }
+      this.pc.eval(this);
+    }
   }
 }

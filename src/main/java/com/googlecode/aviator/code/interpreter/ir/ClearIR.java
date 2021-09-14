@@ -12,6 +12,7 @@ public class ClearIR implements IR {
   @Override
   public void eval(final InterpretContext context) {
     context.clearStack();
+    context.dispatch();
   }
 
   @Override

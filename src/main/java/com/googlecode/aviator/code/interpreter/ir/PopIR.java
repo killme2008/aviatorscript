@@ -11,6 +11,7 @@ public class PopIR implements IR {
   @Override
   public void eval(final InterpretContext context) {
     context.pop();
+    context.dispatch();
   }
 
   @Override

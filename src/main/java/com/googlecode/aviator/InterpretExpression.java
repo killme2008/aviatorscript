@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import com.googlecode.aviator.code.interpreter.IR;
 import com.googlecode.aviator.code.interpreter.InterpretContext;
-import com.googlecode.aviator.code.interpreter.ir.JumpIR;
 import com.googlecode.aviator.code.interpreter.ir.LoadIR;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Token;
@@ -51,7 +50,7 @@ public class InterpretExpression extends BaseExpression {
     InterpretContext ctx = new InterpretContext(this, instruments, getCompileEnv());
     for (Token<?> token : constants) {
       final LoadIR loadConstantIR = new LoadIR(this.sourceFile, token, null, false);
-      loadConstantIR.eval(ctx);
+      loadConstantIR.evalWithoutDispatch(ctx);
       this.constantPool.put(token, ctx.pop());
     }
   }
@@ -102,22 +101,23 @@ public class InterpretExpression extends BaseExpression {
     }
 
     InterpretContext ctx = new InterpretContext(this, this.instruments, (Env) env);
-    IR ir = null;
-    while ((ir = ctx.getPc()) != null) {
-      if (trace) {
-        RuntimeUtils.printlnTrace(env, "    " + ir + "    " + ctx.descOperandsStack());
-      }
-      ir.eval(ctx);
-      if (ir instanceof JumpIR) {
-        if (ir != ctx.getPc()) {
-          // jump successfully, we don't move pc to next.
-          continue;
-        }
-      }
-      if (!ctx.next()) {
-        break;
-      }
-    }
+    ctx.dispatch(false);
+
+    // while ((ir = ctx.getPc()) != null) {
+    // if (trace) {
+    // RuntimeUtils.printlnTrace(env, " " + ir + " " + ctx.descOperandsStack());
+    // }
+    // ir.eval(ctx);
+    // if (ir instanceof JumpIR) {
+    // if (ir != ctx.getPc()) {
+    // // jump successfully, we don't move pc to next.
+    // continue;
+    // }
+    // }
+    // if (!ctx.next()) {
+    // break;
+    // }
+    // }
     if (trace) {
       RuntimeUtils.printlnTrace(env, "    return    " + ctx.descOperandsStack());
     }

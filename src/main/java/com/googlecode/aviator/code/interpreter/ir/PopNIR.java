@@ -17,6 +17,7 @@ public class PopNIR implements IR {
     while (i-- > 0) {
       context.pop();
     }
+    context.dispatch();
   }
 
   @Override

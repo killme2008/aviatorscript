@@ -44,6 +44,11 @@ public class LoadIR implements IR {
 
   @Override
   public void eval(final InterpretContext context) {
+    evalWithoutDispatch(context);
+    context.dispatch();
+  }
+
+  public void evalWithoutDispatch(final InterpretContext context) {
     if (this.token == null) {
       return;
     }

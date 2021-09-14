@@ -19,6 +19,7 @@ public class NewLambdaIR implements IR {
   @Override
   public void eval(final InterpretContext context) {
     context.push(context.getExpression().newLambda(context.getEnv(), this.lambdaName));
+    context.dispatch();
   }
 
   @Override
