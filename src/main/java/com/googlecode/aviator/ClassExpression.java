@@ -17,14 +17,10 @@ package com.googlecode.aviator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.parser.VariableMeta;
-import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.RuntimeUtils;
-import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
@@ -37,28 +33,9 @@ import com.googlecode.aviator.utils.Reflector;
  */
 public abstract class ClassExpression extends BaseExpression {
 
-  protected Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
-
-
-  public Map<String, LambdaFunctionBootstrap> getLambdaBootstraps() {
-    return this.lambdaBootstraps;
-  }
-
-  public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
-    this.lambdaBootstraps = lambdaBootstraps;
-  }
-
   public ClassExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
       final SymbolTable symbolTable) {
     super(instance, vars, symbolTable);
-  }
-
-  public LambdaFunction newLambda(final Env env, final String name) {
-    LambdaFunctionBootstrap bootstrap = this.lambdaBootstraps.get(name);
-    if (bootstrap == null) {
-      throw new ExpressionNotFoundException("Lambda " + name + " not found");
-    }
-    return bootstrap.newInstance(env);
   }
 
   @Override
@@ -73,28 +50,6 @@ public abstract class ClassExpression extends BaseExpression {
       throw e;
     } catch (Throwable t) {
       throw Reflector.sneakyThrow(t);
-    }
-  }
-
-  @Override
-  protected void afterPopulateFullNames(final Map<String, VariableMeta> fullNames,
-      final Set<String> parentVars) {
-    if (this.lambdaBootstraps != null) {
-      for (LambdaFunctionBootstrap bootstrap : this.lambdaBootstraps.values()) {
-        for (VariableMeta meta : bootstrap.getClosureOverFullVarNames()) {
-          VariableMeta existsMeta = fullNames.get(meta.getName());
-          if (existsMeta == null) {
-            if (!parentVars.contains(meta.getName())) {
-              fullNames.put(meta.getName(), meta);
-            }
-          } else {
-            // Appear first, update the meta
-            if (existsMeta.getFirstIndex() > meta.getFirstIndex()) {
-              fullNames.put(meta.getName(), meta);
-            }
-          }
-        }
-      }
     }
   }
 

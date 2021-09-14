@@ -56,16 +56,21 @@ public class OperationRuntime {
     if (func == null) {
       return opType.eval(args, env);
     } else {
-      switch (args.length) {
-        case 1:
-          return func.call(env, args[0]);
-        case 2:
-          return func.call(env, args[0], args[1]);
-        case 3:
-          return func.call(env, args[0], args[1], args[2]);
-      }
-      throw new IllegalArityException("Too many arguments.");
+      return evalOpFunction(env, args, opType, func);
     }
+  }
+
+  public static AviatorObject evalOpFunction(final Map<String, Object> env,
+      final AviatorObject[] args, final OperatorType opType, final AviatorFunction func) {
+    switch (opType.getArity()) {
+      case 1:
+        return func.call(env, args[0]);
+      case 2:
+        return func.call(env, args[0], args[1]);
+      case 3:
+        return func.call(env, args[0], args[1], args[2]);
+    }
+    throw new IllegalArityException("Too many arguments.");
   }
 
   /**
@@ -146,8 +151,12 @@ public class OperationRuntime {
 
   public static final boolean hasRuntimeContext(final Map<String, Object> env,
       final OperatorType opType) {
-    return RuntimeUtils.getInstance(env).getOpsMap().containsKey(opType)
-        || RuntimeUtils.isTracedEval(env);
+    return containsOpFunction(env, opType) || RuntimeUtils.isTracedEval(env);
+  }
+
+  public static boolean containsOpFunction(final Map<String, Object> env,
+      final OperatorType opType) {
+    return RuntimeUtils.getInstance(env).getOpsMap().containsKey(opType);
   }
 
   private static final String WHITE_SPACE = " ";
@@ -164,23 +173,15 @@ public class OperationRuntime {
   private static void trace(final Map<String, Object> env, final OperatorType opType,
       final AviatorObject result, final AviatorObject... args) {
 
-    switch (args.length) {
-      case 1:
-        RuntimeUtils.printlnTrace(env,
-            TRACE_PREFIX + opType.token + desc(args[0], env) + " => " + desc(result, env));
-        break;
-      case 2:
-        RuntimeUtils.printlnTrace(env, TRACE_PREFIX + desc(args[0], env) + WHITE_SPACE
-            + opType.token + WHITE_SPACE + desc(args[1], env) + " => " + desc(result, env));
-        break;
-      case 3:
-        RuntimeUtils.printlnTrace(env,
-            TRACE_PREFIX + desc(args[0], env) + WHITE_SPACE + "?" + WHITE_SPACE + desc(args[0], env)
-                + WHITE_SPACE + ":" + WHITE_SPACE + desc(args[1], env) + " => "
-                + desc(result, env));
-        break;
-      default:
-        throw new UnsupportedOperationException("Impossible");
+    StringBuilder argsDec = new StringBuilder();
+    argsDec.append(desc(args[0], env));
+    for (int i = 1; i < args.length; i++) {
+      if (args[i] != null) {
+        argsDec.append(WHITE_SPACE).append(opType.token).append(WHITE_SPACE)
+            .append(desc(args[i], env));
+      }
     }
+
+    RuntimeUtils.printlnTrace(env, TRACE_PREFIX + argsDec + " => " + desc(result, env));
   }
 }

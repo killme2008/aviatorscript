@@ -109,4 +109,13 @@ public class Utils {
     }
     return CURRENT_VERSION;
   }
+
+  public static boolean isAndroid() {
+    try {
+      Class.forName("android.os.Build");
+      return true;
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
+  }
 }

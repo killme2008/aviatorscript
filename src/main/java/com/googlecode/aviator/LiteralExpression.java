@@ -46,4 +46,9 @@ public class LiteralExpression extends BaseExpression {
     }
     return this.result;
   }
+
+  @Override
+  public String toString() {
+    return "LiteralExpression [result=" + this.result + "]";
+  }
 }

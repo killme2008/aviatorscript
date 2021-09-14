@@ -72,6 +72,10 @@ public class PerfBenchmark {
   private Expression objectExp;
   private Expression condExp;
 
+  private Expression arithExpInterpret;
+  private Expression objectExpInterpret;
+  private Expression condExpInterpret;
+
   @Setup
   public void init() {
     this.paras.put("A", new Data("false", 23342423));
@@ -82,6 +86,7 @@ public class PerfBenchmark {
     initScript();
     initBeetl();
     initAviator();
+    initAviatorInterpreterMode();
   }
 
   @Benchmark
@@ -154,6 +159,22 @@ public class PerfBenchmark {
   }
 
   @Benchmark
+  public void testArithByAviatorInterpretMode() {
+    Object result = this.arithExpInterpret.execute(this.paras);
+  }
+
+  @Benchmark
+  public void testObjectByAviatorInterpretMode() {
+    Object result = this.objectExpInterpret.execute(this.paras);
+  }
+
+  @Benchmark
+  public void testCondByAviatorInterpretMode() {
+    Object result = this.condExpInterpret.execute(this.paras);
+  }
+
+
+  @Benchmark
   public void testArithByAviator() {
     Object result = this.arithExp.execute(this.paras);
   }
@@ -202,12 +223,23 @@ public class PerfBenchmark {
   }
 
   private void initAviator() {
-    this.arithExp = AviatorEvaluator.getInstance().compile("(A.ivalue+B.ivalue-C.ivalue)*D.ivalue");
-    this.objectExp = AviatorEvaluator.getInstance().compile(
+    AviatorEvaluatorInstance instance = AviatorEvaluator.newInstance(EvalMode.ASM);
+    this.arithExp = instance.compile("(A.ivalue+B.ivalue-C.ivalue)*D.ivalue");
+    this.objectExp = instance.compile(
         "let object=seq.map('f1', A.ivalue, 'f2', A.ivalue+B.ivalue, 'f3', C.ivalue, 'f4', (A.ivalue+B.ivalue-C.ivalue)*D.ivalue); return object;");
-    this.condExp = AviatorEvaluator.getInstance().compile(
+    this.condExp = instance.compile(
         "if(A.ikey=='true'){return A.ivalue;}elsif(B.ikey=='true'){return B.ivalue;}elsif(C.ikey=='true'){return C.ivalue;}elsif(D.ikey=='true'){return D.ivalue;}else{return 0;}");
-    System.out.println("Aviator准备工作就绪！");
+    System.out.println("Aviator ASM 模式准备工作就绪！");
+  }
+
+  private void initAviatorInterpreterMode() {
+    AviatorEvaluatorInstance instance = AviatorEvaluator.newInstance(EvalMode.INTERPRETER);
+    this.arithExpInterpret = instance.compile("(A.ivalue+B.ivalue-C.ivalue)*D.ivalue");
+    this.objectExpInterpret = instance.compile(
+        "let object=seq.map('f1', A.ivalue, 'f2', A.ivalue+B.ivalue, 'f3', C.ivalue, 'f4', (A.ivalue+B.ivalue-C.ivalue)*D.ivalue); return object;");
+    this.condExpInterpret = instance.compile(
+        "if(A.ikey=='true'){return A.ivalue;}elsif(B.ikey=='true'){return B.ivalue;}elsif(C.ikey=='true'){return C.ivalue;}elsif(D.ikey=='true'){return D.ivalue;}else{return 0;}");
+    System.out.println("Aviator 解释器模式准备工作就绪！");
   }
 
   public static void main(final String[] args) throws Exception {

@@ -30,7 +30,6 @@ import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.LiteralExpression;
-import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.DelegateToken;
@@ -69,7 +68,7 @@ import com.googlecode.aviator.utils.Env;
  *
  */
 public class OptimizeCodeGenerator implements CodeGenerator {
-  private final ASMCodeGenerator codeGen;
+  private final EvalCodeGenerator codeGen;
 
   private final List<Token<?>> tokenList = new ArrayList<>();
 
@@ -95,8 +94,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       final ClassLoader classLoader, final OutputStream traceOutStream) {
     this.instance = instance;
     this.sourceFile = sourceFile;
-    this.codeGen = new ASMCodeGenerator(instance, sourceFile, (AviatorClassLoader) classLoader,
-        traceOutStream);
+    this.codeGen = instance.newEvalCodeGenerator((AviatorClassLoader) classLoader, sourceFile);
   }
 
   private Env getCompileEnv() {
@@ -142,7 +140,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
       if (token.getType() == TokenType.Operator) {
         final OperatorToken op = (OperatorToken) token;
         final OperatorType operatorType = op.getOperatorType();
-        final int operandCount = operatorType.getOperandCount();
+        final int operandCount = operatorType.getArity();
         switch (operatorType) {
           case FUNC:
           case INDEX:

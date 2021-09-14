@@ -51,9 +51,11 @@ import com.googlecode.aviator.annotation.Import;
 import com.googlecode.aviator.annotation.ImportScope;
 import com.googlecode.aviator.asm.Opcodes;
 import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.code.EvalCodeGenerator;
 import com.googlecode.aviator.code.NoneCodeGenerator;
 import com.googlecode.aviator.code.OptimizeCodeGenerator;
 import com.googlecode.aviator.code.asm.ASMCodeGenerator;
+import com.googlecode.aviator.code.interpreter.InterpretCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
@@ -204,9 +206,11 @@ public final class AviatorEvaluatorInstance {
   /** internal libs in main resources */
   private static final String[] libs = new String[] {"aviator.av"};
 
-  /** cached compiled internal lib functions */
-  private static volatile Map<String, AviatorFunction> internalLibFunctions;
+  /** cached compiled internal ASM lib functions */
+  private static volatile Map<String, AviatorFunction> internalASMLibFunctions;
 
+  /** cached compiled internal interpred lib functions */
+  private static volatile Map<String, AviatorFunction> internalInterpretedLibFunctions;
 
   /**
    * Adds a function loader
@@ -1020,32 +1024,46 @@ public final class AviatorEvaluatorInstance {
   }
 
   private void loadInternalLibs() {
-    if (internalLibFunctions == null) {
-      Map<String, AviatorFunction> funcs = new HashMap<>();
-      for (String lib : libs) {
-        try (final InputStream in = this.getClass().getResourceAsStream("/" + lib);
-            final BufferedInputStream bis = new BufferedInputStream(in);
-            final Reader reader = new InputStreamReader(bis)) {
-          Expression exp = this.compile(lib, Utils.readFully(reader), false);
-          Map<String, Object> exports = executeModule(exp, lib);
-          for (Map.Entry<String, Object> entry : exports.entrySet()) {
-            if (entry.getValue() instanceof AviatorFunction) {
-              final AviatorFunction fn = (AviatorFunction) entry.getValue();
-              addFunction(entry.getKey(), fn);
-              funcs.put(entry.getKey(), fn);
-            }
-          }
-        } catch (IOException e) {
-          throw new IllegalStateException("Fail to load internal lib: " + lib, e);
+    if (getEvalMode() == EvalMode.ASM) {
+      if (internalASMLibFunctions == null) {
+        internalASMLibFunctions = loadInternalFunctions(); // cache it
+      } else {
+        for (Map.Entry<String, AviatorFunction> entry : internalASMLibFunctions.entrySet()) {
+          addFunction(entry.getKey(), entry.getValue());
         }
       }
-
-      internalLibFunctions = funcs; // cache it
     } else {
-      for (Map.Entry<String, AviatorFunction> entry : internalLibFunctions.entrySet()) {
-        addFunction(entry.getKey(), entry.getValue());
+      if (internalInterpretedLibFunctions == null) {
+        internalInterpretedLibFunctions = loadInternalFunctions(); // cache it
+      } else {
+        for (Map.Entry<String, AviatorFunction> entry : internalInterpretedLibFunctions
+            .entrySet()) {
+          addFunction(entry.getKey(), entry.getValue());
+        }
       }
     }
+  }
+
+  private Map<String, AviatorFunction> loadInternalFunctions() {
+    Map<String, AviatorFunction> funcs = new HashMap<>();
+    for (String lib : libs) {
+      try (final InputStream in = this.getClass().getResourceAsStream("/" + lib);
+          final BufferedInputStream bis = new BufferedInputStream(in);
+          final Reader reader = new InputStreamReader(bis)) {
+        Expression exp = this.compile(lib, Utils.readFully(reader), false);
+        Map<String, Object> exports = executeModule(exp, lib);
+        for (Map.Entry<String, Object> entry : exports.entrySet()) {
+          if (entry.getValue() instanceof AviatorFunction) {
+            final AviatorFunction fn = (AviatorFunction) entry.getValue();
+            addFunction(entry.getKey(), fn);
+            funcs.put(entry.getKey(), fn);
+          }
+        }
+      } catch (IOException e) {
+        throw new IllegalStateException("Fail to load internal lib: " + lib, e);
+      }
+    }
+    return funcs;
   }
 
   /**
@@ -1066,8 +1084,9 @@ public final class AviatorEvaluatorInstance {
   /**
    * Create a aviator evaluator instance.
    */
-  AviatorEvaluatorInstance() {
+  AviatorEvaluatorInstance(final EvalMode evalMode) {
     fillDefaultOpts();
+    setOption(Options.EVAL_MODE, evalMode);
     loadFeatureFunctions();
     loadLib();
     loadModule();
@@ -1498,6 +1517,10 @@ public final class AviatorEvaluatorInstance {
     return exp;
   }
 
+  private EvalMode getEvalMode() {
+    return getOptionValue(Options.EVAL_MODE).evalMode;
+  }
+
   private int getOptimizeLevel() {
     return getOptionValue(Options.OPTIMIZE_LEVEL).number;
   }
@@ -1509,14 +1532,26 @@ public final class AviatorEvaluatorInstance {
 
   }
 
+  public EvalCodeGenerator newEvalCodeGenerator(final AviatorClassLoader classLoader,
+      final String sourceFile) {
+    switch (getEvalMode()) {
+      case ASM:
+        return new ASMCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
+      case INTERPRETER:
+        return new InterpretCodeGenerator(this, sourceFile, classLoader);
+      default:
+        throw new IllegalArgumentException("Unknown eval mode: " + getEvalMode());
+
+    }
+  }
+
   public CodeGenerator newCodeGenerator(final AviatorClassLoader classLoader,
       final String sourceFile) {
     switch (getOptimizeLevel()) {
       case AviatorEvaluator.COMPILE:
-        ASMCodeGenerator asmCodeGenerator =
-            new ASMCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
-        asmCodeGenerator.start();
-        return asmCodeGenerator;
+        final EvalCodeGenerator codeGen = newEvalCodeGenerator(classLoader, sourceFile);
+        codeGen.start();
+        return codeGen;
       case AviatorEvaluator.EVAL:
         return new OptimizeCodeGenerator(this, sourceFile, classLoader, this.traceOutputStream);
       default:

@@ -1,0 +1,15 @@
+package com.googlecode.aviator.test.function;
+
+import org.junit.Before;
+import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.EvalMode;
+
+public class GrammarUnitTestWithInterpreter extends GrammarUnitTest {
+
+  @Override
+  @Before
+  public void setup() {
+    this.instance = AviatorEvaluator.newInstance(EvalMode.INTERPRETER);
+  }
+
+}

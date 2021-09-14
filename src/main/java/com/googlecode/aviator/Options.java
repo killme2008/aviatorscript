@@ -2,6 +2,7 @@ package com.googlecode.aviator;
 
 import java.math.MathContext;
 import java.util.Set;
+import com.googlecode.aviator.utils.Utils;
 
 
 /**
@@ -108,7 +109,11 @@ public enum Options {
    * allowed (default); Empty ALLOWED_CLASS_SET or ASSIGNABLE_ALLOWED_CLASS_SET means forbidding all
    * classes.
    */
-  ASSIGNABLE_ALLOWED_CLASS_SET;
+  ASSIGNABLE_ALLOWED_CLASS_SET,
+  /**
+   * Script engine evaluate mode, default is ASM mode.
+   */
+  EVAL_MODE;
 
 
   /**
@@ -123,6 +128,12 @@ public enum Options {
     public int number;
     public Set<Feature> featureSet;
     public Set<Class<?>> classes;
+    public EvalMode evalMode;
+
+    public Value(final EvalMode evalMode) {
+      super();
+      this.evalMode = evalMode;
+    }
 
     public Value() {
       super();
@@ -191,6 +202,8 @@ public enum Options {
       case ALLOWED_CLASS_SET:
       case ASSIGNABLE_ALLOWED_CLASS_SET:
         return val.classes;
+      case EVAL_MODE:
+        return val.evalMode;
     }
     throw new IllegalArgumentException("Fail to cast value " + val + " for option " + this);
   }
@@ -230,6 +243,8 @@ public enum Options {
         return new Value((Set<Feature>) val);
       case MATH_CONTEXT:
         return new Value((MathContext) val);
+      case EVAL_MODE:
+        return new Value((EvalMode) val);
     }
     throw new IllegalArgumentException("Fail to cast value " + val + " for option " + this);
   }
@@ -250,12 +265,15 @@ public enum Options {
       case ASSIGNABLE_ALLOWED_CLASS_SET:
         return val instanceof Set;
       case OPTIMIZE_LEVEL:
-        return val instanceof Integer && (((Integer) val).intValue() == AviatorEvaluator.EVAL
-            || ((Integer) val).intValue() == AviatorEvaluator.COMPILE);
+        final int level = ((Integer) val).intValue();
+        return val instanceof Integer
+            && (level == AviatorEvaluator.EVAL || level == AviatorEvaluator.COMPILE);
       case MAX_LOOP_COUNT:
         return val instanceof Long || val instanceof Integer;
       case MATH_CONTEXT:
         return val instanceof MathContext;
+      case EVAL_MODE:
+        return val instanceof EvalMode;
     }
     return false;
   }
@@ -276,6 +294,10 @@ public enum Options {
   private static final boolean TRACE_EVAL_DEFAULT_VAL =
       Boolean.parseBoolean(System.getProperty("aviator.trace_eval", "false"));
 
+  public static final Value ASM_MODE = new Value(EvalMode.ASM);
+
+  public static final Value INTERPRETER_MODE = new Value(EvalMode.INTERPRETER);
+
   public static final Value NULL_CLASS_SET = Value.fromClasses(null);
 
 
@@ -287,7 +309,6 @@ public enum Options {
   public Object getDefaultValue() {
     return intoObject(getDefaultValueObject());
   }
-
 
   /**
    * Returns the default value object of option.
@@ -322,7 +343,47 @@ public enum Options {
       case ALLOWED_CLASS_SET:
       case ASSIGNABLE_ALLOWED_CLASS_SET:
         return NULL_CLASS_SET;
+      case EVAL_MODE:
+        return getDefaultEvalMode();
     }
     return null;
+  }
+
+  public static Value getDefaultEvalMode() {
+    if (SYS_EVAL_MODE != null) {
+      return SYS_EVAL_MODE;
+    }
+
+    return Utils.isAndroid() ? INTERPRETER_MODE : ASM_MODE;
+  }
+
+
+  public static Value SYS_EVAL_MODE = getSystemEvalMode();
+
+  private static Value getSystemEvalMode() {
+    String sysProperty = System.getProperty("aviator.eval.mode");
+    Value result = null;
+    if (sysProperty != null && sysProperty.trim().length() > 0) {
+      try {
+        EvalMode mode = EvalMode.valueOf(sysProperty.trim().toUpperCase());
+        switch (mode) {
+          case ASM:
+            result = ASM_MODE;
+            break;
+          case INTERPRETER:
+            result = INTERPRETER_MODE;
+            break;
+          default:
+            break;
+        }
+      } catch (Throwable t) {
+        // ignore
+      }
+    }
+    if (result != null) {
+      System.out.println("[Aviator INFO] Using " + result.evalMode.name()
+          + " eval mode by system property setting aviator.eval.mode");
+    }
+    return result;
   }
 }

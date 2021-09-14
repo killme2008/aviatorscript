@@ -79,16 +79,27 @@ public final class AviatorEvaluator {
   public static int BYTECODE_VER = getInstance().getBytecodeVersion();
 
   /**
-   * Create a aviator evaluator instance.
+   * Create a aviator script engine instance with eval mode
    *
-   * @return
+   * @since 5.3
+   * @return the script engine
+   */
+  public static AviatorEvaluatorInstance newInstance(final EvalMode evalMode) {
+    return new AviatorEvaluatorInstance(evalMode);
+  }
+
+  /**
+   * Create a aviator script engine instance.
+   *
+   * @return the script engine
    */
   public static AviatorEvaluatorInstance newInstance() {
-    return new AviatorEvaluatorInstance();
+    return newInstance(Options.getDefaultEvalMode().evalMode);
   }
 
   private static class StaticHolder {
-    private static AviatorEvaluatorInstance INSTANCE = new AviatorEvaluatorInstance();
+    private static AviatorEvaluatorInstance INSTANCE =
+        new AviatorEvaluatorInstance(Options.getDefaultEvalMode().evalMode);
   }
 
   /**

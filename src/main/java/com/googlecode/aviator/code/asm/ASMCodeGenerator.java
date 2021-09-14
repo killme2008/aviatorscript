@@ -45,7 +45,6 @@ import static com.googlecode.aviator.asm.Opcodes.RETURN;
 import static com.googlecode.aviator.asm.Opcodes.SWAP;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,14 +56,14 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.ClassExpression;
+import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.asm.ClassWriter;
 import com.googlecode.aviator.asm.Label;
 import com.googlecode.aviator.asm.MethodVisitor;
 import com.googlecode.aviator.asm.Opcodes;
-import com.googlecode.aviator.code.CodeGenerator;
+import com.googlecode.aviator.code.BaseEvalCodeGenerator;
 import com.googlecode.aviator.code.LambdaGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -75,14 +74,12 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
-import com.googlecode.aviator.parser.Parser;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.FunctionParam;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.utils.Constants;
-import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
 
@@ -92,7 +89,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  * @author dennis
  *
  */
-public class ASMCodeGenerator implements CodeGenerator {
+public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   private static final String RUNTIME_UTILS = "com/googlecode/aviator/runtime/RuntimeUtils";
   private static final String OBJECT_DESC = "Lcom/googlecode/aviator/runtime/type/AviatorObject;";
@@ -102,13 +99,6 @@ public class ASMCodeGenerator implements CodeGenerator {
   private static final String OBJECT_OWNER = "com/googlecode/aviator/runtime/type/AviatorObject";
   public static final String FUNC_ARGS_INNER_VAR = "__fas__";
   private static final String FIELD_PREFIX = "f";
-  // evaluator instance
-  private final AviatorEvaluatorInstance instance;
-  private SymbolTable symbolTable;
-  /**
-   * Compile environment only has the *instance*.
-   */
-  private final Env compileEnv;
   // Class Writer to generate class
   // private final ClassWriter clazzWriter;
   // Trace visitor
@@ -119,13 +109,6 @@ public class ASMCodeGenerator implements CodeGenerator {
   private MethodVisitor mv;
   // Class name
   private final String className;
-  // Class loader to define generated class
-  private final AviatorClassLoader classLoader;
-  // lambda function generator
-  private LambdaGenerator lambdaGenerator;
-  // parser
-  private Parser parser;
-
   private static final AtomicLong CLASS_COUNTER = new AtomicLong();
 
   /**
@@ -145,40 +128,13 @@ public class ASMCodeGenerator implements CodeGenerator {
   private Map<Token<?>/* constant token */, String/* field name */> constantPool =
       Collections.emptyMap();
 
-  private Map<String, VariableMeta/* metadata */> variables = Collections.emptyMap();
   private Map<String, Integer/* counter */> methodTokens = Collections.emptyMap();
 
   private final Map<Label, Map<String/* inner name */, Integer/* local index */>> labelNameIndexMap =
       new IdentityHashMap<>();
-  /**
-   * function params info.
-   */
-  private Map<Integer/* internal function id */, List<FunctionArgument>> funcsArgs;
-
-  private int funcInvocationId = 0;
-
-  /**
-   * Compiled lambda functions.
-   */
-  private Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
-
   private static final Label START_LABEL = new Label();
 
   private Label currentLabel = START_LABEL;
-
-
-  /**
-   * parent code generator when compiling lambda.
-   */
-  private CodeGenerator parentCodeGenerator;
-
-  private final String sourceFile;
-
-  @Override
-  public void setParser(final Parser parser) {
-    this.parser = parser;
-    this.symbolTable = parser.getSymbolTable();
-  }
 
 
   private void setMaxStacks(final int newMaxStacks) {
@@ -187,24 +143,9 @@ public class ASMCodeGenerator implements CodeGenerator {
     }
   }
 
-  private Map<Integer/* internal function id */, List<FunctionArgument>> getFuncsArgs() {
-    if (this.funcsArgs == null) {
-      this.funcsArgs = new HashMap<>();
-    }
-    return this.funcsArgs;
-  }
-
-  private int getNextFuncInvocationId() {
-    return this.funcInvocationId++;
-  }
-
   public ASMCodeGenerator(final AviatorEvaluatorInstance instance, final String sourceFile,
       final AviatorClassLoader classLoader, final OutputStream traceOut) {
-    this.classLoader = classLoader;
-    this.instance = instance;
-    this.compileEnv = new Env();
-    this.sourceFile = sourceFile;
-    this.compileEnv.setInstance(this.instance);
+    super(instance, sourceFile, classLoader);
     // Generate inner class name
     this.className = "Script_" + System.currentTimeMillis() + "_" + CLASS_COUNTER.getAndIncrement();
     // Auto compute frames
@@ -218,18 +159,12 @@ public class ASMCodeGenerator implements CodeGenerator {
     visitClass();
   }
 
-
-
-  public AviatorClassLoader getClassLoader() {
-    return this.classLoader;
-  }
-
-
   LambdaGenerator getLambdaGenerator() {
     return this.lambdaGenerator;
   }
 
 
+  @Override
   public void start() {
     makeConstructor();
     startVisitMethodCode();
@@ -500,19 +435,16 @@ public class ASMCodeGenerator implements CodeGenerator {
   private void visitRightBranch(final Token<?> lookhead, final int ints,
       final OperatorType opType) {
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
+      this.mv.visitInsn(DUP);
       loadEnv();
-      String first = "TRUE";
       String second = "FALSE";
       if (opType == OperatorType.OR) {
-        first = "FALSE";
         second = "TRUE";
       }
 
       visitBoolean();
-      this.mv.visitJumpInsn(ints, peekLabel0());
-      // Result is true
-      this.mv.visitFieldInsn(GETSTATIC, "com/googlecode/aviator/runtime/type/AviatorBoolean", first,
-          "Lcom/googlecode/aviator/runtime/type/AviatorBoolean;");
+      this.mv.visitInsn(POP);
+
       Label l1 = makeLabel();
       visitLineNumber(lookhead);
       this.mv.visitJumpInsn(GOTO, l1);
@@ -834,7 +766,7 @@ public class ASMCodeGenerator implements CodeGenerator {
           ClassDefiner.defineClass(this.className, Expression.class, bytes, this.classLoader);
       Constructor<?> constructor =
           defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class, SymbolTable.class);
-      ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
+      BaseExpression exp = (BaseExpression) constructor.newInstance(this.instance,
           new ArrayList<VariableMeta>(this.variables.values()), this.symbolTable);
       exp.setLambdaBootstraps(this.lambdaBootstraps);
       exp.setFuncsArgs(this.funcsArgs);
@@ -1021,12 +953,7 @@ public class ASMCodeGenerator implements CodeGenerator {
     return false;
   }
 
-
-  public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
-    this.lambdaBootstraps = lambdaBootstraps;
-  }
-
-
+  @Override
   public void initVariables(final Map<String, VariableMeta/* counter */> vars) {
     this.variables = vars;
     this.innerVars = new HashMap<>(this.variables.size());
@@ -1045,6 +972,7 @@ public class ASMCodeGenerator implements CodeGenerator {
    *
    * @param constants
    */
+  @Override
   public void initConstants(final Set<Token<?>> constants) {
     if (constants.isEmpty()) {
       return;
@@ -1060,6 +988,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
   public void initMethods(final Map<String, Integer/* counter */> methods) {
     this.methodTokens = methods;
     this.innerMethodMap = new HashMap<>(methods.size());
@@ -1208,18 +1137,25 @@ public class ASMCodeGenerator implements CodeGenerator {
     this.pushOperand(1);
   }
 
-  private static class MethodMetaData {
-    int parameterCount = 0;
-    int variadicListIndex = -1;
+  public static class MethodMetaData {
+    public int parameterCount = 0;
+
+    public int variadicListIndex = -1;
+
+    public final Token<?> token;
+
+    public final String methodName;
+
+    public int funcId = -1;
 
 
-    public MethodMetaData(final String methodName) {
+
+    public MethodMetaData(final Token<?> token, final String methodName) {
       super();
+      this.token = token;
+      this.methodName = methodName;
     }
   }
-
-  private final ArrayDeque<MethodMetaData> methodMetaDataStack = new ArrayDeque<>();
-
 
   @Override
   public void onArray(final Token<?> lookhead) {
@@ -1300,6 +1236,7 @@ public class ASMCodeGenerator implements CodeGenerator {
   }
 
 
+  @Override
   public void genNewLambdaCode(final LambdaFunctionBootstrap bootstrap) {
     this.mv.visitVarInsn(ALOAD, 0);
     loadEnv();
@@ -1332,14 +1269,14 @@ public class ASMCodeGenerator implements CodeGenerator {
           "wrapTrace",
           "(Lcom/googlecode/aviator/runtime/type/AviatorFunction;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
     }
-
+    // FIXME it will not work in compile mode.
     if (lookhead.getMeta(Constants.UNPACK_ARGS, false)) {
       this.mv.visitMethodInsn(INVOKESTATIC, RUNTIME_UTILS, "unpackArgsFunction",
           "(Lcom/googlecode/aviator/runtime/type/AviatorFunction;)Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
     }
 
     loadEnv();
-    this.methodMetaDataStack.push(new MethodMetaData(outtterMethodName));
+    this.methodMetaDataStack.push(new MethodMetaData(lookhead, outtterMethodName));
   }
 
 

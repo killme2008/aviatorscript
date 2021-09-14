@@ -16,11 +16,11 @@
 package com.googlecode.aviator.lexer.token;
 
 import java.util.Map;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.IllegalArityException;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
-import com.googlecode.aviator.utils.Env;
 
 
 /**
@@ -90,17 +90,17 @@ public enum OperatorType {
 
   public final String token;
 
-  public final int operandCount;
+  public final int arity;
 
 
   OperatorType(final String token, final int operandCount) {
     this.token = token;
-    this.operandCount = operandCount;
+    this.arity = operandCount;
   }
 
   public AviatorObject eval(final AviatorObject[] args, final Map<String, Object> env) {
-    if (args.length < this.operandCount) {
-      throw new IllegalArityException("Expect " + this.operandCount + " parameters for " + name()
+    if (args.length < this.arity) {
+      throw new IllegalArityException("Expect " + this.arity + " parameters for " + name()
           + ", but have " + args.length + " arguments.");
     }
     switch (this) {
@@ -114,13 +114,14 @@ public enum OperatorType {
         if (!(args[0] instanceof AviatorJavaType)) {
           throw new IllegalArgumentException(args[0].desc(env) + " can't be as a left value.");
         }
-        ((Env) env).override(((AviatorJavaType) args[0]).getName(), args[1].getValue(env));
+        args[0].defineValue(args[1], env);
         return args[1];
       case ASSIGNMENT:
         if (!(args[0] instanceof AviatorJavaType)) {
-          throw new IllegalArgumentException(args[0].desc(env) + " can't be as a left value.");
+          throw new ExpressionRuntimeException(
+              args[0].desc(env) + " can't be a left value for assignment.");
         }
-        env.put(((AviatorJavaType) args[0]).getName(), args[1].getValue(env));
+        args[0].setValue(args[1], env);
         return args[1];
       case DIV:
         return args[0].div(args[1], env);
@@ -191,7 +192,7 @@ public enum OperatorType {
   }
 
 
-  public int getOperandCount() {
-    return this.operandCount;
+  public int getArity() {
+    return this.arity;
   }
 }
