@@ -30,9 +30,12 @@ public class SendIR implements IR {
 
   private AviatorObject callFn(final AviatorFunction fn, final AviatorObject[] args,
       final int arity, final Env env) {
+
+    if (arity == 0) {
+      return fn.call(env);
+    }
+
     switch (arity) {
-      case 0:
-        return fn.call(env);
       case 1:
         return fn.call(env, args[0]);
       case 2:

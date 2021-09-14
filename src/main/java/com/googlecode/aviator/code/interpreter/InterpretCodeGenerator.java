@@ -118,10 +118,7 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void initMethods(final Map<String, Integer> methods) {
-    // TODO Auto-generated method stub
-
-  }
+  public void initMethods(final Map<String, Integer> methods) {}
 
   @Override
   public void genNewLambdaCode(final LambdaFunctionBootstrap bootstrap) {
@@ -497,9 +494,7 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onArrayIndexStart(final Token<?> token) {
-    // TODO
-  }
+  public void onArrayIndexStart(final Token<?> token) {}
 
   @Override
   public void onArrayIndexEnd(final Token<?> lookhead) {
