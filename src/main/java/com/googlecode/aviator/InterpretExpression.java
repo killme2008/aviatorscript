@@ -47,7 +47,9 @@ public class InterpretExpression extends BaseExpression {
   }
 
   private void loadConstants(final Set<Token<?>> constants, final List<IR> instruments) {
-    InterpretContext ctx = new InterpretContext(this, instruments, getCompileEnv());
+    final Env env = new Env();
+    env.setInstance(this.instance);
+    InterpretContext ctx = new InterpretContext(this, instruments, env);
     for (Token<?> token : constants) {
       final LoadIR loadConstantIR = new LoadIR(this.sourceFile, token, null, false);
       loadConstantIR.evalWithoutDispatch(ctx);
