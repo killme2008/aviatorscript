@@ -90,7 +90,9 @@ The year is: 120
 The month is: 3
 ```
 
-See [user guide](https://www.yuque.com/boyan-avfmj/aviatorscript/cpow90?translate=en) for details.
+A complex example is [calculator.av](https://github.com/killme2008/aviatorscript/blob/master/examples/calculator.av) which evaluates arithmetic expression in string.
+
+Read [user guide](https://www.yuque.com/boyan-avfmj/aviatorscript/cpow90?translate=en) for details.
 
 
 # Links

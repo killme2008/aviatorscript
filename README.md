@@ -85,6 +85,8 @@ p("The year is: "+ getYear(date));
 p("The month is: #{getMonth(date)}");
 ```
 
+一个更复杂的计算器例子（求值算术表达式字符串）参见[calculator.av](https://github.com/killme2008/aviatorscript/blob/master/examples/calculator.av)。
+
 4. 执行脚本：
 
 ```sh
