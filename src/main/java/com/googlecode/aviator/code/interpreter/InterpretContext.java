@@ -92,13 +92,11 @@ public class InterpretContext {
     return this.pc;
   }
 
-  public void push(final AviatorObject... args) {
-    for (AviatorObject arg : args) {
-      if (arg == null) {
-        arg = AviatorNil.NIL;
-      }
-      this.operands.push(arg);
+  public void push(AviatorObject arg) {
+    if (arg == null) {
+      arg = AviatorNil.NIL;
     }
+    this.operands.push(arg);
   }
 
   public AviatorObject peek() {
