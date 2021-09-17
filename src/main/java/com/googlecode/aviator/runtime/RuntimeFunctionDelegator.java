@@ -1,6 +1,7 @@
-package com.googlecode.aviator;
+package com.googlecode.aviator.runtime;
 
 import java.util.Map;
+import com.googlecode.aviator.FunctionMissing;
 import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.lexer.SymbolTable;
@@ -18,7 +19,7 @@ import com.googlecode.aviator.utils.Env;
  * @author dennis
  *
  */
-final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFunction {
+public final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFunction {
 
   @Override
   public AviatorObject call() throws Exception {
@@ -296,7 +297,7 @@ final class RuntimeFunctionDelegator extends AviatorObject implements AviatorFun
 
   private final FunctionMissing functionMissing;
 
-  RuntimeFunctionDelegator(final String name, final SymbolTable symbolTable,
+  public RuntimeFunctionDelegator(final String name, final SymbolTable symbolTable,
       final FunctionMissing functionMissing) {
     if (symbolTable != null) {
       this.name = symbolTable.reserve(name).getLexeme();

@@ -69,6 +69,7 @@ import com.googlecode.aviator.lexer.token.Token.TokenType;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
 import com.googlecode.aviator.parser.ExpressionParser;
+import com.googlecode.aviator.runtime.RuntimeFunctionDelegator;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
 import com.googlecode.aviator.runtime.function.math.MathAbsFunction;
 import com.googlecode.aviator.runtime.function.math.MathAcosFunction;
