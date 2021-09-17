@@ -19,7 +19,7 @@
 5. 轻量化的[模块系统](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81)。
 6. 多种方式，方便地[调用 Java 方法](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2)，完整支持 Java [脚本 API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b)（方便从 Java 调用脚本）。
 7. 丰富的定制选项，可作为安全的语言沙箱和全功能语言使用。
-8. 轻量化，高性能，通过直接将脚本翻译成 JVM 字节码，AviatorScript 的基础性能较好。
+8. 轻量化，高性能，ASM 模式下通过直接将脚本翻译成 JVM 字节码，[解释模式](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx)可运行于 Android 等非标 Java 平台。
 
 使用场景包括：
 1. 规则判断及规则引擎
@@ -32,6 +32,7 @@
 
 # News
 
+* [5.3.0-beta2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.0-beta2)，[解释器模式](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx) 可运行于 Android 等非标准 Java 平台。
 * [5.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.7)，修复 `Expression#getVariableNames` 和 `Expression#getVariableFullNames` 方法存在的并发 bug等。
 * [5.2.6](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.6)，**强烈推荐升级**，修复 continue 语句无法在 if/else 或者嵌套 if 语句里正常工作的 work，增加 `partial(f, &args)` 函数等。
 

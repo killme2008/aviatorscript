@@ -21,13 +21,14 @@ It compiles script to java byte code and evaluate it on the fly.
 5. Lightweight [module system](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81?translate=en)。
 6. [Call Java methods](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2?translate=en) conveniently，supports Java [Scripting API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b?translate=en)。
 7. A wide range of customization options to be used as a secure runtime scripting sandbox or full-featured scripting language.
-8. Lightweight and high performance.
+8. Lightweight and high performance. ASM mode compile script into JVM bytecode on fly ,and [interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) make it run on Android platform etc.
 
 
 **Recommend version 5.2.6 and above.**
 
 # News
 
+* [5.3.0-beta2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.0-beta2)，[interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) to run on Android etc.
 * [5.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.7)，fixed a concurrent issue in `Expression#getVariableNames` and `Expression#getVariableFullNames` etc.
 * [5.2.6](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.6)，**A strongly recommended upgrading**，fixed `continue` statement not work with if/else or nested if statements etc.
 
