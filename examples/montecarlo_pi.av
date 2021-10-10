@@ -1,0 +1,30 @@
+## examples/montecarlo_pi.av
+## Use Monte Carlo simulation method to calculate pi.
+
+fn rand_point() {
+  x = rand();
+  y = rand();
+  return tuple(x, y);
+}
+
+fn in_range(point) {
+  return point[0]**2 + point[1]**2 <= 1;
+}
+
+fn calc_pi(n) {
+  let m = 0.0;
+  for i in range(0, n) {
+    let p = rand_point();
+
+    if in_range(p) {
+      m = m + 1;
+    }
+  }
+
+  return 4*m/n;
+}
+
+p(calc_pi(1000));
+p(calc_pi(10000));
+p(calc_pi(100000));
+p(calc_pi(1000000));
