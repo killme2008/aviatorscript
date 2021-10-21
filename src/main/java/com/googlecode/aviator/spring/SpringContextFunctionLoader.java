@@ -2,6 +2,7 @@ package com.googlecode.aviator.spring;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import com.googlecode.aviator.FunctionLoader;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 
@@ -12,7 +13,7 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
  * @author dennis
  *
  */
-public class SpringContextFunctionLoader implements FunctionLoader {
+public class SpringContextFunctionLoader implements FunctionLoader, ApplicationContextAware {
 
   private ApplicationContext applicationContext;
 
@@ -22,24 +23,25 @@ public class SpringContextFunctionLoader implements FunctionLoader {
   }
 
 
-  public SpringContextFunctionLoader(ApplicationContext applicationContext) {
+  public SpringContextFunctionLoader(final ApplicationContext applicationContext) {
     super();
     this.applicationContext = applicationContext;
   }
 
 
   public ApplicationContext getApplicationContext() {
-    return applicationContext;
+    return this.applicationContext;
   }
 
 
-  public void setApplicationContext(ApplicationContext applicationContext) {
+  @Override
+  public void setApplicationContext(final ApplicationContext applicationContext) {
     this.applicationContext = applicationContext;
   }
 
 
   @Override
-  public AviatorFunction onFunctionNotFound(String name) {
+  public AviatorFunction onFunctionNotFound(final String name) {
     try {
       return (AviatorFunction) this.applicationContext.getBean(name);
     } catch (NoSuchBeanDefinitionException e) {
