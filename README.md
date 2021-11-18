@@ -7,7 +7,7 @@
 
 ----------------------------------------
 
-`AviatorScript` 是一门高性能、轻量级寄宿于 JVM 之上的脚本语言。
+`AviatorScript` 是一门高性能、轻量级寄宿于 JVM （包括 Android 平台）之上的脚本语言。
 
 # 特性介绍
 
@@ -32,7 +32,7 @@
 
 # News
 
-* [5.3.0-beta2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.0-beta2)，[解释器模式](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx) 可运行于 Android 等非标准 Java 平台。
+* [5.3.0](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.0)，[解释器模式](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx) 可运行于 Android 等非标准 Java 平台。
 * [5.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.7)，修复 `Expression#getVariableNames` 和 `Expression#getVariableFullNames` 方法存在的并发 bug等。
 * [5.2.6](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.6)，**强烈推荐升级**，修复 continue 语句无法在 if/else 或者嵌套 if 语句里正常工作的 work，增加 `partial(f, &args)` 函数等。
 

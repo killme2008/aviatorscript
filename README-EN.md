@@ -8,7 +8,7 @@
 
 ----------------------------------------
 
-`AviatorScript` is a lightweight, high performance scripting language hosted on the JVM.
+`AviatorScript` is a lightweight, high performance scripting language hosted on the JVM (and Android platform).
 It compiles script to java byte code and evaluate it on the fly.
 
 # Feature Intro
@@ -28,7 +28,7 @@ It compiles script to java byte code and evaluate it on the fly.
 
 # News
 
-* [5.3.0-beta2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.0-beta2)，[interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) to run on Android etc.
+* [5.3.0](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.0)，[interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) to run on Android etc.
 * [5.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.7)，fixed a concurrent issue in `Expression#getVariableNames` and `Expression#getVariableFullNames` etc.
 * [5.2.6](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.6)，**A strongly recommended upgrading**，fixed `continue` statement not work with if/else or nested if statements etc.
 
