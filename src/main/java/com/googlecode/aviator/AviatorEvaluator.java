@@ -541,7 +541,7 @@ public final class AviatorEvaluator {
    * @return
    */
   public static Object execute(final String expression, final Map<String, Object> env) {
-    return execute(expression, env, false);
+    return getInstance().execute(expression,env);
   }
 
 
