@@ -75,10 +75,9 @@ public abstract class BaseExpression implements Expression {
       }
 
       List<String> newVarNames = new ArrayList<>(this.varFullNames.size());
-
       Set<String> nameSet = new HashSet<>();
-
       Set<String> parentInitNames = new HashSet<>();
+
       for (VariableMeta m : this.vars) {
         if (m.isInit() && !m.getName().contains(".") && m.getFirstIndex() >= 0) {
           parentInitNames.add(m.getName());
@@ -122,7 +121,6 @@ public abstract class BaseExpression implements Expression {
     if (this.varFullNames == null) {
       Map<String, VariableMeta> fullNames = getFullNameMetas();
 
-
       final ArrayList<VariableMeta> metas = new ArrayList<>(fullNames.values());
       Collections.sort(metas, new Comparator<VariableMeta>() {
 
@@ -146,12 +144,22 @@ public abstract class BaseExpression implements Expression {
   public Map<String, VariableMeta> getFullNameMetas() {
     Map<String, VariableMeta> fullNames = new LinkedHashMap<>(this.vars.size());
     Set<String> parentVars = new HashSet<>(this.vars.size());
+    Set<String> definedVars = new HashSet<>();
+
     for (VariableMeta m : this.vars) {
-      if (!m.isInit() && m.getFirstIndex() >= 0) {
-        fullNames.put(m.getName(), m);
+      final String name = m.getName();
+      String[] tmps = Constants.SPLIT_PAT.split(name);
+      if (!m.isInit() && !definedVars.contains(tmps[0]) && !definedVars.contains(name)
+          && m.getFirstIndex() >= 0) {
+        fullNames.put(name, m);
+      } else if (m.getFirstIndex() >= 0) {
+        // It's defined in current scope
+        definedVars.add(name);
+        definedVars.add(tmps[0]);
       }
-      parentVars.add(m.getName());
+      parentVars.add(name);
     }
+
     afterPopulateFullNames(fullNames, parentVars);
     return fullNames;
   }
