@@ -24,6 +24,7 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.utils.ArrayUtils;
 
 
 /**
@@ -54,10 +55,10 @@ public class SeqSortFunction extends AbstractFunction {
       Arrays.sort(a);
       return AviatorRuntimeJavaType.valueOf(Arrays.asList(a));
     } else if (clazz.isArray()) {
-      int length = Array.getLength(first);
+      int length = ArrayUtils.getLength(first);
       Object[] dup = (Object[]) Array.newInstance(first.getClass().getComponentType(), length);
       for (int i = 0; i < length; i++) {
-        dup[i] = Array.get(first, i);
+        dup[i] = ArrayUtils.get(first, i);
       }
       // System.arraycopy(array, 0, dup, 0, dup.length);
       Arrays.sort(dup);
@@ -88,10 +89,10 @@ public class SeqSortFunction extends AbstractFunction {
       Arrays.sort(a, comparator);
       return AviatorRuntimeJavaType.valueOf(Arrays.asList(a));
     } else if (clazz.isArray()) {
-      int length = Array.getLength(first);
+      int length = ArrayUtils.getLength(first);
       Object[] dup = (Object[]) Array.newInstance(first.getClass().getComponentType(), length);
       for (int i = 0; i < length; i++) {
-        dup[i] = Array.get(first, i);
+        dup[i] = ArrayUtils.get(first, i);
       }
       // System.arraycopy(array, 0, dup, 0, dup.length);
       Arrays.sort(dup, comparator);

@@ -15,7 +15,6 @@
  **/
 package com.googlecode.aviator.runtime.type;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +29,7 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.DispatchFunction;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaElementType.ContainerType;
+import com.googlecode.aviator.utils.ArrayUtils;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
@@ -645,7 +645,7 @@ public class AviatorJavaType extends AviatorObject {
           new Callable<Object>() {
             @Override
             public Object call() throws Exception {
-              return Array.get(thisValue, index);
+              return ArrayUtils.get(thisValue, index);
             }
           });
     } else if (thisValue instanceof List) {

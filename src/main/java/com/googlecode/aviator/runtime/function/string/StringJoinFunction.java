@@ -1,6 +1,5 @@
 package com.googlecode.aviator.runtime.function.string;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -8,6 +7,7 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorString;
+import com.googlecode.aviator.utils.ArrayUtils;
 
 
 /**
@@ -60,10 +60,10 @@ public class StringJoinFunction extends AbstractFunction {
         wasFirst = append(sb, split, wasFirst, obj);
       }
     } else if (clazz.isArray()) {
-      int length = Array.getLength(target);
+      int length = ArrayUtils.getLength(target);
       boolean wasFirst = true;
       for (int i = 0; i < length; i++) {
-        Object obj = Array.get(target, i);
+        Object obj = ArrayUtils.get(target, i);
         wasFirst = append(sb, split, wasFirst, obj);
       }
     } else {

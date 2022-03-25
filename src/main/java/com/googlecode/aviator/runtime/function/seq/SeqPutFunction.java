@@ -6,6 +6,7 @@ import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import com.googlecode.aviator.utils.ArrayUtils;
 
 
 /**
@@ -48,8 +49,8 @@ public class SeqPutFunction extends AbstractFunction {
       previousVal = ((Map) coll).put(key, val);
     } else if (clazz.isArray()) {
       int index = ((Number) key).intValue();
-      previousVal = Array.get(coll, index);
-      Array.set(coll, index, val);
+      previousVal = ArrayUtils.get(coll, index);
+      ArrayUtils.set(coll, index, val);
     } else {
       throw new IllegalArgumentException(arg1.desc(env) + " can't put elements.");
     }

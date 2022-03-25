@@ -7,6 +7,7 @@ import java.util.Map;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.ArrayUtils;
 
 /**
  * reverse(seq) to reverse an array or list in place.
@@ -35,12 +36,12 @@ public class SeqReverseFunction extends AbstractFunction {
       Collections.reverse(list);
       return arg1;
     } else if (clazz.isArray()) {
-      int length = Array.getLength(first);
+      int length = ArrayUtils.getLength(first);
 
       for (int i = 0; i < length / 2; i++) {
-        Object temp = Array.get(first, i);
-        Array.set(first, i, Array.get(first, length - 1 - i));
-        Array.set(first, length - 1 - i, temp);
+        Object temp = ArrayUtils.get(first, i);
+        ArrayUtils.set(first, i, ArrayUtils.get(first, length - 1 - i));
+        ArrayUtils.set(first, length - 1 - i, temp);
       }
       return arg1;
     } else {
