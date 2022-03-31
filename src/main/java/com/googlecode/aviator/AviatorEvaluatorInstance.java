@@ -213,6 +213,35 @@ public final class AviatorEvaluatorInstance {
   /** cached compiled internal interpred lib functions */
   private static volatile Map<String, AviatorFunction> internalInterpretedLibFunctions;
 
+
+  /**
+   * alias operator token
+   */
+  private final Map<OperatorType, String> aliasOperatorTokens = new IdentityHashMap<>();
+
+
+  /**
+   * Set a alias token for the operator, only supports AND and OR operator right now. <strong> It's
+   * not thread-safe, and you must call it before using this instance</strong>
+   *
+   * @param type the operator type
+   * @param token the alias token
+   * @since 5.3.1
+   */
+  public void aliasOperator(final OperatorType type, final String token) {
+    // TODO more constraints on token
+    if ((type != OperatorType.AND && type != OperatorType.OR) || token == null
+        || !ExpressionParser.isJavaIdentifier(token)) {
+      throw new IllegalArgumentException();
+    }
+    this.aliasOperatorTokens.put(type, token);
+  }
+
+  public String getOperatorAliasToken(final OperatorType type) {
+    return this.aliasOperatorTokens.get(type);
+  }
+
+
   /**
    * Adds a function loader
    *

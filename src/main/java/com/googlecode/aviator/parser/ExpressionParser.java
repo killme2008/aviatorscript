@@ -33,6 +33,7 @@ import com.googlecode.aviator.lexer.token.CharToken;
 import com.googlecode.aviator.lexer.token.DelegateToken;
 import com.googlecode.aviator.lexer.token.DelegateToken.DelegateTokenType;
 import com.googlecode.aviator.lexer.token.NumberToken;
+import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.lexer.token.PatternToken;
 import com.googlecode.aviator.lexer.token.StringToken;
 import com.googlecode.aviator.lexer.token.Token;
@@ -253,11 +254,21 @@ public class ExpressionParser implements Parser {
           reportSyntaxError("expect '|'");
         }
       } else {
-        if (this.lookhead == null) {
-          break;
-        } else {
-          break;
+        // Process operator alias
+        String alias = this.instance.getOperatorAliasToken(OperatorType.OR);
+        if (alias != null) {
+          if (opToken != null && opToken.getType() == TokenType.Variable
+              && opToken.getLexeme().equals(alias)) {
+            CodeGenerator cg = getCodeGeneratorWithTimes();
+            cg.onJoinLeft(opToken);
+            move(true);
+            and();
+            cg.onJoinRight(opToken);
+            continue;
+          }
         }
+
+        break;
       }
 
     }
@@ -329,6 +340,7 @@ public class ExpressionParser implements Parser {
     bitOr();
     while (true) {
       Token<?> opToken = this.lookhead;
+
       if (expectChar('&')) {
         CodeGenerator cg = getCodeGeneratorWithTimes();
         cg.onAndLeft(opToken);
@@ -341,8 +353,24 @@ public class ExpressionParser implements Parser {
           reportSyntaxError("expect '&'");
         }
       } else {
+        // Process operator alias
+        String alias = this.instance.getOperatorAliasToken(OperatorType.AND);
+        if (alias != null) {
+          if (opToken != null && opToken.getType() == TokenType.Variable
+              && opToken.getLexeme().equals(alias)) {
+            CodeGenerator cg = getCodeGeneratorWithTimes();
+            cg.onAndLeft(opToken);
+            move(true);
+            bitOr();
+            cg.onAndRight(opToken);
+            continue;
+          }
+        }
+
         break;
       }
+
+
     }
 
   }
