@@ -715,7 +715,7 @@ public class Reflector {
       }
 
       if (arrayIndex >= 0) {
-        Array.set(target, arrayIndex, boxArg(target.getClass().getComponentType(), val));
+        ArrayUtils.set(target, arrayIndex, boxArg(target.getClass().getComponentType(), val));
       } else {
         ((Map) target).put(keyIndex, val);
       }
@@ -820,7 +820,7 @@ public class Reflector {
 
       if (arrayIndex >= 0) {
         if (val.getClass().isArray()) {
-          val = Array.get(val, arrayIndex);
+          val = ArrayUtils.get(val, arrayIndex);
         } else if (val instanceof List) {
           val = ((List) val).get(arrayIndex);
         } else if (val instanceof CharSequence) {

@@ -13,7 +13,36 @@ public class SimpleELPerformanceTest extends TestCase {
       perf();
       perfVarAccess();
       perfStringInterpolation();
+      perfArrayAccess();
     }
+  }
+
+  /**
+   * time : 189 Perf array accessing time : 148 Perf array accessing time : 146 Perf array accessing
+   * time : 136 Perf array accessing time : 132 Perf array accessing time : 131 Perf array accessing
+   * time : 132 Perf array accessing time : 135 Perf array accessing time : 133 Perf array accessing
+   * time : 133
+   */
+  private void perfArrayAccess() {
+    System.out.println("Perf array accessing");
+    final String script = "'http://'+uris[2]+'/'";
+    // final String script =
+    // "'a=' + a + ', b='+b +', c=' +c +', ' + a + '+' + b + '+' + c + '=' + (a+b+c)";
+    Expression exp = AviatorEvaluator.compile(script);
+    Map<String, Object> ctx = exp.newEnv("uris", new String[] {"a.com", "b.com", "c.com"});
+
+    long startMillis = System.currentTimeMillis();
+
+    final int COUNT = 1 * 1000 * 1000;
+    for (int i = 0; i < COUNT; ++i) {
+      if (!"http://c.com/".equals(exp.execute(ctx))) {
+        fail();
+      }
+    }
+
+    long millis = System.currentTimeMillis() - startMillis;
+
+    System.out.println("time : " + NumberFormat.getInstance().format(millis));
   }
 
   private void perfStringInterpolation() {

@@ -1,10 +1,10 @@
 package com.googlecode.aviator.runtime.type;
 
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.utils.ArrayUtils;
 import com.googlecode.aviator.utils.Reflector;
 
 public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
@@ -35,7 +35,7 @@ public class AviatorRuntimeJavaElementType extends AviatorRuntimeJavaType {
     Object val = value.getValue(env);
     switch (this.containerType) {
       case Array:
-        Array.set(this.container, (int) this.index,
+        ArrayUtils.set(this.container, (int) this.index,
             Reflector.boxArg(this.container.getClass().getComponentType(), val));
         break;
       case List:

@@ -7,6 +7,7 @@ import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorType;
+import com.googlecode.aviator.utils.ArrayUtils;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.TypeUtils;
@@ -54,7 +55,7 @@ public class SeqArrayFunction extends AbstractVariadicFunction {
       Object ret = Array.newInstance(clazz, args.length - 1);
 
       for (int i = 1; i < args.length; i++) {
-        Array.set(ret, i - 1, Reflector.boxArg(clazz, args[i].getValue(env)));
+        ArrayUtils.set(ret, i - 1, Reflector.boxArg(clazz, args[i].getValue(env)));
       }
 
       return AviatorRuntimeJavaType.valueOf(ret);

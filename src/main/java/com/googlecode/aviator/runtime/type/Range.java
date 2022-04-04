@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import com.googlecode.aviator.exception.CompareNotSupportedException;
+import com.googlecode.aviator.utils.ArrayUtils;
 import com.googlecode.aviator.utils.Env;
 
 /**
@@ -111,7 +112,7 @@ public final class Range extends AviatorObject implements Sequence<Number> {
 
         @Override
         public void add(final Object e) {
-          Array.set(this.array, this.i++, e);
+          ArrayUtils.set(this.array, this.i++, e);
         }
 
         @Override

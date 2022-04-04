@@ -1,8 +1,8 @@
 package com.googlecode.aviator.runtime.type.seq;
 
-import java.lang.reflect.Array;
 import java.util.Iterator;
 import com.googlecode.aviator.runtime.type.Collector;
+import com.googlecode.aviator.utils.ArrayUtils;
 
 /**
  * Sequence for object array.
@@ -37,7 +37,7 @@ public class ArraySequence extends AbstractSequence<Object> {
   public ArraySequence(final Object a) {
     super();
     this.a = a;
-    this.len = Array.getLength(a);
+    this.len = ArrayUtils.getLength(a);
   }
 
 
@@ -54,7 +54,7 @@ public class ArraySequence extends AbstractSequence<Object> {
 
       @Override
       public Object next() {
-        return Array.get(ArraySequence.this.a, this.i++);
+        return ArrayUtils.get(ArraySequence.this.a, this.i++);
       }
 
       @Override

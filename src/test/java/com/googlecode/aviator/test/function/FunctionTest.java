@@ -826,6 +826,17 @@ public class FunctionTest {
     assertEquals("a.b", vars.get(0));
   }
 
+  @Test
+  public void testIssue431() {
+    Expression expr = this.instance.compile("{\n" + "    let itemv1 = seq.get(info.value,index);\n"
+        + "    print( itemv1.name )\n" + "}");
+
+    List<String> vars = expr.getVariableNames();
+    assertEquals(2, vars.size());
+    assertEquals("info", vars.get(0));
+    assertEquals("index", vars.get(1));
+  }
+
 
   @Test
   public void testGetVariableNames() {
