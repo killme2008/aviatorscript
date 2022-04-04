@@ -28,9 +28,9 @@ It compiles script to java byte code and evaluate it on the fly.
 
 # News
 
+* [5.3.1](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.1)，Supports logical operator alias and fixes some issues.
 * [5.3.0](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.0)，[interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) to run on Android etc.
 * [5.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.7)，fixed a concurrent issue in `Expression#getVariableNames` and `Expression#getVariableFullNames` etc.
-* [5.2.6](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.6)，**A strongly recommended upgrading**，fixed `continue` statement not work with if/else or nested if statements etc.
 
 # Dependency
 
