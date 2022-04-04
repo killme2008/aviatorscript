@@ -59,6 +59,29 @@ public class AviatorEvaluatorInstanceUnitTest {
 
 
   @Test
+  public void testAliasOperator() {
+    this.instance.aliasOperator(OperatorType.AND, "and");
+    this.instance.aliasOperator(OperatorType.OR, "或者");
+    assertTrue((boolean) this.instance.execute("1==1 && 2==2"));
+    assertTrue((boolean) this.instance.execute("1==1 and 2==2"));
+    assertTrue((boolean) this.instance.execute("1==3 || 2==2"));
+    assertTrue((boolean) this.instance.execute("1==3 或者 2==2"));
+
+    assertTrue((boolean) this.instance.execute("a = (1==3 或者 2==2); a"));
+
+    assertFalse((boolean) this.instance.execute("a = (1==3 或者 2==2) and b == 3; a",
+        AviatorEvaluator.newEnv("b", 4)));
+    assertTrue((boolean) this.instance.execute("a = (1==3 或者 2==2) and b == 3; a",
+        AviatorEvaluator.newEnv("b", 3)));
+    try {
+      this.instance.aliasOperator(OperatorType.ASSIGNMENT, "assign");
+      fail();
+    } catch (IllegalArgumentException e) {
+
+    }
+  }
+
+  @Test
   public void testClassAllowList() {
     final HashSet<Object> classes = new HashSet<>();
     classes.add(ArrayBlockingQueue.class);

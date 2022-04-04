@@ -15,7 +15,6 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.runtime.RuntimeUtils;
@@ -23,6 +22,7 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.ArrayUtils;
 
 
 /**
@@ -56,7 +56,7 @@ public class SeqContainsKeyFunction extends AbstractFunction {
       }
     } else if (clazz.isArray()) {
       int index = FunctionUtils.getNumberValue(arg2, env).intValue();
-      return AviatorBoolean.valueOf(index >= 0 && index < Array.getLength(first));
+      return AviatorBoolean.valueOf(index >= 0 && index < ArrayUtils.getLength(first));
     } else if (List.class.isAssignableFrom(clazz)) {
       int index = FunctionUtils.getNumberValue(arg2, env).intValue();
       return AviatorBoolean.valueOf(index >= 0 && index < ((List) first).size());

@@ -15,7 +15,6 @@
  **/
 package com.googlecode.aviator.runtime.function.seq;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 import com.googlecode.aviator.runtime.RuntimeUtils;
@@ -23,6 +22,7 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorLong;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.Range;
+import com.googlecode.aviator.utils.ArrayUtils;
 
 
 /**
@@ -54,7 +54,7 @@ public class SeqCountFunction extends AbstractFunction {
     } else if (CharSequence.class.isAssignableFrom(clazz)) {
       size = ((CharSequence) value).length();
     } else if (clazz.isArray()) {
-      size = Array.getLength(value);
+      size = ArrayUtils.getLength(value);
     } else if (Range.class.isAssignableFrom(clazz)) {
       size = ((Range) value).size();
     } else {

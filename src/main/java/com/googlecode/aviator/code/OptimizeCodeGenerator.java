@@ -646,8 +646,6 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   }
 
-
-
   @Override
   public void onAssignment(final Token<?> lookhead) {
     this.tokenList.add(new OperatorToken(lookhead,
