@@ -26,6 +26,7 @@ fn is_digit(ch) {
 fn lexer(s) {
   let it = new StringCharacterIterator(s);
   let peek = current(it);
+
   return fn() {
     while true {
       if peek == CharacterIterator.DONE {
@@ -36,6 +37,7 @@ fn lexer(s) {
         peek  = next(it);
         continue;
       }
+
       break;
     }
 
@@ -96,7 +98,7 @@ fn term(parser, tokens) {
     } elsif t.val == '/' {
       parser.move();
       unary(parser, tokens);
-      seq.add(tokens, OP_DIV);
+      seq.add(tokens, OP_DIV);x
     } else {
       break;
     }
@@ -115,7 +117,6 @@ fn unary(parser, tokens) {
 }
 
 fn factor(parser, tokens) {
-
   let t = parser.lookhead;
 
   if t.val == '(' {
@@ -134,16 +135,21 @@ fn factor(parser, tokens) {
   }
 }
 
-fn parse(s) {
-  let tokens = seq.list();
-  let lexer = lexer(s);
-
+fn parser(lexer) {
   let parser = seq.map();
   parser.lookhead = lexer();
 
   parser.move = fn() {
     parser.lookhead = lexer();
   };
+
+  return parser;
+}
+
+fn parse(s) {
+  let tokens = seq.list();
+  let lexer = lexer(s);
+  let parser = parser(lexer);
 
   expr(parser, tokens);
 
@@ -160,11 +166,9 @@ fn calculate(s) {
   let operands = new Stack();
 
   for top in s {
-    ## p("#{top}: #{operands}");
-
     if top.type == NUMBER {
       push(operands, top.val);
-    }elsif top.type == EOF {
+    } elsif top.type == EOF {
       break;
     } else {
       assert(top.type == OP);
@@ -172,7 +176,7 @@ fn calculate(s) {
       if top == OP_NEG {
         let arg = pop(operands);
         push(operands,  -arg);
-      } else{
+      } else {
         let arg2 = pop(operands);
         let arg1 = pop(operands);
 
@@ -182,7 +186,7 @@ fn calculate(s) {
           push(operands, arg1 - arg2);
         } elsif top == OP_MULTI {
           push(operands, arg1 * arg2);
-        }else {
+        } else {
           push(operands, arg1 / arg2);
         }
       }
