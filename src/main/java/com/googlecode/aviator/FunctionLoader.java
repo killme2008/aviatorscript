@@ -11,7 +11,8 @@ import com.googlecode.aviator.runtime.type.AviatorFunction;
 public interface FunctionLoader {
 
   /**
-   * Invoked when function not found
+   * Invoked when function not found, <strong>The implementation must returns null when function not
+   * found.</strong>
    *
    * @param name function name
    */
