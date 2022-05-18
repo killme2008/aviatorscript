@@ -98,7 +98,7 @@ fn term(parser, tokens) {
     } elsif t.val == '/' {
       parser.move();
       unary(parser, tokens);
-      seq.add(tokens, OP_DIV);x
+      seq.add(tokens, OP_DIV);
     } else {
       break;
     }
