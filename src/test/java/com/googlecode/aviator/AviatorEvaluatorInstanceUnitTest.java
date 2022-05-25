@@ -43,6 +43,7 @@ import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
 import com.googlecode.aviator.runtime.type.AviatorString;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.TestUtils;
@@ -57,6 +58,30 @@ public class AviatorEvaluatorInstanceUnitTest {
     this.instance = AviatorEvaluator.newInstance();
   }
 
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testIssue466() {
+    this.instance.addOpFunction(OperatorType.ADD, new AbstractFunction() {
+
+      @Override
+      public AviatorObject call(final Map<String, Object> env, final AviatorObject arg1,
+          final AviatorObject arg2) {
+        Map<String, Object> test = new HashMap<String, Object>();
+        test.put("test", "123");
+        return AviatorRuntimeJavaType.valueOf(test);
+      }
+
+      @Override
+      public String getName() {
+        return OperatorType.ADD.getToken();
+      }
+    });
+
+    Expression compiledExp = this.instance.compile("10000+ 20000 ");
+    Object result = compiledExp.execute();
+    assertTrue(result instanceof HashMap);
+    assertEquals("123", ((Map<String, Object>) result).get("test"));
+  }
 
   @Test
   public void testAliasOperator() {

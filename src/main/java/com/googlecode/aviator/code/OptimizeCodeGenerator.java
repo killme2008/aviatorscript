@@ -147,6 +147,10 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             // Could not optimize function and index call
             break;
           default:
+            // If the operator is override, we don't optimize it.
+            if (OperationRuntime.hasRuntimeContext(getCompileEnv(), operatorType)) {
+              break;
+            }
             Map<Integer, DelegateTokenType> index2DelegateType =
                 getIndex2DelegateTypeMap(operatorType);
             final int result =
