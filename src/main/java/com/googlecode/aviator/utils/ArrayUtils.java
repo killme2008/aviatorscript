@@ -36,7 +36,7 @@ public class ArrayUtils {
       return ((Object[]) a).length;
     }
 
-    return ArrayUtils.getLength(a);
+    return Array.getLength(a);
   }
 
   public static Object get(final Object a, final int index) {
@@ -62,7 +62,7 @@ public class ArrayUtils {
       return ((Object[]) a)[index];
     }
 
-    return ArrayUtils.get(a, index);
+    return Array.get(a, index);
   }
 
   public static void set(final Object a, final int index, final Object val) {
@@ -87,7 +87,7 @@ public class ArrayUtils {
     } else if (a instanceof Object[]) {
       ((Object[]) a)[index] = val;
     } else {
-      ArrayUtils.set(a, index, val);
+      Array.set(a, index, val);
     }
   }
 }
