@@ -107,6 +107,11 @@ public abstract class AbstractToken<T> implements Token<T>, Serializable {
     return this.lineIndex;
   }
 
+  @Override
+  public int getEndIndex() {
+    return this.lineIndex + (this.lexeme != null ? this.lexeme.length() : 0);
+  }
+
 
   @Override
   public String toString() {

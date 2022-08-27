@@ -1051,7 +1051,7 @@ public class ExpressionParser implements Parser {
     this.inPattern = true;
     StringBuilder sb = new StringBuilder();
     while (this.lookhead != null) {
-      while (!expectChar('/')) {
+      while (!expectChar('/') && this.lookhead != null) {
         sb.append(this.lookhead.getLexeme());
         move(false);
       }
@@ -1886,6 +1886,16 @@ public class ExpressionParser implements Parser {
       ensureDepthState();
     }
     ensureNoStatementAfterReturn(stmtType);
+    // If the last statement is ternary,it must be ended with END TOKEN such as null token, '}',
+    // 'end' keyword, or ';'
+    // Otherwise report syntax error.
+    if (stmtType == StatementType.Ternary) {
+      if (lookhead != null && !expectChar(';') && !expectChar('}') && lookhead != Variable.END) {
+        this.back();
+        reportSyntaxError("unexpect token '" + currentTokenLexeme()
+            + "', maybe forget to insert ';' to complete last expression ");
+      }
+    }
 
     return stmtType;
   }

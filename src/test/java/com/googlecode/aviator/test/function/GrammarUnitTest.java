@@ -144,6 +144,23 @@ public class GrammarUnitTest {
   }
 
   @Test
+  public void testIssue483() {
+    try {
+      this.instance
+          .execute("if(true){\n" + "return false;\n" + "}\n" + "//注释xxxx\n" + "return true;");
+      fail();
+    } catch (ExpressionSyntaxErrorException e) {
+    }
+
+    try {
+      this.instance.execute("if(true){\n" + "return false;\n" + "}\n" + "//\n" + "return true;");
+      fail();
+    } catch (ExpressionSyntaxErrorException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
   public void testEscapeStringInterpolation() {
     this.instance.disableFeature(Feature.StringInterpolation);
     try {

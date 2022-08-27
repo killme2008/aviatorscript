@@ -442,7 +442,11 @@ public class ExpressionLexer {
   }
 
   public String getScanString() {
-    return this.expression.substring(0, this.iterator.getIndex());
+    Token<?> firstPushbackToken = this.tokenBuffer != null ? this.tokenBuffer.peekFirst() : null;
+    return this.expression.substring(0,
+        (firstPushbackToken != null && firstPushbackToken.getStartIndex() > 0)
+            ? firstPushbackToken.getEndIndex()
+            : this.iterator.getIndex());
   }
 
   private String getBigNumberLexeme(final StringBuilder sb) {
