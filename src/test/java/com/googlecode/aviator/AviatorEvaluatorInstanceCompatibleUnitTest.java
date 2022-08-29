@@ -25,6 +25,12 @@ public class AviatorEvaluatorInstanceCompatibleUnitTest extends AviatorEvaluator
 
   @Override
   @Test
+  public void testIssue476() {
+    // ignore
+  }
+
+  @Override
+  @Test
   public void testClassAllowList() {
     // ignore
   }

@@ -7,5 +7,5 @@ package com.googlecode.aviator.parser;
  *
  */
 public enum CompileTypes {
-  Function, Array;
+  Function, Array, Class,
 }

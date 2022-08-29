@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.io.ByteArrayOutputStream;
 import java.math.MathContext;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,14 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Before
   public void setup() {
     this.instance = AviatorEvaluator.newInstance();
+  }
+
+  @Test
+  public void testIssue476() {
+    Expression expr = instance.compile("let abc = new String('abc');");
+    assertTrue(expr.getVariableFullNames().isEmpty());
+    expr = instance.compile("let abc = new String('abc'); abc + x");
+    assertEquals(expr.getVariableFullNames(), Arrays.asList("x"));
   }
 
   @SuppressWarnings("unchecked")

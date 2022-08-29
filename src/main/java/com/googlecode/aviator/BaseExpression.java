@@ -17,6 +17,7 @@ import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
+import com.googlecode.aviator.parser.CompileTypes;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
@@ -149,8 +150,8 @@ public abstract class BaseExpression implements Expression {
     for (VariableMeta m : this.vars) {
       final String name = m.getName();
       String[] tmps = Constants.SPLIT_PAT.split(name);
-      if (!m.isInit() && !definedVars.contains(tmps[0]) && !definedVars.contains(name)
-          && m.getFirstIndex() >= 0) {
+      if (!m.isInit() && m.getType() != CompileTypes.Class && !definedVars.contains(tmps[0])
+          && !definedVars.contains(name) && m.getFirstIndex() >= 0) {
         fullNames.put(name, m);
       } else if (m.getFirstIndex() >= 0) {
         // It's defined in current scope

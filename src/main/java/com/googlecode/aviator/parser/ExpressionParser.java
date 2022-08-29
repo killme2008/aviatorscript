@@ -1565,7 +1565,8 @@ public class ExpressionParser implements Parser {
       reportSyntaxError("invalid class name");
     }
     checkVariableName(this.lookhead);
-    getCodeGeneratorWithTimes().onConstant(this.lookhead);
+    getCodeGeneratorWithTimes()
+        .onConstant(this.lookhead.withMeta(Constants.TYPE_META, CompileTypes.Class));
     getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
     move(true);
 
