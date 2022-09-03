@@ -32,9 +32,9 @@
 
 # News
 
+* [5.3.2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.2)，一些 Bug 修复，推荐升级。
 * [5.3.1](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.1)，逻辑运算符支持别名和 bug 修复等。
 * [5.3.0](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.0)，[解释器模式](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx) 可运行于 Android 等非标准 Java 平台。
-* [5.2.7](https://github.com/killme2008/aviator/releases/tag/aviator-5.2.7)，修复 `Expression#getVariableNames` 和 `Expression#getVariableFullNames` 方法存在的并发 bug等。
 
 # Dependency
 
