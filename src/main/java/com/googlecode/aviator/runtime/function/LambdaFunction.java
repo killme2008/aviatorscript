@@ -62,6 +62,13 @@ public final class LambdaFunction extends AbstractVariadicFunction {
     this.context = context;
   }
 
+  public void resetContext() {
+    if (this.inheritEnv) {
+      // gc friendly
+      this.context = null;
+    }
+  }
+
   public LambdaFunction(final String name, final List<FunctionParam> params,
       final Expression expression, final Env context) {
     super();

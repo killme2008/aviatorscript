@@ -1,8 +1,8 @@
 package com.googlecode.aviator.runtime.function.internal;
 
-
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -56,9 +56,14 @@ public class TryCatchFunction extends AbstractFunction {
         throw Reflector.sneakyThrow(t);
       }
     } finally {
-      if (finallyBody != null) {
-        AviatorObject ret = finallyBody.call(env);
-        result = chooseResult(result, ret);
+      try {
+        if (finallyBody != null) {
+          AviatorObject ret = finallyBody.call(env);
+          result = chooseResult(result, ret);
+        }
+      } finally {
+        RuntimeUtils.resetLambdaContext(tryBody);
+        RuntimeUtils.resetLambdaContext(finallyBody);
       }
     }
 
@@ -71,11 +76,15 @@ public class TryCatchFunction extends AbstractFunction {
       return result;
     }
     AviatorFunction continueFn = (AviatorFunction) val;
-    AviatorObject contResult = continueFn.call(env);
-    if (contResult == Constants.REDUCER_EMPTY) {
-      return result;
-    } else {
-      return contResult;
+    try {
+      AviatorObject contResult = continueFn.call(env);
+      if (contResult == Constants.REDUCER_EMPTY) {
+        return result;
+      } else {
+        return contResult;
+      }
+    } finally {
+      RuntimeUtils.resetLambdaContext(continueFn);
     }
   }
 
