@@ -2,12 +2,10 @@ package com.googlecode.aviator.runtime.function.seq;
 
 import java.util.Collection;
 import java.util.Map;
-import com.googlecode.aviator.runtime.RuntimeFunctionDelegator;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.Collector;
-import com.googlecode.aviator.utils.ArrayUtils;
 
 /**
  * seq.add function to add all elements in other sequence into this one.
@@ -49,7 +47,8 @@ public class SeqAddAllFunction extends AbstractFunction {
       } else if (Collector.class.isAssignableFrom(clazz)) {
         ((Collector) coll1).add(element);
       } else {
-        throw new IllegalArgumentException(arg1.desc(env) + " is not a collection or map.");
+        throw new IllegalArgumentException(
+            "Can't add value: " + element + " into " + arg1.desc(env));
       }
     }
     return arg1;

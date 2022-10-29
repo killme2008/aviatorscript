@@ -47,7 +47,7 @@ public class SeqAddFunction extends AbstractFunction {
       ((Collector) coll).add(element);
       return arg1;
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a collection or map.");
+      throw new IllegalArgumentException("Can't add value: " + element + " into " + arg1.desc(env));
     }
 
   }
@@ -75,7 +75,8 @@ public class SeqAddFunction extends AbstractFunction {
       ArrayUtils.set(coll, index, value);
       return arg1;
     } else {
-      throw new IllegalArgumentException(arg1.desc(env) + " is not a map or array.");
+      throw new IllegalArgumentException(
+          "Can't add key: " + key + " and value: " + value + " into " + arg1.desc(env));
     }
 
   }
