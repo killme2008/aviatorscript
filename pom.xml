@@ -76,6 +76,7 @@
 
   <build>
     <plugins>
+      <!--
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -98,7 +99,8 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
+        </plugin>
+      -->
       <plugin>
 	<artifactId>maven-source-plugin</artifactId>
 	<version>3.1.0</version>
