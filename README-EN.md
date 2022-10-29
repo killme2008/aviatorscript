@@ -28,9 +28,9 @@ It compiles script to java byte code and evaluate it on the fly.
 
 # News
 
+* [5.3.3](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.3)，fixed potential memory leak, wrong value captured by function etc.
 * [5.3.2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.2)，some bugs fixed, recommended to upgrade.
 * [5.3.1](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.1)，Supports logical operator alias and fixes some issues.
-* [5.3.0](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.0)，[interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) to run on Android etc.
 
 # Dependency
 
