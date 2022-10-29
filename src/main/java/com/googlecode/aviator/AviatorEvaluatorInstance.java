@@ -85,6 +85,7 @@ import com.googlecode.aviator.runtime.function.math.MathRoundFunction;
 import com.googlecode.aviator.runtime.function.math.MathSinFunction;
 import com.googlecode.aviator.runtime.function.math.MathSqrtFunction;
 import com.googlecode.aviator.runtime.function.math.MathTanFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqAddAllFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqAddFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqArrayFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCollectorFunction;
@@ -947,6 +948,7 @@ public final class AviatorEvaluatorInstance {
     addFunction(new SeqMapEntryFunction());
     addFunction(new SeqIntoFunction());
     addFunction(new SeqAddFunction());
+    addFunction(new SeqAddAllFunction());
     addFunction(new SeqRemoveFunction());
     addFunction(new SeqGetFunction());
     addFunction(new SeqPutFunction());

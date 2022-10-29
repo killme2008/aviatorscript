@@ -1,5 +1,8 @@
 package com.googlecode.aviator.runtime;
 
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -27,7 +30,7 @@ public class LambdaFunctionBootstrap implements Comparable<LambdaFunctionBootstr
   private final List<FunctionParam> params;
   private final boolean inheritEnv;
 
-  private final ThreadLocal<LambdaFunction> fnLocal = new ThreadLocal<>();
+  private final ThreadLocal<Reference<LambdaFunction>> fnLocal = new ThreadLocal<>();
 
 
   @Override
@@ -82,26 +85,22 @@ public class LambdaFunctionBootstrap implements Comparable<LambdaFunctionBootstr
    * @return
    */
   public LambdaFunction newInstance(final Env env) {
-    LambdaFunction fn = null;
-    if (this.inheritEnv && (fn = this.fnLocal.get()) != null) {
-      fn.setContext(env);
-      return fn;
+    Reference<LambdaFunction> ref = null;
+    if (this.inheritEnv && (ref = this.fnLocal.get()) != null) {
+      LambdaFunction fn = ref.get();
+      if (fn != null) {
+        fn.setContext(env);
+        return fn;
+      } else {
+        this.fnLocal.remove();
+      }
     }
 
-    // try {
-    fn = new LambdaFunction(this.name, this.params, this.expression, env);
+    LambdaFunction fn = new LambdaFunction(this.name, this.params, this.expression, env);
     fn.setInheritEnv(this.inheritEnv);
     if (this.inheritEnv) {
-      this.fnLocal.set(fn);
+      this.fnLocal.set(new SoftReference<>(fn));
     }
     return fn;
-    // final LambdaFunction fn =
-    // (LambdaFunction) this.constructor.invoke(this.params, this.expression, env);
-
-    // } catch (ExpressionRuntimeException e) {
-    // throw e;
-    // } catch (Throwable t) {
-    // throw new ExpressionRuntimeException("Fail to create lambda instance.", t);
-    // }
   }
 }

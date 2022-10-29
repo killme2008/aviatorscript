@@ -358,6 +358,24 @@ fn test_partial() {
   j.assertEquals(21, t(4, 5, 6));  
 }
 
+fn test_seq_add_all() {
+  tests = tests + 1;
+
+  let s1 = seq.set(1, 2, 3, 4, 5);
+  let s2 = seq.list(6, 7, 7, 8, 9);
+
+  seq.add_all(s1, s2);
+  j.assertEquals(9, count(s1));
+  j.assertEquals(s1, seq.set(1, 2, 3, 4, 5, 6, 7, 8, 9));
+
+  let m1 = seq.map('a', 1, 'b', 2);
+  let m2 = seq.map('b', 3, 'c', 4, 'd', 5);
+  seq.add_all(m1, m2);
+
+  j.assertEquals(4, count(m1));
+  j.assertEquals(m1, seq.map('a', 1, 'b', 3, 'c', 4, 'd', 5));
+}
+
 test_take_while();
 test_drop_while();
 test_concat();
@@ -378,5 +396,6 @@ test_static_methods();
 test_is_distinct();
 test_meta();
 test_partial();
+test_seq_add_all();
 
-j.assertEquals(20, tests);
+j.assertEquals(21, tests);

@@ -22,7 +22,6 @@ import com.googlecode.aviator.utils.Constants;
  */
 public class ReducerFunction extends AbstractFunction {
 
-
   private static final long serialVersionUID = -6117602709327741955L;
 
   private ReducerFunction() {}
@@ -41,6 +40,15 @@ public class ReducerFunction extends AbstractFunction {
     Object coll = arg1.getValue(env);
     AviatorFunction iteratorFn = (AviatorFunction) arg2;
 
+    try {
+      return reduce(env, arg2, arg3, coll, iteratorFn);
+    } finally {
+      RuntimeUtils.resetLambdaContext(iteratorFn);
+    }
+  }
+
+  private AviatorObject reduce(final Map<String, Object> env, final AviatorObject arg2,
+      final AviatorObject arg3, Object coll, AviatorFunction iteratorFn) {
     int maxLoopCount = RuntimeUtils.getInstance(env).getOptionValue(Options.MAX_LOOP_COUNT).number;
     AviatorObject result = AviatorNil.NIL;
     long c = 0;
@@ -134,5 +142,4 @@ public class ReducerFunction extends AbstractFunction {
       return contResult;
     }
   }
-
 }

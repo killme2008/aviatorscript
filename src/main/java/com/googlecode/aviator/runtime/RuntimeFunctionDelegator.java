@@ -8,6 +8,7 @@ import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.runtime.function.system.ConstantFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorType;
 import com.googlecode.aviator.utils.Constants;
@@ -36,6 +37,9 @@ public final class RuntimeFunctionDelegator extends AviatorObject implements Avi
 
   @Override
   public int innerCompare(final AviatorObject other, final Map<String, Object> env) {
+    if (this.tryGetFuncFromEnv(env) == null) {
+      return AviatorNil.NIL.innerCompare(other, env);
+    }
     throw new CompareNotSupportedException("Lambda function can't be compared.");
   }
 
@@ -46,7 +50,7 @@ public final class RuntimeFunctionDelegator extends AviatorObject implements Avi
 
   @Override
   public Object getValue(final Map<String, Object> env) {
-    return this;
+    return this.tryGetFuncFromEnv(env);
   }
 
   @Override
@@ -317,15 +321,23 @@ public final class RuntimeFunctionDelegator extends AviatorObject implements Avi
     if (this.containsDot && this.subNames == null) {
       this.subNames = Constants.SPLIT_PAT.split(this.name);
     }
-    Object val = AviatorJavaType.getValueFromEnv(this.name, this.containsDot, this.subNames, env,
-        false, true);
-    if (val instanceof AviatorFunction) {
-      return (AviatorFunction) val;
+    AviatorFunction func = tryGetFuncFromEnv(env);
+    if (func != null) {
+      return func;
     }
     if (this.functionMissing != null) {
       return new ConstantFunction(this.name,
           this.functionMissing.onFunctionMissing(this.name, env, args));
     }
     throw new FunctionNotFoundException("Function not found: " + this.name);
+  }
+
+  private AviatorFunction tryGetFuncFromEnv(final Map<String, Object> env) {
+    Object val = AviatorJavaType.getValueFromEnv(this.name, this.containsDot, this.subNames, env,
+        false, true);
+    if (val instanceof AviatorFunction) {
+      return (AviatorFunction) val;
+    }
+    return null;
   }
 }

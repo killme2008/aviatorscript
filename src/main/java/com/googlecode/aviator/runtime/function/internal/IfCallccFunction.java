@@ -1,6 +1,7 @@
 package com.googlecode.aviator.runtime.function.internal;
 
 import java.util.Map;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
@@ -13,7 +14,6 @@ import com.googlecode.aviator.utils.Constants;
  *
  */
 public class IfCallccFunction extends AbstractFunction {
-
 
   private static final long serialVersionUID = 3511688119189694245L;
 
@@ -40,12 +40,16 @@ public class IfCallccFunction extends AbstractFunction {
       }
 
       AviatorFunction otherClausesFn = (AviatorFunction) nextClauseVal;
-      AviatorObject result = otherClausesFn.call(env);
-      // No remaining statements, return the if statement result.
-      if (result == Constants.REDUCER_EMPTY) {
-        return arg1;
+      try {
+        AviatorObject result = otherClausesFn.call(env);
+        // No remaining statements, return the if statement result.
+        if (result == Constants.REDUCER_EMPTY) {
+          return arg1;
+        }
+        return result;
+      } finally {
+        RuntimeUtils.resetLambdaContext(otherClausesFn);
       }
-      return result;
     }
   }
 }

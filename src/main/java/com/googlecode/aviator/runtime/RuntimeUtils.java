@@ -6,6 +6,7 @@ import java.util.Map;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.runtime.function.internal.UnpackingArgsFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -55,6 +56,12 @@ public final class RuntimeUtils {
       return fn;
     }
     return new UnpackingArgsFunction(fn);
+  }
+
+  public static void resetLambdaContext(AviatorFunction fn) {
+    if (fn != null && fn instanceof LambdaFunction) {
+      ((LambdaFunction) fn).resetContext();
+    }
   }
 
   /**
