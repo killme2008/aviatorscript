@@ -25,6 +25,7 @@ import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.lexer.SymbolTable;
+import com.googlecode.aviator.runtime.RuntimeFunctionDelegator;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.DispatchFunction;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
@@ -316,7 +317,12 @@ public class AviatorJavaType extends AviatorObject {
 
   @Override
   public Object getValue(final Map<String, Object> env) {
-    return this.getValueFromEnv(this.name, this.containsDot, env, true);
+    Object value = this.getValueFromEnv(this.name, this.containsDot, env, true);
+    // If value is a function delegator,try to get the real value
+    if (value instanceof RuntimeFunctionDelegator) {
+      value = ((RuntimeFunctionDelegator) value).getValue(env);
+    }
+    return value;
   }
 
   public Object getValueFromEnv(final String name, final boolean nameContainsDot,
