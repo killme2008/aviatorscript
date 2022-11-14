@@ -472,6 +472,19 @@ public final class AviatorEvaluator {
     return getInstance().getCachedExpression(expression);
   }
 
+  /**
+   * Compile a text expression to Expression object and cache it with the specified cache key
+   *
+   * @param cacheKey cache key
+   * @param expression text expression
+   * @param cached Whether to cache the compiled result,make true to cache it.
+   * @return
+   */
+  public static Expression compile(final String cacheKey, final String expression,
+      final boolean cached) {
+    return getInstance().compile(cacheKey, expression, cached);
+  }
+
 
   /**
    * Compile a text expression to Expression object

@@ -24,6 +24,7 @@ import static org.junit.Assert.fail;
 import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
+import com.googlecode.aviator.utils.Utils;
 import org.junit.Test;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 
@@ -126,6 +127,18 @@ public class AviatorEvaluatorUnitTest {
     AviatorEvaluator.exec("a-b+c", 1, 2);
   }
 
+  @Test
+  public void testCompileCacheWithSpecifiedCacheKey() {
+    String expression = "1+3";
+    Expression exp1 = AviatorEvaluator.compile(Utils.md5sum(expression), expression, true);
+    Expression exp2 = AviatorEvaluator.compile(Utils.md5sum(expression), expression, true);
+    assertNotNull(exp1);
+    assertNotNull(exp2);
+    assertSame(exp1, exp2);
+
+    assertEquals(4, exp1.execute(null));
+    assertEquals(4, exp2.execute(null));
+  }
 
   @Test
   public void testCompileCache() {
