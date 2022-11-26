@@ -190,6 +190,17 @@ public class AviatorEvaluatorUnitTest {
     assertEquals("hello world", AviatorEvaluator.execute("a+b", env, true));
   }
 
+  @Test
+  public void evaluatorWithSpecifiedCacheKey() {
+    Map<String, Object> env = new HashMap<>();
+    env.put("a", "hello");
+    env.put("b", " world");
+    assertEquals("hello world", AviatorEvaluator.execute("key", "a + b", env, true));
+    final Expression expression = AviatorEvaluator.getInstance().getCachedExpressionByKey("key");
+    assertNotNull(expression);
+    assertEquals("hello world", expression.execute(env));
+  }
+
 
   @Test(expected = CompileExpressionErrorException.class)
   public void compileBlankExpression1() {

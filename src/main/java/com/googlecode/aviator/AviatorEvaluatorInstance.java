@@ -1655,6 +1655,24 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
+  /**
+   * Execute a text expression with environment
+   *
+   * @param cacheKey unique key for caching
+   * @param expression text expression
+   * @param env Binding variable environment
+   * @param cached Whether to cache the compiled result,make true to cache it.
+   */
+  public Object execute(final String cacheKey, final String expression,
+      final Map<String, Object> env, final boolean cached) {
+    Expression compiledExpression = compile(cacheKey, expression, cached);
+    if (compiledExpression != null) {
+      return compiledExpression.execute(env);
+    } else {
+      throw new ExpressionNotFoundException("Null compiled expression for " + expression);
+    }
+  }
+
 
   /**
    * Execute a text expression with environment
@@ -1665,12 +1683,7 @@ public final class AviatorEvaluatorInstance {
    */
   public Object execute(final String expression, final Map<String, Object> env,
       final boolean cached) {
-    Expression compiledExpression = compile(expression, cached);
-    if (compiledExpression != null) {
-      return compiledExpression.execute(env);
-    } else {
-      throw new ExpressionNotFoundException("Null compiled expression for " + expression);
-    }
+    return execute(expression, expression, env, cached);
   }
 
 

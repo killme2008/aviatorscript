@@ -532,6 +532,19 @@ public final class AviatorEvaluator {
     return getInstance().exec(expression, values);
   }
 
+  /**
+   * Execute a text expression with environment
+   *
+   * @param cacheKey unique key for caching
+   * @param expression text expression
+   * @param env Binding variable environment
+   * @param cached Whether to cache the compiled result,make true to cache it.
+   */
+  public static Object execute(final String cacheKey, final String expression,
+      final Map<String, Object> env, final boolean cached) {
+    return getInstance().execute(cacheKey, expression, env, cached);
+  }
+
 
   /**
    * Execute a text expression with environment
