@@ -284,8 +284,8 @@ public final class AviatorEvaluatorInstance {
   /**
    * Compile a script file into expression.
    *
-   * @param file the script file path
-   * @param cached whether to cached the compiled result with key is script file's absolute path.
+   * @param path the script file path
+   * @param cached whether to cache the compiled result with key is script file's absolute path.
    * @since 5.0.0
    * @return the compiled expression instance.
    */
@@ -356,10 +356,9 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
-   * Loads a script from path and return it's exports.
+   * Loads a script from path and return its exports.
    *
-   * @param path
-   * @param args arguments to execute the script.
+   * @param path the script file path
    * @throws IOException
    * @return the exports map.
    * @since 5.0.0
@@ -389,10 +388,9 @@ public final class AviatorEvaluatorInstance {
 
 
   /**
-   * Loads a script from path and return it's exports with module caching.
+   * Loads a script from path and return its exports with module caching.
    *
-   * @param path
-   * @param args arguments to execute the script.
+   * @param path the script file path
    * @throws IOException
    * @return the exports map
    * @since 5.0.0
@@ -902,7 +900,7 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
-   * Set a alias name for function specified by name
+   * Set alias name for function specified by name
    *
    * @param name the origin function name
    * @param aliasName the alias function name
@@ -1304,7 +1302,7 @@ public final class AviatorEvaluatorInstance {
    * Retrieve an aviator function by name,throw exception if not found or null.It's not thread-safe.
    *
    * @param name
-   * @param symbolTablee
+   * @param symbolTable
    * @return
    */
   public AviatorFunction getFunction(final String name, final SymbolTable symbolTable) {
@@ -1655,6 +1653,24 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
+  /**
+   * Execute a text expression with environment
+   *
+   * @param cacheKey unique key for caching
+   * @param expression text expression
+   * @param env Binding variable environment
+   * @param cached Whether to cache the compiled result,make true to cache it.
+   */
+  public Object execute(final String cacheKey, final String expression,
+      final Map<String, Object> env, final boolean cached) {
+    Expression compiledExpression = compile(cacheKey, expression, cached);
+    if (compiledExpression != null) {
+      return compiledExpression.execute(env);
+    } else {
+      throw new ExpressionNotFoundException("Null compiled expression for " + expression);
+    }
+  }
+
 
   /**
    * Execute a text expression with environment
@@ -1665,12 +1681,7 @@ public final class AviatorEvaluatorInstance {
    */
   public Object execute(final String expression, final Map<String, Object> env,
       final boolean cached) {
-    Expression compiledExpression = compile(expression, cached);
-    if (compiledExpression != null) {
-      return compiledExpression.execute(env);
-    } else {
-      throw new ExpressionNotFoundException("Null compiled expression for " + expression);
-    }
+    return execute(expression, expression, env, cached);
   }
 
 

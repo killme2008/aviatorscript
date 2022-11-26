@@ -472,6 +472,19 @@ public final class AviatorEvaluator {
     return getInstance().getCachedExpression(expression);
   }
 
+  /**
+   * Compile a text expression to Expression object and cache it with the specified cache key
+   *
+   * @param cacheKey cache key
+   * @param expression text expression
+   * @param cached Whether to cache the compiled result,make true to cache it.
+   * @return
+   */
+  public static Expression compile(final String cacheKey, final String expression,
+      final boolean cached) {
+    return getInstance().compile(cacheKey, expression, cached);
+  }
+
 
   /**
    * Compile a text expression to Expression object
@@ -517,6 +530,19 @@ public final class AviatorEvaluator {
   @Deprecated
   public static Object exec(final String expression, final Object... values) {
     return getInstance().exec(expression, values);
+  }
+
+  /**
+   * Execute a text expression with environment
+   *
+   * @param cacheKey unique key for caching
+   * @param expression text expression
+   * @param env Binding variable environment
+   * @param cached Whether to cache the compiled result,make true to cache it.
+   */
+  public static Object execute(final String cacheKey, final String expression,
+      final Map<String, Object> env, final boolean cached) {
+    return getInstance().execute(cacheKey, expression, env, cached);
   }
 
 

@@ -640,6 +640,17 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertEquals("hello world", this.instance.execute("a+b", env, true));
   }
 
+  @Test
+  public void evaluatorWithSpecifiedCacheKey() {
+    Map<String, Object> env = new HashMap<>();
+    env.put("a", "hello");
+    env.put("b", " world");
+    assertEquals("hello world", this.instance.execute("key", "a + b", env, true));
+    final Expression expression = this.instance.getCachedExpressionByKey("key");
+    assertNotNull(expression);
+    assertEquals("hello world", expression.execute(env));
+  }
+
 
   @Test(expected = UnsupportedFeatureException.class)
   public void testDisableAssignment() {
