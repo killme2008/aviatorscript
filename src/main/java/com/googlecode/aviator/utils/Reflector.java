@@ -318,6 +318,12 @@ public class Reflector {
       isBooleanType = true;
     }
 
+    if ((methods == null || methods.isEmpty()) && name.startsWith("is")) {
+      // Fix https://github.com/killme2008/aviatorscript/issues/517
+      methods = getInstanceMethods(clazz, name);
+      isBooleanType = true;
+    }
+
     if (methods != null && !methods.isEmpty()) {
       Method method = methods.get(0);
       for (Method m : methods) {
