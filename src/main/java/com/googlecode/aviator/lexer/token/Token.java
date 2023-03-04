@@ -15,6 +15,7 @@
  **/
 package com.googlecode.aviator.lexer.token;
 
+import java.io.Serializable;
 import java.util.Map;
 
 
@@ -25,7 +26,7 @@ import java.util.Map;
  *
  * @param <T>
  */
-public interface Token<T> {
+public interface Token<T> extends Serializable {
   enum TokenType {
     String, Variable, Number, Char, Operator, Pattern, Delegate
   }

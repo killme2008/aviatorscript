@@ -1,5 +1,3 @@
-package com.googlecode.aviator;
-
 /**
  * Copyright (C) 2010 dennis zhuang (killme2008@gmail.com)
  *
@@ -15,6 +13,11 @@ package com.googlecode.aviator;
  * if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  **/
+package com.googlecode.aviator;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 import com.googlecode.aviator.parser.VariableMeta;
@@ -29,8 +32,8 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
  */
 public class LiteralExpression extends BaseExpression {
 
-  private final Object result;
-
+  private static final long serialVersionUID = 7320801048592600557L;
+  private Object result;
 
   public LiteralExpression(final AviatorEvaluatorInstance instance, final Object result,
       final List<VariableMeta> vars) {
@@ -50,5 +53,15 @@ public class LiteralExpression extends BaseExpression {
   @Override
   public String toString() {
     return "LiteralExpression [result=" + this.result + "]";
+  }
+
+  private void readObject(ObjectInputStream input) throws ClassNotFoundException, IOException {
+    super.customReadObject(input);
+    this.result = input.readObject();
+  }
+
+  private void writeObject(ObjectOutputStream output) throws IOException {
+    super.customWriteObject(output);
+    output.writeObject(this.result);
   }
 }

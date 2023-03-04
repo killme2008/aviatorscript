@@ -5,6 +5,7 @@ import com.googlecode.aviator.code.interpreter.InterpretContext;
 
 public class NewLambdaIR implements IR {
 
+  private static final long serialVersionUID = 991107439815059038L;
   private final String lambdaName;
 
 

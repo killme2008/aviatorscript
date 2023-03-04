@@ -1,5 +1,6 @@
 package com.googlecode.aviator.parser;
 
+import java.io.Serializable;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.utils.Constants;
 
@@ -9,7 +10,8 @@ import com.googlecode.aviator.utils.Constants;
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class VariableMeta {
+public class VariableMeta implements Serializable {
+  private static final long serialVersionUID = 7798932900127029432L;
   private CompileTypes type;
   private String name;
   private boolean isInit;

@@ -4,6 +4,7 @@ import com.googlecode.aviator.code.interpreter.IR;
 import com.googlecode.aviator.code.interpreter.InterpretContext;
 
 public class PopNIR implements IR {
+  private static final long serialVersionUID = -7275602629270711681L;
   private final int times;
 
 

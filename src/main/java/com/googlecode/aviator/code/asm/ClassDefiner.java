@@ -68,9 +68,9 @@ public class ClassDefiner {
   private static int errorTimes = 0;
 
   public static final Class<?> defineClass(final String className, final Class<?> clazz,
-      final byte[] bytes, final AviatorClassLoader classLoader)
+      final byte[] bytes, final AviatorClassLoader classLoader, boolean forceClassLoader)
       throws NoSuchFieldException, IllegalAccessException {
-    if (!preferClassLoader && DEFINE_CLASS_HANDLE != null) {
+    if (!preferClassLoader && !forceClassLoader && DEFINE_CLASS_HANDLE != null) {
       try {
         Class<?> defineClass = (Class<?>) DEFINE_CLASS_HANDLE.invokeExact(clazz, bytes, EMPTY_OBJS);
         return defineClass;

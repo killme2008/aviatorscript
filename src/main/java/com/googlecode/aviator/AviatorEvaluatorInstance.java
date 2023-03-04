@@ -16,7 +16,6 @@
  **/
 package com.googlecode.aviator;
 
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.reflect.Method;
@@ -168,11 +169,12 @@ import com.googlecode.aviator.runtime.type.string.ExpressionSegment;
 import com.googlecode.aviator.runtime.type.string.LiteralSegment;
 import com.googlecode.aviator.runtime.type.string.StringSegment;
 import com.googlecode.aviator.runtime.type.string.VarSegment;
+import com.googlecode.aviator.serialize.AviatorObjectInputStream;
+import com.googlecode.aviator.serialize.AviatorObjectOutputStream;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.LRUMap;
 import com.googlecode.aviator.utils.Reflector;
 import com.googlecode.aviator.utils.Utils;
-
 
 /**
  * A aviator evaluator instance
@@ -201,7 +203,6 @@ public final class AviatorEvaluatorInstance {
    */
   private volatile Map<Options, Value> options = new IdentityHashMap<Options, Value>();
 
-
   /** function loader list */
   private List<FunctionLoader> functionLoaders;
 
@@ -214,12 +215,10 @@ public final class AviatorEvaluatorInstance {
   /** cached compiled internal interpred lib functions */
   private static volatile Map<String, AviatorFunction> internalInterpretedLibFunctions;
 
-
   /**
    * alias operator token
    */
   private final Map<OperatorType, String> aliasOperatorTokens = new IdentityHashMap<>();
-
 
   /**
    * Set a alias token for the operator, only supports AND and OR operator right now. <strong> It's
@@ -242,6 +241,36 @@ public final class AviatorEvaluatorInstance {
     return this.aliasOperatorTokens.get(type);
   }
 
+  /**
+   * Create an ObjectInputStream from an input stream for deserialize an expression.
+   * 
+   * @since 5.3.4
+   * @return the stream
+   * @throws IOException
+   * 
+   */
+  public ObjectInputStream newObjectInputStream(InputStream in) throws IOException {
+    ensureEnableSerializableOption();
+    return new AviatorObjectInputStream(in, this);
+  }
+
+  private void ensureEnableSerializableOption() {
+    if (!getOptionValue(Options.SERIALIZABLE).bool) {
+      throw new IllegalStateException("Options.SERIALIZABLE is false");
+    }
+  }
+
+  /**
+   * Create an ObjectOutputStream to serialize an expression.
+   * 
+   * @since 5.3.4
+   * @return
+   * @throws IOException
+   */
+  public ObjectOutputStream newObjectOutputStream(OutputStream out) throws IOException {
+    ensureEnableSerializableOption();
+    return new AviatorObjectOutputStream(out);
+  }
 
   /**
    * Adds a function loader
@@ -267,7 +296,6 @@ public final class AviatorEvaluatorInstance {
     return this.envProcessor;
   }
 
-
   /**
    * Set an env processor. Note, this method should be called before using the evaluator instance.
    *
@@ -278,8 +306,6 @@ public final class AviatorEvaluatorInstance {
   public void setEnvProcessor(final EnvProcessor envProcessor) {
     this.envProcessor = envProcessor;
   }
-
-
 
   /**
    * Compile a script file into expression.
@@ -370,7 +396,6 @@ public final class AviatorEvaluatorInstance {
     return loadScript0(abPath);
   }
 
-
   private Map<String, Object> loadScript0(final String abPath) throws IOException {
     Expression exp = this.compileScript(abPath);
     return executeModule(exp, abPath);
@@ -385,7 +410,6 @@ public final class AviatorEvaluatorInstance {
     exports.configure(this, exp);
     return (Map<String, Object>) module.get("exports");
   }
-
 
   /**
    * Loads a script from path and return its exports with module caching.
@@ -499,7 +523,6 @@ public final class AviatorEvaluatorInstance {
     return this.compileScript(path, this.cachedExpressionByDefault);
   }
 
-
   /**
    * Returns the function missing handler, null if not set.
    *
@@ -510,7 +533,6 @@ public final class AviatorEvaluatorInstance {
     return this.functionMissing;
   }
 
-
   /**
    * Configure a function missing handler.the handler can be null.
    *
@@ -520,7 +542,6 @@ public final class AviatorEvaluatorInstance {
   public void setFunctionMissing(final FunctionMissing functionMissing) {
     this.functionMissing = functionMissing;
   }
-
 
   /**
    * Adds all public instance methods in the class as custom functions into evaluator except those
@@ -643,7 +664,6 @@ public final class AviatorEvaluatorInstance {
           continue;
         }
 
-
         String methodName = method.getName();
         Function func = method.getAnnotation(Function.class);
         if (func != null) {
@@ -750,7 +770,6 @@ public final class AviatorEvaluatorInstance {
     return this.options.get(Options.FEATURE_SET).featureSet.contains(feature);
   }
 
-
   /**
    * Disable a script engine feature.
    *
@@ -765,7 +784,6 @@ public final class AviatorEvaluatorInstance {
     }
     loadFeatureFunctions();
   }
-
 
   /**
    * Returns the current evaluator option value, returns null if missing.
@@ -796,7 +814,6 @@ public final class AviatorEvaluatorInstance {
     return val;
   }
 
-
   /**
    * Returns the generated java classes byte code version, 1.6 by defualt.
    *
@@ -805,7 +822,6 @@ public final class AviatorEvaluatorInstance {
   public int getBytecodeVersion() {
     return this.bytecodeVersion;
   }
-
 
   /**
    * Set the generated java classes java byte code version.
@@ -816,7 +832,6 @@ public final class AviatorEvaluatorInstance {
   public void setBytecodeVersion(final int bytecodeVersion) {
     this.bytecodeVersion = bytecodeVersion;
   }
-
 
   /**
    * Get the evaluator instance options
@@ -831,7 +846,6 @@ public final class AviatorEvaluatorInstance {
     return ret;
   }
 
-
   /**
    * Returns the functions map
    *
@@ -840,7 +854,6 @@ public final class AviatorEvaluatorInstance {
   public Map<String, Object> getFuncMap() {
     return this.funcMap;
   }
-
 
   /**
    * Returns the operators map.
@@ -851,7 +864,6 @@ public final class AviatorEvaluatorInstance {
     return this.opsMap;
   }
 
-
   /**
    * Get current trace output stream,default is System.out
    *
@@ -860,7 +872,6 @@ public final class AviatorEvaluatorInstance {
   public OutputStream getTraceOutputStream() {
     return this.traceOutputStream;
   }
-
 
   /**
    * Set trace output stream
@@ -1110,7 +1121,6 @@ public final class AviatorEvaluatorInstance {
 
   private boolean cachedExpressionByDefault;
 
-
   /**
    * Create a aviator evaluator instance.
    */
@@ -1175,7 +1185,6 @@ public final class AviatorEvaluatorInstance {
     return this;
   }
 
-
   /**
    * Clear all cached compiled expression
    */
@@ -1199,7 +1208,6 @@ public final class AviatorEvaluatorInstance {
     this.aviatorClassLoader = initAviatorClassLoader();
   }
 
-
   /**
    * Returns classloader
    *
@@ -1208,7 +1216,6 @@ public final class AviatorEvaluatorInstance {
   public AviatorClassLoader getAviatorClassLoader() {
     return getAviatorClassLoader(false);
   }
-
 
   /**
    * Returns classloader
@@ -1222,7 +1229,6 @@ public final class AviatorEvaluatorInstance {
       return new AviatorClassLoader(this.getClass().getClassLoader());
     }
   }
-
 
   /**
    * Add an aviator function,it's not thread-safe.
@@ -1278,7 +1284,6 @@ public final class AviatorEvaluatorInstance {
     this.addFunction(name, function);
   }
 
-
   /**
    * Remove an aviator function by name,it's not thread-safe.
    *
@@ -1318,7 +1323,8 @@ public final class AviatorEvaluatorInstance {
       }
     }
     if (function == null) {
-      // Returns a delegate function that will try to find the function from runtime env.
+      // Returns a delegate function that will try to find the function from runtime
+      // env.
       function = new RuntimeFunctionDelegator(name, symbolTable, this.functionMissing);
     }
     return function;
@@ -1332,7 +1338,6 @@ public final class AviatorEvaluatorInstance {
   public void addOpFunction(final OperatorType opType, final AviatorFunction function) {
     this.opsMap.put(opType, function);
   }
-
 
   /**
    * Retrieve an operator aviator function by op type, return null if not found.It's not
@@ -1357,7 +1362,6 @@ public final class AviatorEvaluatorInstance {
     return this.opsMap.remove(opType);
   }
 
-
   /**
    * Check if the function is existed in aviator
    *
@@ -1377,7 +1381,6 @@ public final class AviatorEvaluatorInstance {
   public AviatorFunction removeFunction(final AviatorFunction function) {
     return removeFunction(function.getName());
   }
-
 
   /**
    * Returns a compiled expression in cache
@@ -1437,7 +1440,6 @@ public final class AviatorEvaluatorInstance {
     return this.expressionCache.size();
   }
 
-
   /**
    * Compile a text expression to Expression object
    *
@@ -1448,7 +1450,6 @@ public final class AviatorEvaluatorInstance {
   public Expression compile(final String expression, final boolean cached) {
     return this.compile(expression, expression, cached);
   }
-
 
   /**
    * Compile a text expression to Expression object
@@ -1517,7 +1518,6 @@ public final class AviatorEvaluatorInstance {
     });
   }
 
-
   private Expression getCompiledExpression(final String cacheKey,
       final FutureTask<Expression> task) {
     try {
@@ -1533,7 +1533,6 @@ public final class AviatorEvaluatorInstance {
           t);
     }
   }
-
 
   private Expression innerCompile(final String expression, final String sourceFile,
       final boolean cached) {
@@ -1554,7 +1553,6 @@ public final class AviatorEvaluatorInstance {
   private int getOptimizeLevel() {
     return getOptionValue(Options.OPTIMIZE_LEVEL).number;
   }
-
 
   public CodeGenerator newCodeGenerator(final String sourceFile, final boolean cached) {
     AviatorClassLoader classLoader = getAviatorClassLoader(cached);
@@ -1589,7 +1587,6 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
-
   /**
    * Compile a text expression to Expression Object without caching
    *
@@ -1615,7 +1612,6 @@ public final class AviatorEvaluatorInstance {
     ExpressionParser parser = new ExpressionParser(this, lexer, codeGenerator);
     parser.parse();
   }
-
 
   /**
    * Execute a text expression with values that are variables order in the expression.It only runs
@@ -1671,7 +1667,6 @@ public final class AviatorEvaluatorInstance {
     }
   }
 
-
   /**
    * Execute a text expression with environment
    *
@@ -1684,7 +1679,6 @@ public final class AviatorEvaluatorInstance {
     return execute(expression, expression, env, cached);
   }
 
-
   /**
    * Execute a text expression without caching
    *
@@ -1695,7 +1689,6 @@ public final class AviatorEvaluatorInstance {
   public Object execute(final String expression, final Map<String, Object> env) {
     return execute(expression, env, this.cachedExpressionByDefault);
   }
-
 
   /**
    * Invalidate expression cache
@@ -1720,7 +1713,6 @@ public final class AviatorEvaluatorInstance {
       this.expressionCache.remove(cacheKey);
     }
   }
-
 
   /**
    * Execute a text expression without caching and env map.

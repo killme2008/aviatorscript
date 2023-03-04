@@ -1,6 +1,11 @@
 package com.googlecode.aviator.code.interpreter.ir;
 
-public class Label {
+import java.io.Serializable;
+
+public class Label implements Serializable {
+
+  private static final long serialVersionUID = -8044349898664624643L;
+
   public String name;
   public int i;
 

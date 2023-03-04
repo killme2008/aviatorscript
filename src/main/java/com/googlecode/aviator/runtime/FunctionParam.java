@@ -1,12 +1,15 @@
 package com.googlecode.aviator.runtime;
 
+import java.io.Serializable;
+
 /**
  * Function param
  *
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class FunctionParam {
+public class FunctionParam implements Serializable {
+  private static final long serialVersionUID = 2500321752781875680L;
   private final int index;
   private final String name;
   private final boolean isVariadic;

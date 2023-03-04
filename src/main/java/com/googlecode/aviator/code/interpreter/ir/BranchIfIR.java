@@ -5,6 +5,7 @@ import com.googlecode.aviator.code.interpreter.InterpretContext;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
 public class BranchIfIR implements IR, JumpIR {
+  private static final long serialVersionUID = 5374232314686082568L;
   private int pc;
   private final Label label;
   private final SourceInfo sourceInfo;

@@ -5,6 +5,8 @@ import com.googlecode.aviator.code.interpreter.InterpretContext;
 
 public class AssertTypeIR implements IR {
 
+  private static final long serialVersionUID = -856359371027702741L;
+
   public static enum AssertTypes {
     Number, String, Bool,
   }

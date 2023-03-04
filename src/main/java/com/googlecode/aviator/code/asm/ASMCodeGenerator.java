@@ -57,6 +57,7 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.BaseExpression;
+import com.googlecode.aviator.ClassExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.asm.ClassWriter;
@@ -81,7 +82,6 @@ import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.op.OperationRuntime;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.TypeUtils;
-
 
 /**
  * Code generator using asm
@@ -136,7 +136,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   private Label currentLabel = START_LABEL;
 
-
   private void setMaxStacks(final int newMaxStacks) {
     if (newMaxStacks > this.maxStacks) {
       this.maxStacks = newMaxStacks;
@@ -147,11 +146,13 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
       final AviatorClassLoader classLoader, final OutputStream traceOut) {
     super(instance, sourceFile, classLoader);
     // Generate inner class name
-    this.className = "Script_" + System.currentTimeMillis() + "_" + CLASS_COUNTER.getAndIncrement();
+    this.className =
+        "AviatorScript_" + System.currentTimeMillis() + "_" + CLASS_COUNTER.getAndIncrement();
     // Auto compute frames
     this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     // if (trace) {
-    // this.traceClassVisitor = new TraceClassVisitor(this.clazzWriter, new PrintWriter(traceOut));
+    // this.traceClassVisitor = new TraceClassVisitor(this.clazzWriter, new
+    // PrintWriter(traceOut));
     // this.classWriter = new CheckClassAdapter(this.traceClassVisitor);
     // } else {
     // this.classWriter = new CheckClassAdapter(this.clazzWriter);
@@ -163,13 +164,11 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     return this.lambdaGenerator;
   }
 
-
   @Override
   public void start() {
     makeConstructor();
     startVisitMethodCode();
   }
-
 
   private void startVisitMethodCode() {
     this.mv = this.classWriter.visitMethod(ACC_PUBLIC + +ACC_FINAL, "execute0",
@@ -177,7 +176,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
         "(Lcom/googlecode/aviator/utils/Env;)Ljava/lang/Object;", null);
     this.mv.visitCode();
   }
-
 
   private void endVisitMethodCode(final boolean unboxObject) {
     if (this.operandsCount > 0) {
@@ -207,11 +205,9 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   }
 
-
   private void endVisitClass() {
     this.classWriter.visitEnd();
   }
-
 
   /**
    * Make a default constructor
@@ -283,7 +279,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.classWriter.visitSource(this.sourceFile == null ? this.className : this.sourceFile, null);
   }
 
-
   /**
    * Make a label
    *
@@ -292,7 +287,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   private Label makeLabel() {
     return new Label();
   }
-
 
   /*
    * (non-Javadoc)
@@ -310,7 +304,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
         opType.name(), "Lcom/googlecode/aviator/lexer/token/OperatorType;");
   }
 
-
   /**
    * Pop a operand from stack
    */
@@ -318,14 +311,12 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.operandsCount--;
   }
 
-
   /**
    * Pop a operand from stack
    */
   private void popOperand(final int n) {
     this.operandsCount -= n;
   }
-
 
   /*
    * (non-Javadoc)
@@ -336,7 +327,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   public void onSub(final Token<?> lookhead) {
     visitBinOperator(lookhead, OperatorType.SUB, "sub");
   }
-
 
   /*
    * (non-Javadoc)
@@ -349,13 +339,10 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     visitBinOperator(lookhead, OperatorType.MULT, "mult");
   }
 
-
-
   @Override
   public void onExponent(final Token<?> lookhead) {
     visitBinOperator(lookhead, OperatorType.Exponent, "exponent");
   }
-
 
   @Override
   public void onAssignment(final Token<?> lookhead) {
@@ -378,7 +365,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.pushOperand();
   }
 
-
   /*
    * (non-Javadoc)
    *
@@ -388,7 +374,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   public void onDiv(final Token<?> lookhead) {
     visitBinOperator(lookhead, OperatorType.DIV, "div");
   }
-
 
   /*
    * (non-Javadoc)
@@ -400,7 +385,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     visitBinOperator(lookhead, OperatorType.MOD, "mod");
   }
 
-
   /**
    * Do logic operation "&&" left operand
    */
@@ -410,16 +394,13 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     visitLeftBranch(lookhead, IFEQ, OperatorType.AND);
   }
 
-
   private void visitBoolean() {
     this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "booleanValue", "(Ljava/util/Map;)Z");
   }
 
-
   private void pushLabel0(final Label l0) {
     this.l0stack.push(l0);
   }
-
 
   /**
    * Do logic operation "&&" right operand
@@ -430,7 +411,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.popOperand(2); // boolean object and environment
     this.pushOperand();
   }
-
 
   private void visitRightBranch(final Token<?> lookhead, final int ints,
       final OperatorType opType) {
@@ -469,7 +449,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   private final Stack<Label> l0stack = new Stack<Label>();
   private final Stack<Label> l1stack = new Stack<Label>();
 
-
   @Override
   public void onTernaryBoolean(final Token<?> lookhead) {
     loadEnv();
@@ -487,11 +466,9 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.popOperand(); // pop the last result
   }
 
-
   private void pushLabel1(final Label l1) {
     this.l1stack.push(l1);
   }
-
 
   @Override
   public void onTernaryLeft(final Token<?> lookhead) {
@@ -501,11 +478,9 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.popOperand(); // pop one boolean
   }
 
-
   private Label peekLabel1() {
     return this.l1stack.peek();
   }
-
 
   @Override
   public void onTernaryRight(final Token<?> lookhead) {
@@ -513,7 +488,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     visitLineNumber(lookhead);
     this.popOperand(); // pop one boolean
   }
-
 
   @Override
   public void onTernaryEnd(final Token<?> lookhead) {
@@ -530,7 +504,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     return this.l1stack.pop();
   }
 
-
   /**
    * Do logic operation "||" right operand
    */
@@ -542,22 +515,18 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   }
 
-
   private void visitLabel(final Label label) {
     this.mv.visitLabel(label);
     this.currentLabel = label;
   }
 
-
   private Label peekLabel0() {
     return this.l0stack.peek();
   }
 
-
   private Label popLabel0() {
     return this.l0stack.pop();
   }
-
 
   /**
    * Do logic operation "||" left operand
@@ -567,7 +536,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     loadEnv();
     visitLeftBranch(lookhead, IFNE, OperatorType.OR);
   }
-
 
   private void visitLeftBranch(final Token<?> lookhead, final int ints, final OperatorType opType) {
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
@@ -581,12 +549,10 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.popOperand();
   }
 
-
   @Override
   public void onEq(final Token<?> lookhead) {
     doCompareAndJump(lookhead, IFNE, OperatorType.EQ);
   }
-
 
   @Override
   public void onMatch(final Token<?> lookhead) {
@@ -596,12 +562,10 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.pushOperand();
   }
 
-
   @Override
   public void onNeq(final Token<?> lookhead) {
     doCompareAndJump(lookhead, IFEQ, OperatorType.NEQ);
   }
-
 
   private void doCompareAndJump(final Token<?> lookhead, final int ints,
       final OperatorType opType) {
@@ -611,7 +575,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.popOperand();
     this.popOperand();
   }
-
 
   private boolean isEqNe(final int ints) {
     return ints == IFEQ || ints == IFNE;
@@ -641,25 +604,21 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   }
 
-
   @Override
   public void onGe(final Token<?> lookhead) {
     doCompareAndJump(lookhead, IFLT, OperatorType.GE);
   }
-
 
   @Override
   public void onGt(final Token<?> lookhead) {
     doCompareAndJump(lookhead, IFLE, OperatorType.GT);
   }
 
-
   @Override
   public void onLe(final Token<?> lookhead) {
     doCompareAndJump(lookhead, IFGT, OperatorType.LE);
 
   }
-
 
   @Override
   public void onLt(final Token<?> lookhead) {
@@ -670,7 +629,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.operandsCount += delta;
     setMaxStacks(this.operandsCount);
   }
-
 
   /**
    * Logic operation '!'
@@ -726,10 +684,8 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
       this.popOperand();
     }
 
-
     this.popOperand();
   }
-
 
   /**
    * Bit operation '~'
@@ -738,7 +694,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   public void onBitNot(final Token<?> lookhead) {
     visitUnaryOperator(lookhead, OperatorType.BIT_NOT, "bitNot");
   }
-
 
   /*
    * (non-Javadoc)
@@ -762,15 +717,19 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
     byte[] bytes = this.classWriter.toByteArray();
     try {
-      Class<?> defineClass =
-          ClassDefiner.defineClass(this.className, Expression.class, bytes, this.classLoader);
+      boolean enableSerializable = this.instance.getOptionValue(Options.SERIALIZABLE).bool;
+      Class<?> defineClass = ClassDefiner.defineClass(this.className, Expression.class, bytes,
+          this.classLoader, enableSerializable);
       Constructor<?> constructor =
           defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class, SymbolTable.class);
-      BaseExpression exp = (BaseExpression) constructor.newInstance(this.instance,
+      ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
           new ArrayList<VariableMeta>(this.variables.values()), this.symbolTable);
       exp.setLambdaBootstraps(this.lambdaBootstraps);
       exp.setFuncsArgs(this.funcsArgs);
       exp.setSourceFile(this.sourceFile);
+      if (enableSerializable) {
+        exp.setClassBytes(bytes);
+      }
       return exp;
     } catch (ExpressionRuntimeException e) {
       throw e;
@@ -782,12 +741,106 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     }
   }
 
+  private void genReadObject() {
+    // 1. BaseExpresson#customReadObject
+    MethodVisitor mv = this.classWriter.visitMethod(ACC_PRIVATE, "readObject",
+        "(Ljava/io/ObjectInputStream;)V", "(Ljava/io/ObjectInputStream;)V",
+        new String[] {"java/lang/ClassNotFoundException", "java/io/IOException"});
+    mv.visitCode();
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitVarInsn(ALOAD, 1);
+    mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/BaseExpression", "customReadObject",
+        "(Ljava/io/ObjectInputStream;)V");
+    // 2.read inner variables
+    for (String innerName : this.innerVars.values()) {
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitVarInsn(ALOAD, 1);
+      mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/ObjectInputStream", "readObject",
+          "()Ljava/lang/Object;");
+      mv.visitTypeInsn(CHECKCAST, JAVA_TYPE_OWNER);
+      mv.visitFieldInsn(PUTFIELD, this.className, innerName,
+          "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;");
+
+    }
+    // 3.read constant pool
+    for (String innerName : this.constantPool.values()) {
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitVarInsn(ALOAD, 1);
+      mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/ObjectInputStream", "readObject",
+          "()Ljava/lang/Object;");
+      mv.visitTypeInsn(CHECKCAST, OBJECT_OWNER);
+      mv.visitFieldInsn(PUTFIELD, this.className, innerName, OBJECT_DESC);
+    }
+    // 4. read inner functions
+    for (String innerName : this.innerMethodMap.values()) {
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitVarInsn(ALOAD, 1);
+      mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/ObjectInputStream", "readObject",
+          "()Ljava/lang/Object;");
+      mv.visitTypeInsn(CHECKCAST, "com/googlecode/aviator/runtime/type/AviatorFunction");
+      mv.visitFieldInsn(PUTFIELD, this.className, innerName,
+          "Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
+    }
+
+    mv.visitInsn(RETURN);
+    mv.visitMaxs(2, 2);
+    mv.visitEnd();
+  }
+
+  private void genCustomSerializeMethod() {
+    if (this.instance.getOptionValue(Options.SERIALIZABLE).bool) {
+      this.genReadObject();
+      this.genWriteObject();
+    }
+  }
+
+  private void genWriteObject() {
+    // 1. BaseExpression#customWriteObject
+    MethodVisitor mv =
+        this.classWriter.visitMethod(ACC_PRIVATE, "writeObject", "(Ljava/io/ObjectOutputStream;)V",
+            "(Ljava/io/ObjectOutputStream;)V", new String[] {"java/io/IOException"});
+    mv.visitCode();
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitVarInsn(ALOAD, 1);
+    mv.visitMethodInsn(INVOKESPECIAL, "com/googlecode/aviator/BaseExpression", "customWriteObject",
+        "(Ljava/io/ObjectOutputStream;)V");
+    // 2.write inner variables
+    for (String innerName : this.innerVars.values()) {
+      mv.visitVarInsn(ALOAD, 1);
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitFieldInsn(GETFIELD, this.className, innerName,
+          "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;");
+      mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/ObjectOutputStream", "writeObject",
+          "(Ljava/lang/Object;)V");
+    }
+    // 3.write constant pool
+    for (String innerName : this.constantPool.values()) {
+      mv.visitVarInsn(ALOAD, 1);
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitFieldInsn(GETFIELD, this.className, innerName, OBJECT_DESC);
+      mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/ObjectOutputStream", "writeObject",
+          "(Ljava/lang/Object;)V");
+    }
+    // 4. write inner functions
+    for (String innerName : this.innerMethodMap.values()) {
+      mv.visitVarInsn(ALOAD, 1);
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitFieldInsn(GETFIELD, this.className, innerName,
+          "Lcom/googlecode/aviator/runtime/type/AviatorFunction;");
+      mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/ObjectOutputStream", "writeObject",
+          "(Ljava/lang/Object;)V");
+    }
+
+    mv.visitInsn(RETURN);
+    mv.visitMaxs(2, 2);
+    mv.visitEnd();
+  }
 
   private void end(final boolean unboxObject) {
     endVisitMethodCode(unboxObject);
+    genCustomSerializeMethod();
     endVisitClass();
   }
-
 
   /*
    * (non-Javadoc)
@@ -799,7 +852,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   public void onConstant(final Token<?> lookhead) {
     onConstant0(lookhead, false);
   }
-
 
   private void onConstant0(final Token<?> lookhead, final boolean inConstructor) {
     if (lookhead == null) {
@@ -941,7 +993,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     }
   }
 
-
   private boolean loadConstant(final Token<?> lookhead, final boolean inConstructor) {
     String fieldName;
     if (!inConstructor && (fieldName = this.constantPool.get(lookhead)) != null) {
@@ -961,7 +1012,7 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
       // Use inner variable name instead of outter variable name
       String innerVarName = getInnerName(outterVarName);
       this.innerVars.put(outterVarName, innerVarName);
-      this.classWriter.visitField(ACC_PRIVATE + ACC_FINAL, innerVarName,
+      this.classWriter.visitField(ACC_PRIVATE, innerVarName,
           "Lcom/googlecode/aviator/runtime/type/AviatorJavaType;", null, null).visitEnd();
 
     }
@@ -982,11 +1033,9 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     for (Token<?> token : constants) {
       String fieldName = getInnerName(token.getLexeme());
       this.constantPool.put(token, fieldName);
-      this.classWriter.visitField(ACC_PRIVATE + ACC_FINAL, fieldName, OBJECT_DESC, null, null)
-          .visitEnd();
+      this.classWriter.visitField(ACC_PRIVATE, fieldName, OBJECT_DESC, null, null).visitEnd();
     }
   }
-
 
   @Override
   public void initMethods(final Map<String, Integer/* counter */> methods) {
@@ -996,16 +1045,14 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
       // Use inner method name instead of outter method name
       String innerMethodName = getInnerName(outterMethodName);
       this.innerMethodMap.put(outterMethodName, innerMethodName);
-      this.classWriter.visitField(ACC_PRIVATE + ACC_FINAL, innerMethodName,
+      this.classWriter.visitField(ACC_PRIVATE, innerMethodName,
           "Lcom/googlecode/aviator/runtime/type/AviatorFunction;", null, null).visitEnd();
     }
   }
 
-
   private String getInnerName(final String varName) {
     return FIELD_PREFIX + this.fieldCounter++;
   }
-
 
   private static String getInvokeMethodDesc(final int paramCount) {
     StringBuilder sb = new StringBuilder("(Ljava/util/Map;");
@@ -1023,7 +1070,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     sb.append(")Lcom/googlecode/aviator/runtime/type/AviatorObject;");
     return sb.toString();
   }
-
 
   @Override
   public void onMethodInvoke(final Token<?> lookhead) {
@@ -1093,7 +1139,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.pushOperand();
   }
 
-
   @Override
   public void onMethodParameter(final Token<?> lookhead) {
     visitLineNumber(lookhead);
@@ -1132,7 +1177,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     // this.methodMetaDataStack.peek().parameterListIndex);
   }
 
-
   private void pushOperand() {
     this.pushOperand(1);
   }
@@ -1148,8 +1192,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
     public int funcId = -1;
 
-
-
     public MethodMetaData(final Token<?> token, final String methodName) {
       super();
       this.token = token;
@@ -1162,12 +1204,10 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     onConstant(lookhead);
   }
 
-
   @Override
   public void onArrayIndexStart(final Token<?> token) {
     loadEnv();
   }
-
 
   @Override
   public void onArrayIndexEnd(final Token<?> lookhead) {
@@ -1187,12 +1227,9 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.pushOperand();
   }
 
-
   public int getLocalIndex() {
     return this.maxLocals++;
   }
-
-
 
   @Override
   public void onLambdaDefineStart(final Token<?> lookhead) {
@@ -1234,7 +1271,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.lambdaGenerator = null;
     this.parser.setCodeGenerator(this.parentCodeGenerator);
   }
-
 
   @Override
   public void genNewLambdaCode(final LambdaFunctionBootstrap bootstrap) {
@@ -1279,7 +1315,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.methodMetaDataStack.push(new MethodMetaData(lookhead, outtterMethodName));
   }
 
-
   private void loadAviatorFunction(final String outterMethodName, final String innerMethodName) {
     Map<String, Integer> name2Index = this.labelNameIndexMap.get(this.currentLabel);
     // Is it stored in local?
@@ -1315,7 +1350,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.mv.visitVarInsn(ALOAD, 1);
   }
 
-
   private void createAviatorFunctionObject(final String methodName) {
     loadEnv();
     this.pushOperand();
@@ -1326,24 +1360,20 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.pushOperand();
   }
 
-
   @Override
   public void onBitAnd(final Token<?> lookhead) {
     visitBinOperator(lookhead, OperatorType.BIT_AND, "bitAnd");
   }
-
 
   @Override
   public void onBitOr(final Token<?> lookhead) {
     visitBinOperator(lookhead, OperatorType.BIT_OR, "bitOr");
   }
 
-
   @Override
   public void onBitXor(final Token<?> lookhead) {
     visitBinOperator(lookhead, OperatorType.BIT_XOR, "bitXor");
   }
-
 
   @Override
   public void onShiftLeft(final Token<?> lookhead) {
@@ -1351,13 +1381,11 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   }
 
-
   @Override
   public void onShiftRight(final Token<?> lookhead) {
     visitBinOperator(lookhead, OperatorType.SHIFT_RIGHT, "shiftRight");
 
   }
-
 
   @Override
   public void onUnsignedShiftRight(final Token<?> lookhead) {

@@ -22,6 +22,7 @@
  */
 package com.googlecode.aviator.utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,14 +48,16 @@ import com.googlecode.aviator.runtime.type.Range;
  * @param <String>
  * @param <Object>
  */
-public class Env implements Map<String, Object> {
+public class Env implements Map<String, Object>, Serializable {
+  private static final long serialVersionUID = -7793716992176999689L;
+
   /** Default values map. */
   private final Map<String, Object> mDefaults;
 
   /**
    * Current evaluator instance that executes current expression.
    */
-  private AviatorEvaluatorInstance instance;
+  private transient AviatorEvaluatorInstance instance;
 
   /** Override values map. */
   private Map<String, Object> mOverrides;
@@ -66,7 +69,7 @@ public class Env implements Map<String, Object> {
   private List<String> importedPackages;
 
   // Caching resolved classes
-  private Map<String/* class name */, Class<?>> resolvedClasses;
+  private transient Map<String/* class name */, Class<?>> resolvedClasses;
 
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
 

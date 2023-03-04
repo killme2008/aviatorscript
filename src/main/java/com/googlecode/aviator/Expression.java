@@ -15,6 +15,7 @@
  **/
 package com.googlecode.aviator;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import java.util.Map;
  * @author dennis
  *
  */
-public interface Expression {
+public interface Expression extends Serializable {
 
   /**
    * Execute expression with environment

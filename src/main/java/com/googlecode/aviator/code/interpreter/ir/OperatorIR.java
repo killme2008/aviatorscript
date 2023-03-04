@@ -14,6 +14,8 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  *
  */
 public class OperatorIR implements IR {
+  private static final long serialVersionUID = 8149126448968020948L;
+
   private final OperatorType op;
 
   private AviatorFunction fn;
