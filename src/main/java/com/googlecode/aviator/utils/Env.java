@@ -177,13 +177,16 @@ public class Env implements Map<String, Object> {
         return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
     } else {
-      // java.lang.XXX
-      clazz = classForName("java.lang." + name);
+      // from cache
+      clazz = retrieveFromCache(name);
+      if(clazz == NullClass.class){
+        throw new ClassNotFoundException(name);
+      }
       if (clazz != null) {
         return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
-      // from cache
-      clazz = retrieveFromCache(name);
+      // java.lang.XXX
+      clazz = classForName("java.lang." + name);
       if (clazz != null) {
         return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
@@ -205,6 +208,7 @@ public class Env implements Map<String, Object> {
     }
 
     if (clazz == null) {
+      put2cache(name,NullClass.class);
       throw new ClassNotFoundException(name);
     }
 
@@ -550,5 +554,11 @@ public class Env implements Map<String, Object> {
       // this.mOverrides = new HashMap<>();
     }
     return this.mOverrides;
+  }
+
+  /**
+   * Default Value when cannot resolve class symbol.
+   */
+  static class NullClass{
   }
 }
