@@ -31,7 +31,7 @@ public class AviatorScriptEngineFactory implements ScriptEngineFactory {
   static {
     PARAM_MAP.put(ScriptEngine.ENGINE, "Aviator");
     PARAM_MAP.put(ScriptEngine.ENGINE_VERSION, AviatorEvaluator.VERSION);
-    PARAM_MAP.put(ScriptEngine.LANGUAGE, "A high performance scripting language hosted on the JVM");
+    PARAM_MAP.put(ScriptEngine.LANGUAGE, "aviator");
     PARAM_MAP.put(ScriptEngine.LANGUAGE_VERSION, AviatorEvaluator.VERSION);
   }
 
