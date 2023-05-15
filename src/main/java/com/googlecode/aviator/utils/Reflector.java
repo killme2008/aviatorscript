@@ -133,9 +133,13 @@ public class Reflector {
 
   }
 
+
   public static StringBuilder capitalize(final StringBuilder sb, final String s) {
     if (s == null) {
       return sb;
+    }
+    if (s.length() > 1 && Character.isUpperCase(s.charAt(1))) {
+      return sb.append(s);
     }
     sb.append(s.substring(0, 1).toUpperCase());
     sb.append(s.substring(1));
