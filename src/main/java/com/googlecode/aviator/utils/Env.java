@@ -56,7 +56,6 @@ public class Env implements Map<String, Object> {
    */
   private AviatorEvaluatorInstance instance;
 
-
   /** Override values map. */
   private Map<String, Object> mOverrides;
 
@@ -68,7 +67,6 @@ public class Env implements Map<String, Object> {
 
   // Caching resolved classes
   private Map<String/* class name */, Class<?>> resolvedClasses;
-
 
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
 
@@ -170,50 +168,38 @@ public class Env implements Map<String, Object> {
 
   public Class<?> resolveClassSymbol(final String name, final boolean checkIfAllow)
       throws ClassNotFoundException {
-    Class<?> clazz = null;
-    if (name.contains(".")) {
-      clazz = classForName(name);
-      if (clazz != null) {
-        return checkIfClassIsAllowed(checkIfAllow, clazz);
-      }
-    } else {
-      // from cache
-      clazz = retrieveFromCache(name);
-      if(clazz == NullClass.class){
-        throw new ClassNotFoundException(name);
-      }
-      if (clazz != null) {
-        return checkIfClassIsAllowed(checkIfAllow, clazz);
-      }
-      // java.lang.XXX
-      clazz = classForName("java.lang." + name);
-      if (clazz != null) {
-        put2cache(name,NullClass.class);
-        return checkIfClassIsAllowed(checkIfAllow, clazz);
-      }
-      // from imported packages
-      clazz = resolveFromImportedPackages(name);
-      if (clazz != null) {
-        return checkIfClassIsAllowed(checkIfAllow, clazz);
-      }
-      // from imported classes
-      clazz = resolveFromImportedSymbols(name, clazz);
-      if (clazz != null) {
-        return checkIfClassIsAllowed(checkIfAllow, clazz);
-      }
-
-      // try to find from parent env.
-      if (clazz == null && this.mDefaults instanceof Env) {
-        clazz = ((Env) this.mDefaults).resolveClassSymbol(name, checkIfAllow);
+    // from cache
+    Class<?> clazz = retrieveFromCache(name);
+    if (clazz == NullClass.class) {
+      throw new ClassNotFoundException(name);
+    }
+    if (clazz == null) {
+      if (name.contains(".")) {
+        clazz = classForName(name);
+      } else {
+        // java.lang.XXX
+        clazz = classForName("java.lang." + name);
+        // from imported packages
+        if (clazz == null) {
+          clazz = resolveFromImportedPackages(name);
+        }
+        // from imported classes
+        if (clazz == null) {
+          clazz = resolveFromImportedSymbols(name, clazz);
+        }
+        // try to find from parent env.
+        if (clazz == null && this.mDefaults instanceof Env) {
+          clazz = ((Env) this.mDefaults).resolveClassSymbol(name, checkIfAllow);
+        }
       }
     }
 
     if (clazz == null) {
-      put2cache(name,NullClass.class);
+      put2cache(name, NullClass.class);
       throw new ClassNotFoundException(name);
     }
-
-    return clazz;
+    put2cache(name, clazz);
+    return checkIfClassIsAllowed(checkIfAllow, clazz);
   }
 
   private Class<?> checkIfClassIsAllowed(final boolean checkIfAllow, final Class<?> clazz) {
@@ -247,7 +233,6 @@ public class Env implements Map<String, Object> {
       for (String pkg : this.importedPackages) {
         clazz = classForName(pkg + name);
         if (clazz != null) {
-          put2cache(name, clazz);
           return clazz;
         }
       }
@@ -260,9 +245,6 @@ public class Env implements Map<String, Object> {
     final String classSym = findSymbol(name);
     if (classSym != null) {
       clazz = classForName(classSym);
-      if (clazz != null) {
-        put2cache(name, clazz);
-      }
     }
     return clazz;
   }
@@ -512,7 +494,6 @@ public class Env implements Map<String, Object> {
     return vals;
   }
 
-
   /**
    * Gets the map as a String.
    *
@@ -560,6 +541,6 @@ public class Env implements Map<String, Object> {
   /**
    * Default Value when cannot resolve class symbol.
    */
-  static class NullClass{
+  static class NullClass {
   }
 }
