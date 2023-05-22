@@ -188,7 +188,7 @@ public class Env implements Map<String, Object> {
       // java.lang.XXX
       clazz = classForName("java.lang." + name);
       if (clazz != null) {
-        put2cache(name,NullClass.class);
+        put2cache(name, clazz);
         return checkIfClassIsAllowed(checkIfAllow, clazz);
       }
       // from imported packages
