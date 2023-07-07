@@ -1,0 +1,24 @@
+# 简单列表
+let r1 = seq.partition(range(1,10), 5);
+println(r1);
+
+# 对象列表
+let list = seq.list(seq.map('id', 1, 'name', '1'), seq.map('id', 2, 'name', '22'), seq.map('id', 3, 'name', '333'),
+                    seq.map('id', 4, 'name', '4'), seq.map('id', 5, 'name', '5'));
+let r2 = seq.partition(list, 2);
+println(r2);
+println(seq.get(seq.get(seq.get(r2, 1), 1), 'id'));
+
+for i in r2 {
+    println(i);
+}
+
+# 针对map
+let map = seq.map();
+for i in range(1,10) {
+    seq.add(map, i, i * 2);
+}
+let r3 = seq.partition(map, 5);
+println(r3);
+let node = seq.get(seq.get(r3, 1), 1);
+println("key=" + getKey(node) + ", value=" + getValue(node));

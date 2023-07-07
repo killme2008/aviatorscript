@@ -1,0 +1,6 @@
+let list = seq.list(seq.map('id', 1, 'name', '1'), seq.map('id', 2, 'name', '22'), seq.map('id', 3, 'name', '333'),
+                    seq.map('id', 1, 'name', '1111'));
+let map1 = seq.toMap(list, lambda(x) -> x.id end);
+println(map1);
+let map2 = seq.toMap(seq.list(1,2,3), lambda(x) -> x end, lambda(x) -> x * 2 end);
+println(map2);

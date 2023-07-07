@@ -382,4 +382,14 @@ public class TestScripts {
     assertEquals(1, testScript("try_catch6.av"));
     assertEquals(2, testScript("try_catch7.av"));
   }
+
+  @Test
+  public void testToMap() {
+    testScript("toMap.av");
+  }
+
+  @Test
+  public void testPartition() {
+    testScript("partition.av");
+  }
 }
