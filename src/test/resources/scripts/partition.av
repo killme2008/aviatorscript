@@ -1,8 +1,8 @@
-# 简单列表
+## 简单列表
 let r1 = seq.partition(range(1,10), 5);
 println(r1);
 
-# 对象列表
+## 对象列表
 let list = seq.list(seq.map('id', 1, 'name', '1'), seq.map('id', 2, 'name', '22'), seq.map('id', 3, 'name', '333'),
                     seq.map('id', 4, 'name', '4'), seq.map('id', 5, 'name', '5'));
 let r2 = seq.partition(list, 2);
@@ -13,7 +13,7 @@ for i in r2 {
     println(i);
 }
 
-# 针对map
+## 针对map
 let map = seq.map();
 for i in range(1,10) {
     seq.add(map, i, i * 2);
