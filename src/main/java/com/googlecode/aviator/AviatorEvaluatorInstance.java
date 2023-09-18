@@ -58,6 +58,7 @@ import com.googlecode.aviator.code.asm.ASMCodeGenerator;
 import com.googlecode.aviator.code.interpreter.InterpretCodeGenerator;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionNotFoundException;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.ExpressionLexer;
@@ -1884,5 +1885,38 @@ public final class AviatorEvaluatorInstance {
     } else {
       return new StringSegments(Collections.<StringSegment>emptyList(), 0);
     }
+  }
+
+
+  /**
+   * check if class is in Options.ALLOWED_CLASS_SET
+   *
+   * @param checkIfAllow check or not
+   * @param clazz        the class for check
+   * @return the class for check
+   */
+  public Class<?> checkIfClassIsAllowed(final boolean checkIfAllow, final Class<?> clazz) {
+    if (checkIfAllow) {
+      Set<Class<?>> allowedList = this.getOptionValue(Options.ALLOWED_CLASS_SET).classes;
+      if (allowedList != null) {
+        // Null list means allowing all classes
+        if (!allowedList.contains(clazz)) {
+          throw new ExpressionRuntimeException(
+                  "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
+        }
+      }
+      Set<Class<?>> assignableList =
+              this.getOptionValue(Options.ASSIGNABLE_ALLOWED_CLASS_SET).classes;
+      if (assignableList != null) {
+        for (Class<?> aClass : assignableList) {
+          if (aClass.isAssignableFrom(clazz)) {
+            return clazz;
+          }
+        }
+        throw new ExpressionRuntimeException(
+                "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
+      }
+    }
+    return clazz;
   }
 }
