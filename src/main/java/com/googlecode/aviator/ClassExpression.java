@@ -24,7 +24,6 @@ import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
-
 /**
  * Compiled expression,all generated class inherit this class
  *
@@ -32,6 +31,18 @@ import com.googlecode.aviator.utils.Reflector;
  *
  */
 public abstract class ClassExpression extends BaseExpression {
+
+  private static final long serialVersionUID = -1335572034070560078L;
+
+  protected transient byte[] classBytes;
+
+  public byte[] getClassBytes() {
+    return classBytes;
+  }
+
+  public void setClassBytes(byte[] classBytes) {
+    this.classBytes = classBytes;
+  }
 
   public ClassExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
       final SymbolTable symbolTable) {
@@ -54,7 +65,6 @@ public abstract class ClassExpression extends BaseExpression {
   }
 
   public abstract Object execute0(Env env);
-
 
   /**
    * Get generated java class

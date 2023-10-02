@@ -35,7 +35,8 @@ public class IfCallccFunction extends AbstractFunction {
       return arg1;
     } else {
       final Object nextClauseVal = arg2.getValue(env);
-      if (nextClauseVal == Constants.REDUCER_EMPTY) {
+      if ((nextClauseVal instanceof ReducerResult)
+          && ((ReducerResult) nextClauseVal).isEmptyState()) {
         return arg1;
       }
 
@@ -43,7 +44,7 @@ public class IfCallccFunction extends AbstractFunction {
       try {
         AviatorObject result = otherClausesFn.call(env);
         // No remaining statements, return the if statement result.
-        if (result == Constants.REDUCER_EMPTY) {
+        if ((result instanceof ReducerResult) && ((ReducerResult) result).isEmptyState()) {
           return arg1;
         }
         return result;

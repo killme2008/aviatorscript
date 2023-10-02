@@ -1,5 +1,6 @@
 package com.googlecode.aviator.runtime;
 
+import java.io.Serializable;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -19,7 +20,8 @@ import com.googlecode.aviator.utils.Env;
  * @author dennis
  *
  */
-public class LambdaFunctionBootstrap implements Comparable<LambdaFunctionBootstrap> {
+public class LambdaFunctionBootstrap implements Comparable<LambdaFunctionBootstrap>, Serializable {
+  private static final long serialVersionUID = -8884911908304713609L;
   // the generated lambda class name
   private final String name;
   // The compiled lambda body expression
@@ -30,7 +32,7 @@ public class LambdaFunctionBootstrap implements Comparable<LambdaFunctionBootstr
   private final List<FunctionParam> params;
   private final boolean inheritEnv;
 
-  private final ThreadLocal<Reference<LambdaFunction>> fnLocal = new ThreadLocal<>();
+  private transient ThreadLocal<Reference<LambdaFunction>> fnLocal = new ThreadLocal<>();
 
 
   @Override
@@ -86,6 +88,9 @@ public class LambdaFunctionBootstrap implements Comparable<LambdaFunctionBootstr
    */
   public LambdaFunction newInstance(final Env env) {
     Reference<LambdaFunction> ref = null;
+    if (this.fnLocal == null) {
+      this.fnLocal = new ThreadLocal<Reference<LambdaFunction>>();
+    }
     if (this.inheritEnv && (ref = this.fnLocal.get()) != null) {
       LambdaFunction fn = ref.get();
       if (fn != null) {

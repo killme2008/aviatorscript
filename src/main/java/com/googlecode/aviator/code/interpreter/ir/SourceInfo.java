@@ -1,12 +1,15 @@
 package com.googlecode.aviator.code.interpreter.ir;
 
+import java.io.Serializable;
+
 /**
  * Source info to debug.
  *
  * @author dennis(killme2008@gmail.com)
  *
  */
-public class SourceInfo {
+public class SourceInfo implements Serializable {
+  private static final long serialVersionUID = -5836810241460848224L;
   public final String sourceFile;
   public final int lineNo;
 

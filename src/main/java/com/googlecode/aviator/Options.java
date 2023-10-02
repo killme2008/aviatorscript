@@ -113,7 +113,13 @@ public enum Options {
   /**
    * Script engine evaluate mode, default is ASM mode.
    */
-  EVAL_MODE;
+  EVAL_MODE,
+
+  /**
+   * Whether the compiled expression is serializable. If true, the compiled expression will
+   * implement {@link #jva.io.Serializable} and can be encoded/decoded by java serialization.
+   */
+  SERIALIZABLE;
 
 
   /**
@@ -204,6 +210,8 @@ public enum Options {
         return val.classes;
       case EVAL_MODE:
         return val.evalMode;
+      case SERIALIZABLE:
+        return val.bool;
     }
     throw new IllegalArgumentException("Fail to cast value " + val + " for option " + this);
   }
@@ -225,6 +233,7 @@ public enum Options {
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
       case CAPTURE_FUNCTION_ARGS:
+      case SERIALIZABLE:
         return ((boolean) val) ? TRUE_VALUE : FALSE_VALUE;
       case OPTIMIZE_LEVEL: {
         int level = (int) val;
@@ -259,6 +268,7 @@ public enum Options {
       case NIL_WHEN_PROPERTY_NOT_FOUND:
       case USE_USER_ENV_AS_TOP_ENV_DIRECTLY:
       case CAPTURE_FUNCTION_ARGS:
+      case SERIALIZABLE:
         return val instanceof Boolean;
       case FEATURE_SET:
       case ALLOWED_CLASS_SET:
@@ -319,6 +329,7 @@ public enum Options {
     switch (this) {
       case ALWAYS_PARSE_FLOATING_POINT_NUMBER_INTO_DECIMAL:
       case ALWAYS_PARSE_INTEGRAL_NUMBER_INTO_DECIMAL:
+      case SERIALIZABLE:
         return FALSE_VALUE;
       case ENABLE_PROPERTY_SYNTAX_SUGAR:
         return TRUE_VALUE;

@@ -5,6 +5,8 @@ import com.googlecode.aviator.code.interpreter.InterpretContext;
 
 public class ClearIR implements IR {
 
+  private static final long serialVersionUID = -486328244006736142L;
+
   private ClearIR() {};
 
   public static final ClearIR INSTANCE = new ClearIR();

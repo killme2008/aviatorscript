@@ -4,6 +4,7 @@ import com.googlecode.aviator.code.interpreter.IR;
 import com.googlecode.aviator.code.interpreter.InterpretContext;
 
 public class VisitLabelIR implements IR {
+  private static final long serialVersionUID = 5535667281818822262L;
   private final Label label;
 
   public VisitLabelIR(final Label label) {

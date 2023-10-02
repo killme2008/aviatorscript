@@ -25,7 +25,6 @@ public class Constants {
   public static final String DEFINE_META = "define";
   public static final Variable REDUCER_LOOP = new Variable("__reducer_loop", 0, -1);
   public static final String NEWLINE = "\r\n";
-  public static final ReducerResult REDUCER_EMPTY = ReducerResult.withEmpty(AviatorNil.NIL);
   public static final String REQUIRE_FN = "require";
   public static final String LOAD_FN = "load";
   public static final Variable CATCH_HANDLER_VAR = new Variable("__catch_handler", 0, -1);

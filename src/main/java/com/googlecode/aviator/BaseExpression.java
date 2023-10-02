@@ -1,5 +1,8 @@
 package com.googlecode.aviator;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,7 +29,6 @@ import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
-
 /**
  * Base expression
  *
@@ -35,22 +37,23 @@ import com.googlecode.aviator.utils.Reflector;
  */
 public abstract class BaseExpression implements Expression {
 
+  private static final long serialVersionUID = 2819544277750883372L;
+
   public static final String FUNC_PARAMS_VAR = "__funcs_args__";
   protected List<String> varNames;
   protected List<String> varFullNames;
-  private final List<VariableMeta> vars;
+  private List<VariableMeta> vars;
   private String expression;
-  protected AviatorEvaluatorInstance instance;
+  protected transient AviatorEvaluatorInstance instance;
   private Env compileEnv;
   private Map<Integer, List<FunctionArgument>> funcsArgs = Collections.emptyMap();
   protected SymbolTable symbolTable;
   // cached compiled string segments for string interpolation.
-  private final ConcurrentHashMap<String, FutureTask<StringSegments>> stringSegs =
+  private transient final ConcurrentHashMap<String, FutureTask<StringSegments>> stringSegs =
       new ConcurrentHashMap<String, FutureTask<StringSegments>>();
 
   protected String sourceFile;
   protected Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
-
 
   @Override
   public String getSourceFile() {
@@ -59,6 +62,11 @@ public abstract class BaseExpression implements Expression {
 
   public void setSourceFile(final String sourceFile) {
     this.sourceFile = sourceFile;
+  }
+
+
+  public void setInstance(AviatorEvaluatorInstance instance) {
+    this.instance = instance;
   }
 
   public BaseExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
@@ -136,7 +144,6 @@ public abstract class BaseExpression implements Expression {
       for (VariableMeta meta : metas) {
         newFullNames.add(meta.getName());
       }
-
 
       this.varFullNames = newFullNames;
     }
@@ -251,24 +258,20 @@ public abstract class BaseExpression implements Expression {
     }
   }
 
-
   public void setFuncsArgs(final Map<Integer, List<FunctionArgument>> funcsArgs) {
     if (funcsArgs != null) {
       this.funcsArgs = Collections.unmodifiableMap(funcsArgs);
     }
   }
 
-
   public Env getCompileEnv() {
     return this.compileEnv;
   }
-
 
   public void setCompileEnv(final Env compileEnv) {
     this.compileEnv = compileEnv;
     this.compileEnv.setExpression(this);
   }
-
 
   /**
    * Returns the expression string when turn on {@link Options#TRACE_EVAL} option, else returns
@@ -283,7 +286,6 @@ public abstract class BaseExpression implements Expression {
   public void setExpression(final String expression) {
     this.expression = expression;
   }
-
 
   @Override
   public String addSymbol(final String name) {
@@ -303,7 +305,6 @@ public abstract class BaseExpression implements Expression {
   public Object execute() {
     return this.execute(null);
   }
-
 
   @Override
   public List<String> getVariableFullNames() {
@@ -371,6 +372,27 @@ public abstract class BaseExpression implements Expression {
       throw new ExpressionNotFoundException("Lambda " + name + " not found");
     }
     return bootstrap.newInstance(env);
+  }
+
+  @SuppressWarnings("unchecked")
+  public void customReadObject(ObjectInputStream input) throws ClassNotFoundException, IOException {
+    this.vars = (List<VariableMeta>) input.readObject();
+    this.expression = (String) input.readObject();
+    this.compileEnv = (Env) input.readObject();
+    this.funcsArgs = (Map<Integer, List<FunctionArgument>>) input.readObject();
+    this.symbolTable = (SymbolTable) input.readObject();
+    this.sourceFile = (String) input.readObject();
+    this.lambdaBootstraps = (Map<String, LambdaFunctionBootstrap>) input.readObject();
+  }
+
+  public void customWriteObject(ObjectOutputStream output) throws IOException {
+    output.writeObject(this.vars);
+    output.writeObject(this.expression);
+    output.writeObject(this.compileEnv);
+    output.writeObject(this.funcsArgs);
+    output.writeObject(this.symbolTable);
+    output.writeObject(this.sourceFile);
+    output.writeObject(this.lambdaBootstraps);
   }
 
 }

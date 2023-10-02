@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @param <T>
  */
-public abstract class AbstractToken<T> implements Token<T>, Serializable {
+public abstract class AbstractToken<T> implements Token<T> {
 
   private static final long serialVersionUID = 4498841242745542399L;
 

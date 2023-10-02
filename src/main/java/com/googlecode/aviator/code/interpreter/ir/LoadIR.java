@@ -28,6 +28,7 @@ import com.googlecode.aviator.utils.TypeUtils;
  *
  */
 public class LoadIR implements IR {
+  private static final long serialVersionUID = -688605619463290104L;
   private final Token<?> token;
   private final VariableMeta meta;
   private final String sourceFile;

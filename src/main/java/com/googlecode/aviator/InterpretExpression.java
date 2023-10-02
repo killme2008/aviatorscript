@@ -1,5 +1,8 @@
 package com.googlecode.aviator;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -14,20 +17,25 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.function.internal.ReducerResult;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 
 public class InterpretExpression extends BaseExpression {
 
-  private final List<IR> instruments;
+  private static final long serialVersionUID = -3831400781523526582L;
 
-  private final boolean unboxObject;
+  private List<IR> instruments;
 
-  private final Map<VariableMeta, AviatorJavaType> variables =
+  private boolean unboxObject;
+
+  private Map<VariableMeta, AviatorJavaType> variables =
       new IdentityHashMap<VariableMeta, AviatorJavaType>();
 
-  private final Map<Token<?>, AviatorObject> constantPool = new IdentityHashMap<>();
+  private Map<Token<?>, AviatorObject> constantPool = new IdentityHashMap<>();
 
 
   public InterpretExpression(final AviatorEvaluatorInstance instance, final List<VariableMeta> vars,
@@ -136,5 +144,23 @@ public class InterpretExpression extends BaseExpression {
     } else {
       return result.deref(env);
     }
+  }
+
+
+  @SuppressWarnings("unchecked")
+  private void readObject(ObjectInputStream input) throws ClassNotFoundException, IOException {
+    super.customReadObject(input);
+    this.instruments = (List<IR>) input.readObject();
+    this.unboxObject = input.readBoolean();
+    this.variables = (Map<VariableMeta, AviatorJavaType>) input.readObject();
+    this.constantPool = (Map<Token<?>, AviatorObject>) input.readObject();
+  }
+
+  private void writeObject(ObjectOutputStream output) throws IOException {
+    super.customWriteObject(output);
+    output.writeObject(this.instruments);
+    output.writeBoolean(this.unboxObject);
+    output.writeObject(this.variables);
+    output.writeObject(this.constantPool);
   }
 }
