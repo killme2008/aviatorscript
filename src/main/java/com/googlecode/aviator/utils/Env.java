@@ -38,6 +38,8 @@ import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
+import com.googlecode.aviator.runtime.function.internal.ReducerResult;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.Range;
 
 /**
@@ -336,7 +338,7 @@ public class Env implements Map<String, Object>, Serializable {
       return Range.LOOP;
     }
     if (Constants.REDUCER_EMPTY_VAR == key) {
-      return Constants.REDUCER_EMPTY;
+      return ReducerResult.withEmpty(AviatorNil.NIL);
     }
 
     if (Constants.ENV_VAR == key) {

@@ -17,6 +17,10 @@ public class ReducerResult extends AviatorRuntimeJavaType {
   public final ReducerState state;
   public AviatorObject obj;
 
+  public boolean isEmptyState() {
+    return this.state == ReducerState.Empty;
+  }
+
   public static ReducerResult withEmpty(final AviatorObject obj) {
     return new ReducerResult(ReducerState.Empty, obj);
   }

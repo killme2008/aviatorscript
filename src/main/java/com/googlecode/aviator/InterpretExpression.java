@@ -17,8 +17,11 @@ import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.RuntimeUtils;
+import com.googlecode.aviator.runtime.function.internal.ReducerResult;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
+import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.AviatorObject;
+import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 
 public class InterpretExpression extends BaseExpression {

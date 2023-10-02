@@ -13,16 +13,42 @@ import org.junit.Test;
 public class ExpressionSerializeTest {
   private AviatorEvaluatorInstance engine;
 
+
   @Before
   public void setup() {
     this.engine = AviatorEvaluator.newInstance();
     this.engine.setOption(Options.SERIALIZABLE, true);
-    this.engine.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
-    this.engine.setOption(Options.EVAL_MODE, EvalMode.INTERPRETER);
   }
 
   @Test
-  public void testLiteral() throws Exception {
+  public void testInterpreteEngine() throws Exception {
+    this.engine.setOption(Options.EVAL_MODE, EvalMode.INTERPRETER);
+
+    this.engine.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
+    testLiteral(engine);
+    testClassExpression(engine);
+
+    this.engine.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.EVAL);
+    testLiteral(engine);
+    testClassExpression(engine);
+
+  }
+
+  @Test
+  public void testAsmEngine() throws Exception {
+    this.engine.setOption(Options.EVAL_MODE, EvalMode.ASM);
+
+    this.engine.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.COMPILE);
+    testLiteral(engine);
+    testClassExpression(engine);
+
+    this.engine.setOption(Options.OPTIMIZE_LEVEL, AviatorEvaluator.EVAL);
+    testLiteral(engine);
+    testClassExpression(engine);
+
+  }
+
+  public static void testLiteral(AviatorEvaluatorInstance engine) throws Exception {
     Expression exp = engine.compile("1+2");
     assertEquals((long) exp.execute(), 3L);
     byte[] bs = null;
@@ -43,9 +69,8 @@ public class ExpressionSerializeTest {
     }
   }
 
-  @Test
-  public void testClassExpression() throws Exception {
-    Expression exp = engine.compile("print(a);if(a>b) { a } else { b }", true);
+  public static void testClassExpression(AviatorEvaluatorInstance engine) throws Exception {
+    Expression exp = engine.compile("p(a);if(a>b) { a } else { b }", true);
     assertEquals((long) exp.execute(exp.newEnv("a", 3L, "b", 2L)), 3L);
     byte[] bs = null;
     ByteArrayOutputStream out = new ByteArrayOutputStream();

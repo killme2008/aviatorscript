@@ -1009,6 +1009,9 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.variables = vars;
     this.innerVars = new HashMap<>(this.variables.size());
     for (String outterVarName : this.variables.keySet()) {
+      if (outterVarName.equals(Constants.REDUCER_EMPTY_VAR)) {
+        continue;
+      }
       // Use inner variable name instead of outter variable name
       String innerVarName = getInnerName(outterVarName);
       this.innerVars.put(outterVarName, innerVarName);

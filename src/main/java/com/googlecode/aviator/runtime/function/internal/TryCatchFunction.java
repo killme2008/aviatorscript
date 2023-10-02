@@ -72,13 +72,13 @@ public class TryCatchFunction extends AbstractFunction {
     }
 
     Object val = arg4.getValue(env);
-    if (val == Constants.REDUCER_EMPTY) {
+    if ((val instanceof ReducerResult) && ((ReducerResult) val).isEmptyState()) {
       return result;
     }
     AviatorFunction continueFn = (AviatorFunction) val;
     try {
       AviatorObject contResult = continueFn.call(env);
-      if (contResult == Constants.REDUCER_EMPTY) {
+      if ((contResult instanceof ReducerResult) && ((ReducerResult) contResult).isEmptyState()) {
         return result;
       } else {
         return contResult;
