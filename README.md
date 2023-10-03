@@ -20,6 +20,7 @@
 6. 多种方式，方便地[调用 Java 方法](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2)，完整支持 Java [脚本 API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b)（方便从 Java 调用脚本）。
 7. 丰富的定制选项，可作为安全的语言沙箱和全功能语言使用。
 8. 轻量化，高性能，ASM 模式下通过直接将脚本翻译成 JVM 字节码，[解释模式](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx)可运行于 Android 等非标 Java 平台。
+9. 支持编译后表达式序列化，方便缓存加速等。
 
 使用场景包括：
 1. 规则判断及规则引擎
@@ -32,9 +33,9 @@
 
 # News
 
+* [5.4.0](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.4.0)，修复 `elsif` 语法解析错误，增加编译表达式序列化支持([例子](https://github.com/killme2008/aviatorscript/blob/master/src/test/java/com/googlecode/aviator/example/SerializeExample.java))等。
 * [5.3.3](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.3)，修复潜在内存泄露、变量捕获错误等 Bug。
 * [5.3.2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.2)，一些 Bug 修复，推荐升级。
-* [5.3.1](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.1)，逻辑运算符支持别名和 bug 修复等。
 
 # Dependency
 

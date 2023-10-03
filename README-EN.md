@@ -22,15 +22,16 @@ It compiles script to java byte code and evaluate it on the fly.
 6. [Call Java methods](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2?translate=en) conveniently，supports Java [Scripting API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b?translate=en)。
 7. A wide range of customization options to be used as a secure runtime scripting sandbox or full-featured scripting language.
 8. Lightweight and high performance. ASM mode compile script into JVM bytecode on fly ,and [interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) make it run on Android platform etc.
+9. Supports compiled expression serialization, easy to cache etc.
 
 
 **Recommend version 5.2.6 and above.**
 
 # News
 
+* [5.4.0](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.4.0)，Fixed `elsif` parser errors，supports expression serialization([example](https://github.com/killme2008/aviatorscript/blob/master/src/test/java/com/googlecode/aviator/example/SerializeExample.java)) etc.
 * [5.3.3](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.3)，fixed potential memory leak, wrong value captured by function etc.
 * [5.3.2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.2)，some bugs fixed, recommended to upgrade.
-* [5.3.1](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.1)，Supports logical operator alias and fixes some issues.
 
 # Dependency
 
