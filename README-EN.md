@@ -15,14 +15,14 @@ It compiles script to java byte code and evaluate it on the fly.
 
 1. Suppport number,string, boolean and regular expression etc. [basic types](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw?translate=en)，support all java operators and their priorities.
 2. [Function](https://www.yuque.com/boyan-avfmj/aviatorscript/gl2p0q?translate=en) is first-class, supports closure and functional programming.
-2. Supports bigint/decmal for big integer and big decimal operations, using normal arithmetic operators `+-*/` by [operator overloading](https://www.yuque.com/boyan-avfmj/aviatorscript/ydllav?translate=en#5hq4k).
-3. Full-featured scripting language syntax, such as multi statements, conditional statement ,`for/while` loop, lexical scope and exception handling.
-4. Processing collections/array conveniently by [sequence abstract](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93?translate=en) and [functional programming](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc?translate=en).
-5. Lightweight [module system](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81?translate=en)。
-6. [Call Java methods](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2?translate=en) conveniently，supports Java [Scripting API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b?translate=en)。
-7. A wide range of customization options to be used as a secure runtime scripting sandbox or full-featured scripting language.
-8. Lightweight and high performance. ASM mode compile script into JVM bytecode on fly ,and [interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) make it run on Android platform etc.
-9. Supports compiled expression serialization, easy to cache etc.
+3. Supports bigint/decmal for big integer and big decimal operations, using normal arithmetic operators `+-*/` by [operator overloading](https://www.yuque.com/boyan-avfmj/aviatorscript/ydllav?translate=en#5hq4k).
+4. Full-featured scripting language syntax, such as multi statements, conditional statement ,`for/while` loop, lexical scope and exception handling.
+5. Processing collections/array conveniently by [sequence abstract](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93?translate=en) and [functional programming](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc?translate=en).
+6. Lightweight [module system](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81?translate=en)。
+7. [Call Java methods](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2?translate=en) conveniently，supports Java [Scripting API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b?translate=en)。
+8. A wide range of customization options to be used as a secure runtime scripting sandbox or full-featured scripting language.
+9. Lightweight and high performance. ASM mode compile script into JVM bytecode on fly ,and [interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) make it run on Android platform etc.
+10. Supports compiled expression serialization, easy to cache etc.
 
 
 **Recommend version 5.2.6 and above.**
