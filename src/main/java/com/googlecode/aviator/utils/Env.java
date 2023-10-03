@@ -35,8 +35,6 @@ import java.util.Set;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Feature;
-import com.googlecode.aviator.Options;
-import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
 import com.googlecode.aviator.runtime.function.internal.ReducerResult;
 import com.googlecode.aviator.runtime.type.AviatorNil;
@@ -204,32 +202,7 @@ public class Env implements Map<String, Object>, Serializable {
       throw new ClassNotFoundException(name);
     }
     put2cache(name, clazz);
-    return checkIfClassIsAllowed(checkIfAllow, clazz);
-  }
-
-  private Class<?> checkIfClassIsAllowed(final boolean checkIfAllow, final Class<?> clazz) {
-    if (checkIfAllow) {
-      Set<Class<?>> allowedList = this.instance.getOptionValue(Options.ALLOWED_CLASS_SET).classes;
-      if (allowedList != null) {
-        // Null list means allowing all classes
-        if (!allowedList.contains(clazz)) {
-          throw new ExpressionRuntimeException(
-              "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
-        }
-      }
-      Set<Class<?>> assignableList =
-          this.instance.getOptionValue(Options.ASSIGNABLE_ALLOWED_CLASS_SET).classes;
-      if (assignableList != null) {
-        for (Class<?> aClass : assignableList) {
-          if (aClass.isAssignableFrom(clazz)) {
-            return clazz;
-          }
-        }
-        throw new ExpressionRuntimeException(
-            "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
-      }
-    }
-    return clazz;
+    return this.instance.checkIfClassIsAllowed(checkIfAllow, clazz);
   }
 
   private Class<?> resolveFromImportedPackages(final String name) {
