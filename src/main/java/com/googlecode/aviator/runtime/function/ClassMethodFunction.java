@@ -1,10 +1,18 @@
 package com.googlecode.aviator.runtime.function;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.code.interpreter.IR;
+import com.googlecode.aviator.lexer.token.Token;
+import com.googlecode.aviator.parser.VariableMeta;
+import com.googlecode.aviator.runtime.type.AviatorJavaType;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.utils.Reflector;
 
@@ -20,11 +28,11 @@ public class ClassMethodFunction extends AbstractVariadicFunction {
   private static final long serialVersionUID = 5946505010078966461L;
   private MethodHandle handle; // Only for one-arity function.
   private Class<?>[] pTypes;
-  private final String name;
-  private final String methodName;
+  private String name;
+  private String methodName;
   private List<Method> methods; // For reflection.
-  private final Class<?> clazz;
-  private final boolean isStatic;
+  private Class<?> clazz;
+  private boolean isStatic;
 
   public ClassMethodFunction(final Class<?> clazz, final boolean isStatic, final String name,
       final String methodName, final List<Method> methods)
@@ -34,6 +42,11 @@ public class ClassMethodFunction extends AbstractVariadicFunction {
     this.isStatic = isStatic;
     this.methodName = methodName;
 
+    init(isStatic, methodName, methods);
+  }
+
+  private void init(final boolean isStatic, final String methodName, final List<Method> methods)
+      throws IllegalAccessException, NoSuchMethodException {
     if (methods.size() == 1) {
       // fast path by method handle.
       this.handle = MethodHandles.lookup().unreflect(methods.get(0)).asFixedArity();
@@ -53,6 +66,32 @@ public class ClassMethodFunction extends AbstractVariadicFunction {
     }
   }
 
+  private void readObject(ObjectInputStream input) throws ClassNotFoundException, IOException {
+    this.name = (String) input.readObject();
+    this.clazz = (Class<?>) input.readObject();
+    this.isStatic = input.readBoolean();
+    this.methodName = (String) input.readObject();
+
+    Map<String, List<Method>> allMethods = Reflector.findMethodsFromClass(clazz, isStatic);
+
+    List<Method> methods = allMethods.get(this.methodName);
+    if (methods == null) {
+      methods = Collections.emptyList();
+    }
+
+    try {
+      this.init(this.isStatic, this.methodName, methods);
+    } catch (Throwable t) {
+      throw Reflector.sneakyThrow(t);
+    }
+  }
+
+  private void writeObject(ObjectOutputStream output) throws IOException {
+    output.writeObject(this.name);
+    output.writeObject(this.clazz);
+    output.writeBoolean(this.isStatic);
+    output.writeObject(this.methodName);
+  }
 
   @Override
   public String getName() {

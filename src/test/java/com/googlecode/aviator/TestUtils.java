@@ -71,6 +71,10 @@ public class TestUtils {
   }
 
   public static void assertEquals(final Object expected, final Object real) {
+    if (expected == real) {
+      return;
+    }
+
     if (expected instanceof Number && real instanceof Number) {
       if (TypeUtils.isDouble(expected) && TypeUtils.isDouble(real)) {
         double delta = ((Number) expected).doubleValue() - ((Number) real).doubleValue();

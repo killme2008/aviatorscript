@@ -12,7 +12,13 @@ import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.ClassExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.code.asm.ClassDefiner;
+import com.googlecode.aviator.lexer.SymbolTable;
+import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
+import com.googlecode.aviator.runtime.type.AviatorBigInt;
+import com.googlecode.aviator.runtime.type.AviatorBoolean;
+import com.googlecode.aviator.runtime.type.AviatorNil;
+import com.googlecode.aviator.runtime.type.Range;
 import com.googlecode.aviator.utils.Reflector;
 
 /**
@@ -50,6 +56,30 @@ public class AviatorObjectInputStream extends ObjectInputStream {
             .setClassBytes(this.classBytesCache.get(object.getClass().getName()));
       }
     }
+
+    // Processing some internal constants.
+    if (object instanceof AviatorBoolean) {
+      AviatorBoolean bool = (AviatorBoolean) object;
+      if (bool.getBooleanValue()) {
+        object = AviatorBoolean.TRUE;
+      } else {
+        object = AviatorBoolean.FALSE;
+      }
+    }
+    if (object instanceof AviatorNil) {
+      object = AviatorNil.NIL;
+    }
+
+    if (object instanceof Range) {
+      if (((Range) object).isLoop()) {
+        object = Range.LOOP;
+      }
+    }
+
+    if (object instanceof Variable) {
+      object = SymbolTable.tryReserveKeyword((Variable) object);
+    }
+
     return object;
   }
 

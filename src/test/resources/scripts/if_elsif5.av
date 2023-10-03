@@ -1,0 +1,16 @@
+let list = seq.list();
+
+for i in range(0, 10) {
+  if (i != 3 && i != 2) {
+    seq.add(list, "condition1");
+  } elsif(i != 3) {
+    seq.add(list, "condition2");
+  } elsif(i != 2) {
+    seq.add(list, "condition3");
+    continue;
+  }
+
+  seq.add(list, "end"+i);
+}
+
+return list;

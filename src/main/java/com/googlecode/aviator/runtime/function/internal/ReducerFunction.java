@@ -54,7 +54,6 @@ public class ReducerFunction extends AbstractFunction {
     long c = 0;
 
     if (coll != Range.LOOP) {
-
       long arities = (long) arg2.meta(Constants.ARITIES_META);
       long index = 0;
       boolean unboxEntry =

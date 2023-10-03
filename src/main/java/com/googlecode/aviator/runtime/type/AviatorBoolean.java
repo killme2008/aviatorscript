@@ -51,6 +51,9 @@ public class AviatorBoolean extends AviatorObject {
     return this.value.booleanValue();
   }
 
+  public boolean getBooleanValue() {
+    return this.value;
+  }
 
   @Override
   public AviatorObject add(final AviatorObject other, final Map<String, Object> env) {

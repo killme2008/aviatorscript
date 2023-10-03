@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import com.googlecode.aviator.ClassExpression;
+import com.googlecode.aviator.runtime.type.Range;
 
 /**
  * A special ObjectOutputStream that will write the generated script class byte array.
@@ -30,6 +31,7 @@ public class AviatorObjectOutputStream extends ObjectOutputStream {
     if (obj instanceof ClassExpression) {
       this.classBytesCache.put(obj.getClass().getName(), ((ClassExpression) obj).getClassBytes());
     }
+
     return super.replaceObject(obj);
   }
 
