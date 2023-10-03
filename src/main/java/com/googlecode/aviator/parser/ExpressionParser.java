@@ -1965,7 +1965,7 @@ public class ExpressionParser implements Parser {
       this.scope.leaveBrace();
       move(true);
 
-      elseBodyHasReturn = elseStatement(isWhile, ifBodyHasReturn);
+      elseBodyHasReturn = elseStatement(isWhile, isElsif, ifBodyHasReturn);
       getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
     }
 
@@ -2008,7 +2008,8 @@ public class ExpressionParser implements Parser {
     return isWhile ? "while" : "if";
   }
 
-  private boolean elseStatement(final boolean isWhile, final boolean ifBodyHasReturn) {
+  private boolean elseStatement(final boolean isWhile, boolean isElsif,
+      final boolean ifBodyHasReturn) {
     if (isWhile) {
       // Call __reducer_break(nil)
       final CodeGenerator cg = getCodeGeneratorWithTimes();
@@ -2046,7 +2047,7 @@ public class ExpressionParser implements Parser {
       } else if (hasElsif) {
         hasReturn = ifStatement(false, true);
         getCodeGenerator().onTernaryRight(this.lookhead);
-      } else if (ifBodyHasReturn) {
+      } else if (ifBodyHasReturn && !isElsif) {
         hasReturn = elseBody(true);
       } else {
         return withoutElse();

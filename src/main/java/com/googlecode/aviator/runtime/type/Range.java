@@ -23,11 +23,19 @@ public final class Range extends AviatorObject implements Sequence<Number> {
   private static final AviatorLong ZERO = AviatorLong.valueOf(0L);
   public static final Range LOOP = new Range(ZERO, ZERO, ZERO);
 
+  static {
+    LOOP.isLoop = true;
+  }
+
   private final AviatorNumber step;
   private final AviatorNumber start;
   private final AviatorNumber end;
   final boolean forward;
+  private boolean isLoop;
 
+  public boolean isLoop() {
+    return this.isLoop;
+  }
 
   public Range(final AviatorNumber start, final AviatorNumber end, final AviatorNumber step) {
     super();
@@ -35,6 +43,7 @@ public final class Range extends AviatorObject implements Sequence<Number> {
     this.end = end;
     this.step = step;
     this.forward = Range.this.step.compare(ZERO, Env.EMPTY_ENV) >= 0;
+    this.isLoop = false;
   }
 
   @Override

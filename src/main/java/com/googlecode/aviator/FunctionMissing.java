@@ -8,6 +8,7 @@ package com.googlecode.aviator;
  *
  */
 
+import java.io.Serializable;
 import java.util.Map;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 
@@ -22,7 +23,7 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
  * @since 4.2.5
  *
  */
-public interface FunctionMissing {
+public interface FunctionMissing extends Serializable {
   /**
    * Called when function not found, return the invocation result.
    *

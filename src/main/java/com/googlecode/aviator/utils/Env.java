@@ -334,26 +334,26 @@ public class Env implements Map<String, Object>, Serializable {
   public Object get(final Object key) {
     // Should check ENV_VAR at first
     // TODO: performance tweak
-    if (Constants.REDUCER_LOOP_VAR == key) {
+    if (Constants.REDUCER_LOOP_VAR.equals(key)) {
       return Range.LOOP;
     }
-    if (Constants.REDUCER_EMPTY_VAR == key) {
+    if (Constants.REDUCER_EMPTY_VAR.equals(key)) {
       return ReducerResult.withEmpty(AviatorNil.NIL);
     }
 
-    if (Constants.ENV_VAR == key) {
+    if (Constants.ENV_VAR.equals(key)) {
       this.instance.ensureFeatureEnabled(Feature.InternalVars);
       return this;
     }
-    if (Constants.FUNC_ARGS_VAR == key) {
+    if (Constants.FUNC_ARGS_VAR.equals(key)) {
       this.instance.ensureFeatureEnabled(Feature.InternalVars);
       return FunctionUtils.getFunctionArguments(this);
     }
-    if (Constants.INSTANCE_VAR == key) {
+    if (Constants.INSTANCE_VAR.equals(key)) {
       this.instance.ensureFeatureEnabled(Feature.InternalVars);
       return this.instance;
     }
-    if (Constants.EXP_VAR == key) {
+    if (Constants.EXP_VAR.equals(key)) {
       this.instance.ensureFeatureEnabled(Feature.InternalVars);
       return this.expression;
     }

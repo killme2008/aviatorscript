@@ -2,9 +2,14 @@ package com.googlecode.aviator.scripts;
 
 import static com.googlecode.aviator.TestUtils.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -13,6 +18,7 @@ import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.Options;
 import com.googlecode.aviator.TestUtils;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import com.googlecode.aviator.exception.StandardError;
@@ -26,6 +32,8 @@ public class TestScripts {
 
   protected AviatorEvaluatorInstance instance;
 
+  protected boolean testSerialize = false;
+
   @Before
   public void setup() throws Exception {
     this.instance = AviatorEvaluator.newInstance();
@@ -35,11 +43,37 @@ public class TestScripts {
 
   public Object testScript(final String name, final Object... args) {
     try {
-      System.out.println("Testing script " + name + " with args: " + Arrays.toString(args));
+      System.out.println("Testing script(testSerialize=" + this.testSerialize + ") " + name
+          + " with args: " + Arrays.toString(args));
       final String file = TestScripts.class.getResource("/scripts/" + name).getFile();
       this.instance.validate(IoModule.slurp(file));
       Expression exp = this.instance.compileScript(file, true);
-      return exp.execute(AviatorEvaluator.newEnv(args));
+
+      Object result = exp.execute(AviatorEvaluator.newEnv(args));
+      if (testSerialize) {
+        // test serialize/deserialize
+        byte[] bs = null;
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+          ObjectOutputStream output = instance.newObjectOutputStream(out);
+          output.writeObject(exp);
+          output.close();
+          bs = out.toByteArray();
+        }
+
+        assertNotNull(bs);
+
+        try (ByteArrayInputStream in = new ByteArrayInputStream(bs)) {
+          ObjectInputStream input = instance.newObjectInputStream(in);
+          Expression deExp = (Expression) input.readObject();
+          assertNotSame(deExp, exp);
+          Object resultDes = deExp.execute(AviatorEvaluator.newEnv(args));
+          // return the result by deserialized expression executed.
+          return resultDes;
+        }
+      } else {
+        return result;
+      }
+
     } catch (Throwable t) {
       Reflector.sneakyThrow(t);
     }
@@ -58,7 +92,6 @@ public class TestScripts {
     }
     return null;
   }
-
 
   @Test
   public void testLibs() {
@@ -137,7 +170,6 @@ public class TestScripts {
     assertTrue(testScript("range.av") instanceof Range);
   }
 
-
   @Test
   public void testStringSeq() {
     assertEquals("hello world", testScript("string_seq.av"));
@@ -190,6 +222,13 @@ public class TestScripts {
     assertEquals("a is less than 10.", testScript("if_elsif3.av", "a", 8));
     assertEquals("a is greater than 10.", testScript("if_elsif3.av", "a", 12));
     assertEquals("statement after if", testScript("if_elsif3.av", "a", 112));
+    assertEquals(2, testScript("if_elsif4.av", "a", 1));
+    assertEquals(1, testScript("if_elsif4.av", "a", 0));
+    assertEquals(
+        Arrays.asList("condition1", "end0", "condition1", "end1", "condition2", "end2",
+            "condition3", "condition1", "end4", "condition1", "end5", "condition1", "end6",
+            "condition1", "end7", "condition1", "end8", "condition1", "end9"),
+        testScript("if_elsif5.av"));
 
     assertEquals(7, testScript("if_else7.av"));
     assertEquals(8, testScript("if_else8.av"));
@@ -354,7 +393,6 @@ public class TestScripts {
       int[] a = genRandomIntArray(i);
       assertSortArray((int[]) testScript("selection_sort.av", "a", a), i);
     }
-
 
     // test fibonacci
     assertEquals(0, testScript("fibonacci.av", "n", 0));

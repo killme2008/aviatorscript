@@ -18,6 +18,8 @@ import com.googlecode.aviator.utils.Reflector;
  */
 public class JavaMethodReflectionFunctionMissing implements FunctionMissing {
 
+  private static final long serialVersionUID = -7829608231403725185L;
+
   private JavaMethodReflectionFunctionMissing() {
 
   }

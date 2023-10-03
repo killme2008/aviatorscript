@@ -84,6 +84,16 @@ public class SymbolTable implements Serializable {
     return isReservedKeyword(name) || this.table.containsKey(name);
   }
 
+  /**
+   * Try to reserve key word, return the reserved variable if success, otherwise return itself.
+   * 
+   * @param var
+   * @return
+   */
+  public static Variable tryReserveKeyword(final Variable var) {
+    Variable reserve = RESERVED.get(var.getLexeme());
+    return reserve != null ? reserve : var;
+  }
 
   /**
    * Get variable by name

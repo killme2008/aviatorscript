@@ -28,7 +28,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.AccessController;
@@ -493,7 +492,7 @@ public final class AviatorEvaluatorInstance {
 
   private Env loadModule(final Class<?> moduleClazz)
       throws IllegalAccessException, NoSuchMethodException {
-    Map<String, List<Method>> methodMap = findMethodsFromClass(moduleClazz, true);
+    Map<String, List<Method>> methodMap = Reflector.findMethodsFromClass(moduleClazz, true);
 
     if (methodMap == null || methodMap.isEmpty()) {
       throw new IllegalArgumentException("Empty module");
@@ -564,7 +563,7 @@ public final class AviatorEvaluatorInstance {
 
   private List<String> addMethodFunctions(final String namespace, final boolean isStatic,
       final Class<?> clazz) throws IllegalAccessException, NoSuchMethodException {
-    Map<String, List<Method>> methodMap = findMethodsFromClass(clazz, isStatic);
+    Map<String, List<Method>> methodMap = Reflector.findMethodsFromClass(clazz, isStatic);
     List<String> added = new ArrayList<>();
 
     for (Map.Entry<String, List<Method>> entry : methodMap.entrySet()) {
@@ -641,52 +640,6 @@ public final class AviatorEvaluatorInstance {
       }
     }
     return result;
-  }
-
-  private Map<String, List<Method>> findMethodsFromClass(final Class<?> clazz,
-      final boolean isStatic) {
-    Map<String, List<Method>> methodMap = new HashMap<>();
-
-    for (Method method : clazz.getMethods()) {
-      int modifiers = method.getModifiers();
-      if (Modifier.isPublic(modifiers)) {
-        if (isStatic) {
-          if (!Modifier.isStatic(modifiers)) {
-            continue;
-          }
-        } else {
-          if (Modifier.isStatic(modifiers)) {
-            continue;
-          }
-        }
-
-        if (method.getAnnotation(Ignore.class) != null) {
-          continue;
-        }
-
-        String methodName = method.getName();
-        Function func = method.getAnnotation(Function.class);
-        if (func != null) {
-          String rename = func.rename();
-          if (!rename.isEmpty()) {
-            if (!ExpressionParser.isJavaIdentifier(rename)) {
-              throw new IllegalArgumentException("Invalid rename `" + rename + "` for method "
-                  + method.getName() + " in class " + clazz);
-            }
-            methodName = func.rename();
-          }
-        }
-
-        List<Method> methods = methodMap.get(methodName);
-        if (methods == null) {
-          methods = new ArrayList<>(3);
-          methodMap.put(methodName, methods);
-        }
-        methods.add(method);
-      }
-    }
-
-    return methodMap;
   }
 
   /**

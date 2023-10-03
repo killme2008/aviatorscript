@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Feature;
+import com.googlecode.aviator.annotation.Function;
+import com.googlecode.aviator.annotation.Ignore;
 import com.googlecode.aviator.exception.NoSuchPropertyException;
+import com.googlecode.aviator.parser.ExpressionParser;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.ClassMethodFunction;
 import com.googlecode.aviator.runtime.type.AviatorJavaType;
@@ -869,5 +873,51 @@ public class Reflector {
       }
     }
     return throwNoSuchPropertyException("Variable `" + name + "` not found in env: " + env);
+  }
+
+  public static Map<String, List<Method>> findMethodsFromClass(final Class<?> clazz,
+      final boolean isStatic) {
+    Map<String, List<Method>> methodMap = new HashMap<>();
+
+    for (Method method : clazz.getMethods()) {
+      int modifiers = method.getModifiers();
+      if (Modifier.isPublic(modifiers)) {
+        if (isStatic) {
+          if (!Modifier.isStatic(modifiers)) {
+            continue;
+          }
+        } else {
+          if (Modifier.isStatic(modifiers)) {
+            continue;
+          }
+        }
+
+        if (method.getAnnotation(Ignore.class) != null) {
+          continue;
+        }
+
+        String methodName = method.getName();
+        Function func = method.getAnnotation(Function.class);
+        if (func != null) {
+          String rename = func.rename();
+          if (!rename.isEmpty()) {
+            if (!ExpressionParser.isJavaIdentifier(rename)) {
+              throw new IllegalArgumentException("Invalid rename `" + rename + "` for method "
+                  + method.getName() + " in class " + clazz);
+            }
+            methodName = func.rename();
+          }
+        }
+
+        List<Method> methods = methodMap.get(methodName);
+        if (methods == null) {
+          methods = new ArrayList<>(3);
+          methodMap.put(methodName, methods);
+        }
+        methods.add(method);
+      }
+    }
+
+    return methodMap;
   }
 }

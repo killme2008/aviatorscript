@@ -49,7 +49,7 @@ public abstract class BaseExpression implements Expression {
   private Map<Integer, List<FunctionArgument>> funcsArgs = Collections.emptyMap();
   protected SymbolTable symbolTable;
   // cached compiled string segments for string interpolation.
-  private transient final ConcurrentHashMap<String, FutureTask<StringSegments>> stringSegs =
+  private transient ConcurrentHashMap<String, FutureTask<StringSegments>> stringSegs =
       new ConcurrentHashMap<String, FutureTask<StringSegments>>();
 
   protected String sourceFile;
@@ -383,6 +383,7 @@ public abstract class BaseExpression implements Expression {
     this.symbolTable = (SymbolTable) input.readObject();
     this.sourceFile = (String) input.readObject();
     this.lambdaBootstraps = (Map<String, LambdaFunctionBootstrap>) input.readObject();
+    this.stringSegs = new ConcurrentHashMap<String, FutureTask<StringSegments>>();
   }
 
   public void customWriteObject(ObjectOutputStream output) throws IOException {
