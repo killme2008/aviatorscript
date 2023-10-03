@@ -1837,7 +1837,7 @@ public final class AviatorEvaluatorInstance {
    * check if class is in Options.ALLOWED_CLASS_SET
    *
    * @param checkIfAllow check or not
-   * @param clazz        the class for check
+   * @param clazz the class for check
    * @return the class for check
    */
   public Class<?> checkIfClassIsAllowed(final boolean checkIfAllow, final Class<?> clazz) {
@@ -1847,11 +1847,11 @@ public final class AviatorEvaluatorInstance {
         // Null list means allowing all classes
         if (!allowedList.contains(clazz)) {
           throw new ExpressionRuntimeException(
-                  "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
+              "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
         }
       }
       Set<Class<?>> assignableList =
-              this.getOptionValue(Options.ASSIGNABLE_ALLOWED_CLASS_SET).classes;
+          this.getOptionValue(Options.ASSIGNABLE_ALLOWED_CLASS_SET).classes;
       if (assignableList != null) {
         for (Class<?> aClass : assignableList) {
           if (aClass.isAssignableFrom(clazz)) {
@@ -1859,7 +1859,7 @@ public final class AviatorEvaluatorInstance {
           }
         }
         throw new ExpressionRuntimeException(
-                "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
+            "`" + clazz + "` is not in allowed class set, check Options.ALLOWED_CLASS_SET");
       }
     }
     return clazz;
