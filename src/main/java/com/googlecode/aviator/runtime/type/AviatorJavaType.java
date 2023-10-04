@@ -15,6 +15,9 @@
  **/
 package com.googlecode.aviator.runtime.type;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -45,8 +48,20 @@ import com.googlecode.aviator.utils.TypeUtils;
 public class AviatorJavaType extends AviatorObject {
   private static final long serialVersionUID = -4353225521490659987L;
   protected String name;
-  private final boolean containsDot;
+  private boolean containsDot;
   private String[] subNames;
+  private SymbolTable symbolTable;
+
+  private void readObject(ObjectInputStream input) throws ClassNotFoundException, IOException {
+    String name = (String) input.readObject();
+    SymbolTable symbolTable = (SymbolTable) input.readObject();
+    init(name, symbolTable);
+  }
+
+  private void writeObject(ObjectOutputStream output) throws IOException {
+    output.writeObject(this.name);
+    output.writeObject(this.symbolTable);
+  }
 
   @Override
   public AviatorType getAviatorType() {
@@ -63,6 +78,10 @@ public class AviatorJavaType extends AviatorObject {
 
   public AviatorJavaType(final String name, final SymbolTable symbolTable) {
     super();
+    init(name, symbolTable);
+  }
+
+  private void init(final String name, final SymbolTable symbolTable) {
     if (name != null) {
       String rName = reserveName(name);
       if (rName != null) {
@@ -79,6 +98,7 @@ public class AviatorJavaType extends AviatorObject {
       this.name = null;
       this.containsDot = false;
     }
+    this.symbolTable = symbolTable;
   }
 
   /**
@@ -135,8 +155,6 @@ public class AviatorJavaType extends AviatorObject {
         return super.div(other, env);
     }
   }
-
-
 
   @Override
   public AviatorObject match(final AviatorObject other, final Map<String, Object> env) {
@@ -353,7 +371,6 @@ public class AviatorJavaType extends AviatorObject {
     }
     return null;
   }
-
 
   @Override
   public AviatorObject defineValue(final AviatorObject value, final Map<String, Object> env) {

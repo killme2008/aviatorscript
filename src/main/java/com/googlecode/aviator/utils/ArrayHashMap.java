@@ -13,7 +13,9 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V>
 
   private static final long serialVersionUID = 362498820763181265L;
 
-  private static class MapEntry<K, V> implements Map.Entry<K, V> {
+  private static class MapEntry<K, V> implements Map.Entry<K, V>, Serializable {
+
+    private static final long serialVersionUID = 1759214536880718767L;
     K key;
     V value;
     int hash;

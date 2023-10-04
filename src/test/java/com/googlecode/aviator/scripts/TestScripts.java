@@ -402,6 +402,7 @@ public class TestScripts {
     assertEquals(610, testScript("fibonacci.av", "n", 15));
     assertEquals(6765, testScript("fibonacci.av", "n", 20));
     testScript("unpacking_arguments.av");
+    assertEquals(Arrays.asList(3L, 2L, 4L, 1L), testScript("recusive_fn.av"));
   }
 
   @Test
