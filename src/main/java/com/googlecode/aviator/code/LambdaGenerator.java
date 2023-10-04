@@ -52,7 +52,7 @@ public class LambdaGenerator implements CodeGenerator {
     this.inheritEnv = inheritEnv;
     // Generate lambda class name
     this.className =
-        "Lambda_" + System.currentTimeMillis() + "_" + LAMBDA_COUNTER.getAndIncrement();
+        "AviatorScript_" + System.currentTimeMillis() + "_" + LAMBDA_COUNTER.getAndIncrement();
     // Auto compute frames
     // this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     // visitClass();

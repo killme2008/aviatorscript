@@ -28,10 +28,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Feature;
@@ -296,6 +298,76 @@ public class Env implements Map<String, Object>, Serializable {
     return ret;
   }
 
+  static class TargetObjectTask implements GetValueTask {
+
+    public TargetObjectTask(Object target) {
+      super();
+      this.target = target;
+    }
+
+    Object target;
+
+    @Override
+    public Object call(Env env) {
+      return target;
+    }
+
+  }
+
+  static interface GetValueTask {
+    Object call(Env env);
+  }
+
+  /**
+   * Internal variable tasks to get the value.
+   */
+  private static final IdentityHashMap<String, GetValueTask> INTERNAL_VARIABLES =
+      new IdentityHashMap<String, GetValueTask>();
+
+  static {
+    INTERNAL_VARIABLES.put(Constants.REDUCER_LOOP_VAR, new TargetObjectTask(Range.LOOP));
+    INTERNAL_VARIABLES.put(Constants.REDUCER_EMPTY_VAR,
+        new TargetObjectTask(ReducerResult.withEmpty(AviatorNil.NIL)));
+    INTERNAL_VARIABLES.put(Constants.ENV_VAR, new GetValueTask() {
+
+      @Override
+      public Object call(Env env) {
+        env.instance.ensureFeatureEnabled(Feature.InternalVars);
+        return env;
+      }
+
+    });
+    INTERNAL_VARIABLES.put(Constants.FUNC_ARGS_VAR, new GetValueTask() {
+
+      @Override
+      public Object call(Env env) {
+        env.instance.ensureFeatureEnabled(Feature.InternalVars);
+        return FunctionUtils.getFunctionArguments(env);
+      }
+
+    });
+    INTERNAL_VARIABLES.put(Constants.INSTANCE_VAR, new GetValueTask() {
+
+      @Override
+      public Object call(Env env) {
+        env.instance.ensureFeatureEnabled(Feature.InternalVars);
+        return env.instance;
+      }
+
+    });
+
+    INTERNAL_VARIABLES.put(Constants.EXP_VAR, new GetValueTask() {
+
+      @Override
+      public Object call(Env env) {
+        env.instance.ensureFeatureEnabled(Feature.InternalVars);
+        return env.expression;
+      }
+
+    });
+
+  }
+
   /**
    * Get value for key. If the key is present in the overrides map, the value from that map is
    * returned; otherwise, the value for the key in the defaults map is returned.
@@ -305,30 +377,9 @@ public class Env implements Map<String, Object>, Serializable {
    */
   @Override
   public Object get(final Object key) {
-    // Should check ENV_VAR at first
-    // TODO: performance tweak
-    if (Constants.REDUCER_LOOP_VAR.equals(key)) {
-      return Range.LOOP;
-    }
-    if (Constants.REDUCER_EMPTY_VAR.equals(key)) {
-      return ReducerResult.withEmpty(AviatorNil.NIL);
-    }
-
-    if (Constants.ENV_VAR.equals(key)) {
-      this.instance.ensureFeatureEnabled(Feature.InternalVars);
-      return this;
-    }
-    if (Constants.FUNC_ARGS_VAR.equals(key)) {
-      this.instance.ensureFeatureEnabled(Feature.InternalVars);
-      return FunctionUtils.getFunctionArguments(this);
-    }
-    if (Constants.INSTANCE_VAR.equals(key)) {
-      this.instance.ensureFeatureEnabled(Feature.InternalVars);
-      return this.instance;
-    }
-    if (Constants.EXP_VAR.equals(key)) {
-      this.instance.ensureFeatureEnabled(Feature.InternalVars);
-      return this.expression;
+    GetValueTask task = INTERNAL_VARIABLES.get(key);
+    if (task != null) {
+      return task.call(this);
     }
 
     Map<String, Object> overrides = getmOverrides(true);

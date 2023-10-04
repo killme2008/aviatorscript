@@ -1,0 +1,20 @@
+ fn post_order(nodes, values) {
+  for node in nodes {
+    if (node.children != nil && !is_empty(node.children)) {
+      post_order(node.children, values);
+    }
+    seq.add(values, node.value);
+  }
+}
+                                
+let tree = seq.list(seq.map(
+    "value", 1,
+    "children", seq.list(seq.map(
+        "value", 2,
+        "children", seq.list(seq.map(
+            "value", 3))), seq.map(
+        "value", 4))));
+let values = seq.list();
+post_order(tree, values);
+
+return values;

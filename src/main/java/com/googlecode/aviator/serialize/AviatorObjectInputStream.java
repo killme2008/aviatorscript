@@ -15,10 +15,12 @@ import com.googlecode.aviator.code.asm.ClassDefiner;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
 import com.googlecode.aviator.parser.AviatorClassLoader;
+import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
 import com.googlecode.aviator.runtime.type.AviatorBigInt;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
 import com.googlecode.aviator.runtime.type.AviatorNil;
 import com.googlecode.aviator.runtime.type.Range;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
 
 /**
@@ -47,14 +49,10 @@ public class AviatorObjectInputStream extends ObjectInputStream {
     Object object = super.resolveObject(obj);
     if (object instanceof BaseExpression) {
       BaseExpression exp = (BaseExpression) object;
-      exp.setInstance(this.instance);
-      if (exp.getCompileEnv() != null) {
-        exp.getCompileEnv().setInstance(this.instance);
-      }
-      if (object instanceof ClassExpression) {
-        ((ClassExpression) object)
-            .setClassBytes(this.classBytesCache.get(object.getClass().getName()));
-      }
+      configureExpression(exp);
+    }
+    if (object instanceof Env) {
+      ((Env) object).setInstance(this.instance);
     }
 
     // Processing some internal constants.
@@ -81,6 +79,13 @@ public class AviatorObjectInputStream extends ObjectInputStream {
     }
 
     return object;
+  }
+
+  private void configureExpression(BaseExpression exp) {
+    exp.setInstance(this.instance);
+    if (exp instanceof ClassExpression) {
+      ((ClassExpression) exp).setClassBytes(this.classBytesCache.get(exp.getClass().getName()));
+    }
   }
 
   @Override

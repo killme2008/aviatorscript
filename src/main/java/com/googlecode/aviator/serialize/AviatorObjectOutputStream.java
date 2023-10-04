@@ -40,8 +40,8 @@ public class AviatorObjectOutputStream extends ObjectOutputStream {
     if (ClassExpression.class.isAssignableFrom(cl) && cl != ClassExpression.class) {
       byte[] classBytes = this.classBytesCache.get(cl.getName());
       if (classBytes == null) {
-        throw new IllegalArgumentException(
-            "Class bytes not found, forgot to enable Options.SERIALIZABLE before compiling the script?");
+        throw new IllegalArgumentException("Class bytes not found: " + cl.getName()
+            + ", forgot to enable Options.SERIALIZABLE before compiling the script?");
       }
       this.writeInt(classBytes.length);
       this.write(classBytes);

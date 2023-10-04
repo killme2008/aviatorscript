@@ -1020,6 +1020,7 @@ public final class AviatorEvaluatorInstance {
 
   private void loadInternalLibs() {
     if (getEvalMode() == EvalMode.ASM) {
+
       if (internalASMLibFunctions == null) {
         internalASMLibFunctions = loadInternalFunctions(); // cache it
       } else {
@@ -1081,10 +1082,18 @@ public final class AviatorEvaluatorInstance {
   AviatorEvaluatorInstance(final EvalMode evalMode) {
     fillDefaultOpts();
     setOption(Options.EVAL_MODE, evalMode);
-    loadFeatureFunctions();
-    loadLib();
-    loadModule();
-    addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
+
+    // Load libs with Options.SERIALIZABLE=true
+    boolean serializable = this.getOptionValue(Options.SERIALIZABLE).bool;
+    try {
+      this.setOption(Options.SERIALIZABLE, true);
+      loadFeatureFunctions();
+      loadLib();
+      loadModule();
+      addFunctionLoader(ClassPathConfigFunctionLoader.getInstance());
+    } finally {
+      this.setOption(Options.SERIALIZABLE, serializable);
+    }
   }
 
   private void fillDefaultOpts() {
