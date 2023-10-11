@@ -1,0 +1,294 @@
+{
+    // Olası öznitelikler hakkında bilgi edinmek için IntelliSense kullanın.
+    // Mevcut özniteliklerin açıklamalarını görüntülemek için üzerine gelin.
+    // Daha fazla bilgi için şu adresi ziyaret edin: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.Main",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "PerfBenchmark",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.PerfBenchmark",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "AddFunctionExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.AddFunctionExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "AliasOperatorExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.AliasOperatorExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "Benchmark",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.Benchmark",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "BigNumberExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.BigNumberExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "CollectionExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.CollectionExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "CompileExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.CompileExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "ConfigureInstanceExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.ConfigureInstanceExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "CustomDivideExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.CustomDivideExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "DateExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.DateExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "FunctionExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.FunctionExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "FunctionMissingExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.FunctionMissingExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "InterpreterExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.InterpreterExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "JavaMethodFunctionsExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.JavaMethodFunctionsExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "JavaReflectionFunctionMissingExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.JavaReflectionFunctionMissingExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "LambdaExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.LambdaExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "NilExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.NilExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "OperatorOverloadExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.OperatorOverloadExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "RegularExpressionExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.RegularExpressionExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "RunScriptExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.RunScriptExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "SayHello",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.SayHello",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "SeqExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.SeqExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "SimpleExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.SimpleExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "StringExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.StringExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "TernaryOperatorExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.TernaryOperatorExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "TestAviator",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.TestAviator",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "TraceEvalExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.TraceEvalExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "VariableExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.VariableExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "JavaModuleExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.module.JavaModuleExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "CompileScript",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.scripting.CompileScript",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "ConfigureEngine",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.scripting.ConfigureEngine",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "EvalScriptExample",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.scripting.EvalScriptExample",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "InvokeScriptFunction",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.scripting.InvokeScriptFunction",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "InvokeScriptMethod",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.scripting.InvokeScriptMethod",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "MultiScopes",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.scripting.MultiScopes",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "RunnableImpl",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.scripting.RunnableImpl",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "RunnableImplObject",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.scripting.RunnableImplObject",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "ScriptVars",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.scripting.ScriptVars",
+            "projectName": "aviator"
+        },
+        {
+            "type": "java",
+            "name": "DemoResultSetSeq",
+            "request": "launch",
+            "mainClass": "com.googlecode.aviator.example.seq.DemoResultSetSeq",
+            "projectName": "aviator"
+        }
+    ]
+}
