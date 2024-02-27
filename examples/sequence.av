@@ -41,7 +41,8 @@ for x in new_range {
    print(x);
    print(", ");
 }
-println()
+println();
+
 let new_map = map(m, lambda(e) -> e.value = e.value + 100; return e; end);
 println("new map is: " + new_map + ", and type is: "+ type(new_map));
 
