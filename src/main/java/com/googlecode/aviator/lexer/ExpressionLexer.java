@@ -351,6 +351,37 @@ public class ExpressionLexer {
       variable.setQuote(true);
       return this.symbolTable.reserve(variable);
     }
+    // 支持对象和数组嵌套型变量，前面不用加 #
+    if (Character.isJavaIdentifierStart(this.peek)) {
+      char oldPeek = peek;
+      int startIndex = this.iterator.getIndex();
+
+      StringBuilder sb = new StringBuilder();
+      int dots = 0;
+      int brackets = 0;
+
+      while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '['
+              || this.peek == ']') {
+        if(this.peek == '.'){
+          dots++;
+        }
+        if(this.peek == '[' || this.peek == ']'){
+          brackets++;
+        }
+        sb.append(this.peek);
+        nextChar();
+      }
+      String lexeme = sb.toString();
+      // 同时出现点号和中括号，是对象和数组混合型变量
+      if(dots > 0 && brackets > 0){
+        Variable variable = new Variable(lexeme, this.lineNo, startIndex);
+        variable.setQuote(true);
+        return this.symbolTable.reserve(variable);
+      }else{
+        this.iterator.setIndex(startIndex);
+        this.peek = oldPeek;
+      }
+    }
     if (Character.isJavaIdentifierStart(this.peek)) {
       int startIndex = this.iterator.getIndex();
       StringBuilder sb = new StringBuilder();
