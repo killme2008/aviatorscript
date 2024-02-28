@@ -34,7 +34,7 @@ public class DoubleFunction extends AbstractFunction {
         } else if (obj instanceof Character) {
           return new AviatorDouble(Double.parseDouble(String.valueOf(obj)));
         } else {
-          throw new ClassCastException("Could not cast " + obj.getClass().getName() + " to double");
+          throw new ClassCastException("Could not cast " + (obj != null ? obj.getClass().getName() : "null")  + " to double, AviatorObject is" + arg1 );
         }
       case String:
         return new AviatorDouble(Double.parseDouble((String) arg1.getValue(env)));
