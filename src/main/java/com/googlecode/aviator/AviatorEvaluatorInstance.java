@@ -119,16 +119,7 @@ import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqValsFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqZipmapFunction;
-import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
-import com.googlecode.aviator.runtime.function.string.StringEndsWithFunction;
-import com.googlecode.aviator.runtime.function.string.StringIndexOfFunction;
-import com.googlecode.aviator.runtime.function.string.StringJoinFunction;
-import com.googlecode.aviator.runtime.function.string.StringLengthFunction;
-import com.googlecode.aviator.runtime.function.string.StringReplaceAllFunction;
-import com.googlecode.aviator.runtime.function.string.StringReplaceFirstFunction;
-import com.googlecode.aviator.runtime.function.string.StringSplitFunction;
-import com.googlecode.aviator.runtime.function.string.StringStartsWithFunction;
-import com.googlecode.aviator.runtime.function.string.StringSubStringFunction;
+import com.googlecode.aviator.runtime.function.string.*;
 import com.googlecode.aviator.runtime.function.system.AssertFunction;
 import com.googlecode.aviator.runtime.function.system.BigIntFunction;
 import com.googlecode.aviator.runtime.function.system.BinaryFunction;
@@ -243,11 +234,11 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Create an ObjectInputStream from an input stream for deserialize an expression.
-   * 
+   *
    * @since 5.3.4
    * @return the stream
    * @throws IOException
-   * 
+   *
    */
   public ObjectInputStream newObjectInputStream(InputStream in) throws IOException {
     ensureEnableSerializableOption();
@@ -262,7 +253,7 @@ public final class AviatorEvaluatorInstance {
 
   /**
    * Create an ObjectOutputStream to serialize an expression.
-   * 
+   *
    * @since 5.3.4
    * @return
    * @throws IOException
@@ -970,6 +961,9 @@ public final class AviatorEvaluatorInstance {
     addFunction(new StringJoinFunction());
     addFunction(new StringReplaceFirstFunction());
     addFunction(new StringReplaceAllFunction());
+
+    //根据json路径获取json的某个key的值 add by Eric Han 2023-05-12
+    addFunction(new StringGetJsonValFunction());
   }
 
   private void loadSystemFunctions() {
