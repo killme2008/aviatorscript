@@ -1,3 +1,5 @@
+**It's not a fxxx game, it's a programming languge, don't send me junk email any more!!!**
+
 # AviatorScript
 
 [![Build Status](https://travis-ci.org/killme2008/aviatorscript.svg?branch=master)](https://travis-ci.org/killme2008/aviatorscript)
