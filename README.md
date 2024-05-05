@@ -1,5 +1,3 @@
-**It's not a fxxx game, it's a programming languge, don't send me junk email any more!!!**
-
 # AviatorScript
 
 [![Build Status](https://travis-ci.org/killme2008/aviatorscript.svg?branch=master)](https://travis-ci.org/killme2008/aviatorscript)
@@ -10,6 +8,8 @@
 ----------------------------------------
 
 `AviatorScript` 是一门高性能、轻量级寄宿于 JVM （包括 Android 平台）之上的脚本语言。
+
+**It's not a game, it's a programming language. Please refrain from sending me any more unsolicited emails.RTFM**
 
 # 特性介绍
 
