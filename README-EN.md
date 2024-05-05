@@ -11,6 +11,8 @@
 `AviatorScript` is a lightweight, high performance scripting language hosted on the JVM (and Android platform).
 It compiles script to java byte code and evaluate it on the fly.
 
+**It's not a game, it's a programming language. Please refrain from sending me any more unsolicited emails.RTFM**
+
 # Feature Intro
 
 1. Suppport number,string, boolean and regular expression etc. [basic types](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw?translate=en)，support all java operators and their priorities.
