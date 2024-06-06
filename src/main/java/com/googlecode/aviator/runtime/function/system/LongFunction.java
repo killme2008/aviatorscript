@@ -34,7 +34,9 @@ public class LongFunction extends AbstractFunction {
         } else if (obj instanceof Character) {
           return AviatorLong.valueOf(Long.valueOf(String.valueOf(obj)));
         } else {
-          throw new ClassCastException("Could not cast " + (obj != null ? obj.getClass().getName() : "null")  + " to long, AviatorObject is " + arg1);
+          throw new ClassCastException(
+              "Could not cast " + (obj != null ? obj.getClass().getName() : "null")
+                  + " to long, AviatorObject is " + arg1);
         }
       case String:
         return AviatorLong.valueOf(Long.valueOf((String) arg1.getValue(env)));

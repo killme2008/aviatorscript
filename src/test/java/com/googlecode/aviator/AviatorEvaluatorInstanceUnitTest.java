@@ -680,7 +680,6 @@ public class AviatorEvaluatorInstanceUnitTest {
       this.instance.setOption(Options.TRACE_EVAL, false);
       this.instance.setTraceOutputStream(System.out);
     }
-
   }
 
   @Test(expected = CompileExpressionErrorException.class)

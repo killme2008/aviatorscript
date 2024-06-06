@@ -117,9 +117,20 @@ public enum Options {
 
   /**
    * Whether the compiled expression is serializable. If true, the compiled expression will
-   * implement {@link #jva.io.Serializable} and can be encoded/decoded by java serialization.
+   * implement {@link jva.io.Serializable} and can be encoded/decoded by java serialization.
    */
-  SERIALIZABLE;
+  SERIALIZABLE,
+
+  /**
+   * 
+   * The expression execution timeout value in milliseconds. If the execution time exceeds this
+   * value, it will throw a {@link com.googlecode.aviator.exception.TimeoutException}. A value of
+   * zero or less indicates no timeout limitation, the default value is zero (no limitation).
+   * 
+   * @since 5.5.0
+   * 
+   */
+  EVAL_TIMEOUT_MS;
 
 
   /**
@@ -200,6 +211,7 @@ public enum Options {
         return val.bool;
       case MAX_LOOP_COUNT:
       case OPTIMIZE_LEVEL:
+      case EVAL_TIMEOUT_MS:
         return val.number;
       case FEATURE_SET:
         return val.featureSet;
@@ -243,6 +255,7 @@ public enum Options {
           return COMPILE_VALUE;
         }
       }
+      case EVAL_TIMEOUT_MS:
       case MAX_LOOP_COUNT:
         return new Value(((Number) val).intValue());
       case ALLOWED_CLASS_SET:
@@ -278,6 +291,7 @@ public enum Options {
         final int level = ((Integer) val).intValue();
         return val instanceof Integer
             && (level == AviatorEvaluator.EVAL || level == AviatorEvaluator.COMPILE);
+      case EVAL_TIMEOUT_MS:
       case MAX_LOOP_COUNT:
         return val instanceof Long || val instanceof Integer;
       case MATH_CONTEXT:
@@ -356,6 +370,8 @@ public enum Options {
         return NULL_CLASS_SET;
       case EVAL_MODE:
         return getDefaultEvalMode();
+      case EVAL_TIMEOUT_MS:
+        return ZERO_VALUE;
     }
     return null;
   }

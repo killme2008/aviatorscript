@@ -131,6 +131,11 @@ public final class RuntimeUtils {
     return getInstance(env).getOptionValue(Options.TRACE_EVAL).bool;
   }
 
+  // Returns the eval timeout value in milliseconds
+  public static final int getEvalTimeoutMs(final Map<String, Object> env) {
+    return getInstance(env).getOptionValue(Options.EVAL_TIMEOUT_MS).number;
+  }
+
   public static AviatorFunction getFunction(final Object object, final Map<String, Object> env) {
     if (object instanceof AviatorFunction) {
       return (AviatorFunction) object;

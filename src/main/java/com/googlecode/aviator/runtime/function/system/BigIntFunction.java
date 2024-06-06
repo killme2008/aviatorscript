@@ -36,7 +36,9 @@ public class BigIntFunction extends AbstractFunction {
         } else if (obj instanceof Character) {
           return AviatorBigInt.valueOf(new BigInteger(String.valueOf(obj)));
         } else {
-          throw new ClassCastException("Could not cast " + (obj != null ? obj.getClass().getName() : "null")  + " to bigint, AviatorObject is " + arg1);
+          throw new ClassCastException(
+              "Could not cast " + (obj != null ? obj.getClass().getName() : "null")
+                  + " to bigint, AviatorObject is " + arg1);
         }
       case String:
         return AviatorBigInt.valueOf(new BigInteger((String) arg1.getValue(env)));

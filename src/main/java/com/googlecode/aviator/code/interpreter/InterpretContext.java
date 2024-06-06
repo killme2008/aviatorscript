@@ -2,7 +2,9 @@ package com.googlecode.aviator.code.interpreter;
 
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import com.googlecode.aviator.InterpretExpression;
+import com.googlecode.aviator.exception.TimeoutException;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.RuntimeUtils;
@@ -26,6 +28,8 @@ public class InterpretContext {
   private final InterpretExpression expression;
   private boolean reachEnd;
   private final boolean trace;
+  private long startNs = -1;
+  private long evalTimeoutNs = 0;
 
 
   public InterpretContext(final InterpretExpression exp, final List<IR> instruments,
@@ -34,6 +38,11 @@ public class InterpretContext {
     this.instruments = instruments.toArray(this.instruments);
     this.env = env;
     this.trace = RuntimeUtils.isTracedEval(env);
+    long ms = RuntimeUtils.getEvalTimeoutMs(env);
+    if (ms > 0) {
+      this.evalTimeoutNs = TimeUnit.NANOSECONDS.convert(ms, TimeUnit.MILLISECONDS);
+      this.startNs = System.nanoTime();
+    }
     next();
   }
 
@@ -135,6 +144,14 @@ public class InterpretContext {
   public void dispatch(final boolean next) {
     if (next && !next()) {
       return;
+    }
+
+    // Check whether it's execution is timed out.
+    if (this.startNs > 0) {
+      if (System.nanoTime() - this.startNs > this.evalTimeoutNs) {
+        throw new TimeoutException("Expression execution timed out, exceeded: "
+            + RuntimeUtils.getEvalTimeoutMs(env) + " ms");
+      }
     }
 
     if (this.pc != null) {
