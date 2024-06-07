@@ -241,13 +241,16 @@ public abstract class BaseExpression implements Expression {
 
   public abstract Object executeDirectly(final Map<String, Object> env);
 
-
   @Override
   public Object execute(Map<String, Object> map) {
+    return this.execute(map, true);
+  }
+
+  protected Object execute(Map<String, Object> map, boolean checkExecutionTimeout) {
     if (map == null) {
       map = Collections.emptyMap();
     }
-    Env env = genTopEnv(map);
+    Env env = genTopEnv(map, checkExecutionTimeout);
     EnvProcessor envProcessor = this.instance.getEnvProcessor();
     if (envProcessor != null) {
       envProcessor.beforeExecute(env, this);
@@ -330,23 +333,25 @@ public abstract class BaseExpression implements Expression {
     return this.varNames;
   }
 
-  protected Env newEnv(final Map<String, Object> map, final boolean direct) {
+  protected Env newEnv(final Map<String, Object> map, final boolean direct,
+      boolean checkExecutionTimeout) {
     Env env;
     if (direct) {
       env = new Env(map, map == Collections.EMPTY_MAP ? new HashMap<String, Object>() : map);
     } else {
       env = new Env(map);
     }
-    env.configure(this.instance, this, Utils.currentTimeNanos());
+    env.configure(this.instance, this, getExecutionStartNs(checkExecutionTimeout));
     return env;
   }
 
-  protected Env genTopEnv(final Map<String, Object> map) {
+  protected Env genTopEnv(final Map<String, Object> map, boolean checkExecutionTimeout) {
     if (map instanceof Env) {
-      ((Env) map).configure(this.instance, this, Utils.currentTimeNanos());
+      ((Env) map).configure(this.instance, this, getExecutionStartNs(checkExecutionTimeout));
     }
     Env env =
-        newEnv(map, this.instance.getOptionValue(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY).bool);
+        newEnv(map, this.instance.getOptionValue(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY).bool,
+            checkExecutionTimeout);
 
     if (this.compileEnv != null && !this.compileEnv.isEmpty()) {
       env.putAll(this.compileEnv);
@@ -357,8 +362,16 @@ public abstract class BaseExpression implements Expression {
     return env;
   }
 
+  private long getExecutionStartNs(boolean checkExecutionTimeout) {
+    long startNs = -1;
+    if (checkExecutionTimeout && this.instance.getOptionValue(Options.EVAL_TIMEOUT_MS).number > 0) {
+      startNs = Utils.currentTimeNanos();
+    }
+    return startNs;
+  }
+
   protected Env newEnv(final Map<String, Object> map) {
-    return newEnv(map, false);
+    return newEnv(map, false, true);
   }
 
   public Map<String, LambdaFunctionBootstrap> getLambdaBootstraps() {

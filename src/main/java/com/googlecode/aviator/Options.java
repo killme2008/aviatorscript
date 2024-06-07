@@ -136,9 +136,9 @@ public enum Options {
    * </ul>
    * 
    * So if the expression doesn't contains these clauses or trapped into a function invocation, the
-   * behavior may be not expected.
+   * behavior may be not expected. Try its best, but no promises.
    * 
-   * @since 5.5.0
+   * @since 5.4.2
    * 
    */
   EVAL_TIMEOUT_MS;
@@ -272,8 +272,7 @@ public enum Options {
         Value value = new Value(((Number) val).intValue());
         // Cached the converted result.
         if (value.number > 0) {
-          value.cachedNumber =
-              (int) TimeUnit.NANOSECONDS.convert(value.number, TimeUnit.MILLISECONDS);
+          value.cachedNumber = TimeUnit.NANOSECONDS.convert(value.number, TimeUnit.MILLISECONDS);
         }
         return value;
       }

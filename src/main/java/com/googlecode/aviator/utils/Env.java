@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Feature;
@@ -77,6 +76,7 @@ public class Env implements Map<String, Object>, Serializable {
 
   // The execution start timestamp in nanoseconds.
   private transient long startNs = -1;
+
 
   /**
    * Constructs an env instance with empty state.
@@ -163,8 +163,8 @@ public class Env implements Map<String, Object>, Serializable {
     setStartNs(startNs);
   }
 
-  public void setStartNs(long startNs) {
-    if (this.startNs == -1) {
+  private void setStartNs(long startNs) {
+    if (this.startNs == -1 && startNs > 0) {
       this.startNs = startNs;
     }
   }

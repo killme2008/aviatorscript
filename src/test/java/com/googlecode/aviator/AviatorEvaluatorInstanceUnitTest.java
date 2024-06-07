@@ -74,6 +74,21 @@ public class AviatorEvaluatorInstanceUnitTest {
     this.instance.execute("while(true) { }");
   }
 
+  @Test
+  public void testEvalTimeoutAndTryAgain() throws Exception {
+    Expression exp = this.instance.compile("Thread.sleep(120); a + 1");
+    try {
+      exp.execute(exp.newEnv("a", 2));
+    } catch (TimeoutException e) {
+      assertTrue(e.getMessage().contains("Expression execution timed out, exceeded: 100 ms"));
+      // ignore
+    }
+    this.instance.setOption(Options.EVAL_TIMEOUT_MS, 200);
+    assertEquals(exp.execute(exp.newEnv("a", 2)), 3);
+    Thread.sleep(500);
+    assertEquals(exp.execute(exp.newEnv("a", 2)), 3);
+  }
+
   @SuppressWarnings("unchecked")
   @Test
   public void testIssue466() {

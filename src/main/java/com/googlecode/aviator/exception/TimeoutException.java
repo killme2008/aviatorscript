@@ -4,7 +4,7 @@ package com.googlecode.aviator.exception;
  * The expression execution is timed out.
  *
  * @author dennis(killme2008@gmail.com)
- * @since 5.5.0
+ * @since 5.4.2
  */
 public class TimeoutException extends ExpressionRuntimeException {
 

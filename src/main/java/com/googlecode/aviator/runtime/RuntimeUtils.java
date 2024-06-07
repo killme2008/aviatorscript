@@ -105,11 +105,11 @@ public final class RuntimeUtils {
   }
 
   public static void checkExecutionTimedOut(final Map<String, Object> env) {
-    long execTimeoutNs = getEvalTimeoutNs(env);
-    if (execTimeoutNs > 0) {
-      if (env instanceof Env) {
-        long startNs = ((Env) env).getStartNs();
-        if (startNs > 0) {
+    if (env instanceof Env) {
+      long startNs = ((Env) env).getStartNs();
+      if (startNs > 0) {
+        long execTimeoutNs = getEvalTimeoutNs(env);
+        if (execTimeoutNs > 0) {
           if (Utils.currentTimeNanos() - startNs > execTimeoutNs) {
             throw new TimeoutException("Expression execution timed out, exceeded: "
                 + getInstance(env).getOptionValue(Options.EVAL_TIMEOUT_MS).number + " ms");
