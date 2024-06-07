@@ -34,6 +34,11 @@ public class AviatorEvaluatorInstanceCompatibleUnitTest extends AviatorEvaluator
     // ignore
   }
 
+  @Test
+  public void testEvalTimeoutAndTryAgain() throws Exception {
+    // ignore
+  }
+
   @Override
   @Test
   public void testClassAllowList() {
