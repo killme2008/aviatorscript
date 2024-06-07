@@ -41,6 +41,13 @@ public class BranchIfIR implements IR, JumpIR {
     }
   }
 
+
+
+  @Override
+  public boolean mayBeCost() {
+    return true;
+  }
+
   @Override
   public String toString() {
     return "branch_if " + this.pc + "  [" + this.label + "]      " + this.sourceInfo;

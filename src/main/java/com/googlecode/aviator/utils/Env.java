@@ -76,7 +76,7 @@ public class Env implements Map<String, Object>, Serializable {
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
 
   // The execution start timestamp in nanoseconds.
-  private long startNs = -1;
+  private transient long startNs = -1;
 
   /**
    * Constructs an env instance with empty state.

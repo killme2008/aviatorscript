@@ -24,6 +24,7 @@ import com.googlecode.aviator.parser.CompileTypes;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.FunctionArgument;
 import com.googlecode.aviator.runtime.LambdaFunctionBootstrap;
+import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
@@ -239,6 +240,7 @@ public abstract class BaseExpression implements Expression {
   }
 
   public abstract Object executeDirectly(final Map<String, Object> env);
+
 
   @Override
   public Object execute(Map<String, Object> map) {

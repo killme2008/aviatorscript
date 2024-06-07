@@ -38,6 +38,7 @@ import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
+import com.googlecode.aviator.exception.TimeoutException;
 import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -57,6 +58,7 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Before
   public void setup() {
     this.instance = AviatorEvaluator.newInstance();
+    this.instance.setOption(Options.EVAL_TIMEOUT_MS, 100);
   }
 
   @Test
@@ -65,6 +67,11 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertTrue(expr.getVariableFullNames().isEmpty());
     expr = instance.compile("let abc = new String('abc'); abc + x");
     assertEquals(expr.getVariableFullNames(), Arrays.asList("x"));
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testEvalTimeout() {
+    this.instance.execute("while(true) { }");
   }
 
   @SuppressWarnings("unchecked")

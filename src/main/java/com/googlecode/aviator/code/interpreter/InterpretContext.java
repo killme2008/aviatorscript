@@ -28,7 +28,6 @@ public class InterpretContext {
   private final InterpretExpression expression;
   private boolean reachEnd;
   private final boolean trace;
-  private long evalTimeoutNs = 0;
 
 
   public InterpretContext(final InterpretExpression exp, final List<IR> instruments,
@@ -37,10 +36,6 @@ public class InterpretContext {
     this.instruments = instruments.toArray(this.instruments);
     this.env = env;
     this.trace = RuntimeUtils.isTracedEval(env);
-    long ms = RuntimeUtils.getEvalTimeoutMs(env);
-    if (ms > 0) {
-      this.evalTimeoutNs = TimeUnit.NANOSECONDS.convert(ms, TimeUnit.MILLISECONDS);
-    }
     next();
   }
 
@@ -144,15 +139,10 @@ public class InterpretContext {
       return;
     }
 
-    // Check whether it's execution is timed out.
-    if (this.evalTimeoutNs > 0 && this.env.getStartNs() > 0) {
-      if (System.nanoTime() - this.env.getStartNs() > this.evalTimeoutNs) {
-        throw new TimeoutException("Expression execution timed out, exceeded: "
-            + RuntimeUtils.getEvalTimeoutMs(env) + " ms");
-      }
-    }
-
     if (this.pc != null) {
+      if (this.pc.mayBeCost()) {
+        RuntimeUtils.checkExecutionTimedOut(env);
+      }
       if (this.trace) {
         RuntimeUtils.printlnTrace(this.env, "    " + this.pc + "    " + descOperandsStack());
       }

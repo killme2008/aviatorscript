@@ -43,6 +43,11 @@ public class BranchUnlessIR implements IR, JumpIR {
   }
 
   @Override
+  public boolean mayBeCost() {
+    return true;
+  }
+
+  @Override
   public String toString() {
     return "branch_unless " + this.pc + "  [" + this.label + "]      " + this.sourceInfo;
   }
