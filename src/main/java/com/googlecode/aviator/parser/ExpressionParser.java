@@ -1602,8 +1602,7 @@ public class ExpressionParser implements Parser {
     if (expectChar('*')) {
       wildcard();
     } else {
-      checkVariableName(this.lookhead);
-      getCodeGenerator().onConstant(this.lookhead);
+      getCodeGenerator().onConstant(this.lookhead.withMeta(Constants.USE_CLASS_PKG, true));
     }
     move(true);
   }

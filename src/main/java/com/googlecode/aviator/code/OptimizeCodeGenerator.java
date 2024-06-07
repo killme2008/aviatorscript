@@ -373,6 +373,10 @@ public class OptimizeCodeGenerator implements CodeGenerator {
           if (SymbolTable.isReservedKeyword((Variable) token)) {
             continue;
           }
+          // Ignore class name or package name
+          if (token.getMeta(Constants.USE_CLASS_PKG, false)) {
+            continue;
+          }
 
           String varName = token.getLexeme();
           VariableMeta meta = variables.get(varName);
