@@ -28,6 +28,7 @@ import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.utils.Constants;
 import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.Reflector;
+import com.googlecode.aviator.utils.Utils;
 
 /**
  * Base expression
@@ -334,13 +335,13 @@ public abstract class BaseExpression implements Expression {
     } else {
       env = new Env(map);
     }
-    env.configure(this.instance, this);
+    env.configure(this.instance, this, Utils.currentTimeNanos());
     return env;
   }
 
   protected Env genTopEnv(final Map<String, Object> map) {
     if (map instanceof Env) {
-      ((Env) map).configure(this.instance, this);
+      ((Env) map).configure(this.instance, this, Utils.currentTimeNanos());
     }
     Env env =
         newEnv(map, this.instance.getOptionValue(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY).bool);

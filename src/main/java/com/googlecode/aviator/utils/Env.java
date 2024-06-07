@@ -75,6 +75,9 @@ public class Env implements Map<String, Object>, Serializable {
 
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
 
+  // The execution start timestamp in nanoseconds.
+  private long startNs = -1;
+
   /**
    * Constructs an env instance with empty state.
    */
@@ -98,6 +101,10 @@ public class Env implements Map<String, Object>, Serializable {
 
   public void setmOverrides(final Map<String, Object> mOverrides) {
     this.mOverrides = mOverrides;
+  }
+
+  public long getStartNs() {
+    return startNs;
   }
 
   public List<String> getImportedSymbols() {
@@ -148,9 +155,18 @@ public class Env implements Map<String, Object>, Serializable {
     this.instance = instance;
   }
 
-  public void configure(final AviatorEvaluatorInstance instance, final Expression exp) {
+  // Configure the env.
+  public void configure(final AviatorEvaluatorInstance instance, final Expression exp,
+      long startNs) {
     this.instance = instance;
     this.expression = exp;
+    setStartNs(startNs);
+  }
+
+  public void setStartNs(long startNs) {
+    if (this.startNs == -1) {
+      this.startNs = startNs;
+    }
   }
 
   private String findSymbol(final String name) throws ClassNotFoundException {

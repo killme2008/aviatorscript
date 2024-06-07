@@ -12,6 +12,7 @@ public class AviatorEvaluatorInstanceInterpreteUnitTest extends AviatorEvaluator
   public void setup() {
     super.setup();
     this.instance.setOption(Options.EVAL_MODE, EvalMode.INTERPRETER);
+    this.instance.setOption(Options.EVAL_TIMEOUT_MS, 50);
   }
 
   @Test
@@ -21,8 +22,6 @@ public class AviatorEvaluatorInstanceInterpreteUnitTest extends AviatorEvaluator
 
   @Test(expected = TimeoutException.class)
   public void testEvalTimeout() {
-    this.instance.setOption(Options.EVAL_TIMEOUT_MS, 1);
-
     this.instance.execute("while(true) { }");
   }
 

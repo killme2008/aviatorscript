@@ -29,6 +29,10 @@ public class Utils {
 
   }
 
+  public static long currentTimeNanos() {
+    return System.nanoTime();
+  }
+
   private static final ThreadLocal<MessageDigest> MESSAGE_DIGEST_LOCAL =
       new ThreadLocal<MessageDigest>() {
 
