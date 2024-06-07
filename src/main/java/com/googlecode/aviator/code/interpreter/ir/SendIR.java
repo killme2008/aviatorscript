@@ -139,6 +139,11 @@ public class SendIR implements IR {
   }
 
   @Override
+  public boolean mayBeCost() {
+    return true;
+  }
+
+  @Override
   public String toString() {
     return "send " + (this.name == null ? "<top>" : this.name) + ", " + this.arity + ", "
         + this.unpackArgs + "      " + this.sourceInfo;

@@ -42,6 +42,13 @@ public class AviatorEvaluatorUnitTest {
     assertEquals(4, exp2.execute(null));
   }
 
+  @Test
+  public void testIssue597() {
+    String s = "use java.lang.Thread;\n" + "Thread.sleep(2000);\n" + "return 1 > 0;";
+
+    Expression exp = AviatorEvaluator.compile(s);
+    assertTrue(exp.getVariableNames().isEmpty());
+  }
 
   @Test
   public void testNewEnv() {

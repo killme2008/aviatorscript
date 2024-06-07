@@ -128,7 +128,6 @@ public class OperationRuntime {
    */
   public static AviatorObject eval(final AviatorObject left, final AviatorObject right,
       final Map<String, Object> env, final OperatorType opType) {
-
     AviatorFunction func = RuntimeUtils.getInstance(env).getOpFunction(opType);
     AviatorObject ret = eval0(left, right, env, opType, func);
     if (RuntimeUtils.isTracedEval(env)) {

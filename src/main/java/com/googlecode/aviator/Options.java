@@ -2,6 +2,7 @@ package com.googlecode.aviator;
 
 import java.math.MathContext;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import com.googlecode.aviator.utils.Utils;
 
 
@@ -117,9 +118,30 @@ public enum Options {
 
   /**
    * Whether the compiled expression is serializable. If true, the compiled expression will
-   * implement {@link #jva.io.Serializable} and can be encoded/decoded by java serialization.
+   * implement {@link jva.io.Serializable} and can be encoded/decoded by java serialization.
    */
-  SERIALIZABLE;
+  SERIALIZABLE,
+
+  /**
+   * 
+   * The expression execution timeout value in milliseconds. If the execution time exceeds this
+   * value, it will throw a {@link com.googlecode.aviator.exception.TimeoutException}. A value of
+   * zero or less indicates no timeout limitation, the default value is zero (no limitation). <br/>
+   * <br/>
+   * Note: this limitation is not strict and may hurt performance, it is only checked before:
+   * <ul>
+   * <li>Operator evaluating, such as add, sub etc.</li>
+   * <li>Jumping in branches, such as loop and conditional clauses etc.</li>
+   * <li>Function invocation</li>
+   * </ul>
+   * 
+   * So if the expression doesn't contains these clauses or trapped into a function invocation, the
+   * behavior may be not expected. Try its best, but no promises.
+   * 
+   * @since 5.4.2
+   * 
+   */
+  EVAL_TIMEOUT_MS;
 
 
   /**
@@ -135,6 +157,8 @@ public enum Options {
     public Set<Feature> featureSet;
     public Set<Class<?>> classes;
     public EvalMode evalMode;
+    // Temporal cached number value to avoid expensive calculation.
+    public long cachedNumber;
 
     public Value(final EvalMode evalMode) {
       super();
@@ -200,6 +224,7 @@ public enum Options {
         return val.bool;
       case MAX_LOOP_COUNT:
       case OPTIMIZE_LEVEL:
+      case EVAL_TIMEOUT_MS:
         return val.number;
       case FEATURE_SET:
         return val.featureSet;
@@ -243,6 +268,14 @@ public enum Options {
           return COMPILE_VALUE;
         }
       }
+      case EVAL_TIMEOUT_MS: {
+        Value value = new Value(((Number) val).intValue());
+        // Cached the converted result.
+        if (value.number > 0) {
+          value.cachedNumber = TimeUnit.NANOSECONDS.convert(value.number, TimeUnit.MILLISECONDS);
+        }
+        return value;
+      }
       case MAX_LOOP_COUNT:
         return new Value(((Number) val).intValue());
       case ALLOWED_CLASS_SET:
@@ -278,6 +311,7 @@ public enum Options {
         final int level = ((Integer) val).intValue();
         return val instanceof Integer
             && (level == AviatorEvaluator.EVAL || level == AviatorEvaluator.COMPILE);
+      case EVAL_TIMEOUT_MS:
       case MAX_LOOP_COUNT:
         return val instanceof Long || val instanceof Integer;
       case MATH_CONTEXT:
@@ -356,6 +390,8 @@ public enum Options {
         return NULL_CLASS_SET;
       case EVAL_MODE:
         return getDefaultEvalMode();
+      case EVAL_TIMEOUT_MS:
+        return ZERO_VALUE;
     }
     return null;
   }

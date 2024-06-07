@@ -23,9 +23,19 @@ public class AviatorEvaluatorInstanceCompatibleUnitTest extends AviatorEvaluator
     super.testMaxLoopCount();
   }
 
+  @Test
+  public void testEvalTimeout() {
+    // ignore
+  }
+
   @Override
   @Test
   public void testIssue476() {
+    // ignore
+  }
+
+  @Test
+  public void testEvalTimeoutAndTryAgain() throws Exception {
     // ignore
   }
 

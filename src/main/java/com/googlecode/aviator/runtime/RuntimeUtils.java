@@ -3,9 +3,11 @@ package com.googlecode.aviator.runtime;
 import java.io.IOException;
 import java.math.MathContext;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
+import com.googlecode.aviator.exception.TimeoutException;
 import com.googlecode.aviator.runtime.function.LambdaFunction;
 import com.googlecode.aviator.runtime.function.internal.UnpackingArgsFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
@@ -19,6 +21,7 @@ import com.googlecode.aviator.runtime.type.seq.IterableSequence;
 import com.googlecode.aviator.runtime.type.seq.LimitedSequence;
 import com.googlecode.aviator.runtime.type.seq.MapSequence;
 import com.googlecode.aviator.utils.Env;
+import com.googlecode.aviator.utils.Utils;
 
 /**
  * Runtime utils
@@ -101,6 +104,22 @@ public final class RuntimeUtils {
     return seq;
   }
 
+  public static void checkExecutionTimedOut(final Map<String, Object> env) {
+    if (env instanceof Env) {
+      long startNs = ((Env) env).getStartNs();
+      if (startNs > 0) {
+        long execTimeoutNs = getEvalTimeoutNs(env);
+        if (execTimeoutNs > 0) {
+          if (Utils.currentTimeNanos() - startNs > execTimeoutNs) {
+            throw new TimeoutException("Expression execution timed out, exceeded: "
+                + getInstance(env).getOptionValue(Options.EVAL_TIMEOUT_MS).number + " ms");
+          }
+        }
+      }
+    }
+
+  }
+
   /**
    * Ensure the object is not null, cast null into AviatorNil.
    *
@@ -129,6 +148,11 @@ public final class RuntimeUtils {
 
   public static final boolean isTracedEval(final Map<String, Object> env) {
     return getInstance(env).getOptionValue(Options.TRACE_EVAL).bool;
+  }
+
+  // Returns the eval timeout value in nanoseconds
+  public static final long getEvalTimeoutNs(final Map<String, Object> env) {
+    return getInstance(env).getOptionValue(Options.EVAL_TIMEOUT_MS).cachedNumber;
   }
 
   public static AviatorFunction getFunction(final Object object, final Map<String, Object> env) {

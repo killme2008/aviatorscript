@@ -38,6 +38,7 @@ import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
+import com.googlecode.aviator.exception.TimeoutException;
 import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.token.OperatorType;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
@@ -57,6 +58,7 @@ public class AviatorEvaluatorInstanceUnitTest {
   @Before
   public void setup() {
     this.instance = AviatorEvaluator.newInstance();
+    this.instance.setOption(Options.EVAL_TIMEOUT_MS, 100);
   }
 
   @Test
@@ -65,6 +67,26 @@ public class AviatorEvaluatorInstanceUnitTest {
     assertTrue(expr.getVariableFullNames().isEmpty());
     expr = instance.compile("let abc = new String('abc'); abc + x");
     assertEquals(expr.getVariableFullNames(), Arrays.asList("x"));
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testEvalTimeout() {
+    this.instance.execute("while(true) { }");
+  }
+
+  @Test
+  public void testEvalTimeoutAndTryAgain() throws Exception {
+    Expression exp = this.instance.compile("Thread.sleep(120); a + 1");
+    try {
+      exp.execute(exp.newEnv("a", 2));
+    } catch (TimeoutException e) {
+      assertTrue(e.getMessage().contains("Expression execution timed out, exceeded: 100 ms"));
+      // ignore
+    }
+    this.instance.setOption(Options.EVAL_TIMEOUT_MS, 200);
+    assertEquals(exp.execute(exp.newEnv("a", 2)), 3);
+    Thread.sleep(500);
+    assertEquals(exp.execute(exp.newEnv("a", 2)), 3);
   }
 
   @SuppressWarnings("unchecked")
@@ -680,7 +702,6 @@ public class AviatorEvaluatorInstanceUnitTest {
       this.instance.setOption(Options.TRACE_EVAL, false);
       this.instance.setTraceOutputStream(System.out);
     }
-
   }
 
   @Test(expected = CompileExpressionErrorException.class)

@@ -453,6 +453,7 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   public void onTernaryBoolean(final Token<?> lookhead) {
     loadEnv();
     visitLineNumber(lookhead);
+    checkExecutionTimeout();
     visitBoolean();
     Label l0 = makeLabel();
     Label l1 = makeLabel();
@@ -472,6 +473,7 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   @Override
   public void onTernaryLeft(final Token<?> lookhead) {
+    checkExecutionTimeout();
     this.mv.visitJumpInsn(GOTO, peekLabel1());
     visitLabel(popLabel0());
     visitLineNumber(lookhead);
@@ -484,6 +486,7 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   @Override
   public void onTernaryRight(final Token<?> lookhead) {
+    checkExecutionTimeout();
     visitLabel(popLabel1());
     visitLineNumber(lookhead);
     this.popOperand(); // pop one boolean
@@ -570,6 +573,7 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   private void doCompareAndJump(final Token<?> lookhead, final int ints,
       final OperatorType opType) {
     visitLineNumber(lookhead);
+    this.checkExecutionTimeout();
     loadEnv();
     visitCompare(ints, opType);
     this.popOperand();
@@ -641,6 +645,7 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   private void visitBinOperator(final Token<?> token, final OperatorType opType,
       final String methodName) {
     visitLineNumber(token);
+    this.checkExecutionTimeout();
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
       // swap arguments for regular-expression match operator.
       if (opType == OperatorType.MATCH) {
@@ -1288,6 +1293,9 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   @Override
   public void onMethodName(final Token<?> lookhead) {
+
+    checkExecutionTimeout();
+
     String outtterMethodName = "lambda";
     if (lookhead.getType() != TokenType.Delegate) {
       outtterMethodName = lookhead.getLexeme();
@@ -1316,6 +1324,13 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
     loadEnv();
     this.methodMetaDataStack.push(new MethodMetaData(lookhead, outtterMethodName));
+  }
+
+  private void checkExecutionTimeout() {
+    loadEnv();
+    this.mv.visitMethodInsn(INVOKESTATIC, RUNTIME_UTILS, "checkExecutionTimedOut",
+        "(Ljava/util/Map;)V");
+    this.popOperand();
   }
 
   private void loadAviatorFunction(final String outterMethodName, final String innerMethodName) {

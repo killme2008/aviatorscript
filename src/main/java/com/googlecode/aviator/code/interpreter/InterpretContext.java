@@ -2,7 +2,9 @@ package com.googlecode.aviator.code.interpreter;
 
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import com.googlecode.aviator.InterpretExpression;
+import com.googlecode.aviator.exception.TimeoutException;
 import com.googlecode.aviator.lexer.token.Token;
 import com.googlecode.aviator.parser.VariableMeta;
 import com.googlecode.aviator.runtime.RuntimeUtils;
@@ -138,6 +140,9 @@ public class InterpretContext {
     }
 
     if (this.pc != null) {
+      if (this.pc.mayBeCost()) {
+        RuntimeUtils.checkExecutionTimedOut(env);
+      }
       if (this.trace) {
         RuntimeUtils.printlnTrace(this.env, "    " + this.pc + "    " + descOperandsStack());
       }

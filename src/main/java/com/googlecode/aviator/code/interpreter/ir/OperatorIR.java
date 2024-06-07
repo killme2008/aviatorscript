@@ -110,7 +110,10 @@ public class OperatorIR implements IR {
     context.dispatch();
   }
 
-
+  @Override
+  public boolean mayBeCost() {
+    return true;
+  }
 
   public OperatorType getOp() {
     return this.op;

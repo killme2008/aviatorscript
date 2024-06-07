@@ -44,6 +44,7 @@ public class Constants {
   // Whether string has interpolation point.
   public static final String INTER_META = "hasInterpolation";
   public static final String UNPACK_ARGS = "unpackingArgs";
+  public static final String USE_CLASS_PKG = "useClassOrPkg";
   public static final Pattern SPLIT_PAT = Pattern.compile("\\.");
 
   // runtime metadata keys

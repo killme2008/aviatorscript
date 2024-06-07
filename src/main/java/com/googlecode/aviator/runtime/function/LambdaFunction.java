@@ -241,9 +241,9 @@ public final class LambdaFunction extends AbstractVariadicFunction {
     Env env = null;
     if (!this.inheritEnv) {
       final Env contextEnv = new Env(parentEnv, this.context);
-      contextEnv.configure(this.context.getInstance(), this.expression);
+      contextEnv.configure(this.context.getInstance(), this.expression, this.context.getStartNs());
       env = new Env(contextEnv);
-      env.configure(this.context.getInstance(), this.expression);
+      env.configure(this.context.getInstance(), this.expression, this.context.getStartNs());
     } else {
       // assert (parentEnv == this.context);
       env = (Env) parentEnv;
