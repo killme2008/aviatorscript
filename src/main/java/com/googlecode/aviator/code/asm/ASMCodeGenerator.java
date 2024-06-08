@@ -56,7 +56,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
-import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.ClassExpression;
 import com.googlecode.aviator.Expression;
 import com.googlecode.aviator.Options;
@@ -414,6 +413,7 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   private void visitRightBranch(final Token<?> lookhead, final int ints,
       final OperatorType opType) {
+    this.checkExecutionTimeout();
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
       this.mv.visitInsn(DUP);
       loadEnv();
@@ -541,6 +541,7 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   private void visitLeftBranch(final Token<?> lookhead, final int ints, final OperatorType opType) {
+    this.checkExecutionTimeout();
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
       visitBoolean();
       Label l0 = makeLabel();

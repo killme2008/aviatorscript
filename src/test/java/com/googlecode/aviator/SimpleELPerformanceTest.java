@@ -8,7 +8,7 @@ import junit.framework.TestCase;
 public class SimpleELPerformanceTest extends TestCase {
   public void test_perf() throws Exception {
 
-    // AviatorEvaluator.setTrace(true);
+    // AviatorEvaluator.setOption(Options.EVAL_TIMEOUT_MS, 100);
     for (int i = 0; i < 10; ++i) {
       perf();
       perfVarAccess();
