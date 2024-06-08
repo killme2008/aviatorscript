@@ -341,13 +341,13 @@ public abstract class BaseExpression implements Expression {
     } else {
       env = new Env(map);
     }
-    env.configure(this.instance, this, getExecutionStartNs(checkExecutionTimeout));
+    env.configure(this.instance, this, getExecutionStartNs(checkExecutionTimeout), null);
     return env;
   }
 
   protected Env genTopEnv(final Map<String, Object> map, boolean checkExecutionTimeout) {
     if (map instanceof Env) {
-      ((Env) map).configure(this.instance, this, getExecutionStartNs(checkExecutionTimeout));
+      ((Env) map).configure(this.instance, this, getExecutionStartNs(checkExecutionTimeout), null);
     }
     Env env =
         newEnv(map, this.instance.getOptionValue(Options.USE_USER_ENV_AS_TOP_ENV_DIRECTLY).bool,

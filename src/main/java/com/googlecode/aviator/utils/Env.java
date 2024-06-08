@@ -75,7 +75,15 @@ public class Env implements Map<String, Object>, Serializable {
   public static final Map<String, Object> EMPTY_ENV = Collections.emptyMap();
 
   // The execution start timestamp in nanoseconds.
-  private transient long startNs = -1;
+  private long startNs = -1;
+
+  public static class IntCounter {
+    transient int n = 0;
+  }
+
+  // The "execution" checkpoint times
+  private transient IntCounter checkPoints = null;
+
 
 
   /**
@@ -103,8 +111,21 @@ public class Env implements Map<String, Object>, Serializable {
     this.mOverrides = mOverrides;
   }
 
+
   public long getStartNs() {
     return startNs;
+  }
+
+  public int incExecCheckpointsAndGet() {
+    if (this.checkPoints == null) {
+      checkPoints = new IntCounter();
+    }
+    return ++checkPoints.n;
+  }
+
+
+  public IntCounter getCheckPoints() {
+    return checkPoints;
   }
 
   public List<String> getImportedSymbols() {
@@ -156,16 +177,17 @@ public class Env implements Map<String, Object>, Serializable {
   }
 
   // Configure the env.
-  public void configure(final AviatorEvaluatorInstance instance, final Expression exp,
-      long startNs) {
+  public void configure(final AviatorEvaluatorInstance instance, final Expression exp, long startNs,
+      IntCounter checkPoints) {
     this.instance = instance;
     this.expression = exp;
-    setStartNs(startNs);
+    setStats(startNs, checkPoints);
   }
 
-  private void setStartNs(long startNs) {
+  private void setStats(long startNs, IntCounter checkPoints) {
     if (this.startNs == -1 && startNs > 0) {
       this.startNs = startNs;
+      this.checkPoints = checkPoints;
     }
   }
 

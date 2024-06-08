@@ -31,6 +31,8 @@ import com.googlecode.aviator.utils.Utils;
  */
 public final class RuntimeUtils {
 
+  private static final int CHECKPOINTS = 3000;
+
   private RuntimeUtils() {
 
   }
@@ -106,13 +108,16 @@ public final class RuntimeUtils {
 
   public static void checkExecutionTimedOut(final Map<String, Object> env) {
     if (env instanceof Env) {
-      long startNs = ((Env) env).getStartNs();
+      Env theEnv = (Env) env;
+      long startNs = theEnv.getStartNs();
       if (startNs > 0) {
         long execTimeoutNs = getEvalTimeoutNs(env);
         if (execTimeoutNs > 0) {
-          if (Utils.currentTimeNanos() - startNs > execTimeoutNs) {
-            throw new TimeoutException("Expression execution timed out, exceeded: "
-                + getInstance(env).getOptionValue(Options.EVAL_TIMEOUT_MS).number + " ms");
+          if (theEnv.incExecCheckpointsAndGet() % CHECKPOINTS == 0) {
+            if (Utils.currentTimeNanos() - startNs > execTimeoutNs) {
+              throw new TimeoutException("Expression execution timed out, exceeded: "
+                  + getInstance(env).getOptionValue(Options.EVAL_TIMEOUT_MS).number + " ms");
+            }
           }
         }
       }

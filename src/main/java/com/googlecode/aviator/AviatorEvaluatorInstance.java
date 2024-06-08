@@ -404,7 +404,7 @@ public final class AviatorEvaluatorInstance {
   @SuppressWarnings("unchecked")
   private Map<String, Object> executeModule(final Expression exp, final String abPath) {
     final Env exports = new Env();
-    exports.configure(this, exp, -1);
+    exports.configure(this, exp, -1, null);
     final Map<String, Object> module = exp.newEnv("exports", exports, "path", abPath);
     Map<String, Object> env = exp.newEnv("__MODULE__", module, "exports", exports);
     ((BaseExpression) exp).execute(env, false);
