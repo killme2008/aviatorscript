@@ -8,6 +8,10 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.type.AviatorBigInt;
 import com.googlecode.aviator.runtime.type.AviatorDecimal;
@@ -22,15 +26,43 @@ import com.googlecode.aviator.runtime.type.AviatorNumber;
  *
  */
 public class Utils {
-  private static final String CURRENT_VERSION = "5.0.0";
+  private static final String CURRENT_VERSION = "5.4.2";
 
+  private static final int TICK_INTERVAL_MS =
+      Integer.parseInt(System.getProperty("aviator.tick.interval_ms", "1"));
 
   private Utils() {
 
   }
 
+  private static class StaticHolder {
+    static ScheduledExecutorService tickService =
+        Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+
+          @Override
+          public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setDaemon(true);
+            thread.setName("aviatorscript-tick-thread");
+            return thread;
+          }
+        });
+
+    static volatile long nowNs = System.nanoTime();
+
+    static {
+      tickService.scheduleAtFixedRate(new Runnable() {
+
+        @Override
+        public void run() {
+          nowNs = System.nanoTime();
+        }
+      }, 0, TICK_INTERVAL_MS, TimeUnit.MILLISECONDS);
+    }
+  }
+
   public static long currentTimeNanos() {
-    return System.nanoTime();
+    return StaticHolder.nowNs;
   }
 
   private static final ThreadLocal<MessageDigest> MESSAGE_DIGEST_LOCAL =

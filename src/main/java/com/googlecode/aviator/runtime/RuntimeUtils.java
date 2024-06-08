@@ -3,7 +3,6 @@ package com.googlecode.aviator.runtime;
 import java.io.IOException;
 import java.math.MathContext;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Options;
@@ -31,7 +30,8 @@ import com.googlecode.aviator.utils.Utils;
  */
 public final class RuntimeUtils {
 
-  private static final int CHECKPOINTS = 3000;
+  private static final int CHECKPOINTS =
+      Integer.parseInt(System.getProperty("aviator.execution.timeout.checkpoints", "2000"));
 
   private RuntimeUtils() {
 
