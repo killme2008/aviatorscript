@@ -1,6 +1,6 @@
 # AviatorScript
 
-[![Build Status](https://github.com/killme2008/aviatorscript/actions/workflows/maven.yml/badge.svg)
+![Build Status](https://github.com/killme2008/aviatorscript/actions/workflows/maven.yml/badge.svg)
 [![Maven Central](https://img.shields.io/maven-central/v/com.googlecode.aviator/aviator.svg?label=maven%20central)](https://search.maven.org/search?q=g:com.googlecode.aviator%20AND%20aviator)
 
 📖 English Documentation | [📖 中文文档](README.md)
