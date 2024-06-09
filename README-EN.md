@@ -31,9 +31,9 @@ It compiles script to java byte code and evaluate it on the fly.
 
 # News
 
+* [5.4.2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.4.2)，add the `getFunctionNames` method to retrieve a list of functions and set the evaluation timeout, etc.
 * [5.4.1](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.4.1)，Fixed recursive function can't work, fixed function can't be serialized etc.
 * [5.4.0](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.4.0)，Fixed `elsif` parser errors，supports expression serialization([example](https://github.com/killme2008/aviatorscript/blob/master/src/test/java/com/googlecode/aviator/example/SerializeExample.java)) etc.
-* [5.3.3](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.3)，fixed potential memory leak, wrong value captured by function etc.
 
 # Dependency
 

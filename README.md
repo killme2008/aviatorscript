@@ -35,9 +35,9 @@
 
 # News
 
+* [5.4.2](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.4.2)，增加 `getFunctionNames` 方法用于获取函数列表以及设置求值超时时间等。
 * [5.4.1](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.4.1)，修复递归函数无法工作的 bug，修复函数无法序列化的 bug 等。
 * [5.4.0](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.4.0)，修复 `elsif` 语法解析错误，增加编译表达式序列化支持([例子](https://github.com/killme2008/aviatorscript/blob/master/src/test/java/com/googlecode/aviator/example/SerializeExample.java))等。
-* [5.3.3](https://github.com/killme2008/aviatorscript/releases/tag/aviator-5.3.3)，修复潜在内存泄露、变量捕获错误等 Bug。
 
 # Dependency
 
