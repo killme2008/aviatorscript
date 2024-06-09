@@ -430,7 +430,7 @@ public final class AviatorEvaluator {
 
 
   /**
-   * Check if the function is existed in aviator
+   * Check if the function exists in the global evaluator instance.
    *
    * @param name
    * @return

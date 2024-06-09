@@ -29,18 +29,18 @@ import java.util.Map;
 public interface Expression extends Serializable {
 
   /**
-   * Execute expression with environment
+   * Execute an expression with an environment, returns the result.
    *
    * @param env Binding variable environment
-   * @return
+   * @return the result of execution
    */
   Object execute(Map<String, Object> env);
 
 
   /**
-   * Execute expression with empty environment
+   * Execute an expression with an empty environment, returns the result.
    *
-   * @return
+   * @return the result of execution
    */
   Object execute();
 
@@ -55,7 +55,7 @@ public interface Expression extends Serializable {
 
   /**
    * Returns this expression's all uninitialized global variable names in order when using
-   * AviatorEvaluator.EVAL mode,else returns an empty list.
+   * AviatorEvaluator.EVAL mode, otherwise returns an empty list.
    *
    * @see com.googlecode.aviator.AviatorEvaluator#EVAL
    * @return
@@ -65,7 +65,7 @@ public interface Expression extends Serializable {
 
   /**
    * Returns this expression's all uninitialized global variable full names(contains dot) in order
-   * when using AviatorEvaluator.EVAL mode,else returns an empty list.
+   * when using AviatorEvaluator.EVAL mode, otherwise returns an empty list.
    *
    * @return
    */
@@ -90,8 +90,8 @@ public interface Expression extends Serializable {
   String addSymbol(String name);
 
   /**
-   * Returns the function names in the expression when using AviatorEvaluator.EVAL mode,else returns
-   * an empty list.
+   * Returns the function names in the expression when using AviatorEvaluator.EVAL mode, otherwise
+   * returns an empty list.
    * 
    * @since 5.4.2
    * @return the function name list
