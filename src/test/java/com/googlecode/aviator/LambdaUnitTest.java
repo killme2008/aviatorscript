@@ -1,11 +1,15 @@
 package com.googlecode.aviator;
 
 import static com.googlecode.aviator.TestUtils.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
@@ -148,5 +152,34 @@ public class LambdaUnitTest {
     // chain
     assertEquals(AviatorEvaluator.execute(
         "reduce(filter(a, lambda(x) -> x > 49 end), lambda(r,e) -> r + e end, 0)", env), sum);
+  }
+
+  @Test
+  public void testGetFunctionNames() {
+    List<String> names = compileAndGetFuncNames("reduce(a, lambda(r,e) -> r + e end, 0)");
+    assertEquals(Arrays.asList("reduce"), names);
+
+    names = compileAndGetFuncNames(
+        "reduce(filter(a, lambda(x) -> x > 49 end), lambda(r,e) -> r + e end, 0)");
+    assertEquals(Arrays.asList("filter", "reduce"), names);
+
+    names = compileAndGetFuncNames(
+        "let x = lambda(x) -> x > 49 end; reduce(filter(a, x), lambda(r,e) -> r + e end, 0)");
+    assertEquals(Arrays.asList("filter", "reduce"), names);
+
+    names = compileAndGetFuncNames(
+        "let y = lambda(x) -> x > 49 end; y(); reduce(filter(a, y), lambda(r,e) -> r + e end, 0)");
+    assertEquals(Arrays.asList("filter", "reduce"), names);
+
+    names = compileAndGetFuncNames(
+        "let y = fn(x) { x > 49 }; y(); let z = lambda(r,e) -> r + e end; reduce(filter(a, y), z, 0)");
+    assertEquals(Arrays.asList("filter", "reduce"), names);
+  }
+
+  private List<String> compileAndGetFuncNames(String script) {
+    Expression exp = AviatorEvaluator.compile(script);
+    List<String> names = exp.getFunctionNames();
+    Collections.sort(names);
+    return names;
   }
 }

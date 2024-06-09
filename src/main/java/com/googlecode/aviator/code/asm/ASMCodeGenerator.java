@@ -58,6 +58,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.ClassExpression;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.ExpressionAccessor;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.asm.ClassWriter;
 import com.googlecode.aviator.asm.Label;
@@ -126,8 +127,6 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
       Collections.emptyMap();
   private Map<Token<?>/* constant token */, String/* field name */> constantPool =
       Collections.emptyMap();
-
-  private Map<String, Integer/* counter */> methodTokens = Collections.emptyMap();
 
   private final Map<Label, Map<String/* inner name */, Integer/* local index */>> labelNameIndexMap =
       new IdentityHashMap<>();
@@ -730,9 +729,10 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
           defineClass.getConstructor(AviatorEvaluatorInstance.class, List.class, SymbolTable.class);
       ClassExpression exp = (ClassExpression) constructor.newInstance(this.instance,
           new ArrayList<VariableMeta>(this.variables.values()), this.symbolTable);
-      exp.setLambdaBootstraps(this.lambdaBootstraps);
-      exp.setFuncsArgs(this.funcsArgs);
-      exp.setSourceFile(this.sourceFile);
+      ExpressionAccessor.setLambdaBootstraps(exp, this.lambdaBootstraps);
+      ExpressionAccessor.setFuncsArgs(exp, this.funcsArgs);
+      ExpressionAccessor.setSourceFile(exp, this.sourceFile);
+      ExpressionAccessor.setFunctionNames(exp, new ArrayList<>(this.methodTokens.keySet()));
       if (enableSerializable) {
         exp.setClassBytes(bytes);
       }
@@ -1048,7 +1048,7 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
 
   @Override
   public void initMethods(final Map<String, Integer/* counter */> methods) {
-    this.methodTokens = methods;
+    super.initMethods(methods);
     this.innerMethodMap = new HashMap<>(methods.size());
     for (String outterMethodName : methods.keySet()) {
       // Use inner method name instead of outter method name

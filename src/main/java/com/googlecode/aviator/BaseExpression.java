@@ -42,8 +42,8 @@ public abstract class BaseExpression implements Expression {
   private static final long serialVersionUID = 2819544277750883372L;
 
   public static final String FUNC_PARAMS_VAR = "__funcs_args__";
-  protected List<String> varNames;
-  protected List<String> varFullNames;
+  protected transient List<String> varNames;
+  protected transient List<String> varFullNames;
   private List<VariableMeta> vars;
   private String expression;
   protected transient AviatorEvaluatorInstance instance;
@@ -53,6 +53,12 @@ public abstract class BaseExpression implements Expression {
   // cached compiled string segments for string interpolation.
   private transient ConcurrentHashMap<String, FutureTask<StringSegments>> stringSegs =
       new ConcurrentHashMap<String, FutureTask<StringSegments>>();
+  // The function name list in expression
+  private List<String> functionNames = Collections.emptyList();
+
+  // Already filtered function names, try to remove the runtime defined functions.
+  private transient List<String> filteredFunctionNames = null;
+
 
   protected String sourceFile;
   protected Map<String, LambdaFunctionBootstrap> lambdaBootstraps;
@@ -62,12 +68,12 @@ public abstract class BaseExpression implements Expression {
     return this.sourceFile;
   }
 
-  public void setSourceFile(final String sourceFile) {
+  protected void setSourceFile(final String sourceFile) {
     this.sourceFile = sourceFile;
   }
 
 
-  public void setInstance(AviatorEvaluatorInstance instance) {
+  protected void setInstance(AviatorEvaluatorInstance instance) {
     this.instance = instance;
   }
 
@@ -264,7 +270,7 @@ public abstract class BaseExpression implements Expression {
     }
   }
 
-  public void setFuncsArgs(final Map<Integer, List<FunctionArgument>> funcsArgs) {
+  protected void setFuncsArgs(final Map<Integer, List<FunctionArgument>> funcsArgs) {
     if (funcsArgs != null) {
       this.funcsArgs = Collections.unmodifiableMap(funcsArgs);
     }
@@ -274,7 +280,7 @@ public abstract class BaseExpression implements Expression {
     return this.compileEnv;
   }
 
-  public void setCompileEnv(final Env compileEnv) {
+  protected void setCompileEnv(final Env compileEnv) {
     this.compileEnv = compileEnv;
     this.compileEnv.setExpression(this);
   }
@@ -289,7 +295,7 @@ public abstract class BaseExpression implements Expression {
     return this.expression;
   }
 
-  public void setExpression(final String expression) {
+  protected void setExpression(final String expression) {
     this.expression = expression;
   }
 
@@ -374,11 +380,57 @@ public abstract class BaseExpression implements Expression {
     return newEnv(map, false, true);
   }
 
+  public List<String> getFunctionNames() {
+    populateFilteredFuncNames();
+
+    return filteredFunctionNames;
+  }
+
+  private void populateFilteredFuncNames() {
+    if (this.filteredFunctionNames == null) {
+      Set<String> validNames = new HashSet<String>(this.functionNames.size());
+
+      for (String funcName : this.functionNames) {
+        // Remove internal functions
+        if (!funcName.startsWith("__") && !funcName.equals("with_meta")) {
+          validNames.add(funcName);
+        }
+      }
+
+      Set<String> definedFuncs = new HashSet<String>();
+      // Find all runtime defined functions
+      for (VariableMeta v : this.vars) {
+        // TODO: It's not precise, but could work
+        if (v.isInit()) {
+          definedFuncs.add(v.getName());
+        }
+      }
+
+      if (this.lambdaBootstraps != null) {
+        // Adds sub-expressions function names
+        for (LambdaFunctionBootstrap bootstrap : this.lambdaBootstraps.values()) {
+          validNames.addAll(bootstrap.getExpression().getFunctionNames());
+        }
+      }
+
+      // Remove runtime defined functions.
+      validNames.removeAll(definedFuncs);
+
+      this.filteredFunctionNames = new ArrayList<>(validNames);
+    }
+  }
+
+  protected void setFunctionNames(List<String> functionNames) {
+    if (functionNames != null) {
+      this.functionNames = functionNames;
+    }
+  }
+
   public Map<String, LambdaFunctionBootstrap> getLambdaBootstraps() {
     return this.lambdaBootstraps;
   }
 
-  public void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
+  protected void setLambdaBootstraps(final Map<String, LambdaFunctionBootstrap> lambdaBootstraps) {
     this.lambdaBootstraps = lambdaBootstraps;
   }
 
@@ -400,6 +452,7 @@ public abstract class BaseExpression implements Expression {
     this.sourceFile = (String) input.readObject();
     this.lambdaBootstraps = (Map<String, LambdaFunctionBootstrap>) input.readObject();
     this.stringSegs = new ConcurrentHashMap<String, FutureTask<StringSegments>>();
+    this.functionNames = (List<String>) input.readObject();
   }
 
   public void customWriteObject(ObjectOutputStream output) throws IOException {
@@ -410,6 +463,7 @@ public abstract class BaseExpression implements Expression {
     output.writeObject(this.symbolTable);
     output.writeObject(this.sourceFile);
     output.writeObject(this.lambdaBootstraps);
+    output.writeObject(this.functionNames);
   }
 
 }
