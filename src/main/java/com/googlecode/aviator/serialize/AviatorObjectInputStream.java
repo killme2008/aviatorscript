@@ -11,6 +11,7 @@ import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.ClassExpression;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.ExpressionAccessor;
 import com.googlecode.aviator.code.asm.ClassDefiner;
 import com.googlecode.aviator.lexer.SymbolTable;
 import com.googlecode.aviator.lexer.token.Variable;
@@ -82,7 +83,7 @@ public class AviatorObjectInputStream extends ObjectInputStream {
   }
 
   private void configureExpression(BaseExpression exp) {
-    exp.setInstance(this.instance);
+    ExpressionAccessor.setInstance(exp, this.instance);
     if (exp instanceof ClassExpression) {
       ((ClassExpression) exp).setClassBytes(this.classBytesCache.get(exp.getClass().getName()));
     }

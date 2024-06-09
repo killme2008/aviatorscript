@@ -43,6 +43,8 @@ public abstract class BaseEvalCodeGenerator implements EvalCodeGenerator {
    */
   protected final Env compileEnv;
 
+  protected Map<String, Integer/* counter */> methodTokens = Collections.emptyMap();
+
   protected Map<Integer/* internal function id */, List<FunctionArgument>> getFuncsArgs() {
     if (this.funcsArgs == null) {
       this.funcsArgs = new HashMap<>();
@@ -52,6 +54,11 @@ public abstract class BaseEvalCodeGenerator implements EvalCodeGenerator {
 
   protected int getNextFuncInvocationId() {
     return this.funcInvocationId++;
+  }
+
+  @Override
+  public void initMethods(Map<String, Integer> methods) {
+    this.methodTokens = methods;
   }
 
   @Override

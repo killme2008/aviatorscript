@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.Stack;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.ExpressionAccessor;
 import com.googlecode.aviator.InterpretExpression;
 import com.googlecode.aviator.Options;
 import com.googlecode.aviator.code.BaseEvalCodeGenerator;
@@ -116,9 +117,6 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
     }
     this.constantPool = constants;
   }
-
-  @Override
-  public void initMethods(final Map<String, Integer> methods) {}
 
   @Override
   public void genNewLambdaCode(final LambdaFunctionBootstrap bootstrap) {
@@ -358,9 +356,10 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
     final InterpretExpression exp =
         new InterpretExpression(this.instance, new ArrayList<VariableMeta>(this.variables.values()),
             this.constantPool, this.symbolTable, instruments, unboxObject);
-    exp.setLambdaBootstraps(this.lambdaBootstraps);
-    exp.setSourceFile(this.sourceFile);
-    exp.setFuncsArgs(this.funcsArgs);
+    ExpressionAccessor.setLambdaBootstraps(exp, this.lambdaBootstraps);
+    ExpressionAccessor.setSourceFile(exp, this.sourceFile);
+    ExpressionAccessor.setFuncsArgs(exp, this.funcsArgs);
+    ExpressionAccessor.setFunctionNames(exp, new ArrayList<String>(this.methodTokens.keySet()));
 
     return exp;
   }

@@ -1327,13 +1327,27 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
-   * Check if the function is existed in aviator
+   * Check if the function is existed in evaluator. Note: it doesn't check the runtime defined
+   * functions.
    *
    * @param name
    * @return
    */
   public boolean containsFunction(final String name) {
-    return this.funcMap.containsKey(name);
+    boolean exists = this.funcMap.containsKey(name);
+    if (!exists && this.functionLoaders != null) {
+      for (FunctionLoader loader : this.functionLoaders) {
+        if (loader != null) {
+          if (loader.onFunctionNotFound(name) != null) {
+            exists = true;
+            break;
+          }
+        }
+
+      }
+    }
+
+    return exists;
   }
 
   /**

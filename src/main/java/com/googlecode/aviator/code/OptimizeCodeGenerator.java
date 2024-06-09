@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.BaseExpression;
 import com.googlecode.aviator.Expression;
+import com.googlecode.aviator.ExpressionAccessor;
 import com.googlecode.aviator.Feature;
 import com.googlecode.aviator.LiteralExpression;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
@@ -448,8 +449,8 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
     if (exp instanceof BaseExpression) {
-      ((BaseExpression) exp).setCompileEnv(getCompileEnv());
-      ((BaseExpression) exp).setSourceFile(this.sourceFile);
+      ExpressionAccessor.setCompileEnv((BaseExpression) exp, getCompileEnv());
+      ExpressionAccessor.setSourceFile((BaseExpression) exp, this.sourceFile);
     }
     return exp;
   }

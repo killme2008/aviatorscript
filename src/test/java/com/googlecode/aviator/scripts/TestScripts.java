@@ -94,6 +94,13 @@ public class TestScripts {
   }
 
   @Test
+  public void testGetFunctionNames() throws Exception {
+    final String file = TestScripts.class.getResource("/scripts/qsort.av").getFile();
+    Expression exp = this.instance.compileScript(file, true);
+    assertEquals(Arrays.asList("count"), exp.getFunctionNames());
+  }
+
+  @Test
   public void testLibs() {
     testLib("aviator");
     testLib("math");

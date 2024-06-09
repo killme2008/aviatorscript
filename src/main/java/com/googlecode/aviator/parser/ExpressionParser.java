@@ -437,11 +437,11 @@ public class ExpressionParser implements Parser {
 
           }
 
-          statement();
+          StatementType stmtType = statement();
 
           // try to find var(prevToken) in right statement, it's not initialized if presents.
           if (isVar) {
-            checkVarIsInit(prevToken);
+            checkVarIsInit(prevToken, stmtType);
           }
 
           ensureFeatureEnabled(Feature.Assignment);
@@ -464,7 +464,7 @@ public class ExpressionParser implements Parser {
 
 
 
-  private void checkVarIsInit(final Token<?> prevToken) {
+  private void checkVarIsInit(final Token<?> prevToken, StatementType stmtType) {
     boolean isInit = true;
     for (Token<?> t : this.prevTokens) {
       if (t == prevToken) {
@@ -1262,10 +1262,11 @@ public class ExpressionParser implements Parser {
       reportSyntaxError("expect '='");
     }
     move(true);
-    if (statement() == StatementType.Empty) {
+    StatementType stmtType = statement();
+    if (stmtType == StatementType.Empty) {
       reportSyntaxError("invalid value to define");
     }
-    checkVarIsInit(var);
+    checkVarIsInit(var, stmtType);
     ensureFeatureEnabled(Feature.Assignment);
     getCodeGeneratorWithTimes().onAssignment(currentToken().withMeta(Constants.DEFINE_META, true));
     if (!expectChar(';')) {

@@ -55,7 +55,7 @@ public interface Expression extends Serializable {
 
   /**
    * Returns this expression's all uninitialized global variable names in order when using
-   * AviatorEvaluator.EVAL mode,else returns empty set
+   * AviatorEvaluator.EVAL mode,else returns an empty list.
    *
    * @see com.googlecode.aviator.AviatorEvaluator#EVAL
    * @return
@@ -65,7 +65,7 @@ public interface Expression extends Serializable {
 
   /**
    * Returns this expression's all uninitialized global variable full names(contains dot) in order
-   * when using AviatorEvaluator.EVAL mode,else returns empty set
+   * when using AviatorEvaluator.EVAL mode,else returns an empty list.
    *
    * @return
    */
@@ -89,4 +89,12 @@ public interface Expression extends Serializable {
    */
   String addSymbol(String name);
 
+  /**
+   * Returns the function names in the expression when using AviatorEvaluator.EVAL mode,else returns
+   * an empty list.
+   * 
+   * @since 5.4.2
+   * @return the function name list
+   */
+  List<String> getFunctionNames();
 }

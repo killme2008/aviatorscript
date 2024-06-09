@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -746,58 +747,71 @@ public class FunctionTest {
   }
 
   @Test
-  public void testGetVariableNamesComplex() {
+  public void testGetVariableNamesAndFunctionNamesComplex() {
     // lambda
     Expression exp = this.instance.compile("a = 1; add = lambda(x) -> x + a end; add(b)");
     List<String> vars = exp.getVariableNames();
-    System.out.println(vars);
+    List<String> funcs = getFuncs(exp);
     assertEquals(1, vars.size());
-
     assertEquals("b", vars.get(0));
+    assertEquals(0, funcs.size());
 
     // lambda closure over
     exp = this.instance.compile("add = lambda(x) -> x + a end; add(b)");
     vars = exp.getVariableNames();
+    funcs = getFuncs(exp);
     assertEquals(2, vars.size());
     assertEquals("a", vars.get(0));
     assertEquals("b", vars.get(1));
+    assertEquals(0, funcs.size());
 
     // if.. else
     exp = this.instance
         .compile("b=2; if(a > 1) { a + b } elsif( a > 10) { return a + c; } else { return 10; }");
     vars = exp.getVariableNames();
+    funcs = getFuncs(exp);
     assertEquals(2, vars.size());
     assertEquals("a", vars.get(0));
     assertEquals("c", vars.get(1));
+    assertEquals(0, funcs.size());
 
     // for..loop
     exp = this.instance
         .compile("let list = seq.list(1, 2, 3); for x in list { sum = sum + x }; return sum;");
     vars = exp.getVariableNames();
+    funcs = getFuncs(exp);
     assertEquals(1, vars.size());
     assertEquals("sum", vars.get(0));
+    assertEquals(1, funcs.size());
+    assertEquals(Arrays.asList("seq.list"), funcs);
 
     // let statement in block
     exp = this.instance.compile("{let a = 1; let b = b + 1; p(a+b);} c-a");
+    funcs = getFuncs(exp);
     vars = exp.getVariableNames();
     assertEquals(3, vars.size());
     assertEquals("b", vars.get(0));
     assertEquals("c", vars.get(1));
     assertEquals("a", vars.get(2));
+    assertEquals(Arrays.asList("p"), funcs);
 
     // redfine variable
     exp = this.instance.compile("{let a = 1; let b = 2; let b = b + 1; p(a+b);} c-a");
     vars = exp.getVariableNames();
+    funcs = getFuncs(exp);
     assertEquals(2, vars.size());
     assertEquals("c", vars.get(0));
     assertEquals("a", vars.get(1));
+    assertEquals(Arrays.asList("p"), funcs);
 
     // high-order function
     exp = this.instance.compile("map(list, lambda(v) -> v + u end)");
     vars = exp.getVariableNames();
+    funcs = getFuncs(exp);
     assertEquals(2, vars.size());
     assertEquals("list", vars.get(0));
     assertEquals("u", vars.get(1));
+    assertEquals(Arrays.asList("map"), funcs);
 
     // a complex script
     exp = this.instance.compile("let n = 0;  let index =0 ; " + "for i in a {"
@@ -805,25 +819,37 @@ public class FunctionTest {
         + "let m = date.month(b, i); " + "if c[index] == '03' && m <= 12 {" + " n = n + 1; " + "}"
         + "index = index + 1;" + "  } return n;");
     vars = exp.getVariableNames();
+    funcs = getFuncs(exp);
     assertEquals(3, vars.size());
     assertEquals("a", vars.get(0));
     assertEquals("b", vars.get(1));
     assertEquals("c", vars.get(2));
+    assertEquals(Arrays.asList("date.month", "string_to_date"), funcs);
 
     exp = this.instance.compile("a = seq.map(); add = lambda() -> a.b + a.c end; add()");
     vars = exp.getVariableNames();
+    funcs = getFuncs(exp);
     assertEquals(0, vars.size());
     vars = exp.getVariableFullNames();
     assertEquals(2, vars.size());
     assertEquals("a.b", vars.get(0));
     assertEquals("a.c", vars.get(1));
+    assertEquals(Arrays.asList("seq.map"), funcs);
 
     exp = this.instance.compile("a = seq.map(); a.c = 2; add = lambda() -> a.b + a.c end; add()");
+    funcs = getFuncs(exp);
     vars = exp.getVariableNames();
     assertEquals(0, vars.size());
     vars = exp.getVariableFullNames();
     assertEquals(1, vars.size());
     assertEquals("a.b", vars.get(0));
+    assertEquals(Arrays.asList("seq.map"), funcs);
+  }
+
+  private List<String> getFuncs(Expression exp) {
+    List<String> funcs = exp.getFunctionNames();
+    Collections.sort(funcs);
+    return funcs;
   }
 
   @Test
