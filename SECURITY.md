@@ -1,5 +1,13 @@
 # Security Policy
 
+## Security note
+
+Check the document for detailed security tips for AviatorScript:
+
+https://www.yuque.com/boyan-avfmj/aviatorscript/ou23gy#elOSu
+
+I am sorry that it's in Chinese. Kindly utilize ChatGPT or Google Translator to translate it.
+
 ## Supported Versions
 
 Supported with security updates.
