@@ -26,6 +26,7 @@ import com.googlecode.aviator.exception.CompareNotSupportedException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.utils.Constants;
+import com.googlecode.aviator.utils.Env;
 import com.googlecode.aviator.utils.TypeUtils;
 
 /**
@@ -177,7 +178,8 @@ public class AviatorString extends AviatorObject {
       return this.lexeme;
     }
     StringSegments segs = null;
-    BaseExpression exp = (BaseExpression) (env == null ? null : env.get(Constants.EXP_VAR));
+    BaseExpression exp = (BaseExpression) ((env == null || !(env instanceof Env)) ? null
+        : ((Env) env).getExpression());
     if (exp != null) {
       segs = exp.getStringSegements(this.lexeme, this.lineNo);
     } else {

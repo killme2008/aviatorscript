@@ -1,10 +1,13 @@
 package com.googlecode.aviator;
 
 import static com.googlecode.aviator.TestUtils.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import java.math.MathContext;
 import org.junit.Before;
 import org.junit.Test;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
+import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.exception.UnsupportedFeatureException;
 
 public class AviatorEvaluatorInstanceCompatibleUnitTest extends AviatorEvaluatorInstanceUnitTest {
@@ -20,6 +23,39 @@ public class AviatorEvaluatorInstanceCompatibleUnitTest extends AviatorEvaluator
   @Test
   public void testIssue549() {
     // ignore
+  }
+
+  @Test
+  public void testSandboxMode() {
+    this.instance.enableSandboxMode();
+    try {
+      this.instance.execute("new java.util.Date()");
+    } catch (UnsupportedFeatureException e) {
+      // ignore
+    }
+
+    try {
+      this.instance.execute("Math.abs(-1)");
+    } catch (FunctionNotFoundException e) {
+      // ignore
+    }
+
+    try {
+      this.instance.execute("System.exit(1)");
+    } catch (FunctionNotFoundException e) {
+      // ignore
+    }
+
+    try {
+      this.instance.execute("Math.PI");
+    } catch (ExpressionRuntimeException e) {
+      // ignore
+    }
+    try {
+      assertNull(this.instance.execute("__env__"));
+    } catch (UnsupportedFeatureException e) {
+
+    }
   }
 
   @Override

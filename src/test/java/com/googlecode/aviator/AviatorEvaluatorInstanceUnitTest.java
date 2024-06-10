@@ -38,6 +38,7 @@ import com.googlecode.aviator.AviatorEvaluatorInstance.StringSegments;
 import com.googlecode.aviator.exception.CompileExpressionErrorException;
 import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
+import com.googlecode.aviator.exception.FunctionNotFoundException;
 import com.googlecode.aviator.exception.TimeoutException;
 import com.googlecode.aviator.exception.UnsupportedFeatureException;
 import com.googlecode.aviator.lexer.token.OperatorType;
@@ -61,6 +62,43 @@ public class AviatorEvaluatorInstanceUnitTest {
     this.instance.setOption(Options.EVAL_TIMEOUT_MS, 100);
   }
 
+  @Test
+  public void testSandboxMode() {
+    this.instance.enableSandboxMode();
+    try {
+      this.instance.execute("new java.util.Date()");
+    } catch (UnsupportedFeatureException e) {
+      // ignore
+    }
+
+    try {
+      this.instance.execute("Math.abs(-1)");
+    } catch (FunctionNotFoundException e) {
+      // ignore
+    }
+
+    try {
+      this.instance.execute("System.exit(1)");
+    } catch (FunctionNotFoundException e) {
+      // ignore
+    }
+
+    try {
+      this.instance.execute("Math.PI");
+    } catch (ExpressionRuntimeException e) {
+      // ignore
+    }
+    try {
+      this.instance.execute("while(true) {}");
+    } catch (ExpressionRuntimeException e) {
+      // ignore
+    }
+    try {
+      assertNull(this.instance.execute("__env__"));
+    } catch (UnsupportedFeatureException e) {
+
+    }
+  }
 
   @Test
   public void testIssue549() {

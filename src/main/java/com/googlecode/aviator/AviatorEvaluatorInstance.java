@@ -449,6 +449,37 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
+   * Configure the evaluator into sandbox mode for security, it means:
+   * <ul>
+   * <li>Disable syntax feature: Module, NewInstance, StaticMethods and InternalVars,</li>
+   * <li>Disable reflection invocation by function missing,</li>
+   * <li>Set the single maximum loop counter to 65535,</li>
+   * <li>Set ALLOWED_CLASS_SET and ASSIGNABLE_ALLOWED_CLASS_SET to be empty, disable all classes to
+   * be accessed via static fields or methods,</li>
+   * <li>Set the EVAL_TIMEOUT_MS to be 1000 milliseconds(1 second), which means the execution
+   * timeout.
+   * <li>
+   * </ul>
+   * 
+   * For more information on security, please refer to the
+   * <a href="https://www.yuque.com/boyan-avfmj/aviatorscript/ou23gy#elOSu">documentation</a>
+   * 
+   * @since 5.4.3
+   * 
+   */
+  public void enableSandboxMode() {
+    disableFeature(Feature.Module);
+    disableFeature(Feature.NewInstance);
+    disableFeature(Feature.InternalVars);
+    disableFeature(Feature.StaticMethods);
+    setFunctionMissing(null);
+    setOption(Options.MAX_LOOP_COUNT, 65535);
+    setOption(Options.ALLOWED_CLASS_SET, Collections.emptySet());
+    setOption(Options.ASSIGNABLE_ALLOWED_CLASS_SET, Collections.emptySet());
+    setOption(Options.EVAL_TIMEOUT_MS, 1000L);
+  }
+
+  /**
    * Adds a module class and import it's public static methods as module's exports into module
    * cache, return the exports map.
    *
@@ -701,8 +732,10 @@ public final class AviatorEvaluatorInstance {
    * @param feature
    */
   public void enableFeature(final Feature feature) {
-    this.options.get(Options.FEATURE_SET).featureSet.add(feature);
-    this.options.get(Options.FEATURE_SET).featureSet.addAll(feature.getPrequires());
+    Set<Feature> featureSet = new HashSet<>(this.options.get(Options.FEATURE_SET).featureSet);
+    featureSet.add(feature);
+    featureSet.addAll(feature.getPrequires());
+    setOption(Options.FEATURE_SET, featureSet);
     loadFeatureFunctions();
   }
 
@@ -733,10 +766,12 @@ public final class AviatorEvaluatorInstance {
    * @param feature
    */
   public void disableFeature(final Feature feature) {
-    this.options.get(Options.FEATURE_SET).featureSet.remove(feature);
+    Set<Feature> featureSet = new HashSet<>(this.options.get(Options.FEATURE_SET).featureSet);
+    featureSet.remove(feature);
     for (AviatorFunction fn : feature.getFunctions()) {
       this.removeFunction(fn);
     }
+    this.setOption(Options.FEATURE_SET, featureSet);
     loadFeatureFunctions();
   }
 
