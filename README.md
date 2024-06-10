@@ -20,9 +20,9 @@
 5. [函数式编程](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc)结合 [Sequence 抽象](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93)，便捷处理任何集合。
 6. 轻量化的[模块系统](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81)。
 7. 多种方式，方便地[调用 Java 方法](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2)，完整支持 Java [脚本 API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b)（方便从 Java 调用脚本）。
-8. 丰富的定制选项，可作为安全的语言沙箱和全功能语言使用。
-9. 轻量化，高性能，ASM 模式下通过直接将脚本翻译成 JVM 字节码，[解释模式](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx)可运行于 Android 等非标 Java 平台。
-10. 支持编译后表达式序列化，方便缓存加速等。
+8. 丰富的[定制选项](https://www.yuque.com/boyan-avfmj/aviatorscript/yr1oau)，可作为安全的语言沙箱和全功能语言使用。
+9. 动态编译和执行、轻量化、高性能，ASM 模式下通过直接将脚本编译成 JVM 字节码，[解释模式](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx)可运行于 Android 等非标 Java 平台。
+10. 支持[编译结果序列化](https://github.com/killme2008/aviatorscript/blob/master/src/test/java/com/googlecode/aviator/example/SerializeExample.java)，方便缓存加速等。支持[执行超时设置](https://github.com/killme2008/aviatorscript/blob/master/src/test/java/com/googlecode/aviator/example/TimeoutExample.java)，避免破坏性脚本耗尽资源。
 
 使用场景包括：
 1. 规则判断及规则引擎

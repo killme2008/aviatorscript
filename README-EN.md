@@ -14,16 +14,16 @@ It compiles script to java byte code and evaluate it on the fly.
 
 # Feature Intro
 
-1. Suppport number,string, boolean and regular expression etc. [basic types](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw?translate=en)，support all java operators and their priorities.
-2. [Function](https://www.yuque.com/boyan-avfmj/aviatorscript/gl2p0q?translate=en) is first-class, supports closure and functional programming.
-3. Supports bigint/decmal for big integer and big decimal operations, using normal arithmetic operators `+-*/` by [operator overloading](https://www.yuque.com/boyan-avfmj/aviatorscript/ydllav?translate=en#5hq4k).
-4. Full-featured scripting language syntax, such as multi statements, conditional statement ,`for/while` loop, lexical scope and exception handling.
-5. Processing collections/array conveniently by [sequence abstract](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93?translate=en) and [functional programming](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc?translate=en).
-6. Lightweight [module system](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81?translate=en)。
-7. [Call Java methods](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2?translate=en) conveniently，supports Java [Scripting API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b?translate=en)。
-8. A wide range of customization options to be used as a secure runtime scripting sandbox or full-featured scripting language.
-9. Lightweight and high performance. ASM mode compile script into JVM bytecode on fly ,and [interpreter mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx?translate=en) make it run on Android platform etc.
-10. Supports compiled expression serialization, easy to cache etc.
+1. Supports basic types such as numbers, strings, regular expressions, booleans, and more. Full support for all Java operators and precedence, etc. [Basic Types](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw).
+2. [Functions](https://www.yuque.com/boyan-avfmj/aviatorscript/gl2p0q) are first-class, supporting [closures and functional programming](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc).
+3. Built-in [bigint](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw#a0Ifn)/[decimal](https://www.yuque.com/boyan-avfmj/aviatorscript/lvabnw#QbV7z) types for large integers and high-precision calculations. Supports [operator overloading](https://www.yuque.com/boyan-avfmj/aviatorscript/ydllav#5hq4k) to allow these types to use common arithmetic operators `+-*/`.
+4. Full script syntax support, including multiline data, conditional statements, loop statements, lexical scoping, and exception handling.
+5. [Functional programming](https://www.yuque.com/boyan-avfmj/aviatorscript/ksghfc) combined with [Sequence abstraction](https://www.yuque.com/boyan-avfmj/aviatorscript/yc4l93) for convenient collection handling.
+6. Lightweight [module system](https://www.yuque.com/boyan-avfmj/aviatorscript/rqra81).
+7. Multiple ways to easily [call Java methods](https://www.yuque.com/boyan-avfmj/aviatorscript/xbdgg2), with full support for the Java [script API](https://www.yuque.com/boyan-avfmj/aviatorscript/bds23b) (facilitating script calls from Java).
+8. Rich [customization options](https://www.yuque.com/boyan-avfmj/aviatorscript/yr1oau), usable as a secure language sandbox and a fully featured language.
+9. Dynamic compilation and execution, lightweight, and high performance. In ASM mode, it directly compiles scripts into JVM bytecode. [Interpretation mode](https://www.yuque.com/boyan-avfmj/aviatorscript/ok8agx) can run on non-standard Java platforms like Android.
+10. Supports [serialization of compiled results](https://github.com/killme2008/aviatorscript/blob/master/src/test/java/com/googlecode/aviator/example/SerializeExample.java), facilitating caching and compiling acceleration. Supports [execution timeout settings](https://github.com/killme2008/aviatorscript/blob/master/src/test/java/com/googlecode/aviator/example/TimeoutExample.java) to prevent resource exhaustion by disruptive scripts.
 
 
 **Recommend version 5.2.6 and above.**
