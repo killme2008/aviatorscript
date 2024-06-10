@@ -831,9 +831,7 @@ public class FunctionTest {
     funcs = getFuncs(exp);
     assertEquals(0, vars.size());
     vars = exp.getVariableFullNames();
-    assertEquals(2, vars.size());
-    assertEquals("a.b", vars.get(0));
-    assertEquals("a.c", vars.get(1));
+    assertEquals(0, vars.size());
     assertEquals(Arrays.asList("seq.map"), funcs);
 
     exp = this.instance.compile("a = seq.map(); a.c = 2; add = lambda() -> a.b + a.c end; add()");
@@ -841,9 +839,21 @@ public class FunctionTest {
     vars = exp.getVariableNames();
     assertEquals(0, vars.size());
     vars = exp.getVariableFullNames();
-    assertEquals(1, vars.size());
-    assertEquals("a.b", vars.get(0));
+    assertEquals(0, vars.size());
     assertEquals(Arrays.asList("seq.map"), funcs);
+
+    exp = this.instance.compile("add = lambda(a) -> a.b + test1(a.c) + test2(y.d) end; add(x)");
+    funcs = getFuncs(exp);
+    vars = exp.getVariableNames();
+    assertEquals(2, vars.size());
+    assertEquals("y", vars.get(0));
+    assertEquals("x", vars.get(1));
+    vars = exp.getVariableFullNames();
+    assertEquals(2, vars.size());
+    assertEquals("y.d", vars.get(0));
+    assertEquals("x", vars.get(1));
+    assertEquals(2, funcs.size());
+    assertEquals(Arrays.asList("test1", "test2"), funcs);
   }
 
   private List<String> getFuncs(Expression exp) {

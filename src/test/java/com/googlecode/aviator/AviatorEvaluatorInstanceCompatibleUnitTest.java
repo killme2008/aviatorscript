@@ -17,6 +17,11 @@ public class AviatorEvaluatorInstanceCompatibleUnitTest extends AviatorEvaluator
     this.instance.setOption(Options.FEATURE_SET, Feature.getCompatibleFeatures());
   }
 
+  @Test
+  public void testIssue549() {
+    // ignore
+  }
+
   @Override
   @Test(expected = UnsupportedFeatureException.class)
   public void testMaxLoopCount() {

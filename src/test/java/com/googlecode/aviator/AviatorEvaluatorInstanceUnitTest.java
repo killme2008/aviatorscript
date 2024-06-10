@@ -61,6 +61,19 @@ public class AviatorEvaluatorInstanceUnitTest {
     this.instance.setOption(Options.EVAL_TIMEOUT_MS, 100);
   }
 
+
+  @Test
+  public void testIssue549() {
+    Expression exp = instance.compile(
+        "let appkey = get_appkey(\"com.sankuai.aaa.bbb.ccc\"); if appkey != nil{ return appkey.serviceLevel; } return nil;");
+    assertTrue(exp.getVariableNames().isEmpty());
+    assertTrue(exp.getVariableFullNames().isEmpty());
+
+    exp = instance.compile("if appkey != nil{ return appkey.serviceLevel; } return nil;");
+    assertEquals(Arrays.asList("appkey"), exp.getVariableNames());
+    assertEquals(Arrays.asList("appkey"), exp.getVariableFullNames());
+  }
+
   @Test
   public void testIssue476() {
     Expression expr = instance.compile("let abc = new String('abc');");

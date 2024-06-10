@@ -118,9 +118,12 @@ public abstract class BaseExpression implements Expression {
     if (this.lambdaBootstraps != null && !this.lambdaBootstraps.isEmpty()) {
       for (LambdaFunctionBootstrap bootstrap : this.lambdaBootstraps.values()) {
         for (VariableMeta meta : bootstrap.getClosureOverFullVarNames()) {
-          VariableMeta existsMeta = fullNames.get(meta.getName());
+          final String name = meta.getName();
+
+          VariableMeta existsMeta = fullNames.get(name);
           if (existsMeta == null) {
-            if (!parentVars.contains(meta.getName())) {
+            String[] tmps = Constants.SPLIT_PAT.split(name);
+            if (!parentVars.contains(tmps[0])) {
               fullNames.put(meta.getName(), meta);
             }
           } else {
