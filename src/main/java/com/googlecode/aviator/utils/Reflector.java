@@ -20,14 +20,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.Feature;
@@ -621,11 +614,25 @@ public class Reflector {
     return ret;
   }
 
-  private static Set<Class<?>> longClasses = asSet(Long.class, long.class, Integer.class, int.class,
-      Byte.class, byte.class, Short.class, short.class, Byte.class, byte.class);
+  // private static Set<Class<?>> longClasses = asSet(Long.class, long.class, Integer.class,
+  // int.class,
+  // Byte.class, byte.class, Short.class, short.class, Byte.class, byte.class);
 
-  private static Set<Class<?>> doubleClasses =
-      asSet(Double.class, double.class, Float.class, float.class);
+  // private static Set<Class<?>> doubleClasses =
+  // asSet(Double.class, double.class, Float.class, float.class);
+
+  private static final Set<Class<?>> longClasses =
+      new HashSet<>(Arrays.asList(long.class, Long.class));
+  private static final Set<Class<?>> doubleClasses =
+      new HashSet<>(Arrays.asList(double.class, Double.class));
+  private static final Set<Class<?>> floatClasses =
+      new HashSet<>(Arrays.asList(float.class, Float.class));
+  private static final Set<Class<?>> intClasses =
+      new HashSet<>(Arrays.asList(int.class, Integer.class));
+  private static final Set<Class<?>> shortClasses =
+      new HashSet<>(Arrays.asList(short.class, Short.class));
+  private static final Set<Class<?>> byteClasses =
+      new HashSet<>(Arrays.asList(byte.class, Byte.class));
 
 
   private static Set<Class<?>> asSet(final Class<?>... classes) {
@@ -644,14 +651,31 @@ public class Reflector {
       return true;
     }
 
-    boolean ret = longClasses.contains(paramType) && longClasses.contains(argType);
-    if (ret) {
-      return ret;
+    if (longClasses.contains(paramType)
+        && (longClasses.contains(argType) || intClasses.contains(argType)
+            || shortClasses.contains(argType) || byteClasses.contains(argType))) {
+      return true;
     }
-
-    ret = doubleClasses.contains(paramType) && doubleClasses.contains(argType);
-    if (ret) {
-      return ret;
+    if (doubleClasses.contains(paramType)
+        && (doubleClasses.contains(argType) || floatClasses.contains(argType)
+            || longClasses.contains(argType) || intClasses.contains(argType)
+            || shortClasses.contains(argType) || byteClasses.contains(argType))) {
+      return true;
+    }
+    if (floatClasses.contains(paramType)
+        && (floatClasses.contains(argType) || intClasses.contains(argType)
+            || shortClasses.contains(argType) || byteClasses.contains(argType))) {
+      return true;
+    }
+    if (intClasses.contains(paramType) && (intClasses.contains(argType)
+        || shortClasses.contains(argType) || byteClasses.contains(argType))) {
+      return true;
+    }
+    if (shortClasses.contains(paramType) && shortClasses.contains(argType)) {
+      return true;
+    }
+    if (byteClasses.contains(paramType) && byteClasses.contains(argType)) {
+      return true;
     }
 
     if (paramType == char.class) {
