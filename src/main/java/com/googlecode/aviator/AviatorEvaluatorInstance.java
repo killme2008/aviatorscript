@@ -1828,12 +1828,12 @@ public final class AviatorEvaluatorInstance {
                   new ExpressionParser(this, lexer, newCodeGenerator(sourceFile, false));
 
               Expression exp = parser.parse(false);
-              final Token<?> lookhead = parser.getLookhead();
-              if (lookhead == null || (lookhead.getType() != TokenType.Char
-                  || ((CharToken) lookhead).getCh() != '}')) {
+              final Token<?> lookahead = parser.getLookahead();
+              if (lookahead == null || (lookahead.getType() != TokenType.Char
+                  || ((CharToken) lookahead).getCh() != '}')) {
                 parser.reportSyntaxError("expect '}' to complete string interpolation");
               }
-              int expStrLen = lookhead.getStartIndex() + 1;
+              int expStrLen = lookahead.getStartIndex() + 1;
               while (expStrLen-- > 0) {
                 prev = ch;
                 ch = it.next();

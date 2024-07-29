@@ -69,7 +69,7 @@ fn expr(parser, tokens) {
   term(parser, tokens);
 
   while true {
-    let t = parser.lookhead;
+    let t = parser.lookahead;
 
     if t.val == '+' {
       parser.move();
@@ -89,7 +89,7 @@ fn term(parser, tokens) {
   unary(parser, tokens);
 
   while true {
-    let t = parser.lookhead;
+    let t = parser.lookahead;
 
     if t.val == '*' {
       parser.move();
@@ -106,7 +106,7 @@ fn term(parser, tokens) {
 }
 
 fn unary(parser, tokens) {
-  let t = parser.lookhead;
+  let t = parser.lookahead;
   if t.val == '-' {
     parser.move();
     unary(parser, tokens);
@@ -117,12 +117,12 @@ fn unary(parser, tokens) {
 }
 
 fn factor(parser, tokens) {
-  let t = parser.lookhead;
+  let t = parser.lookahead;
 
   if t.val == '(' {
     parser.move();
     expr(parser, tokens);
-    t = parser.lookhead;
+    t = parser.lookahead;
     if t.val != ')'{
       error(t);
     }
@@ -137,10 +137,10 @@ fn factor(parser, tokens) {
 
 fn parser(lexer) {
   let parser = seq.map();
-  parser.lookhead = lexer();
+  parser.lookahead = lexer();
 
   parser.move = fn() {
-    parser.lookhead = lexer();
+    parser.lookahead = lexer();
   };
 
   return parser;
@@ -153,8 +153,8 @@ fn parse(s) {
 
   expr(parser, tokens);
 
-  if parser.lookhead.type != EOF {
-    error(parser.lookhead);
+  if parser.lookahead.type != EOF {
+    error(parser.lookahead);
   }
 
   return tokens;

@@ -20,7 +20,7 @@ public class NoneCodeGenerator implements CodeGenerator {
   private Parser parser;
 
   @Override
-  public void onAssignment(final Token<?> lookhead) {
+  public void onAssignment(final Token<?> lookahead) {
 
 
   }
@@ -31,61 +31,61 @@ public class NoneCodeGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onShiftRight(final Token<?> lookhead) {
+  public void onShiftRight(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onShiftLeft(final Token<?> lookhead) {
+  public void onShiftLeft(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onUnsignedShiftRight(final Token<?> lookhead) {
+  public void onUnsignedShiftRight(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onBitOr(final Token<?> lookhead) {
+  public void onBitOr(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onBitAnd(final Token<?> lookhead) {
+  public void onBitAnd(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onBitXor(final Token<?> lookhead) {
+  public void onBitXor(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onBitNot(final Token<?> lookhead) {
+  public void onBitNot(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onAdd(final Token<?> lookhead) {
+  public void onAdd(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onSub(final Token<?> lookhead) {
+  public void onSub(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onMult(final Token<?> lookhead) {
+  public void onMult(final Token<?> lookahead) {
 
 
   }
@@ -93,120 +93,120 @@ public class NoneCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onExponent(final Token<?> lookhead) {
+  public void onExponent(final Token<?> lookahead) {
 
   }
 
   @Override
-  public void onDiv(final Token<?> lookhead) {
-
-
-  }
-
-  @Override
-  public void onAndLeft(final Token<?> lookhead) {
+  public void onDiv(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onAndRight(final Token<?> lookhead) {
+  public void onAndLeft(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onTernaryBoolean(final Token<?> lookhead) {
+  public void onAndRight(final Token<?> alookahead) {
 
 
   }
 
   @Override
-  public void onTernaryLeft(final Token<?> lookhead) {
+  public void onTernaryBoolean(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onTernaryRight(final Token<?> lookhead) {
+  public void onTernaryLeft(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onTernaryEnd(final Token<?> lookhead) {
+  public void onTernaryRight(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onJoinLeft(final Token<?> lookhead) {
+  public void onTernaryEnd(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onJoinRight(final Token<?> lookhead) {
+  public void onJoinLeft(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onEq(final Token<?> lookhead) {
+  public void onJoinRight(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onMatch(final Token<?> lookhead) {
+  public void onEq(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onNeq(final Token<?> lookhead) {
+  public void onMatch(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onLt(final Token<?> lookhead) {
+  public void onNeq(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onLe(final Token<?> lookhead) {
+  public void onLt(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onGt(final Token<?> lookhead) {
+  public void onLe(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onGe(final Token<?> lookhead) {
+  public void onGt(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onMod(final Token<?> lookhead) {
+  public void onGe(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onNot(final Token<?> lookhead) {
+  public void onMod(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onNeg(final Token<?> lookhead) {
+  public void onNot(final Token<?> lookahead) {
+
+
+  }
+
+  @Override
+  public void onNeg(final Token<?> lookahead) {
 
 
   }
@@ -218,54 +218,54 @@ public class NoneCodeGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onConstant(final Token<?> lookhead) {
+  public void onConstant(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onMethodName(final Token<?> lookhead) {
+  public void onMethodName(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onMethodParameter(final Token<?> lookhead) {
+  public void onMethodParameter(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onMethodInvoke(final Token<?> lookhead) {
+  public void onMethodInvoke(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead) {
-    Boolean newLexicalScope = lookhead.getMeta(Constants.SCOPE_META, false);
+  public void onLambdaDefineStart(final Token<?> lookahead) {
+    Boolean newLexicalScope = lookahead.getMeta(Constants.SCOPE_META, false);
     this.infos.push(this.parser.enterScope(newLexicalScope));
   }
 
   @Override
-  public void onLambdaArgument(final Token<?> lookhead, final FunctionParam param) {
+  public void onLambdaArgument(final Token<?> lookahead, final FunctionParam param) {
 
 
   }
 
   @Override
-  public void onLambdaBodyStart(final Token<?> lookhead) {
+  public void onLambdaBodyStart(final Token<?> lookahead) {
 
 
   }
 
   @Override
-  public void onLambdaBodyEnd(final Token<?> lookhead) {
+  public void onLambdaBodyEnd(final Token<?> lookahead) {
     this.parser.restoreScope(this.infos.pop());
   }
 
   @Override
-  public void onArray(final Token<?> lookhead) {
+  public void onArray(final Token<?> lookahead) {
 
 
   }
@@ -277,7 +277,7 @@ public class NoneCodeGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onArrayIndexEnd(final Token<?> lookhead) {
+  public void onArrayIndexEnd(final Token<?> lookahead) {
 
 
   }

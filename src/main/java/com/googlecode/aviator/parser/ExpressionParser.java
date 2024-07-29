@@ -54,9 +54,9 @@ public class ExpressionParser implements Parser {
   private final ExpressionLexer lexer;
 
   /*
-   * Lookhead token
+   * lookahead token
    */
-  private Token<?> lookhead;
+  private Token<?> lookahead;
 
   private final ArrayDeque<Token<?>> prevTokens = new ArrayDeque<>();
 
@@ -95,8 +95,8 @@ public class ExpressionParser implements Parser {
 
 
 
-  public Token<?> getLookhead() {
-    return this.lookhead;
+  public Token<?> getLookahead() {
+    return this.lookahead;
   }
 
 
@@ -146,12 +146,12 @@ public class ExpressionParser implements Parser {
     this.instance = instance;
     this.captureFuncArgs = instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool;
     this.lexer = lexer;
-    this.lookhead = this.lexer.scan();
-    if (this.lookhead != null) {
+    this.lookahead = this.lexer.scan();
+    if (this.lookahead != null) {
       this.parsedTokens++;
     }
     this.featureSet = this.instance.getOptionValue(Options.FEATURE_SET).featureSet;
-    if (this.lookhead == null) {
+    if (this.lookahead == null) {
       reportSyntaxError("blank script");
     }
     setCodeGenerator(codeGenerator);
@@ -170,14 +170,14 @@ public class ExpressionParser implements Parser {
   public void returnStatement() {
     move(true);
     CodeGenerator cg = getCodeGeneratorWithTimes();
-    cg.onTernaryEnd(this.lookhead);
+    cg.onTernaryEnd(this.lookahead);
     if (expectChar(';')) {
       // 'return;' => 'return nil;'
       if (this.scope.newLexicalScope) {
         cg.onMethodName(Constants.ReducerReturnFn);
         cg.onConstant(Variable.NIL);
-        cg.onMethodParameter(this.lookhead);
-        cg.onMethodInvoke(this.lookhead);
+        cg.onMethodParameter(this.lookahead);
+        cg.onMethodInvoke(this.lookahead);
       } else {
         cg.onConstant(Variable.NIL);
       }
@@ -189,8 +189,8 @@ public class ExpressionParser implements Parser {
         if (!ternary()) {
           reportSyntaxError("invalid value for return, missing ';'?");
         }
-        cg.onMethodParameter(this.lookhead);
-        cg.onMethodInvoke(this.lookhead);
+        cg.onMethodParameter(this.lookahead);
+        cg.onMethodInvoke(this.lookahead);
       } else {
         if (!ternary()) {
           reportSyntaxError("invalid value for return, missing ';'?");
@@ -207,16 +207,16 @@ public class ExpressionParser implements Parser {
   public boolean ternary() {
     int gcTimes = this.getCGTimes;
 
-    if (this.lookhead == Variable.NEW) {
+    if (this.lookahead == Variable.NEW) {
       newStatement();
       return true;
     }
 
     join();
-    if (this.lookhead == null || expectChar(':') || expectChar(',')) {
+    if (this.lookahead == null || expectChar(':') || expectChar(',')) {
       return gcTimes < this.getCGTimes;
     }
-    Token<?> opToken = this.lookhead;
+    Token<?> opToken = this.lookahead;
     if (expectChar('?')) {
       move(true);
       CodeGenerator cg = getCodeGeneratorWithTimes();
@@ -226,11 +226,11 @@ public class ExpressionParser implements Parser {
       }
       if (expectChar(':')) {
         move(true);
-        cg.onTernaryLeft(this.lookhead);
+        cg.onTernaryLeft(this.lookahead);
         if (!ternary()) {
           reportSyntaxError("invalid token for ternary operator");
         }
-        cg.onTernaryRight(this.lookhead);
+        cg.onTernaryRight(this.lookahead);
       } else {
         reportSyntaxError("expect ':'");
       }
@@ -242,7 +242,7 @@ public class ExpressionParser implements Parser {
   public void join() {
     and();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       if (expectChar('|')) {
         getCodeGeneratorWithTimes().onJoinLeft(opToken);
         move(true);
@@ -276,17 +276,17 @@ public class ExpressionParser implements Parser {
 
 
   private boolean expectChar(final char ch) {
-    if (this.lookhead == null) {
+    if (this.lookahead == null) {
       return false;
     }
-    return this.lookhead.getType() == TokenType.Char && ((CharToken) this.lookhead).getCh() == ch;
+    return this.lookahead.getType() == TokenType.Char && ((CharToken) this.lookahead).getCh() == ch;
   }
 
 
   public void bitOr() {
     xor();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       if (expectChar('|')) {
         move(true);
         if (expectChar('|')) {
@@ -305,7 +305,7 @@ public class ExpressionParser implements Parser {
   public void xor() {
     bitAnd();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       if (expectChar('^')) {
         move(true);
         bitAnd();
@@ -320,7 +320,7 @@ public class ExpressionParser implements Parser {
   public void bitAnd() {
     equality();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       if (expectChar('&')) {
         move(true);
         if (expectChar('&')) {
@@ -339,7 +339,7 @@ public class ExpressionParser implements Parser {
   public void and() {
     bitOr();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
 
       if (expectChar('&')) {
         CodeGenerator cg = getCodeGeneratorWithTimes();
@@ -379,7 +379,7 @@ public class ExpressionParser implements Parser {
   public void equality() {
     rel();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       Token<?> prevToken = getPrevToken();
       if (expectChar('=')) {
         move(true);
@@ -483,7 +483,7 @@ public class ExpressionParser implements Parser {
   public void rel() {
     shift();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       if (expectChar('<')) {
         move(true);
         if (expectChar('=')) {
@@ -514,7 +514,7 @@ public class ExpressionParser implements Parser {
   public void shift() {
     expr();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       if (expectChar('<')) {
         move(true);
         if (expectChar('<')) {
@@ -552,7 +552,7 @@ public class ExpressionParser implements Parser {
   public void expr() {
     term();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       if (expectChar('+')) {
         move(true);
         term();
@@ -570,7 +570,7 @@ public class ExpressionParser implements Parser {
   public void exponent() {
     factor();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       if (expectChar('*')) {
         move(true);
         if (expectChar('*')) {
@@ -591,7 +591,7 @@ public class ExpressionParser implements Parser {
   public void term() {
     unary();
     while (true) {
-      Token<?> opToken = this.lookhead;
+      Token<?> opToken = this.lookahead;
       if (expectChar('*')) {
         move(true);
         unary();
@@ -612,7 +612,7 @@ public class ExpressionParser implements Parser {
 
 
   public void unary() {
-    Token<?> opToken = this.lookhead;
+    Token<?> opToken = this.lookahead;
     if (expectChar('!')) {
       move(true);
       // check if it is a seq function call,"!" as variable
@@ -648,15 +648,16 @@ public class ExpressionParser implements Parser {
     }
   }
 
-  private int getLookheadStartIndex() {
-    // We should calculate the lookhead token's start index, because the token may be reserved by
+  private int getLookaheadStartIndex() {
+    // We should calculate the lookahead token's start index, because the token may be reserved by
     // symbol table and it's start index is wrong.
-    return this.lookhead != null ? (this.lexer.getCurrentIndex() - getLookheadLexemeLength()) : -1;
+    return this.lookahead != null ? (this.lexer.getCurrentIndex() - getLookaheadLexemeLength())
+        : -1;
   }
 
-  private int getLookheadLexemeLength() {
-    int len = this.lookhead.getLexeme().length();
-    if (this.lookhead.getType() == TokenType.String) {
+  private int getLookaheadLexemeLength() {
+    int len = this.lookahead.getLexeme().length();
+    if (this.lookahead.getType() == TokenType.String) {
       // Must include quote symbols.
       len += 2;
     }
@@ -664,8 +665,8 @@ public class ExpressionParser implements Parser {
   }
 
   private String getParamExp(final int lastTokenIndex) {
-    if (lastTokenIndex >= 0 && getLookheadStartIndex() >= 0) {
-      return this.lexer.getScanString().substring(lastTokenIndex, getLookheadStartIndex());
+    if (lastTokenIndex >= 0 && getLookaheadStartIndex() >= 0) {
+      return this.lexer.getScanString().substring(lastTokenIndex, getLookaheadStartIndex());
     } else {
       return null;
     }
@@ -704,10 +705,10 @@ public class ExpressionParser implements Parser {
 
 
   private boolean factor0() {
-    if (this.lookhead == null) {
+    if (this.lookahead == null) {
       reportSyntaxError("illegal token");
     }
-    if (this.lookhead == Variable.END) {
+    if (this.lookahead == Variable.END) {
       return false;
     }
     if (expectChar('(')) {
@@ -718,21 +719,21 @@ public class ExpressionParser implements Parser {
         move(true);
         this.scope.leaveParen();
       }
-    } else if (this.lookhead.getType() == TokenType.Number
-        || this.lookhead.getType() == TokenType.String
-        || this.lookhead.getType() == TokenType.Variable || this.lookhead == Variable.TRUE
-        || this.lookhead == Variable.FALSE || isOPVariable(this.lookhead)) {
-      if (this.lookhead.getType() == TokenType.Variable) {
-        checkVariableName(this.lookhead);
+    } else if (this.lookahead.getType() == TokenType.Number
+        || this.lookahead.getType() == TokenType.String
+        || this.lookahead.getType() == TokenType.Variable || this.lookahead == Variable.TRUE
+        || this.lookahead == Variable.FALSE || isOPVariable(this.lookahead)) {
+      if (this.lookahead.getType() == TokenType.Variable) {
+        checkVariableName(this.lookahead);
       }
       // binary operation as variable for seq functions
-      if (this.lookhead.getType() == TokenType.Char) {
-        CharToken charToken = (CharToken) this.lookhead;
+      if (this.lookahead.getType() == TokenType.Char) {
+        CharToken charToken = (CharToken) this.lookahead;
         if (!ExpressionLexer.isBinaryOP(charToken.getCh())) {
           reportSyntaxError("unexpect char '" + charToken.getCh() + "'");
         }
         // make it as variable
-        this.lookhead = this.lexer.getSymbolTable().reserve(
+        this.lookahead = this.lexer.getSymbolTable().reserve(
             new Variable(charToken.getLexeme(), charToken.getLineNo(), charToken.getStartIndex()));
       }
       move(true);
@@ -817,7 +818,7 @@ public class ExpressionParser implements Parser {
       }
 
       move(true);
-      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
       statements();
 
       if (fn) {
@@ -825,19 +826,19 @@ public class ExpressionParser implements Parser {
           reportSyntaxError("missing '}' to close function body");
         }
       } else {
-        if (this.lookhead != Variable.END) {
+        if (this.lookahead != Variable.END) {
           reportSyntaxError("expect lambda 'end'");
         }
       }
 
-      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
       this.scope.leaveLambda();
       move(true);
     }
   }
 
   private String currentTokenLexeme() {
-    return this.lookhead == null ? "END_OF_STRING" : this.lookhead.getLexeme();
+    return this.lookahead == null ? "END_OF_STRING" : this.lookahead.getLexeme();
   }
 
 
@@ -845,12 +846,12 @@ public class ExpressionParser implements Parser {
     if (expectChar('&')) {
       move(true);
 
-      if (this.lookhead.getType() != TokenType.Variable) {
+      if (this.lookahead.getType() != TokenType.Variable) {
         reportSyntaxError("expect argument name, but is: " + currentTokenLexeme());
       }
 
       return lambdaArgument0(index, true);
-    } else if (this.lookhead.getType() == TokenType.Variable) {
+    } else if (this.lookahead.getType() == TokenType.Variable) {
       return lambdaArgument0(index, false);
     } else {
       reportSyntaxError("expect argument name, but is: " + currentTokenLexeme());
@@ -859,11 +860,11 @@ public class ExpressionParser implements Parser {
   }
 
   private FunctionParam lambdaArgument0(final int index, final boolean isVariadic) {
-    if (!isJavaIdentifier(this.lookhead.getLexeme())) {
+    if (!isJavaIdentifier(this.lookahead.getLexeme())) {
       reportSyntaxError("illegal argument name: " + currentTokenLexeme());
     }
-    final FunctionParam param = new FunctionParam(index, this.lookhead.getLexeme(), isVariadic);
-    getCodeGeneratorWithTimes().onLambdaArgument(this.lookhead, param);
+    final FunctionParam param = new FunctionParam(index, this.lookahead.getLexeme(), isVariadic);
+    getCodeGeneratorWithTimes().onLambdaArgument(this.lookahead, param);
     move(true);
     return param;
   }
@@ -900,7 +901,7 @@ public class ExpressionParser implements Parser {
     if (expectChar(']')) {
       this.scope.leaveBracket();
       move(true);
-      getCodeGeneratorWithTimes().onArrayIndexEnd(this.lookhead);
+      getCodeGeneratorWithTimes().onArrayIndexEnd(this.lookahead);
     }
   }
 
@@ -944,7 +945,7 @@ public class ExpressionParser implements Parser {
       if (this.captureFuncArgs) {
         params = new ArrayList<>();
       }
-      int lastTokenIndex = getLookheadStartIndex();
+      int lastTokenIndex = getLookaheadStartIndex();
       if (!expectChar(')')) {
 
         boolean isPackArgs = false;
@@ -966,14 +967,14 @@ public class ExpressionParser implements Parser {
           withMetaEnd(Constants.UNPACK_ARGS, true);
         }
 
-        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
         if (this.captureFuncArgs) {
           params.add(new FunctionArgument(paramIndex++, getParamExp(lastTokenIndex)));
         }
         while (expectChar(',')) {
           move(true);
           isPackArgs = false;
-          lastTokenIndex = getLookheadStartIndex();
+          lastTokenIndex = getLookaheadStartIndex();
           if (expectChar('*')) {
             move(true);
             if (expectChar('*') || expectChar(',')) {
@@ -994,7 +995,7 @@ public class ExpressionParser implements Parser {
             withMetaEnd(Constants.UNPACK_ARGS, true);
           }
 
-          getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+          getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
           if (this.captureFuncArgs) {
             params.add(new FunctionArgument(paramIndex++, getParamExp(lastTokenIndex)));
           }
@@ -1046,13 +1047,13 @@ public class ExpressionParser implements Parser {
 
   private void pattern() {
     // It is a pattern
-    int startIndex = this.lookhead.getStartIndex();
+    int startIndex = this.lookahead.getStartIndex();
     move(true);
     this.inPattern = true;
     StringBuilder sb = new StringBuilder();
-    while (this.lookhead != null) {
-      while (!expectChar('/') && this.lookhead != null) {
-        sb.append(this.lookhead.getLexeme());
+    while (this.lookahead != null) {
+      while (!expectChar('/') && this.lookahead != null) {
+        sb.append(this.lookahead.getLexeme());
         move(false);
       }
       if (getPrevToken().getType() == TokenType.Char
@@ -1074,17 +1075,17 @@ public class ExpressionParser implements Parser {
 
 
   public void reportSyntaxError(final String message) {
-    int index = isValidLookhead() ? this.lookhead.getStartIndex() : this.lexer.getCurrentIndex();
+    int index = isValidLookahead() ? this.lookahead.getStartIndex() : this.lexer.getCurrentIndex();
 
-    if (this.lookhead != null) {
-      this.lexer.pushback(this.lookhead);
+    if (this.lookahead != null) {
+      this.lexer.pushback(this.lookahead);
     }
 
     String msg = "Syntax error: " + message + //
         " at " + index + //
         ", lineNumber: " + this.lexer.getLineNo() + //
         ", token : " + //
-        this.lookhead + ",\nwhile parsing expression: `\n" + //
+        this.lookahead + ",\nwhile parsing expression: `\n" + //
         this.lexer.getScanString() + "^^^\n`";
 
     ExpressionSyntaxErrorException e = new ExpressionSyntaxErrorException(msg);
@@ -1101,15 +1102,15 @@ public class ExpressionParser implements Parser {
     throw e;
   }
 
-  private boolean isValidLookhead() {
-    return this.lookhead != null && this.lookhead.getStartIndex() > 0;
+  private boolean isValidLookahead() {
+    return this.lookahead != null && this.lookahead.getStartIndex() > 0;
   }
 
   public void move(final boolean analyse) {
-    if (this.lookhead != null) {
-      this.prevTokens.push(this.lookhead);
-      this.lookhead = this.lexer.scan(analyse);
-      if (this.lookhead != null) {
+    if (this.lookahead != null) {
+      this.prevTokens.push(this.lookahead);
+      this.lookahead = this.lexer.scan(analyse);
+      if (this.lookahead != null) {
         this.parsedTokens++;
       }
     } else {
@@ -1122,17 +1123,17 @@ public class ExpressionParser implements Parser {
   }
 
   public void back() {
-    if (this.lookhead != null) {
+    if (this.lookahead != null) {
       this.parsedTokens--;
     }
-    this.lexer.pushback(this.lookhead);
-    this.lookhead = getPrevToken();
+    this.lexer.pushback(this.lookahead);
+    this.lookahead = getPrevToken();
   }
 
 
   public Expression parse(final boolean reportErrorIfNotEOF) {
     StatementType statementType = statements();
-    if (this.lookhead != null && reportErrorIfNotEOF) {
+    if (this.lookahead != null && reportErrorIfNotEOF) {
       if (statementType == StatementType.Ternary) {
         reportSyntaxError("unexpect token '" + currentTokenLexeme()
             + "', maybe forget to insert ';' to complete last expression ");
@@ -1161,7 +1162,7 @@ public class ExpressionParser implements Parser {
     }
     move(true);
     getCodeGeneratorWithTimes().onMethodName(Constants.ReducerBreakFn);
-    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
     if (!expectChar(';')) {
       reportSyntaxError("missing ';' for break");
     }
@@ -1178,8 +1179,8 @@ public class ExpressionParser implements Parser {
     move(true);
     getCodeGeneratorWithTimes().onMethodName(Constants.ReducerContFn);
     getCodeGeneratorWithTimes().onConstant(Variable.NIL);
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
-    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
     if (!expectChar(';')) {
       reportSyntaxError("missing ';' for continue");
     }
@@ -1215,7 +1216,7 @@ public class ExpressionParser implements Parser {
     // prepare to call __reducer_callcc(LOOP, iterator, statements)
     getCodeGeneratorWithTimes().onMethodName(Constants.ReducerFn);
     getCodeGeneratorWithTimes().onConstant(Constants.REDUCER_LOOP);
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
 
     // create a lambda function wraps while body(iterator)
     boolean newLexicalScope = this.scope.newLexicalScope;
@@ -1223,10 +1224,10 @@ public class ExpressionParser implements Parser {
     {
       getCodeGeneratorWithTimes().onLambdaDefineStart(
           getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
-      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
       ifStatement(true, false);
-      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
-      getCodeGenerator().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
+      getCodeGenerator().onMethodParameter(this.lookahead);
     }
 
     if (expectChar(';')) {
@@ -1237,16 +1238,16 @@ public class ExpressionParser implements Parser {
       getCodeGeneratorWithTimes().onLambdaDefineStart(
           getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
               .withMeta(Constants.INHERIT_ENV_META, true));
-      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
       if (statements() == StatementType.Empty) {
         getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
       }
-      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
     }
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
 
     // call __reducer_callcc(LOOP, iterator, statements)
-    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
     // restore newLexicalScope
     this.scope.newLexicalScope = newLexicalScope;
 
@@ -1254,7 +1255,7 @@ public class ExpressionParser implements Parser {
 
   private void letStatement() {
     move(true);
-    Token<?> var = this.lookhead;
+    Token<?> var = this.lookahead;
     checkVariableName(var);
     getCodeGenerator().onConstant(var);
     move(true);
@@ -1283,9 +1284,9 @@ public class ExpressionParser implements Parser {
       lambda(true);
     } else {
 
-      checkVariableName(this.lookhead);
-      checkFunctionName(this.lookhead, true);
-      getCodeGeneratorWithTimes().onConstant(this.lookhead.withMeta(Constants.INIT_META, true)
+      checkVariableName(this.lookahead);
+      checkFunctionName(this.lookahead, true);
+      getCodeGeneratorWithTimes().onConstant(this.lookahead.withMeta(Constants.INIT_META, true)
           .withMeta(Constants.TYPE_META, CompileTypes.Function));
       move(true);
       if (!expectChar('(')) {
@@ -1310,7 +1311,7 @@ public class ExpressionParser implements Parser {
   }
 
   private Token<?> currentToken() {
-    Token<?> token = this.lookhead;
+    Token<?> token = this.lookahead;
     if (token == null) {
       token = new CharToken((char) -1, this.lexer.getLineNo(), this.lexer.getCurrentIndex());
     }
@@ -1348,18 +1349,18 @@ public class ExpressionParser implements Parser {
       this.scope.enterBrace();
       getCodeGeneratorWithTimes().onLambdaDefineStart(
           getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
-      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
       hasReturn = statements() == StatementType.Return;
-      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
       getCodeGeneratorWithTimes().onMethodName(anonymousMethodName());
-      getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
 
       if (!expectChar('}')) {
         reportSyntaxError("missing '}' to close scope");
       }
       move(true);
       this.scope.leaveBrace();
-      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
     }
 
     if (expectChar(';')) {
@@ -1370,16 +1371,16 @@ public class ExpressionParser implements Parser {
       getCodeGeneratorWithTimes().onLambdaDefineStart(
           getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
               .withMeta(Constants.INHERIT_ENV_META, true));
-      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
       if (statements() == StatementType.Empty) {
         getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
       }
-      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
     }
-    getCodeGenerator().onMethodParameter(this.lookhead);
+    getCodeGenerator().onMethodParameter(this.lookahead);
 
     // call __if_callcc(result, statements)
-    getCodeGenerator().onMethodInvoke(this.lookhead);
+    getCodeGenerator().onMethodInvoke(this.lookahead);
     this.scope.newLexicalScope = newLexicalScope;
 
     return hasReturn;
@@ -1400,10 +1401,10 @@ public class ExpressionParser implements Parser {
 
       getCodeGeneratorWithTimes().onLambdaDefineStart(
           getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
-      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
       statements();
-      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
-      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
     }
     if (!expectChar('}')) {
       reportSyntaxError("missing '}' for try body");
@@ -1412,7 +1413,7 @@ public class ExpressionParser implements Parser {
     boolean hasCatch = false;
     boolean hasFinally = false;
 
-    while (this.lookhead == Variable.CATCH) {
+    while (this.lookahead == Variable.CATCH) {
       if (!hasCatch) {
         // create a handler list.
         getCodeGeneratorWithTimes().onMethodName(Constants.SEQ_LIST_VAR);
@@ -1425,12 +1426,12 @@ public class ExpressionParser implements Parser {
         reportSyntaxError("expect '(' after catch");
       }
       move(true);
-      if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
+      if (this.lookahead == null || this.lookahead.getType() != TokenType.Variable) {
         reportSyntaxError("invalid exception class name");
       }
-      checkVariableName(this.lookhead);
+      checkVariableName(this.lookahead);
       List<Token<?>> exceptionClasses = new ArrayList<>();
-      exceptionClasses.add(this.lookhead);
+      exceptionClasses.add(this.lookahead);
       move(true);
 
       Token<?> boundVar = null;
@@ -1442,18 +1443,18 @@ public class ExpressionParser implements Parser {
         // catch multi exception
         while (expectChar('|')) {
           move(true);
-          if (this.lookhead.getType() != TokenType.Variable) {
+          if (this.lookahead.getType() != TokenType.Variable) {
             reportSyntaxError("invalid exception class to catch");
           }
-          checkVariableName(this.lookhead);
-          exceptionClasses.add(this.lookhead);
+          checkVariableName(this.lookahead);
+          exceptionClasses.add(this.lookahead);
           move(true);
         }
-        if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
+        if (this.lookahead == null || this.lookahead.getType() != TokenType.Variable) {
           reportSyntaxError("invalid bound variable name for exception");
         }
-        checkVariableName(this.lookhead);
-        boundVar = this.lookhead;
+        checkVariableName(this.lookahead);
+        boundVar = this.lookahead;
         move(true);
       }
 
@@ -1473,17 +1474,17 @@ public class ExpressionParser implements Parser {
             getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
         getCodeGeneratorWithTimes().onLambdaArgument(boundVar,
             new FunctionParam(0, boundVar.getLexeme(), false));
-        getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+        getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
         statements();
-        getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
-        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
+        getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
         for (Token<?> exceptionClass : exceptionClasses) {
           getCodeGeneratorWithTimes().onConstant(exceptionClass);
-          getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+          getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
         }
-        getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+        getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
       }
-      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
       if (!expectChar('}')) {
         reportSyntaxError("missing '}' for to complete catch block");
       }
@@ -1492,14 +1493,14 @@ public class ExpressionParser implements Parser {
 
     if (hasCatch) {
       // Invoke seq.list to create handler list
-      getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
-      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
     } else {
       getCodeGeneratorWithTimes().onConstant(Variable.NIL);
-      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
     }
 
-    if (this.lookhead == Variable.FINALLY) {
+    if (this.lookahead == Variable.FINALLY) {
       hasFinally = true;
       move(true);
       if (!expectChar('{')) {
@@ -1509,9 +1510,9 @@ public class ExpressionParser implements Parser {
       // create a lambda to
       getCodeGeneratorWithTimes().onLambdaDefineStart(
           getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
-      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
       statements();
-      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
       if (!expectChar('}')) {
         reportSyntaxError("missing '}' for finally block");
       }
@@ -1532,26 +1533,26 @@ public class ExpressionParser implements Parser {
       getCodeGeneratorWithTimes().onLambdaDefineStart(
           getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
               .withMeta(Constants.INHERIT_ENV_META, true));
-      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
       if (statements() == StatementType.Empty) {
         getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
       }
-      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+      getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
     }
 
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
 
     this.scope.newLexicalScope = newLexicalScope;
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
-    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
   }
 
   private void throwStatement() {
     getCodeGeneratorWithTimes().onMethodName(Constants.THROW_VAR);
     move(true);
     statement();
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
-    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
     if (!expectChar(';')) {
       reportSyntaxError("missing ';' for throw statement");
     }
@@ -1562,13 +1563,13 @@ public class ExpressionParser implements Parser {
     getCodeGeneratorWithTimes().onMethodName(Constants.NEW_VAR);
     move(true);
 
-    if (this.lookhead == null || this.lookhead.getType() != TokenType.Variable) {
+    if (this.lookahead == null || this.lookahead.getType() != TokenType.Variable) {
       reportSyntaxError("invalid class name");
     }
-    checkVariableName(this.lookhead);
+    checkVariableName(this.lookahead);
     getCodeGeneratorWithTimes()
-        .onConstant(this.lookhead.withMeta(Constants.TYPE_META, CompileTypes.Class));
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        .onConstant(this.lookahead.withMeta(Constants.TYPE_META, CompileTypes.Class));
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
     move(true);
 
     if (!expectChar('(')) {
@@ -1579,32 +1580,32 @@ public class ExpressionParser implements Parser {
     move(true);
     if (!expectChar(')')) {
       ternary();
-      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
       while (expectChar(',')) {
         move(true);
         if (!ternary()) {
           reportSyntaxError("invalid argument");
         }
-        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
       }
     }
     if (!expectChar(')')) {
       reportSyntaxError("missing ')' for new statement");
     }
-    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
     move(true);
     this.scope.leaveParen();
   }
 
   private void className() {
-    if (this.lookhead.getType() != TokenType.Variable && !expectChar('*')) {
+    if (this.lookahead.getType() != TokenType.Variable && !expectChar('*')) {
       reportSyntaxError("expect variable name or * to use");
     }
     if (expectChar('*')) {
       wildcard();
     } else {
-      checkVariableName(this.lookhead);
-      getCodeGenerator().onConstant(this.lookhead.withMeta(Constants.USE_CLASS_PKG, true));
+      checkVariableName(this.lookahead);
+      getCodeGenerator().onConstant(this.lookahead.withMeta(Constants.USE_CLASS_PKG, true));
     }
     move(true);
   }
@@ -1613,22 +1614,22 @@ public class ExpressionParser implements Parser {
     getCodeGeneratorWithTimes().onMethodName(Constants.USE_VAR);
     move(true);
     className();
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
 
     if (expectChar('*')) {
       // wildcard
       wildcard();
-      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
       move(true);
     } else if (expectChar('{')) {
       this.scope.enterBrace();
       move(true);
       className();
-      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
       while (expectChar(',')) {
         move(true);
         className();
-        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
       }
       if (!expectChar('}')) {
         reportSyntaxError("expect '}' to complete use statement");
@@ -1638,7 +1639,7 @@ public class ExpressionParser implements Parser {
       }
     }
 
-    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
     if (!expectChar(';')) {
       reportSyntaxError("missing ';' for use statement");
     }
@@ -1648,48 +1649,48 @@ public class ExpressionParser implements Parser {
 
   private void wildcard() {
     getCodeGenerator()
-        .onConstant(new Variable("*", this.lookhead.getLineNo(), this.lookhead.getStartIndex()));
+        .onConstant(new Variable("*", this.lookahead.getLineNo(), this.lookahead.getStartIndex()));
   }
 
   private StatementType statement() {
-    if (this.lookhead == Variable.IF) {
+    if (this.lookahead == Variable.IF) {
       ensureFeatureEnabled(Feature.If);
       if (ifStatement(false, false)) {
         return StatementType.Return;
       } else {
         return StatementType.Other;
       }
-    } else if (this.lookhead == Variable.FOR) {
+    } else if (this.lookahead == Variable.FOR) {
       ensureFeatureEnabled(Feature.ForLoop);
       forStatement();
       return StatementType.Other;
-    } else if (this.lookhead == Variable.RETURN) {
+    } else if (this.lookahead == Variable.RETURN) {
       ensureFeatureEnabled(Feature.Return);
       returnStatement();
       return StatementType.Return;
-    } else if (this.lookhead == Variable.BREAK) {
+    } else if (this.lookahead == Variable.BREAK) {
       breakStatement();
       return StatementType.Return;
-    } else if (this.lookhead == Variable.CONTINUE) {
+    } else if (this.lookahead == Variable.CONTINUE) {
       continueStatement();
       return StatementType.Return;
-    } else if (this.lookhead == Variable.LET) {
+    } else if (this.lookahead == Variable.LET) {
       ensureFeatureEnabled(Feature.Let);
       letStatement();
       return StatementType.Other;
-    } else if (this.lookhead == Variable.WHILE) {
+    } else if (this.lookahead == Variable.WHILE) {
       ensureFeatureEnabled(Feature.WhileLoop);
       whileStatement();
       return StatementType.Other;
-    } else if (this.lookhead == Variable.FN) {
+    } else if (this.lookahead == Variable.FN) {
       ensureFeatureEnabled(Feature.Fn);
       fnStatement();
       return StatementType.Other;
-    } else if (this.lookhead == Variable.TRY) {
+    } else if (this.lookahead == Variable.TRY) {
       ensureFeatureEnabled(Feature.ExceptionHandle);
       tryStatement();
       return StatementType.Other;
-    } else if (this.lookhead == Variable.THROW) {
+    } else if (this.lookahead == Variable.THROW) {
       ensureFeatureEnabled(Feature.ExceptionHandle);
       throwStatement();
       return StatementType.Other;
@@ -1700,7 +1701,7 @@ public class ExpressionParser implements Parser {
       } else {
         return StatementType.Other;
       }
-    } else if (this.lookhead == Variable.USE) {
+    } else if (this.lookahead == Variable.USE) {
       ensureFeatureEnabled(Feature.Use);
       useStatement();
       return StatementType.Other;
@@ -1718,14 +1719,14 @@ public class ExpressionParser implements Parser {
   }
 
   private void withMetaEnd(final Object key, final Object val) {
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
     getCodeGeneratorWithTimes().onConstant(value2token(key));
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
 
     getCodeGeneratorWithTimes().onConstant(value2token(val));
-    getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
 
-    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
   }
 
 
@@ -1736,10 +1737,9 @@ public class ExpressionParser implements Parser {
     } else if (val == null) {
       return Variable.NIL;
     } else if (val instanceof String) {
-      return (new StringToken((String) val, this.lexer.getLineNo(), this.lookhead.getStartIndex()));
+      return (new StringToken((String) val, this.lexer.getLineNo(), this.lookahead.getStartIndex()));
     } else if (val instanceof Number) {
-      return (new NumberToken((Number) val, val.toString(), this.lexer.getLineNo(),
-          this.lookhead.getStartIndex()));
+      return (new NumberToken((Number) val, val.toString(), this.lexer.getLineNo(), this.lookahead.getStartIndex()));
     } else if (val instanceof Boolean) {
       return (((boolean) val) ? Variable.TRUE : Variable.FALSE);
     } else {
@@ -1776,8 +1776,8 @@ public class ExpressionParser implements Parser {
       if (reducerArgs.size() > 2) {
         reportSyntaxError("Too many variables in for statement: " + reducerArgs.size());
       }
-      reducerArgs.add(this.lookhead);
-      checkVariableName(this.lookhead);
+      reducerArgs.add(this.lookahead);
+      checkVariableName(this.lookahead);
       move(true);
       if (expectChar(',')) {
         move(true);
@@ -1787,7 +1787,7 @@ public class ExpressionParser implements Parser {
       }
     }
 
-    if (this.lookhead == Variable.IN) {
+    if (this.lookahead == Variable.IN) {
       move(true);
       // prepare to call __reducer_callcc(seq, iterator, statements)
       {
@@ -1796,7 +1796,7 @@ public class ExpressionParser implements Parser {
         if (!ternary()) {
           reportSyntaxError("missing collection");
         }
-        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
       }
       if (expectChar('{')) {
         move(true);
@@ -1815,11 +1815,11 @@ public class ExpressionParser implements Parser {
             getCodeGeneratorWithTimes().onLambdaArgument(reducerArg,
                 new FunctionParam(0, reducerArg.getLexeme(), false));
           }
-          getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+          getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
           statements();
-          getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+          getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
           withMetaEnd(Constants.ARITIES_META, Long.valueOf(reducerArgs.size()));
-          getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+          getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
         }
 
         if (expectChar('}')) {
@@ -1837,15 +1837,15 @@ public class ExpressionParser implements Parser {
           getCodeGeneratorWithTimes().onLambdaDefineStart(
               getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
                   .withMeta(Constants.INHERIT_ENV_META, true));
-          getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+          getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
           if (statements() == StatementType.Empty) {
             getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
           }
-          getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+          getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
         }
-        getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+        getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
         // call __reducer_callcc(seq, iterator, statements)
-        getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
+        getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
         // restore newLexicalScope
         this.scope.newLexicalScope = newLexicalScope;
       } else {
@@ -1858,7 +1858,7 @@ public class ExpressionParser implements Parser {
 
 
   private StatementType statements() {
-    if (this.lookhead == null) {
+    if (this.lookahead == null) {
       return StatementType.Empty;
     }
 
@@ -1868,15 +1868,15 @@ public class ExpressionParser implements Parser {
 
       ensureNoStatementAfterReturn(stmtType);
 
-      if (this.lookhead != null && this.lookhead != Variable.END && !expectChar('}')) {
-        getCodeGeneratorWithTimes().onTernaryEnd(this.lookhead);
+      if (this.lookahead != null && this.lookahead != Variable.END && !expectChar('}')) {
+        getCodeGeneratorWithTimes().onTernaryEnd(this.lookahead);
       }
 
       if (expectChar(';')) {
         move(true);
       }
 
-      if (this.lookhead == null) {
+      if (this.lookahead == null) {
         break;
       }
 
@@ -1892,7 +1892,7 @@ public class ExpressionParser implements Parser {
     // 'end' keyword, or ';'
     // Otherwise report syntax error.
     if (stmtType == StatementType.Ternary) {
-      if (lookhead != null && !expectChar(';') && !expectChar('}') && lookhead != Variable.END) {
+      if (lookahead != null && !expectChar(';') && !expectChar('}') && lookahead != Variable.END) {
         this.back();
         reportSyntaxError("unexpect token '" + currentTokenLexeme()
             + "', maybe forget to insert ';' to complete last expression ");
@@ -1903,8 +1903,8 @@ public class ExpressionParser implements Parser {
   }
 
   private void ensureNoStatementAfterReturn(final StatementType statementType) {
-    if (statementType == StatementType.Return && this.lookhead != null) {
-      if (this.lookhead != Variable.END && !expectChar('}')) {
+    if (statementType == StatementType.Return && this.lookahead != null) {
+      if (this.lookahead != Variable.END && !expectChar('}')) {
         reportSyntaxError("unreachable code");
       }
     }
@@ -1945,18 +1945,18 @@ public class ExpressionParser implements Parser {
         reportSyntaxError("missing test statement for if");
       }
 
-      getCodeGeneratorWithTimes().onTernaryBoolean(this.lookhead);
+      getCodeGeneratorWithTimes().onTernaryBoolean(this.lookahead);
       if (expectChar('{')) {
         move(true);
         this.scope.enterBrace();
         getCodeGeneratorWithTimes().onLambdaDefineStart(
             getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope));
-        getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+        getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
         ifBodyHasReturn = statements() == StatementType.Return;
-        getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+        getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
         getCodeGeneratorWithTimes().onMethodName(anonymousMethodName());
-        getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
-        getCodeGeneratorWithTimes().onTernaryLeft(this.lookhead);
+        getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
+        getCodeGeneratorWithTimes().onTernaryLeft(this.lookahead);
       } else {
         reportSyntaxError("expect '{' for " + getLoopKeyword(isWhile) + " statement");
       }
@@ -1967,7 +1967,7 @@ public class ExpressionParser implements Parser {
       move(true);
 
       elseBodyHasReturn = elseStatement(isWhile, isElsif, ifBodyHasReturn);
-      getCodeGeneratorWithTimes().onMethodParameter(this.lookhead);
+      getCodeGeneratorWithTimes().onMethodParameter(this.lookahead);
     }
 
     {
@@ -1985,7 +1985,7 @@ public class ExpressionParser implements Parser {
           getCodeGeneratorWithTimes().onLambdaDefineStart(
               getPrevToken().withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
                   .withMeta(Constants.INHERIT_ENV_META, true));
-          getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+          getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
           if (statements() == StatementType.Empty) {
             getCodeGenerator().onConstant(Constants.ReducerEmptyVal);
           } else {
@@ -1993,12 +1993,12 @@ public class ExpressionParser implements Parser {
               reportSyntaxError("unreachable code");
             }
           }
-          getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+          getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
         }
       }
-      getCodeGenerator().onMethodParameter(this.lookhead);
+      getCodeGenerator().onMethodParameter(this.lookahead);
       // call __if_callcc(result, statements)
-      getCodeGenerator().onMethodInvoke(this.lookhead);
+      getCodeGenerator().onMethodInvoke(this.lookahead);
       this.scope.newLexicalScope = newLexicalScope;
     }
 
@@ -2016,9 +2016,9 @@ public class ExpressionParser implements Parser {
       final CodeGenerator cg = getCodeGeneratorWithTimes();
       cg.onMethodName(Constants.ReducerBreakFn);
       cg.onConstant(Variable.NIL);
-      cg.onMethodParameter(this.lookhead);
-      cg.onMethodInvoke(this.lookhead);
-      cg.onTernaryRight(this.lookhead);
+      cg.onMethodParameter(this.lookahead);
+      cg.onMethodInvoke(this.lookahead);
+      cg.onTernaryRight(this.lookahead);
       return false;
     }
 
@@ -2027,9 +2027,9 @@ public class ExpressionParser implements Parser {
     }
 
     boolean hasReturn = false;
-    boolean hasElsif = this.lookhead == Variable.ELSIF;
-    boolean hasElse = this.lookhead == Variable.ELSE;
-    if (this.lookhead != null && (hasElse || hasElsif || ifBodyHasReturn)) {
+    boolean hasElsif = this.lookahead == Variable.ELSIF;
+    boolean hasElse = this.lookahead == Variable.ELSE;
+    if (this.lookahead != null && (hasElse || hasElsif || ifBodyHasReturn)) {
       if (hasElse) {
         move(true);
         if (expectChar('{')) {
@@ -2047,7 +2047,7 @@ public class ExpressionParser implements Parser {
         }
       } else if (hasElsif) {
         hasReturn = ifStatement(false, true);
-        getCodeGenerator().onTernaryRight(this.lookhead);
+        getCodeGenerator().onTernaryRight(this.lookahead);
       } else if (ifBodyHasReturn && !isElsif) {
         hasReturn = elseBody(true);
       } else {
@@ -2064,26 +2064,26 @@ public class ExpressionParser implements Parser {
   private boolean withoutElse() {
     final CodeGenerator cg = getCodeGeneratorWithTimes();
     cg.onConstant(Variable.NIL);
-    cg.onTernaryRight(this.lookhead);
+    cg.onTernaryRight(this.lookahead);
     return false;
   }
 
   private boolean elseBody(final boolean inheritEnv) {
-    getCodeGeneratorWithTimes().onLambdaDefineStart(this.lookhead //
+    getCodeGeneratorWithTimes().onLambdaDefineStart(this.lookahead //
         .withMeta(Constants.SCOPE_META, this.scope.newLexicalScope) //
         .withMeta(Constants.INHERIT_ENV_META, inheritEnv) //
     );
-    getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookhead);
+    getCodeGeneratorWithTimes().onLambdaBodyStart(this.lookahead);
     boolean hasReturn = statements() == StatementType.Return;
-    getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookhead);
+    getCodeGeneratorWithTimes().onLambdaBodyEnd(this.lookahead);
     getCodeGeneratorWithTimes().onMethodName(anonymousMethodName());
-    getCodeGeneratorWithTimes().onMethodInvoke(this.lookhead);
-    getCodeGeneratorWithTimes().onTernaryRight(this.lookhead);
+    getCodeGeneratorWithTimes().onMethodInvoke(this.lookahead);
+    getCodeGeneratorWithTimes().onTernaryRight(this.lookahead);
     return hasReturn;
   }
 
   private DelegateToken anonymousMethodName() {
-    return new DelegateToken(this.lookhead, DelegateTokenType.Method_Name);
+    return new DelegateToken(this.lookahead, DelegateTokenType.Method_Name);
   }
 
 

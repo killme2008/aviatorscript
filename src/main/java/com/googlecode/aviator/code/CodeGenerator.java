@@ -29,118 +29,118 @@ import com.googlecode.aviator.runtime.FunctionParam;
  */
 public interface CodeGenerator {
 
-  public void onAssignment(Token<?> lookhead);
+  public void onAssignment(Token<?> lookahead);
 
   public void setParser(Parser parser);
 
-  public void onShiftRight(Token<?> lookhead);
+  public void onShiftRight(Token<?> lookahead);
 
 
-  public void onShiftLeft(Token<?> lookhead);
+  public void onShiftLeft(Token<?> lookahead);
 
 
-  public void onUnsignedShiftRight(Token<?> lookhead);
+  public void onUnsignedShiftRight(Token<?> lookahead);
 
 
-  public void onBitOr(Token<?> lookhead);
+  public void onBitOr(Token<?> lookahead);
 
 
-  public void onBitAnd(Token<?> lookhead);
+  public void onBitAnd(Token<?> lookahead);
 
 
-  public void onBitXor(Token<?> lookhead);
+  public void onBitXor(Token<?> lookahead);
 
 
-  public void onBitNot(Token<?> lookhead);
+  public void onBitNot(Token<?> lookahead);
 
 
-  public void onAdd(Token<?> lookhead);
+  public void onAdd(Token<?> lookahead);
 
 
-  public void onSub(Token<?> lookhead);
+  public void onSub(Token<?> lookahead);
 
 
-  public void onMult(Token<?> lookhead);
+  public void onMult(Token<?> lookahead);
 
   public void onExponent(Token<?> loohead);
 
 
-  public void onDiv(Token<?> lookhead);
+  public void onDiv(Token<?> lookahead);
 
 
-  public void onAndLeft(Token<?> lookhead);
+  public void onAndLeft(Token<?> lookahead);
 
 
-  public void onAndRight(Token<?> lookhead);
+  public void onAndRight(Token<?> alookahead);
 
 
-  public void onTernaryBoolean(Token<?> lookhead);
+  public void onTernaryBoolean(Token<?> lookahead);
 
 
-  public void onTernaryLeft(Token<?> lookhead);
+  public void onTernaryLeft(Token<?> lookahead);
 
 
-  public void onTernaryRight(Token<?> lookhead);
+  public void onTernaryRight(Token<?> lookahead);
 
-  public void onTernaryEnd(Token<?> lookhead);
-
-
-  public void onJoinLeft(Token<?> lookhead);
+  public void onTernaryEnd(Token<?> lookahead);
 
 
-  public void onJoinRight(Token<?> lookhead);
+  public void onJoinLeft(Token<?> lookahead);
 
 
-  public void onEq(Token<?> lookhead);
+  public void onJoinRight(Token<?> lookahead);
 
 
-  public void onMatch(Token<?> lookhead);
+  public void onEq(Token<?> lookahead);
 
 
-  public void onNeq(Token<?> lookhead);
+  public void onMatch(Token<?> lookahead);
 
 
-  public void onLt(Token<?> lookhead);
+  public void onNeq(Token<?> lookahead);
 
 
-  public void onLe(Token<?> lookhead);
+  public void onLt(Token<?> lookahead);
 
 
-  public void onGt(Token<?> lookhead);
+  public void onLe(Token<?> lookahead);
 
 
-  public void onGe(Token<?> lookhead);
+  public void onGt(Token<?> lookahead);
 
 
-  public void onMod(Token<?> lookhead);
+  public void onGe(Token<?> lookahead);
 
 
-  public void onNot(Token<?> lookhead);
+  public void onMod(Token<?> lookahead);
 
 
-  public void onNeg(Token<?> lookhead);
+  public void onNot(Token<?> lookahead);
+
+
+  public void onNeg(Token<?> lookahead);
 
   public Expression getResult(boolean unboxObject);
 
-  public void onConstant(Token<?> lookhead);
+  public void onConstant(Token<?> lookahead);
 
-  public void onMethodName(Token<?> lookhead);
+  public void onMethodName(Token<?> lookahead);
 
-  public void onMethodParameter(Token<?> lookhead);
+  public void onMethodParameter(Token<?> lookahead);
 
-  public void onMethodInvoke(Token<?> lookhead);
+  public void onMethodInvoke(Token<?> lookahead);
 
-  public void onLambdaDefineStart(Token<?> lookhead);
+  public void onLambdaDefineStart(Token<?> lookahead);
 
-  public void onLambdaArgument(Token<?> lookhead, FunctionParam param);
+  public void onLambdaArgument(Token<?> lookahead, FunctionParam param);
 
-  public void onLambdaBodyStart(Token<?> lookhead);
+  public void onLambdaBodyStart(Token<?> lookahead);
 
-  public void onLambdaBodyEnd(Token<?> lookhead);
+  public void onLambdaBodyEnd(Token<?> lookahead);
 
-  public void onArray(Token<?> lookhead);
+  public void onArray(Token<?> lookahead);
 
   public void onArrayIndexStart(Token<?> token);
 
-  public void onArrayIndexEnd(Token<?> lookhead);
+  public void onArrayIndexEnd(Token<?> lookahead);
 }

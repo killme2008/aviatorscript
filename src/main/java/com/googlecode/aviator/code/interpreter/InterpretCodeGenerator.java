@@ -129,8 +129,8 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onAssignment(final Token<?> lookhead) {
-    if (lookhead.getMeta(Constants.DEFINE_META, false)) {
+  public void onAssignment(final Token<?> lookahead) {
+    if (lookahead.getMeta(Constants.DEFINE_META, false)) {
       emit(OperatorIR.DEF);
     } else {
       emit(OperatorIR.ASSIGN);
@@ -138,53 +138,53 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onShiftRight(final Token<?> lookhead) {
+  public void onShiftRight(final Token<?> lookahead) {
     emit(OperatorIR.SHIFT_RIGHT);
   }
 
   @Override
-  public void onShiftLeft(final Token<?> lookhead) {
+  public void onShiftLeft(final Token<?> lookahead) {
     emit(OperatorIR.SHIFT_LEFT);
   }
 
   @Override
-  public void onUnsignedShiftRight(final Token<?> lookhead) {
+  public void onUnsignedShiftRight(final Token<?> lookahead) {
     emit(OperatorIR.UNSIGNED_SHIFT_RIGHT);
   }
 
   @Override
-  public void onBitOr(final Token<?> lookhead) {
+  public void onBitOr(final Token<?> lookahead) {
     emit(OperatorIR.BIT_OR);
   }
 
   @Override
-  public void onBitAnd(final Token<?> lookhead) {
+  public void onBitAnd(final Token<?> lookahead) {
     emit(OperatorIR.BIT_AND);
   }
 
   @Override
-  public void onBitXor(final Token<?> lookhead) {
+  public void onBitXor(final Token<?> lookahead) {
     emit(OperatorIR.BIT_XOR);
   }
 
   @Override
-  public void onBitNot(final Token<?> lookhead) {
+  public void onBitNot(final Token<?> lookahead) {
     emit(OperatorIR.BIT_NOT);
   }
 
   @Override
-  public void onAdd(final Token<?> lookhead) {
+  public void onAdd(final Token<?> lookahead) {
     emit(OperatorIR.ADD);
   }
 
   @Override
-  public void onSub(final Token<?> lookhead) {
+  public void onSub(final Token<?> lookahead) {
     emit(OperatorIR.SUB);
 
   }
 
   @Override
-  public void onMult(final Token<?> lookhead) {
+  public void onMult(final Token<?> lookahead) {
     emit(OperatorIR.MULT);
   }
 
@@ -194,19 +194,19 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onDiv(final Token<?> lookhead) {
+  public void onDiv(final Token<?> lookahead) {
     emit(OperatorIR.DIV);
 
   }
 
   @Override
-  public void onAndLeft(final Token<?> lookhead) {
+  public void onAndLeft(final Token<?> lookahead) {
     if (!OperationRuntime.containsOpFunction(this.compileEnv, OperatorType.AND)) {
       emit(new AssertTypeIR(AssertTypes.Bool));
       Label label = makeLabel();
       pushLabel0(label);
       this.instruments
-          .add(new BranchUnlessIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
+          .add(new BranchUnlessIR(label, new SourceInfo(this.sourceFile, lookahead.getLineNo())));
       emit(PopIR.INSTANCE);
     }
   }
@@ -226,7 +226,7 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onAndRight(final Token<?> lookhead) {
+  public void onAndRight(final Token<?> alookahead) {
     if (!OperationRuntime.containsOpFunction(this.compileEnv, OperatorType.AND)) {
       emit(new AssertTypeIR(AssertTypes.Bool));
       Label label = popLabel0();
@@ -237,20 +237,20 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onTernaryBoolean(final Token<?> lookhead) {
+  public void onTernaryBoolean(final Token<?> lookahead) {
     Label label0 = makeLabel();
     pushLabel0(label0);
     Label label1 = makeLabel();
     pushLabel1(label1);
     this.instruments
-        .add(new BranchUnlessIR(label0, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
+        .add(new BranchUnlessIR(label0, new SourceInfo(this.sourceFile, lookahead.getLineNo())));
     emit(PopIR.INSTANCE);
   }
 
   @Override
-  public void onTernaryLeft(final Token<?> lookhead) {
+  public void onTernaryLeft(final Token<?> lookahead) {
     this.instruments
-        .add(new GotoIR(peekLabel1(), new SourceInfo(this.sourceFile, lookhead.getLineNo())));
+        .add(new GotoIR(peekLabel1(), new SourceInfo(this.sourceFile, lookahead.getLineNo())));
 
     // emit(PopIR.INSTANCE);
     Label label0 = popLabel0();
@@ -259,30 +259,30 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onTernaryRight(final Token<?> lookhead) {
+  public void onTernaryRight(final Token<?> lookahead) {
     Label label1 = popLabel1();
     visitLabel(label1);
   }
 
   @Override
-  public void onTernaryEnd(final Token<?> lookhead) {
+  public void onTernaryEnd(final Token<?> lookahead) {
     emit(ClearIR.INSTANCE);
   }
 
   @Override
-  public void onJoinLeft(final Token<?> lookhead) {
+  public void onJoinLeft(final Token<?> lookahead) {
     if (!OperationRuntime.containsOpFunction(this.compileEnv, OperatorType.AND)) {
       emit(new AssertTypeIR(AssertTypes.Bool));
       Label label = makeLabel();
       pushLabel0(label);
       this.instruments
-          .add(new BranchIfIR(label, new SourceInfo(this.sourceFile, lookhead.getLineNo())));
+          .add(new BranchIfIR(label, new SourceInfo(this.sourceFile, lookahead.getLineNo())));
       emit(PopIR.INSTANCE);
     }
   }
 
   @Override
-  public void onJoinRight(final Token<?> lookhead) {
+  public void onJoinRight(final Token<?> lookahead) {
     if (!OperationRuntime.containsOpFunction(this.compileEnv, OperatorType.AND)) {
       emit(new AssertTypeIR(AssertTypes.Bool));
       Label label = popLabel0();
@@ -293,52 +293,52 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onEq(final Token<?> lookhead) {
+  public void onEq(final Token<?> lookahead) {
     emit(OperatorIR.EQ);
   }
 
   @Override
-  public void onMatch(final Token<?> lookhead) {
+  public void onMatch(final Token<?> lookahead) {
     emit(OperatorIR.MATCH);
   }
 
   @Override
-  public void onNeq(final Token<?> lookhead) {
+  public void onNeq(final Token<?> lookahead) {
     emit(OperatorIR.NE);
   }
 
   @Override
-  public void onLt(final Token<?> lookhead) {
+  public void onLt(final Token<?> lookahead) {
     emit(OperatorIR.LT);
   }
 
   @Override
-  public void onLe(final Token<?> lookhead) {
+  public void onLe(final Token<?> lookahead) {
     emit(OperatorIR.LE);
   }
 
   @Override
-  public void onGt(final Token<?> lookhead) {
+  public void onGt(final Token<?> lookahead) {
     emit(OperatorIR.GT);
   }
 
   @Override
-  public void onGe(final Token<?> lookhead) {
+  public void onGe(final Token<?> lookahead) {
     emit(OperatorIR.GE);
   }
 
   @Override
-  public void onMod(final Token<?> lookhead) {
+  public void onMod(final Token<?> lookahead) {
     emit(OperatorIR.MOD);
   }
 
   @Override
-  public void onNot(final Token<?> lookhead) {
+  public void onNot(final Token<?> lookahead) {
     emit(OperatorIR.NOT);
   }
 
   @Override
-  public void onNeg(final Token<?> lookhead) {
+  public void onNeg(final Token<?> lookahead) {
     emit(OperatorIR.NEG);
   }
 
@@ -401,38 +401,38 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onConstant(final Token<?> lookhead) {
-    if (LOAD_CONSTANTS_TYPE.contains(lookhead.getType())) {
+  public void onConstant(final Token<?> lookahead) {
+    if (LOAD_CONSTANTS_TYPE.contains(lookahead.getType())) {
       VariableMeta meta = null;
 
-      if (lookhead.getType() == TokenType.Variable) {
-        meta = this.variables.get(lookhead.getLexeme());
+      if (lookahead.getType() == TokenType.Variable) {
+        meta = this.variables.get(lookahead.getLexeme());
       }
 
-      emit(new LoadIR(this.sourceFile, lookhead, meta, this.constantPool.contains(lookhead)));
+      emit(new LoadIR(this.sourceFile, lookahead, meta, this.constantPool.contains(lookahead)));
     }
   }
 
   @Override
-  public void onMethodName(final Token<?> lookhead) {
-    final MethodMetaData metadata = new MethodMetaData(lookhead,
-        lookhead.getType() == TokenType.Delegate ? null : lookhead.getLexeme());
+  public void onMethodName(final Token<?> lookahead) {
+    final MethodMetaData metadata = new MethodMetaData(lookahead,
+        lookahead.getType() == TokenType.Delegate ? null : lookahead.getLexeme());
     this.methodMetaDataStack.push(metadata);
   }
 
   @Override
-  public void onMethodParameter(final Token<?> lookhead) {
+  public void onMethodParameter(final Token<?> lookahead) {
     MethodMetaData currentMethodMetaData = this.methodMetaDataStack.peek();
     currentMethodMetaData.parameterCount++;
   }
 
   @Override
-  public void onMethodInvoke(final Token<?> lookhead) {
+  public void onMethodInvoke(final Token<?> lookahead) {
 
     final MethodMetaData methodMetaData = this.methodMetaDataStack.pop();
     @SuppressWarnings("unchecked")
-    final List<FunctionArgument> params = lookhead != null
-        ? (List<FunctionArgument>) lookhead.getMeta(Constants.PARAMS_META, Collections.EMPTY_LIST)
+    final List<FunctionArgument> params = lookahead != null
+        ? (List<FunctionArgument>) lookahead.getMeta(Constants.PARAMS_META, Collections.EMPTY_LIST)
         : Collections.<FunctionArgument>emptyList();
 
     if (this.instance.getOptionValue(Options.CAPTURE_FUNCTION_ARGS).bool) {
@@ -447,10 +447,10 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead) {
+  public void onLambdaDefineStart(final Token<?> lookahead) {
     if (this.lambdaGenerator == null) {
-      Boolean newLexicalScope = lookhead.getMeta(Constants.SCOPE_META, false);
-      Boolean inheritEnv = lookhead.getMeta(Constants.INHERIT_ENV_META, false);
+      Boolean newLexicalScope = lookahead.getMeta(Constants.SCOPE_META, false);
+      Boolean inheritEnv = lookahead.getMeta(Constants.INHERIT_ENV_META, false);
       // TODO cache?
       this.lambdaGenerator = new LambdaGenerator(this.instance, this, this.parser, this.classLoader,
           this.sourceFile, newLexicalScope, inheritEnv);
@@ -462,18 +462,18 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onLambdaArgument(final Token<?> lookhead, final FunctionParam param) {
+  public void onLambdaArgument(final Token<?> lookahead, final FunctionParam param) {
     this.lambdaGenerator.addParam(param);
   }
 
   @Override
-  public void onLambdaBodyStart(final Token<?> lookhead) {
+  public void onLambdaBodyStart(final Token<?> lookahead) {
     this.parentCodeGenerator = this.parser.getCodeGenerator();
     this.parser.setCodeGenerator(this.lambdaGenerator);
   }
 
   @Override
-  public void onLambdaBodyEnd(final Token<?> lookhead) {
+  public void onLambdaBodyEnd(final Token<?> lookahead) {
     // this.lambdaGenerator.compileCallMethod();
     LambdaFunctionBootstrap bootstrap = this.lambdaGenerator.getLmabdaBootstrap();
     if (this.lambdaBootstraps == null) {
@@ -488,15 +488,15 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
   }
 
   @Override
-  public void onArray(final Token<?> lookhead) {
-    onConstant(lookhead);
+  public void onArray(final Token<?> lookahead) {
+    onConstant(lookahead);
   }
 
   @Override
   public void onArrayIndexStart(final Token<?> token) {}
 
   @Override
-  public void onArrayIndexEnd(final Token<?> lookhead) {
+  public void onArrayIndexEnd(final Token<?> lookahead) {
     emit(OperatorIR.INDEX);
   }
 

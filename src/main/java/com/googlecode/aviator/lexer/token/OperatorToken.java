@@ -35,10 +35,10 @@ public class OperatorToken extends AbstractToken<OperatorType> {
   }
 
 
-  public OperatorToken(final Token<?> lookhead, final OperatorType operatorType) {
-    super(operatorType.getToken(), lookhead != null ? lookhead.getLineNo() : 0,
-        lookhead != null ? lookhead.getStartIndex() : -1);
-    setMetaMap(lookhead != null ? lookhead.getMetaMap() : null);
+  public OperatorToken(final Token<?> lookahead, final OperatorType operatorType) {
+    super(operatorType.getToken(), lookahead != null ? lookahead.getLineNo() : 0,
+        lookahead != null ? lookahead.getStartIndex() : -1);
+    setMetaMap(lookahead != null ? lookahead.getMetaMap() : null);
     this.operatorType = operatorType;
   }
 

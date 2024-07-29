@@ -319,36 +319,36 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   }
 
 
-  private AviatorObject getAviatorObjectFromToken(final Token<?> lookhead) {
+  private AviatorObject getAviatorObjectFromToken(final Token<?> lookahead) {
     AviatorObject result = null;
-    switch (lookhead.getType()) {
+    switch (lookahead.getType()) {
       case Number:
         // load numbers
-        NumberToken numberToken = (NumberToken) lookhead;
+        NumberToken numberToken = (NumberToken) lookahead;
         Number num = numberToken.getNumber();
         result = AviatorNumber.valueOf(num);
         break;
       case String:
         // load string
         result =
-            new AviatorString((String) lookhead.getValue(null), true, true, lookhead.getLineNo());
+            new AviatorString((String) lookahead.getValue(null), true, true, lookahead.getLineNo());
         break;
       case Pattern:
         // load pattern
-        result = new AviatorPattern((String) lookhead.getValue(null));
+        result = new AviatorPattern((String) lookahead.getValue(null));
         break;
       case Variable:
-        if (lookhead == Variable.TRUE) {
+        if (lookahead == Variable.TRUE) {
           result = AviatorBoolean.TRUE;
-        } else if (lookhead == Variable.FALSE) {
+        } else if (lookahead == Variable.FALSE) {
           result = AviatorBoolean.FALSE;
-        } else if (lookhead == Variable.NIL) {
+        } else if (lookahead == Variable.NIL) {
           result = AviatorNil.NIL;
         }
         break;
       case Char:
-        result = new AviatorString(String.valueOf(lookhead.getValue(null)), true, true,
-            lookhead.getLineNo());
+        result = new AviatorString(String.valueOf(lookahead.getValue(null)), true, true,
+            lookahead.getLineNo());
         break;
     }
     return result;
@@ -617,151 +617,151 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onAdd(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.ADD));
+  public void onAdd(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.ADD));
 
   }
 
 
   @Override
-  public void onAndLeft(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.And_Left));
+  public void onAndLeft(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.And_Left));
   }
 
 
   @Override
-  public void onAndRight(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.AND));
-
-  }
-
-
-  @Override
-  public void onConstant(final Token<?> lookhead) {
-    this.tokenList.add(lookhead);
-  }
-
-
-  @Override
-  public void onDiv(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.DIV));
+  public void onAndRight(final Token<?> alookahead) {
+    this.tokenList.add(new OperatorToken(alookahead, OperatorType.AND));
 
   }
 
 
   @Override
-  public void onArrayIndexStart(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Index_Start));
+  public void onConstant(final Token<?> lookahead) {
+    this.tokenList.add(lookahead);
+  }
+
+
+  @Override
+  public void onDiv(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.DIV));
+
+  }
+
+
+  @Override
+  public void onArrayIndexStart(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Index_Start));
 
   }
 
   @Override
-  public void onAssignment(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead,
-        (lookhead == null || !lookhead.getMeta(Constants.DEFINE_META, false))
+  public void onAssignment(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead,
+        (lookahead == null || !lookahead.getMeta(Constants.DEFINE_META, false))
             ? OperatorType.ASSIGNMENT
             : OperatorType.DEFINE));
   }
 
 
   @Override
-  public void onArrayIndexEnd(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.INDEX));
+  public void onArrayIndexEnd(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.INDEX));
   }
 
 
   @Override
-  public void onArray(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Array));
-
-  }
-
-
-  @Override
-  public void onEq(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.EQ));
+  public void onArray(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Array));
 
   }
 
 
   @Override
-  public void onGe(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.GE));
+  public void onEq(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.EQ));
 
   }
 
 
   @Override
-  public void onGt(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.GT));
+  public void onGe(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.GE));
 
   }
 
 
   @Override
-  public void onJoinLeft(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Join_Left));
-  }
-
-
-  @Override
-  public void onJoinRight(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.OR));
+  public void onGt(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.GT));
 
   }
 
 
   @Override
-  public void onLe(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.LE));
+  public void onJoinLeft(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Join_Left));
+  }
+
+
+  @Override
+  public void onJoinRight(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.OR));
 
   }
 
 
   @Override
-  public void onLt(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.LT));
+  public void onLe(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.LE));
 
   }
 
 
   @Override
-  public void onMatch(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.MATCH));
+  public void onLt(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.LT));
 
   }
 
 
   @Override
-  public void onMethodInvoke(final Token<?> lookhead) {
-    OperatorToken token = new OperatorToken(lookhead, OperatorType.FUNC);
-    token.setMetaMap(lookhead != null ? lookhead.getMetaMap() : null);
+  public void onMatch(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.MATCH));
+
+  }
+
+
+  @Override
+  public void onMethodInvoke(final Token<?> lookahead) {
+    OperatorToken token = new OperatorToken(lookahead, OperatorType.FUNC);
+    token.setMetaMap(lookahead != null ? lookahead.getMetaMap() : null);
     this.tokenList.add(token);
 
   }
 
 
   @Override
-  public void onMethodName(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Method_Name));
+  public void onMethodName(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Method_Name));
 
   }
 
 
   @Override
-  public void onMethodParameter(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Method_Param));
+  public void onMethodParameter(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Method_Param));
 
   }
 
 
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead) {
+  public void onLambdaDefineStart(final Token<?> lookahead) {
     if (this.lambdaGenerator == null) {
       // TODO cache?
-      Boolean newLexicalScope = lookhead.getMeta(Constants.SCOPE_META, false);
-      Boolean inheritEnv = lookhead.getMeta(Constants.INHERIT_ENV_META, false);
+      Boolean newLexicalScope = lookahead.getMeta(Constants.SCOPE_META, false);
+      Boolean inheritEnv = lookahead.getMeta(Constants.INHERIT_ENV_META, false);
       this.lambdaGenerator = new LambdaGenerator(this.instance, this, this.parser,
           this.codeGen.getClassLoader(), this.sourceFile, newLexicalScope, inheritEnv);
       this.lambdaGenerator.setScopeInfo(this.parser.enterScope(newLexicalScope));
@@ -772,27 +772,27 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onLambdaArgument(final Token<?> lookhead, final FunctionParam param) {
+  public void onLambdaArgument(final Token<?> lookahead, final FunctionParam param) {
     this.lambdaGenerator.addParam(param);
   }
 
 
   @Override
-  public void onLambdaBodyStart(final Token<?> lookhead) {
+  public void onLambdaBodyStart(final Token<?> lookahead) {
     this.parentCodeGenerator = this.parser.getCodeGenerator();
     this.parser.setCodeGenerator(this.lambdaGenerator);
   }
 
 
   @Override
-  public void onLambdaBodyEnd(final Token<?> lookhead) {
+  public void onLambdaBodyEnd(final Token<?> lookahead) {
     // this.lambdaGenerator.compileCallMethod();
     LambdaFunctionBootstrap bootstrap = this.lambdaGenerator.getLmabdaBootstrap();
     if (this.lambdaBootstraps == null) {
       this.lambdaBootstraps = new HashMap<String, LambdaFunctionBootstrap>();
     }
     this.lambdaBootstraps.put(bootstrap.getName(), bootstrap);
-    DelegateToken token = new DelegateToken(lookhead, DelegateTokenType.Lambda_New);
+    DelegateToken token = new DelegateToken(lookahead, DelegateTokenType.Lambda_New);
     token.setLambdaFunctionBootstrap(bootstrap);
     this.tokenList.add(token);
     this.parser.restoreScope(this.lambdaGenerator.getScopeInfo());
@@ -802,122 +802,122 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
 
   @Override
-  public void onMod(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.MOD));
+  public void onMod(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.MOD));
 
   }
 
 
   @Override
-  public void onMult(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.MULT));
+  public void onMult(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.MULT));
 
   }
 
   @Override
-  public void onExponent(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.Exponent));
+  public void onExponent(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.Exponent));
 
   }
 
   @Override
-  public void onNeg(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.NEG));
-
-  }
-
-
-  @Override
-  public void onNeq(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.NEQ));
+  public void onNeg(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.NEG));
 
   }
 
 
   @Override
-  public void onNot(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.NOT));
+  public void onNeq(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.NEQ));
 
   }
 
 
   @Override
-  public void onSub(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.SUB));
+  public void onNot(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.NOT));
 
   }
 
 
   @Override
-  public void onTernaryBoolean(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Ternary_Boolean));
+  public void onSub(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.SUB));
 
   }
 
 
   @Override
-  public void onTernaryLeft(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Ternary_Left));
+  public void onTernaryBoolean(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Ternary_Boolean));
 
   }
 
 
   @Override
-  public void onTernaryRight(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.TERNARY));
-  }
-
-
-  @Override
-  public void onTernaryEnd(final Token<?> lookhead) {
-    this.tokenList.add(new DelegateToken(lookhead, DelegateTokenType.Ternay_End));
-  }
-
-
-  @Override
-  public void onBitAnd(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.BIT_AND));
+  public void onTernaryLeft(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Ternary_Left));
 
   }
 
 
   @Override
-  public void onBitNot(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.BIT_NOT));
+  public void onTernaryRight(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.TERNARY));
   }
 
 
   @Override
-  public void onBitOr(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.BIT_OR));
-
+  public void onTernaryEnd(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Ternay_End));
   }
 
 
   @Override
-  public void onShiftLeft(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.SHIFT_LEFT));
-
-  }
-
-
-  @Override
-  public void onShiftRight(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.SHIFT_RIGHT));
+  public void onBitAnd(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.BIT_AND));
 
   }
 
 
   @Override
-  public void onUnsignedShiftRight(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.U_SHIFT_RIGHT));
+  public void onBitNot(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.BIT_NOT));
+  }
+
+
+  @Override
+  public void onBitOr(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.BIT_OR));
 
   }
 
 
   @Override
-  public void onBitXor(final Token<?> lookhead) {
-    this.tokenList.add(new OperatorToken(lookhead, OperatorType.BIT_XOR));
+  public void onShiftLeft(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.SHIFT_LEFT));
+
+  }
+
+
+  @Override
+  public void onShiftRight(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.SHIFT_RIGHT));
+
+  }
+
+
+  @Override
+  public void onUnsignedShiftRight(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.U_SHIFT_RIGHT));
+
+  }
+
+
+  @Override
+  public void onBitXor(final Token<?> lookahead) {
+    this.tokenList.add(new OperatorToken(lookahead, OperatorType.BIT_XOR));
 
   }
 
