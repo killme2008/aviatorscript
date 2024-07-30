@@ -210,212 +210,212 @@ public class LambdaGenerator implements CodeGenerator {
 
 
   @Override
-  public void onShiftRight(final Token<?> lookhead) {
-    this.codeGenerator.onShiftRight(lookhead);
+  public void onShiftRight(final Token<?> lookahead) {
+    this.codeGenerator.onShiftRight(lookahead);
   }
 
 
 
   @Override
-  public void onShiftLeft(final Token<?> lookhead) {
-    this.codeGenerator.onShiftLeft(lookhead);
+  public void onShiftLeft(final Token<?> lookahead) {
+    this.codeGenerator.onShiftLeft(lookahead);
   }
 
 
 
   @Override
-  public void onUnsignedShiftRight(final Token<?> lookhead) {
-    this.codeGenerator.onUnsignedShiftRight(lookhead);
+  public void onUnsignedShiftRight(final Token<?> lookahead) {
+    this.codeGenerator.onUnsignedShiftRight(lookahead);
   }
 
 
 
   @Override
-  public void onAssignment(final Token<?> lookhead) {
-    this.codeGenerator.onAssignment(lookhead);
+  public void onAssignment(final Token<?> lookahead) {
+    this.codeGenerator.onAssignment(lookahead);
   }
 
 
   @Override
-  public void onBitOr(final Token<?> lookhead) {
-    this.codeGenerator.onBitOr(lookhead);
+  public void onBitOr(final Token<?> lookahead) {
+    this.codeGenerator.onBitOr(lookahead);
   }
 
 
   @Override
-  public void onBitAnd(final Token<?> lookhead) {
-    this.codeGenerator.onBitAnd(lookhead);
-  }
-
-
-
-  @Override
-  public void onBitXor(final Token<?> lookhead) {
-    this.codeGenerator.onBitXor(lookhead);
+  public void onBitAnd(final Token<?> lookahead) {
+    this.codeGenerator.onBitAnd(lookahead);
   }
 
 
 
   @Override
-  public void onBitNot(final Token<?> lookhead) {
-    this.codeGenerator.onBitNot(lookhead);
+  public void onBitXor(final Token<?> lookahead) {
+    this.codeGenerator.onBitXor(lookahead);
   }
 
 
 
   @Override
-  public void onAdd(final Token<?> lookhead) {
-    this.codeGenerator.onAdd(lookhead);
-  }
-
-  @Override
-  public void onSub(final Token<?> lookhead) {
-    this.codeGenerator.onSub(lookhead);
+  public void onBitNot(final Token<?> lookahead) {
+    this.codeGenerator.onBitNot(lookahead);
   }
 
 
 
   @Override
-  public void onMult(final Token<?> lookhead) {
-    this.codeGenerator.onMult(lookhead);
+  public void onAdd(final Token<?> lookahead) {
+    this.codeGenerator.onAdd(lookahead);
+  }
+
+  @Override
+  public void onSub(final Token<?> lookahead) {
+    this.codeGenerator.onSub(lookahead);
   }
 
 
 
   @Override
-  public void onExponent(final Token<?> lookhead) {
-    this.codeGenerator.onExponent(lookhead);
-  }
-
-
-  @Override
-  public void onDiv(final Token<?> lookhead) {
-    this.codeGenerator.onDiv(lookhead);
+  public void onMult(final Token<?> lookahead) {
+    this.codeGenerator.onMult(lookahead);
   }
 
 
 
   @Override
-  public void onAndLeft(final Token<?> lookhead) {
-    this.codeGenerator.onAndLeft(lookhead);
+  public void onExponent(final Token<?> lookahead) {
+    this.codeGenerator.onExponent(lookahead);
+  }
+
+
+  @Override
+  public void onDiv(final Token<?> lookahead) {
+    this.codeGenerator.onDiv(lookahead);
   }
 
 
 
   @Override
-  public void onAndRight(final Token<?> lookhead) {
-    this.codeGenerator.onAndRight(lookhead);
+  public void onAndLeft(final Token<?> lookahead) {
+    this.codeGenerator.onAndLeft(lookahead);
   }
 
 
 
   @Override
-  public void onTernaryBoolean(final Token<?> lookhead) {
-    this.codeGenerator.onTernaryBoolean(lookhead);
+  public void onAndRight(final Token<?> alookahead) {
+    this.codeGenerator.onAndRight(alookahead);
   }
 
 
 
   @Override
-  public void onTernaryLeft(final Token<?> lookhead) {
-    this.codeGenerator.onTernaryLeft(lookhead);
+  public void onTernaryBoolean(final Token<?> lookahead) {
+    this.codeGenerator.onTernaryBoolean(lookahead);
   }
 
 
 
   @Override
-  public void onTernaryRight(final Token<?> lookhead) {
-    this.codeGenerator.onTernaryRight(lookhead);
+  public void onTernaryLeft(final Token<?> lookahead) {
+    this.codeGenerator.onTernaryLeft(lookahead);
   }
 
 
 
   @Override
-  public void onTernaryEnd(final Token<?> lookhead) {
-    this.codeGenerator.onTernaryEnd(lookhead);
-  }
-
-
-  @Override
-  public void onJoinLeft(final Token<?> lookhead) {
-    this.codeGenerator.onJoinLeft(lookhead);
+  public void onTernaryRight(final Token<?> lookahead) {
+    this.codeGenerator.onTernaryRight(lookahead);
   }
 
 
 
   @Override
-  public void onJoinRight(final Token<?> lookhead) {
-    this.codeGenerator.onJoinRight(lookhead);
+  public void onTernaryEnd(final Token<?> lookahead) {
+    this.codeGenerator.onTernaryEnd(lookahead);
+  }
+
+
+  @Override
+  public void onJoinLeft(final Token<?> lookahead) {
+    this.codeGenerator.onJoinLeft(lookahead);
   }
 
 
 
   @Override
-  public void onEq(final Token<?> lookhead) {
-    this.codeGenerator.onEq(lookhead);
+  public void onJoinRight(final Token<?> lookahead) {
+    this.codeGenerator.onJoinRight(lookahead);
   }
 
 
 
   @Override
-  public void onMatch(final Token<?> lookhead) {
-    this.codeGenerator.onMatch(lookhead);
+  public void onEq(final Token<?> lookahead) {
+    this.codeGenerator.onEq(lookahead);
   }
 
 
 
   @Override
-  public void onNeq(final Token<?> lookhead) {
-    this.codeGenerator.onNeq(lookhead);
+  public void onMatch(final Token<?> lookahead) {
+    this.codeGenerator.onMatch(lookahead);
   }
 
 
 
   @Override
-  public void onLt(final Token<?> lookhead) {
-    this.codeGenerator.onLt(lookhead);
+  public void onNeq(final Token<?> lookahead) {
+    this.codeGenerator.onNeq(lookahead);
   }
 
 
 
   @Override
-  public void onLe(final Token<?> lookhead) {
-    this.codeGenerator.onLe(lookhead);
+  public void onLt(final Token<?> lookahead) {
+    this.codeGenerator.onLt(lookahead);
   }
 
 
 
   @Override
-  public void onGt(final Token<?> lookhead) {
-    this.codeGenerator.onGt(lookhead);
+  public void onLe(final Token<?> lookahead) {
+    this.codeGenerator.onLe(lookahead);
   }
 
 
 
   @Override
-  public void onGe(final Token<?> lookhead) {
-    this.codeGenerator.onGe(lookhead);
+  public void onGt(final Token<?> lookahead) {
+    this.codeGenerator.onGt(lookahead);
   }
 
 
 
   @Override
-  public void onMod(final Token<?> lookhead) {
-    this.codeGenerator.onMod(lookhead);
+  public void onGe(final Token<?> lookahead) {
+    this.codeGenerator.onGe(lookahead);
   }
 
 
 
   @Override
-  public void onNot(final Token<?> lookhead) {
-    this.codeGenerator.onNot(lookhead);
+  public void onMod(final Token<?> lookahead) {
+    this.codeGenerator.onMod(lookahead);
   }
 
 
 
   @Override
-  public void onNeg(final Token<?> lookhead) {
-    this.codeGenerator.onNeg(lookhead);
+  public void onNot(final Token<?> lookahead) {
+    this.codeGenerator.onNot(lookahead);
+  }
+
+
+
+  @Override
+  public void onNeg(final Token<?> lookahead) {
+    this.codeGenerator.onNeg(lookahead);
   }
 
 
@@ -426,55 +426,55 @@ public class LambdaGenerator implements CodeGenerator {
 
 
   @Override
-  public void onConstant(final Token<?> lookhead) {
-    this.codeGenerator.onConstant(lookhead);
+  public void onConstant(final Token<?> lookahead) {
+    this.codeGenerator.onConstant(lookahead);
   }
 
   @Override
-  public void onMethodName(final Token<?> lookhead) {
-    this.codeGenerator.onMethodName(lookhead);
-  }
-
-
-
-  @Override
-  public void onMethodParameter(final Token<?> lookhead) {
-    this.codeGenerator.onMethodParameter(lookhead);
-  }
-
-  @Override
-  public void onMethodInvoke(final Token<?> lookhead) {
-    this.codeGenerator.onMethodInvoke(lookhead);
+  public void onMethodName(final Token<?> lookahead) {
+    this.codeGenerator.onMethodName(lookahead);
   }
 
 
 
   @Override
-  public void onLambdaDefineStart(final Token<?> lookhead) {
-    this.codeGenerator.onLambdaDefineStart(lookhead);
+  public void onMethodParameter(final Token<?> lookahead) {
+    this.codeGenerator.onMethodParameter(lookahead);
+  }
+
+  @Override
+  public void onMethodInvoke(final Token<?> lookahead) {
+    this.codeGenerator.onMethodInvoke(lookahead);
   }
 
 
 
   @Override
-  public void onLambdaArgument(final Token<?> lookhead, final FunctionParam param) {
-    this.codeGenerator.onLambdaArgument(lookhead, param);
+  public void onLambdaDefineStart(final Token<?> lookahead) {
+    this.codeGenerator.onLambdaDefineStart(lookahead);
+  }
+
+
+
+  @Override
+  public void onLambdaArgument(final Token<?> lookahead, final FunctionParam param) {
+    this.codeGenerator.onLambdaArgument(lookahead, param);
   }
 
   @Override
-  public void onLambdaBodyStart(final Token<?> lookhead) {
-    this.codeGenerator.onLambdaBodyStart(lookhead);
+  public void onLambdaBodyStart(final Token<?> lookahead) {
+    this.codeGenerator.onLambdaBodyStart(lookahead);
   }
 
   @Override
-  public void onLambdaBodyEnd(final Token<?> lookhead) {
+  public void onLambdaBodyEnd(final Token<?> lookahead) {
     // should call parent generator
-    this.parentCodeGenerator.onLambdaBodyEnd(lookhead);
+    this.parentCodeGenerator.onLambdaBodyEnd(lookahead);
   }
 
   @Override
-  public void onArray(final Token<?> lookhead) {
-    this.codeGenerator.onArray(lookhead);
+  public void onArray(final Token<?> lookahead) {
+    this.codeGenerator.onArray(lookahead);
   }
 
   @Override
@@ -483,8 +483,8 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
   @Override
-  public void onArrayIndexEnd(final Token<?> lookhead) {
-    this.codeGenerator.onArrayIndexEnd(lookhead);
+  public void onArrayIndexEnd(final Token<?> lookahead) {
+    this.codeGenerator.onArrayIndexEnd(lookahead);
   }
 
 }
