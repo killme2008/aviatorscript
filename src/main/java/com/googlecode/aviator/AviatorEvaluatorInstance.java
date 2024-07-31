@@ -93,13 +93,18 @@ import com.googlecode.aviator.runtime.function.seq.SeqCollectorFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCollectorRawFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCompsitePredFunFunction.LogicOp;
+import com.googlecode.aviator.runtime.function.seq.SeqContainsAnyFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqContainsKeyFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqCountFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqDisjunctionFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqEveryFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqFilterFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqGetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIncludeFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqIntersectionFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqIntoFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqIsEqualFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqIsSubSeqFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqKeysFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMakePredicateFunFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqMapEntryFunction;
@@ -117,6 +122,8 @@ import com.googlecode.aviator.runtime.function.seq.SeqRemoveFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReverseFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqSubtractFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqUnionFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqValsFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqZipmapFunction;
 import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
@@ -976,6 +983,14 @@ public final class AviatorEvaluatorInstance {
         new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
     addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
     addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
+
+    addFunction(new SeqContainsAnyFunction());
+    addFunction(new SeqDisjunctionFunction());
+    addFunction(new SeqIntersectionFunction());
+    addFunction(new SeqIsEqualFunction());
+    addFunction(new SeqIsSubSeqFunction());
+    addFunction(new SeqSubtractFunction());
+    addFunction(new SeqUnionFunction());
   }
 
   private void loadMathFunctions() {
