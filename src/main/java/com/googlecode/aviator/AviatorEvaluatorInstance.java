@@ -556,6 +556,41 @@ public final class AviatorEvaluatorInstance {
   }
 
   /**
+   * Compile a script into expression.
+   *
+   * @param cacheKey caching key when cached is true.
+   * @param in       the script file's InputStream
+   * @param name     source file name
+   * @return the compiled expression instance.
+   * @throws IOException
+   * @since 5.0.0
+   */
+  public Expression compileScript(final String cacheKey, final InputStream in,
+                                  final String name)
+          throws IOException {
+    return this.compileScript(cacheKey, in, name, this.cachedExpressionByDefault);
+  }
+
+  /**
+   * Compile a script into expression.
+   *
+   * @param cacheKey caching key when cached is true.
+   * @param in       the script file's InputStream
+   * @param name     source file name
+   * @param cached   whether to cache the expression instance by cacheKey.
+   * @return the compiled expression instance.
+   * @throws IOException
+   * @since 5.0.0
+   */
+  public Expression compileScript(final String cacheKey, final InputStream in,
+                                  final String name, final boolean cached)
+          throws IOException {
+    Reader reader = new InputStreamReader(in, Charset.forName("utf-8"));
+    return compile(cacheKey, Utils.readFully(reader), name, cached);
+  }
+
+
+  /**
    * Returns the function missing handler, null if not set.
    *
    * @since 4.2.5
