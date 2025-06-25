@@ -1737,9 +1737,11 @@ public class ExpressionParser implements Parser {
     } else if (val == null) {
       return Variable.NIL;
     } else if (val instanceof String) {
-      return (new StringToken((String) val, this.lexer.getLineNo(), this.lookahead.getStartIndex()));
+      return (new StringToken((String) val, this.lexer.getLineNo(),
+          this.lookahead.getStartIndex()));
     } else if (val instanceof Number) {
-      return (new NumberToken((Number) val, val.toString(), this.lexer.getLineNo(), this.lookahead.getStartIndex()));
+      return (new NumberToken((Number) val, val.toString(), this.lexer.getLineNo(),
+          this.lookahead.getStartIndex()));
     } else if (val instanceof Boolean) {
       return (((boolean) val) ? Variable.TRUE : Variable.FALSE);
     } else {

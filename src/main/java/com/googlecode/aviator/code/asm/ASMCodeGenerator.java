@@ -539,7 +539,8 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     visitLeftBranch(lookahead, IFNE, OperatorType.OR);
   }
 
-  private void visitLeftBranch(final Token<?> lookahead, final int ints, final OperatorType opType) {
+  private void visitLeftBranch(final Token<?> lookahead, final int ints,
+      final OperatorType opType) {
     this.checkExecutionTimeout();
     if (!OperationRuntime.hasRuntimeContext(this.compileEnv, opType)) {
       visitBoolean();

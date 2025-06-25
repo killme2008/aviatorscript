@@ -17,6 +17,7 @@ package com.googlecode.aviator.runtime.function.seq;
 
 import java.util.Map;
 import java.util.Set;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.type.AviatorBoolean;
@@ -56,6 +57,8 @@ public class SeqIncludeFunction extends AbstractFunction {
             break;
           }
         }
+      } catch (ExpressionRuntimeException e) {
+        throw e;
       } catch (Exception e) {
         RuntimeUtils.printStackTrace(env, e);
         return AviatorBoolean.FALSE;

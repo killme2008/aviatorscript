@@ -1607,4 +1607,10 @@ public class FunctionTest {
       return "User{" + "id=" + this.id + ", age=" + this.age + ", name='" + this.name + '\'' + '}';
     }
   }
+
+  @Test(expected = ExpressionRuntimeException.class)
+  public void testIssue674() {
+    this.instance.setOption(Options.MAX_LOOP_COUNT, 3);
+    this.instance.execute("include(seq.list(1,2,3,4),4)");
+  }
 }
