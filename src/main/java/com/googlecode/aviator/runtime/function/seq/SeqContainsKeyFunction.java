@@ -17,6 +17,7 @@ package com.googlecode.aviator.runtime.function.seq;
 
 import java.util.List;
 import java.util.Map;
+import com.googlecode.aviator.exception.ExpressionRuntimeException;
 import com.googlecode.aviator.runtime.RuntimeUtils;
 import com.googlecode.aviator.runtime.function.AbstractFunction;
 import com.googlecode.aviator.runtime.function.FunctionUtils;
@@ -50,6 +51,8 @@ public class SeqContainsKeyFunction extends AbstractFunction {
       Map seq = (Map) first;
       try {
         return AviatorBoolean.valueOf(seq.containsKey(arg2.getValue(env)));
+      } catch (ExpressionRuntimeException e) {
+        throw e;
       } catch (Exception e) {
         RuntimeUtils.printStackTrace(env, e);
         return AviatorBoolean.FALSE;
