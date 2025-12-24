@@ -115,17 +115,20 @@ public class ExpressionLexer {
     this.peek = this.iterator.previous();
   }
 
-  static final char[] VALID_HEX_CHAR = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'a',
-      'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f'};
+  // Character constants for lexical analysis
+  private static final String HEX_CHARS = "0123456789AaBbCcDdEeFf";
+  private static final String OPERATOR_CHARS = "=><+-*/%!&|";
+
+  /** Suffix for BigInteger literals, e.g., 100N */
+  static final char BIGINT_SUFFIX = 'N';
+  /** Suffix for BigDecimal literals, e.g., 3.14M */
+  static final char DECIMAL_SUFFIX = 'M';
+  /** Hex number prefix after '0', e.g., 0xFF */
+  static final char HEX_PREFIX = 'x';
 
 
   public boolean isValidHexChar(final char ch) {
-    for (char c : VALID_HEX_CHAR) {
-      if (c == ch) {
-        return true;
-      }
-    }
-    return false;
+    return HEX_CHARS.indexOf(ch) >= 0;
   }
 
 
@@ -136,11 +139,12 @@ public class ExpressionLexer {
 
 
   public Token<?> scan(final boolean analyse) {
-    // If buffer is not empty,return
+    // If buffer is not empty, return buffered token
     if (this.tokenBuffer != null && !this.tokenBuffer.isEmpty()) {
       return this.tokenBuffer.pop();
     }
-    // Skip white space or line
+
+    // Skip whitespace or return raw char when not analysing
     for (;; nextChar()) {
       if (this.peek == CharacterIterator.DONE) {
         return null;
@@ -162,283 +166,380 @@ public class ExpressionLexer {
       }
     }
 
-    // if it is a hex digit
-    if (Character.isDigit(this.peek) && this.peek == '0') {
-      nextChar();
-      if (this.peek == 'x' || this.peek == 'X') {
-        nextChar();
-        StringBuilder sb = new StringBuilder();
-        int startIndex = this.iterator.getIndex() - 2;
-        long value = 0L;
-        do {
-          sb.append(this.peek);
-          value = 16 * value + Character.digit(this.peek, 16);
-          nextChar();
-        } while (isValidHexChar(this.peek));
-        return new NumberToken(value, sb.toString(), this.lineNo, startIndex);
-      } else {
-        prevChar();
-      }
+    // Try each token type in order
+    Token<?> token;
+
+    if ((token = scanHexNumber()) != null) {
+      return token;
+    }
+    if ((token = scanNumber()) != null) {
+      return token;
+    }
+    if ((token = scanQuoteVariable(analyse)) != null) {
+      return token;
+    }
+    if ((token = scanVariable()) != null) {
+      return token;
+    }
+    if ((token = scanOperator()) != null) {
+      return token;
+    }
+    if ((token = scanString()) != null) {
+      return token;
     }
 
-    // If it is a digit
-    if (Character.isDigit(this.peek) || this.peek == '.') {
-      StringBuilder sb = new StringBuilder();
-      int startIndex = this.iterator.getIndex();
-      long lval = 0L;
+    // Fallback: return single character token (but not DONE)
+    if (this.peek == CharacterIterator.DONE) {
+      return null;
+    }
+    token = new CharToken(this.peek, this.lineNo, this.iterator.getIndex());
+    nextChar();
+    return token;
+  }
 
-      double dval = 0d;
-      boolean hasDot = false;
-      double d = 10.0;
-      boolean isBigInt = false;
-      boolean isBigDecimal = false;
-      boolean scientificNotation = false;
-      boolean negExp = false;
-      boolean isOverflow = false;
+
+  /**
+   * Scan hexadecimal number (0x...).
+   * 
+   * @return NumberToken if hex number found, null otherwise
+   */
+  private Token<?> scanHexNumber() {
+    if (!(Character.isDigit(this.peek) && this.peek == '0')) {
+      return null;
+    }
+
+    nextChar();
+    if (this.peek == HEX_PREFIX || this.peek == 'X') {
+      nextChar();
+      StringBuilder sb = new StringBuilder();
+      int startIndex = this.iterator.getIndex() - 2;
+      long value = 0L;
       do {
         sb.append(this.peek);
-        if (this.peek == '.') {
-          if (scientificNotation) {
-            throw new CompileExpressionErrorException(
-                "Illegal number " + sb + " at " + this.iterator.getIndex());
-          }
-          if (hasDot) {
-            throw new CompileExpressionErrorException(
-                "Illegal Number " + sb + " at " + this.iterator.getIndex());
-          } else {
-            hasDot = true;
-            nextChar();
-          }
+        value = 16 * value + Character.digit(this.peek, 16);
+        nextChar();
+      } while (isValidHexChar(this.peek));
+      return new NumberToken(value, sb.toString(), this.lineNo, startIndex);
+    } else {
+      prevChar();
+      return null;
+    }
+  }
 
-        } else if (this.peek == 'N') {
-          // big integer
-          if (hasDot) {
-            throw new CompileExpressionErrorException(
-                "Illegal number " + sb + " at " + this.iterator.getIndex());
-          }
-          isBigInt = true;
-          nextChar();
-          break;
-        } else if (this.peek == 'M') {
-          isBigDecimal = true;
-          nextChar();
-          break;
-        } else if (this.peek == 'e' || this.peek == 'E') {
-          if (scientificNotation) {
-            throw new CompileExpressionErrorException(
-                "Illegal number " + sb + " at " + this.iterator.getIndex());
-          }
-          scientificNotation = true;
-          nextChar();
-          if (this.peek == '-') {
-            negExp = true;
-            sb.append(this.peek);
-            nextChar();
-          }
-        } else {
-          int digit = Character.digit(this.peek, 10);
-          if (scientificNotation) {
-            int n = digit;
-            nextChar();
-            while (Character.isDigit(this.peek)) {
-              sb.append(this.peek);
-              n = 10 * n + Character.digit(this.peek, 10);
-              nextChar();
-            }
-            while (n-- > 0) {
-              if (negExp) {
-                dval = dval / 10;
-              } else {
-                dval = 10 * dval;
-              }
-            }
-            hasDot = true;
-          } else if (hasDot) {
-            dval = dval + digit / d;
-            d = d * 10;
-            nextChar();
-          } else {
-            if (!isOverflow
-                && (lval > OVERFLOW_FLAG || (lval == OVERFLOW_FLAG && digit > OVERFLOW_SINGLE))) {
-              isOverflow = true;
-            }
-            lval = 10 * lval + digit;
-            dval = 10 * dval + digit;
-            nextChar();
-          }
 
-        }
-
-      } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'E'
-          || this.peek == 'e' || this.peek == 'M' || this.peek == 'N');
-
-      Number value;
-      if (isBigDecimal) {
-        value = new BigDecimal(getBigNumberLexeme(sb), this.mathContext);
-      } else if (isBigInt) {
-        value = new BigInteger(getBigNumberLexeme(sb));
-      } else if (hasDot) {
-        if (this.parseFloatIntoDecimal && sb.length() > 1) {
-          value = new BigDecimal(sb.toString(), this.mathContext);
-        } else if (sb.length() == 1) {
-          // only have a dot character.
-          return new CharToken('.', this.lineNo, startIndex);
-        } else {
-          value = dval;
-        }
-      } else {
-        if (this.parseIntegralNumberIntoDecimal) {
-          // we make integral number as a BigDecimal.
-          value = new BigDecimal(sb.toString(), this.mathContext);
-        } else {
-          // The long value is overflow, we should prompt it to be a BigInteger.
-          if (isOverflow) {
-            value = new BigInteger(sb.toString());
-          } else {
-            value = lval;
-          }
-        }
-      }
-      String lexeme = sb.toString();
-      if (isBigDecimal || isBigInt) {
-        lexeme = lexeme.substring(0, lexeme.length() - 1);
-      }
-      return new NumberToken(value, lexeme, this.lineNo, startIndex);
+  /**
+   * Scan decimal number (integer, float, scientific notation, BigInt, BigDecimal).
+   * 
+   * @return NumberToken or CharToken('.') if found, null otherwise
+   */
+  private Token<?> scanNumber() {
+    if (!(Character.isDigit(this.peek) || this.peek == '.')) {
+      return null;
     }
 
-    // It is a variable
+    StringBuilder sb = new StringBuilder();
+    int startIndex = this.iterator.getIndex();
+    long lval = 0L;
+    double dval = 0d;
+    double d = 10.0;
+    boolean hasDot = false;
+    boolean isBigInt = false;
+    boolean isBigDecimal = false;
+    boolean scientificNotation = false;
+    boolean negExp = false;
+    boolean isOverflow = false;
+
+    do {
+      sb.append(this.peek);
+
+      if (this.peek == '.') {
+        if (scientificNotation) {
+          throw new CompileExpressionErrorException(
+              "Illegal number " + sb + " at " + this.iterator.getIndex());
+        }
+        if (hasDot) {
+          throw new CompileExpressionErrorException(
+              "Illegal Number " + sb + " at " + this.iterator.getIndex());
+        }
+        hasDot = true;
+        nextChar();
+
+      } else if (this.peek == BIGINT_SUFFIX) {
+        if (hasDot) {
+          throw new CompileExpressionErrorException(
+              "Illegal number " + sb + " at " + this.iterator.getIndex());
+        }
+        isBigInt = true;
+        nextChar();
+        break;
+
+      } else if (this.peek == DECIMAL_SUFFIX) {
+        isBigDecimal = true;
+        nextChar();
+        break;
+
+      } else if (this.peek == 'e' || this.peek == 'E') {
+        if (scientificNotation) {
+          throw new CompileExpressionErrorException(
+              "Illegal number " + sb + " at " + this.iterator.getIndex());
+        }
+        scientificNotation = true;
+        nextChar();
+        if (this.peek == '-') {
+          negExp = true;
+          sb.append(this.peek);
+          nextChar();
+        }
+
+      } else {
+        int digit = Character.digit(this.peek, 10);
+        if (scientificNotation) {
+          int n = digit;
+          nextChar();
+          while (Character.isDigit(this.peek)) {
+            sb.append(this.peek);
+            n = 10 * n + Character.digit(this.peek, 10);
+            nextChar();
+          }
+          while (n-- > 0) {
+            if (negExp) {
+              dval = dval / 10;
+            } else {
+              dval = 10 * dval;
+            }
+          }
+          hasDot = true;
+        } else if (hasDot) {
+          dval = dval + digit / d;
+          d = d * 10;
+          nextChar();
+        } else {
+          if (!isOverflow
+              && (lval > OVERFLOW_FLAG || (lval == OVERFLOW_FLAG && digit > OVERFLOW_SINGLE))) {
+            isOverflow = true;
+          }
+          lval = 10 * lval + digit;
+          dval = 10 * dval + digit;
+          nextChar();
+        }
+      }
+
+    } while (Character.isDigit(this.peek) || this.peek == '.' || this.peek == 'E'
+        || this.peek == 'e' || this.peek == DECIMAL_SUFFIX || this.peek == BIGINT_SUFFIX);
+
+    // Build final number value
+    Number value;
+    if (isBigDecimal) {
+      value = new BigDecimal(getBigNumberLexeme(sb), this.mathContext);
+    } else if (isBigInt) {
+      value = new BigInteger(getBigNumberLexeme(sb));
+    } else if (hasDot) {
+      if (this.parseFloatIntoDecimal && sb.length() > 1) {
+        value = new BigDecimal(sb.toString(), this.mathContext);
+      } else if (sb.length() == 1) {
+        // Only a dot character
+        return new CharToken('.', this.lineNo, startIndex);
+      } else {
+        value = dval;
+      }
+    } else {
+      if (this.parseIntegralNumberIntoDecimal) {
+        value = new BigDecimal(sb.toString(), this.mathContext);
+      } else if (isOverflow) {
+        value = new BigInteger(sb.toString());
+      } else {
+        value = lval;
+      }
+    }
+
+    String lexeme = sb.toString();
+    if (isBigDecimal || isBigInt) {
+      lexeme = lexeme.substring(0, lexeme.length() - 1);
+    }
+    return new NumberToken(value, lexeme, this.lineNo, startIndex);
+  }
+
+
+  /**
+   * Scan quote variable (#var or #`var`).
+   * 
+   * @param analyse whether to analyse (for recursive call on comment)
+   * @return Variable token if found, null otherwise
+   */
+  private Token<?> scanQuoteVariable(final boolean analyse) {
+    if (this.peek != '#') {
+      return null;
+    }
+
+    int startIndex = this.iterator.getIndex();
+    nextChar(); // skip '#'
+
+    // ## is a comment
     if (this.peek == '#') {
-      int startIndex = this.iterator.getIndex();
-      nextChar(); // skip '#'
-      boolean hasBackquote = false;
-
-      if (this.peek == '#') {
-        // ## comments
-        while (this.peek != CharacterIterator.DONE && this.peek != '\n') {
-          nextChar();
-        }
-        return this.scan(analyse);
-      } else if (this.peek == '`') {
-        hasBackquote = true;
+      while (this.peek != CharacterIterator.DONE && this.peek != '\n') {
         nextChar();
       }
-
-      StringBuilder sb = new StringBuilder();
-
-      if (hasBackquote) {
-        while (this.peek != '`') {
-          if (this.peek == CharacterIterator.DONE) {
-            throw new CompileExpressionErrorException(
-                "EOF while reading string at index: " + this.iterator.getIndex());
-          }
-          sb.append(this.peek);
-          nextChar();
-        }
-        // skip '`'
-        nextChar();
-      } else {
-        while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '['
-            || this.peek == ']') {
-          sb.append(this.peek);
-          nextChar();
-        }
-      }
-      String lexeme = sb.toString();
-      if (lexeme.isEmpty()) {
-        throw new ExpressionSyntaxErrorException("Blank variable name after '#'");
-      }
-      Variable variable = new Variable(lexeme, this.lineNo, startIndex);
-      variable.setQuote(true);
-      return this.symbolTable.reserve(variable);
-    }
-    if (Character.isJavaIdentifierStart(this.peek)) {
-      int startIndex = this.iterator.getIndex();
-      StringBuilder sb = new StringBuilder();
-      do {
-        sb.append(this.peek);
-        nextChar();
-      } while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.');
-      String lexeme = sb.toString();
-      Variable variable = new Variable(lexeme, this.lineNo, startIndex);
-      return this.symbolTable.reserve(variable);
+      return this.scan(analyse);
     }
 
-    if (isBinaryOP(this.peek)) {
-      CharToken opToken = new CharToken(this.peek, this.lineNo, this.iterator.getIndex());
+    // Check for backquote form #`...`
+    boolean hasBackquote = false;
+    if (this.peek == '`') {
+      hasBackquote = true;
       nextChar();
-      return opToken;
     }
-    // String
-    if (this.peek == '"' || this.peek == '\'') {
-      char left = this.peek;
-      int startIndex = this.iterator.getIndex();
-      StringBuilder sb = new StringBuilder();
-      boolean hasInterpolation = false;
-      // char prev = this.peek;
-      while ((this.peek = this.iterator.next()) != left) {
-        // It's not accurate,but acceptable.
-        if (this.peek == '#' && !hasInterpolation) {
-          hasInterpolation = true;
-        }
 
-        if (this.peek == '\\') { // escape
-          nextChar();
-          if (this.peek == CharacterIterator.DONE) {
-            throw new CompileExpressionErrorException(
-                "EOF while reading string at index: " + this.iterator.getIndex());
-          }
-          if (this.peek == left) {
-            sb.append(this.peek);
-            continue;
-          }
-          switch (this.peek) {
-            case 't':
-              this.peek = '\t';
-              break;
-            case 'r':
-              this.peek = '\r';
-              break;
-            case 'n':
-              this.peek = '\n';
-              break;
-            case '\\':
-              break;
-            case 'b':
-              this.peek = '\b';
-              break;
-            case 'f':
-              this.peek = '\f';
-              break;
-            case '#':
-              hasInterpolation = hasInterpolation || true;
-              if (this.instance.isFeatureEnabled(Feature.StringInterpolation)) {
-                sb.append('\\');
-                this.peek = '#';
-                break;
-              }
-            default: {
-              throw new CompileExpressionErrorException(
-                  "Unsupported escape character: \\" + this.peek);
-            }
+    StringBuilder sb = new StringBuilder();
 
-          }
-        }
-
+    if (hasBackquote) {
+      while (this.peek != '`') {
         if (this.peek == CharacterIterator.DONE) {
           throw new CompileExpressionErrorException(
               "EOF while reading string at index: " + this.iterator.getIndex());
         }
-
         sb.append(this.peek);
+        nextChar();
       }
-      nextChar();
-      return new StringToken(sb.toString(), this.lineNo, startIndex).withMeta(Constants.INTER_META,
-          hasInterpolation);
+      nextChar(); // skip closing '`'
+    } else {
+      while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.' || this.peek == '['
+          || this.peek == ']') {
+        sb.append(this.peek);
+        nextChar();
+      }
     }
 
-    Token<Character> token = new CharToken(this.peek, this.lineNo, this.iterator.getIndex());
+    String lexeme = sb.toString();
+    if (lexeme.isEmpty()) {
+      throw new ExpressionSyntaxErrorException("Blank variable name after '#'");
+    }
+
+    Variable variable = new Variable(lexeme, this.lineNo, startIndex);
+    variable.setQuote(true);
+    return this.symbolTable.reserve(variable);
+  }
+
+
+  /**
+   * Scan normal variable/identifier.
+   * 
+   * @return Variable token if found, null otherwise
+   */
+  private Token<?> scanVariable() {
+    if (!Character.isJavaIdentifierStart(this.peek)) {
+      return null;
+    }
+
+    int startIndex = this.iterator.getIndex();
+    StringBuilder sb = new StringBuilder();
+    boolean hasDot = false;
+
+    do {
+      if (this.peek == '.') {
+        hasDot = true;
+      }
+      sb.append(this.peek);
+      nextChar();
+      // Only allow [] after a dot has been seen (property access syntax)
+    } while (Character.isJavaIdentifierPart(this.peek) || this.peek == '.'
+        || (hasDot && (this.peek == '[' || this.peek == ']')));
+
+    String lexeme = sb.toString();
+    Variable variable = new Variable(lexeme, this.lineNo, startIndex);
+    return this.symbolTable.reserve(variable);
+  }
+
+
+  /**
+   * Scan operator character.
+   * 
+   * @return CharToken if operator found, null otherwise
+   */
+  private Token<?> scanOperator() {
+    if (!isBinaryOP(this.peek)) {
+      return null;
+    }
+
+    CharToken opToken = new CharToken(this.peek, this.lineNo, this.iterator.getIndex());
     nextChar();
-    return token;
+    return opToken;
+  }
+
+
+  /**
+   * Scan string literal ("..." or '...').
+   * 
+   * @return StringToken if found, null otherwise
+   */
+  private Token<?> scanString() {
+    if (this.peek != '"' && this.peek != '\'') {
+      return null;
+    }
+
+    char left = this.peek;
+    int startIndex = this.iterator.getIndex();
+    StringBuilder sb = new StringBuilder();
+    boolean hasInterpolation = false;
+
+    while ((this.peek = this.iterator.next()) != left) {
+      // Check for interpolation marker
+      if (this.peek == '#' && !hasInterpolation) {
+        hasInterpolation = true;
+      }
+
+      // Handle escape sequences
+      if (this.peek == '\\') {
+        nextChar();
+        if (this.peek == CharacterIterator.DONE) {
+          throw new CompileExpressionErrorException(
+              "EOF while reading string at index: " + this.iterator.getIndex());
+        }
+        if (this.peek == left) {
+          sb.append(this.peek);
+          continue;
+        }
+        switch (this.peek) {
+          case 't':
+            this.peek = '\t';
+            break;
+          case 'r':
+            this.peek = '\r';
+            break;
+          case 'n':
+            this.peek = '\n';
+            break;
+          case '\\':
+            break;
+          case 'b':
+            this.peek = '\b';
+            break;
+          case 'f':
+            this.peek = '\f';
+            break;
+          case '#':
+            hasInterpolation = true;
+            if (this.instance.isFeatureEnabled(Feature.StringInterpolation)) {
+              sb.append('\\');
+              this.peek = '#';
+              break;
+            }
+          default:
+            throw new CompileExpressionErrorException(
+                "Unsupported escape character: \\" + this.peek);
+        }
+      }
+
+      if (this.peek == CharacterIterator.DONE) {
+        throw new CompileExpressionErrorException(
+            "EOF while reading string at index: " + this.iterator.getIndex());
+      }
+
+      sb.append(this.peek);
+    }
+
+    nextChar();
+    return new StringToken(sb.toString(), this.lineNo, startIndex).withMeta(Constants.INTER_META,
+        hasInterpolation);
   }
 
   public String getScanString() {
@@ -455,16 +556,8 @@ public class ExpressionLexer {
     return lexeme;
   }
 
-  static final char[] OPS = {'=', '>', '<', '+', '-', '*', '/', '%', '!', '&', '|'};
-
-
   public static boolean isBinaryOP(final char ch) {
-    for (char tmp : OPS) {
-      if (tmp == ch) {
-        return true;
-      }
-    }
-    return false;
+    return OPERATOR_CHARS.indexOf(ch) >= 0;
   }
 
 }

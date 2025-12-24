@@ -418,6 +418,42 @@ public class ExpressionLexerUnitTest {
 
 
   @Test
+  public void testNormalVarWithArrayIndex() {
+    this.lexer = new ExpressionLexer(this.instance, "foo.bars[0].name");
+    Token<?> token = this.lexer.scan();
+
+    assertEquals(TokenType.Variable, token.getType());
+    assertEquals("foo.bars[0].name", token.getValue(null));
+    assertFalse(((Variable) token).isQuote());
+    assertNull(this.lexer.scan());
+  }
+
+
+  @Test
+  public void testNormalVarWithMultipleArrayIndices() {
+    this.lexer = new ExpressionLexer(this.instance, "a.b[0].c[1].d");
+    Token<?> token = this.lexer.scan();
+
+    assertEquals(TokenType.Variable, token.getType());
+    assertEquals("a.b[0].c[1].d", token.getValue(null));
+    assertFalse(((Variable) token).isQuote());
+    assertNull(this.lexer.scan());
+  }
+
+
+  @Test
+  public void testNormalVarWithDotOnly() {
+    this.lexer = new ExpressionLexer(this.instance, "obj.field.nested");
+    Token<?> token = this.lexer.scan();
+
+    assertEquals(TokenType.Variable, token.getType());
+    assertEquals("obj.field.nested", token.getValue(null));
+    assertFalse(((Variable) token).isQuote());
+    assertNull(this.lexer.scan());
+  }
+
+
+  @Test
   public void testExpression_Logic_Join() {
     this.lexer = new ExpressionLexer(this.instance, "a || c ");
     Token<?> token = this.lexer.scan();

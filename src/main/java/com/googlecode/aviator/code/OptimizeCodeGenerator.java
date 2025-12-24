@@ -591,7 +591,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             case Lambda_New:
               this.codeGen.genNewLambdaCode(delegateToken.getLambdaFunctionBootstrap());
               break;
-            case Ternay_End:
+            case Ternary_End:
               this.codeGen.onTernaryEnd(realToken);
               break;
           }
@@ -870,7 +870,7 @@ public class OptimizeCodeGenerator implements CodeGenerator {
 
   @Override
   public void onTernaryEnd(final Token<?> lookahead) {
-    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Ternay_End));
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.Ternary_End));
   }
 
 
