@@ -724,6 +724,118 @@ public class ExpressionParser implements Parser {
     }
   }
 
+  /**
+   * @deprecated Use {@link #parseTernary()} instead.
+   */
+  @Deprecated
+  public boolean ternary() {
+    return parseTernary();
+  }
+
+  /**
+   * @deprecated Use {@link #parseLogicalOr()} instead.
+   */
+  @Deprecated
+  public void join() {
+    parseLogicalOr();
+  }
+
+  /**
+   * @deprecated Use {@link #parseBitOr()} instead.
+   */
+  @Deprecated
+  public void bitOr() {
+    parseBitOr();
+  }
+
+  /**
+   * @deprecated Use {@link #parseBitXor()} instead.
+   */
+  @Deprecated
+  public void xor() {
+    parseBitXor();
+  }
+
+  /**
+   * @deprecated Use {@link #parseBitAnd()} instead.
+   */
+  @Deprecated
+  public void bitAnd() {
+    parseBitAnd();
+  }
+
+  /**
+   * @deprecated Use {@link #parseLogicalAnd()} instead.
+   */
+  @Deprecated
+  public void and() {
+    parseLogicalAnd();
+  }
+
+  /**
+   * @deprecated Use {@link #parseEquality()} instead.
+   */
+  @Deprecated
+  public void equality() {
+    parseEquality();
+  }
+
+  /**
+   * @deprecated Use {@link #parseRelational()} instead.
+   */
+  @Deprecated
+  public void rel() {
+    parseRelational();
+  }
+
+  /**
+   * @deprecated Use {@link #parseShift()} instead.
+   */
+  @Deprecated
+  public void shift() {
+    parseShift();
+  }
+
+  /**
+   * @deprecated Use {@link #parseAdditive()} instead.
+   */
+  @Deprecated
+  public void expr() {
+    parseAdditive();
+  }
+
+  /**
+   * @deprecated Use {@link #parseExponent()} instead.
+   */
+  @Deprecated
+  public void exponent() {
+    parseExponent();
+  }
+
+  /**
+   * @deprecated Use {@link #parseMultiplicative()} instead.
+   */
+  @Deprecated
+  public void term() {
+    parseMultiplicative();
+  }
+
+  /**
+   * @deprecated Use {@link #parseUnary()} instead.
+   */
+  @Deprecated
+  public void unary() {
+    parseUnary();
+  }
+
+  /**
+   * @deprecated Use {@link #parseFactor()} instead.
+   */
+  @Deprecated
+  public void factor() {
+    parseFactor();
+  }
+
 
 
   private boolean parseFactor0() {
@@ -932,8 +1044,13 @@ public class ExpressionParser implements Parser {
       return;
     }
     if (!((Variable) token).isQuote()) {
-      String[] names = token.getLexeme().split("\\.");
-      for (String name : names) {
+      String[] names = token.getLexeme().split("\\.", -1);
+      for (int i = 0; i < names.length; i++) {
+        String name = names[i];
+        if (name.isEmpty() && i == names.length - 1) {
+          // Keep compatibility with existing trailing-dot syntax, e.g. "use java.util."
+          continue;
+        }
         if (!isValidPropertySegment(name)) {
           reportSyntaxError("illegal identifier: " + name);
         }
@@ -943,7 +1060,7 @@ public class ExpressionParser implements Parser {
 
   private boolean isValidPropertySegment(final String segment) {
     if (segment == null || segment.isEmpty()) {
-      return true; // For formats like "a.[0].b"
+      return false;
     }
 
     int bracketIdx = segment.indexOf('[');

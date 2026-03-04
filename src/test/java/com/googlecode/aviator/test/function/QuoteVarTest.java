@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.exception.ExpressionSyntaxErrorException;
 import static com.googlecode.aviator.TestUtils.assertEquals;
 
 
@@ -141,5 +142,11 @@ public class QuoteVarTest {
 
     // When "a.b.c" key doesn't exist, should traverse property chain
     assertEquals("property-chain-value", AviatorEvaluator.execute("a.b.c", env));
+  }
+
+
+  @Test(expected = ExpressionSyntaxErrorException.class)
+  public void testInvalidPropertyChainWithEmptySegment() {
+    AviatorEvaluator.execute("a..b");
   }
 }
