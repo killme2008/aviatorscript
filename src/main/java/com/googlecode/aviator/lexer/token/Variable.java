@@ -353,6 +353,28 @@ public class Variable extends AbstractToken<Object> {
 
   };
 
+  /**
+   * Checks if this variable is one of the reserved keywords.
+   *
+   * @return true if this is a keyword (TRUE, FALSE, NIL, LAMBDA, END, IF, ELSE, etc.)
+   */
+  public boolean isKeyword() {
+    return this == TRUE || this == FALSE || this == NIL || this == LAMBDA || this == END
+        || this == IF || this == ELSE || this == FOR || this == IN || this == RETURN
+        || this == BREAK || this == CONTINUE || this == LET || this == WHILE || this == FN
+        || this == ELSIF || this == TRY || this == CATCH || this == FINALLY || this == THROW
+        || this == NEW || this == USE;
+  }
+
+  /**
+   * Checks if this variable is a literal keyword (TRUE, FALSE, NIL).
+   *
+   * @return true if this is a literal keyword
+   */
+  public boolean isLiteralKeyword() {
+    return this == TRUE || this == FALSE || this == NIL;
+  }
+
   @Override
   public com.googlecode.aviator.lexer.token.Token.TokenType getType() {
     return TokenType.Variable;

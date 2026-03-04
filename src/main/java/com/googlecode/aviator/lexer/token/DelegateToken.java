@@ -33,7 +33,7 @@ public class DelegateToken extends AbstractToken<Token<?>> {
   public static enum DelegateTokenType {
     And_Left, Join_Left, Ternary_Boolean, Ternary_Left, Array, Index_Start, //
     Method_Name, Method_Param, Lambda_New, //
-    Ternay_End
+    Ternary_End
   }
 
 

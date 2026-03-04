@@ -24,68 +24,53 @@ import com.googlecode.aviator.runtime.type.AviatorObject;
 
 
 /**
- * Operator type
+ * Operator type enumeration for AviatorScript.
+ *
+ * <p>
+ * Note on token field semantics:
+ * <ul>
+ * <li>Most operators use their actual source symbol (e.g., "+", "-", "*")</li>
+ * <li>SUB vs NEG: Both use "-" in source, but token differs ("-sub" vs "-neg") to distinguish
+ * binary subtraction from unary negation</li>
+ * <li>ASSIGNMENT vs DEFINE: Both use "=" in source. DEFINE is for variable declaration (let x = 1),
+ * ASSIGNMENT is for reassignment (x = 2)</li>
+ * <li>INDEX and FUNC: Synthetic operators for array access and function calls</li>
+ * </ul>
  *
  * @author dennis
- *
  */
 public enum OperatorType {
-  BIT_OR("|", 2),
+  // Bitwise operators
+  BIT_OR("|", 2), BIT_AND("&", 2), BIT_XOR("^", 2), BIT_NOT("~", 1), SHIFT_LEFT("<<",
+      2), SHIFT_RIGHT(">>", 2), U_SHIFT_RIGHT(">>>", 2),
 
-  BIT_AND("&", 2),
+  // Logical operators
+  NOT("!", 1), AND("&&", 2), OR("||", 2),
 
-  BIT_XOR("^", 2),
-
-  BIT_NOT("~", 1),
-
-  SHIFT_LEFT("<<", 2),
-
-  SHIFT_RIGHT(">>", 2),
-
-  U_SHIFT_RIGHT(">>>", 2),
-
-  NOT("!", 1),
-
-  MULT("*", 2),
-
-  Exponent("**", 2),
-
-  DIV("/", 2),
-
-  MOD("%", 2),
-
-  ADD("+", 2),
-
+  // Arithmetic operators - binary
+  MULT("*", 2), Exponent("**", 2), DIV("/", 2), MOD("%", 2), ADD("+", 2),
+  /** Binary subtraction: a - b. Token differs from NEG to distinguish. */
   SUB("-sub", 2),
 
-  LT("<", 2),
-
-  LE("<=", 2),
-
-  GT(">", 2),
-
-  GE(">=", 2),
-
-  EQ("==", 2),
-
-  NEQ("!=", 2),
-
-  AND("&&", 2),
-
-  MATCH("=~", 2),
-
-  OR("||", 2),
-
-  INDEX("[]", 2),
-
-  FUNC("()", Integer.MAX_VALUE),
-
+  // Arithmetic operators - unary
+  /** Unary negation: -a. Token differs from SUB to distinguish. */
   NEG("-neg", 1),
 
+  // Comparison operators
+  LT("<", 2), LE("<=", 2), GT(">", 2), GE(">=", 2), EQ("==", 2), NEQ("!=", 2), MATCH("=~", 2),
+
+  // Special operators
+  /** Array/map element access: a[i] */
+  INDEX("[]", 2),
+  /** Function call: f(args...). Arity is MAX_VALUE for variadic. */
+  FUNC("()", Integer.MAX_VALUE),
+  /** Ternary conditional: a ? b : c */
   TERNARY("?:", 3),
 
+  // Assignment operators
+  /** Assignment to existing variable: x = value */
   ASSIGNMENT("=", 2),
-
+  /** Variable definition with let: let x = value */
   DEFINE("=", 2);
 
   public final String token;
