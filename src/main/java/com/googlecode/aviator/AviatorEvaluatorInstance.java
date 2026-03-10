@@ -111,12 +111,14 @@ import com.googlecode.aviator.runtime.function.seq.SeqNewListFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNewSetFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqNotAnyFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqPartitionFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqPutFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReduceFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqRemoveFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqReverseFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSomeFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqSortFunction;
+import com.googlecode.aviator.runtime.function.seq.SeqToMapFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqValsFunction;
 import com.googlecode.aviator.runtime.function.seq.SeqZipmapFunction;
 import com.googlecode.aviator.runtime.function.string.StringContainsFunction;
@@ -976,6 +978,8 @@ public final class AviatorEvaluatorInstance {
         new SeqMakePredicateFunFunction("seq.false", OperatorType.EQ, AviatorBoolean.FALSE));
     addFunction(new SeqMakePredicateFunFunction("seq.nil", OperatorType.EQ, AviatorNil.NIL));
     addFunction(new SeqMakePredicateFunFunction("seq.exists", OperatorType.NEQ, AviatorNil.NIL));
+    addFunction(new SeqToMapFunction());
+    addFunction(new SeqPartitionFunction());
   }
 
   private void loadMathFunctions() {
