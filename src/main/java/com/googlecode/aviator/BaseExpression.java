@@ -153,7 +153,9 @@ public abstract class BaseExpression implements Expression {
 
       List<String> newFullNames = new ArrayList<>(fullNames.size());
       for (VariableMeta meta : metas) {
-        newFullNames.add(meta.getName());
+        // Drop the null-safe navigation marker so the public name reflects the real property path,
+        // e.g. "a?.b" is reported as "a.b".
+        newFullNames.add(meta.getName().replace("?.", "."));
       }
 
       this.varFullNames = newFullNames;

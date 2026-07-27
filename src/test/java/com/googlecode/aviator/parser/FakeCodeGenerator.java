@@ -104,6 +104,18 @@ public class FakeCodeGenerator implements CodeGenerator {
 
 
   @Override
+  public void onNullCoalesceLeft(final Token<?> lookahead) {
+
+  }
+
+
+  @Override
+  public void onNullCoalesceRight(final Token<?> lookahead) {
+    appendToken("??");
+  }
+
+
+  @Override
   public void onTernaryBoolean(final Token<?> lookahead) {
 
   }

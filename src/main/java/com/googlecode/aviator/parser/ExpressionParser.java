@@ -241,6 +241,18 @@ public class ExpressionParser implements Parser {
     Token<?> opToken = this.lookahead;
     if (expectChar('?')) {
       move(true);
+      if (expectChar('?')) {
+        // null-coalescing operator '??': right-associative, short-circuits the right operand when
+        // the left operand is not null.
+        move(true);
+        CodeGenerator cg = getCodeGeneratorWithTimes();
+        cg.onNullCoalesceLeft(opToken);
+        if (!parseTernary()) {
+          reportSyntaxError("invalid token for '??' operator");
+        }
+        cg.onNullCoalesceRight(opToken);
+        return gcTimes < this.getCGTimes;
+      }
       CodeGenerator cg = getCodeGeneratorWithTimes();
       cg.onTernaryBoolean(opToken);
       if (!parseTernary()) {
@@ -417,6 +429,11 @@ public class ExpressionParser implements Parser {
         } else {
           // this.back();
           // assignment
+
+          if (prevToken.getType() == TokenType.Variable && prevToken.getLexeme().contains("?.")) {
+            reportSyntaxError("can't assign value to a null-safe navigation expression: "
+                + prevToken.getLexeme());
+          }
 
           boolean isVar = false;
           if (prevToken.getType() == TokenType.Variable) {
@@ -1063,18 +1080,27 @@ public class ExpressionParser implements Parser {
       return false;
     }
 
-    int bracketIdx = segment.indexOf('[');
+    // A trailing '?' marks a null-safe navigation segment (the "a?.b" operator).
+    String seg = segment;
+    if (seg.charAt(seg.length() - 1) == '?') {
+      seg = seg.substring(0, seg.length() - 1);
+      if (seg.isEmpty()) {
+        return false;
+      }
+    }
+
+    int bracketIdx = seg.indexOf('[');
     if (bracketIdx < 0) {
-      return isJavaIdentifier(segment);
+      return isJavaIdentifier(seg);
     }
 
     if (bracketIdx == 0) {
-      return segment.endsWith("]"); // "[0]" format
+      return seg.endsWith("]"); // "[0]" format
     }
 
     // "bars[0]" format
-    String baseName = segment.substring(0, bracketIdx);
-    return isJavaIdentifier(baseName) && segment.endsWith("]");
+    String baseName = seg.substring(0, bracketIdx);
+    return isJavaIdentifier(baseName) && seg.endsWith("]");
   }
 
   private void methodInvokeOrArrayAccess() {
