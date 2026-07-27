@@ -768,8 +768,16 @@ public class Reflector {
       final int offset, final int len) {
     int max = Math.min(offset + len, names.length);
     for (int i = offset; i < max; i++) {
-      String rName = AviatorJavaType.reserveName(names[i]);
-      rName = rName != null ? rName : names[i];
+      String seg = names[i];
+      // A trailing '?' marks a null-safe segment: if its value is null, the whole property
+      // navigation short-circuits to null instead of throwing (the "a?.b" operator).
+      boolean nullSafe = false;
+      if (!seg.isEmpty() && seg.charAt(seg.length() - 1) == '?') {
+        nullSafe = true;
+        seg = seg.substring(0, seg.length() - 1);
+      }
+      String rName = AviatorJavaType.reserveName(seg);
+      rName = rName != null ? rName : seg;
       int arrayIndex = -1;
       String keyIndex = null;
 
@@ -868,6 +876,9 @@ public class Reflector {
         target.innerEnv = null;
         target.targetObject = null;
       } else if (val == null) {
+        if (nullSafe) {
+          return null;
+        }
         throw new NullPointerException(rName);
       } else {
         target.targetObject = val;

@@ -20,6 +20,7 @@ import com.googlecode.aviator.code.asm.ASMCodeGenerator.MethodMetaData;
 import com.googlecode.aviator.code.interpreter.ir.AssertTypeIR;
 import com.googlecode.aviator.code.interpreter.ir.AssertTypeIR.AssertTypes;
 import com.googlecode.aviator.code.interpreter.ir.BranchIfIR;
+import com.googlecode.aviator.code.interpreter.ir.BranchIfNotNilIR;
 import com.googlecode.aviator.code.interpreter.ir.BranchUnlessIR;
 import com.googlecode.aviator.code.interpreter.ir.ClearIR;
 import com.googlecode.aviator.code.interpreter.ir.GotoIR;
@@ -290,6 +291,21 @@ public class InterpretCodeGenerator extends BaseEvalCodeGenerator {
     } else {
       emit(OperatorIR.OR);
     }
+  }
+
+  @Override
+  public void onNullCoalesceLeft(final Token<?> lookahead) {
+    Label label = makeLabel();
+    pushLabel0(label);
+    this.instruments
+        .add(new BranchIfNotNilIR(label, new SourceInfo(this.sourceFile, lookahead.getLineNo())));
+    emit(PopIR.INSTANCE);
+  }
+
+  @Override
+  public void onNullCoalesceRight(final Token<?> lookahead) {
+    Label label = popLabel0();
+    visitLabel(label);
   }
 
   @Override

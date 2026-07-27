@@ -594,6 +594,12 @@ public class OptimizeCodeGenerator implements CodeGenerator {
             case Ternary_End:
               this.codeGen.onTernaryEnd(realToken);
               break;
+            case NullCoalesce_Left:
+              this.codeGen.onNullCoalesceLeft(realToken);
+              break;
+            case NullCoalesce_Right:
+              this.codeGen.onNullCoalesceRight(realToken);
+              break;
           }
           break;
 
@@ -708,6 +714,18 @@ public class OptimizeCodeGenerator implements CodeGenerator {
   public void onJoinRight(final Token<?> lookahead) {
     this.tokenList.add(new OperatorToken(lookahead, OperatorType.OR));
 
+  }
+
+
+  @Override
+  public void onNullCoalesceLeft(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.NullCoalesce_Left));
+  }
+
+
+  @Override
+  public void onNullCoalesceRight(final Token<?> lookahead) {
+    this.tokenList.add(new DelegateToken(lookahead, DelegateTokenType.NullCoalesce_Right));
   }
 
 

@@ -553,6 +553,37 @@ public class ASMCodeGenerator extends BaseEvalCodeGenerator {
     this.popOperand();
   }
 
+  /**
+   * Null-coalescing operator "??" left operand: keep the left value if it is not null, otherwise
+   * evaluate the right operand.
+   */
+  @Override
+  public void onNullCoalesceLeft(final Token<?> lookahead) {
+    this.checkExecutionTimeout();
+    // stack: [left]
+    this.mv.visitInsn(DUP);
+    this.pushOperand();
+    loadEnv();
+    visitLineNumber(lookahead);
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, OBJECT_OWNER, "isNull", "(Ljava/util/Map;)Z");
+    this.popOperand(2);
+    this.pushOperand();
+    Label end = makeLabel();
+    pushLabel0(end);
+    // left is not null: jump to end keeping left on stack, skip the right operand.
+    this.mv.visitJumpInsn(IFEQ, end);
+    this.popOperand();
+    // left is null: discard it, the right operand will be evaluated next.
+    this.mv.visitInsn(POP);
+    this.popOperand();
+  }
+
+  @Override
+  public void onNullCoalesceRight(final Token<?> lookahead) {
+    visitLineNumber(lookahead);
+    visitLabel(popLabel0());
+  }
+
   @Override
   public void onEq(final Token<?> lookahead) {
     doCompareAndJump(lookahead, IFNE, OperatorType.EQ);

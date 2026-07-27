@@ -349,6 +349,18 @@ public class LambdaGenerator implements CodeGenerator {
   }
 
 
+  @Override
+  public void onNullCoalesceLeft(final Token<?> lookahead) {
+    this.codeGenerator.onNullCoalesceLeft(lookahead);
+  }
+
+
+  @Override
+  public void onNullCoalesceRight(final Token<?> lookahead) {
+    this.codeGenerator.onNullCoalesceRight(lookahead);
+  }
+
+
 
   @Override
   public void onEq(final Token<?> lookahead) {

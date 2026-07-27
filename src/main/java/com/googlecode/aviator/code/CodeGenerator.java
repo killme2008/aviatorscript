@@ -91,6 +91,12 @@ public interface CodeGenerator {
   public void onJoinRight(Token<?> lookahead);
 
 
+  public void onNullCoalesceLeft(Token<?> lookahead);
+
+
+  public void onNullCoalesceRight(Token<?> lookahead);
+
+
   public void onEq(Token<?> lookahead);
 
 

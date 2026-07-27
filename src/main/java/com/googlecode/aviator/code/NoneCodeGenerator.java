@@ -152,6 +152,18 @@ public class NoneCodeGenerator implements CodeGenerator {
   }
 
   @Override
+  public void onNullCoalesceLeft(final Token<?> lookahead) {
+
+
+  }
+
+  @Override
+  public void onNullCoalesceRight(final Token<?> lookahead) {
+
+
+  }
+
+  @Override
   public void onEq(final Token<?> lookahead) {
 
 

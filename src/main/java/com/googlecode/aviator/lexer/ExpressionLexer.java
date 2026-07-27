@@ -444,9 +444,13 @@ public class ExpressionLexer {
         }
         sb.append(this.peek);
         nextChar();
+      } else if (this.peek == '?' && tryAbsorbNullSafeDot(sb)) {
+        // The "?." text has been appended and the lexer now points at the next
+        // property segment, which the next iteration consumes.
+        hasDot = true;
       } else if (hasDot && this.peek == '[' && tryAbsorbChainedIndex(sb)) {
         // The "[digits]" text has been appended and the lexer now points at the
-        // following '.', which the next iteration consumes.
+        // following '.' or '?', which the next iteration consumes.
       } else {
         break;
       }
@@ -493,6 +497,32 @@ public class ExpressionLexer {
       }
     }
     // Not a chained literal index: restore the lexer to the original '['.
+    this.peek = this.iterator.setIndex(mark);
+    return false;
+  }
+
+
+  /**
+   * Try to absorb a null-safe navigation operator "?." into the variable lexeme, e.g. the "?." in
+   * "a?.b". The '?' is kept as a marker on the preceding segment so that the runtime can tell which
+   * segments should short-circuit to null instead of throwing on a null intermediate value.
+   *
+   * <p>
+   * Only "?." (a '?' immediately followed by '.') is absorbed. A lone '?' (ternary operator) or
+   * "??" (null-coalescing operator) is left untouched for the parser to handle.
+   *
+   * @param sb the variable lexeme being built, positioned at '?'
+   * @return true if a null-safe dot was absorbed
+   */
+  private boolean tryAbsorbNullSafeDot(final StringBuilder sb) {
+    int mark = this.iterator.getIndex(); // points at '?'
+    nextChar(); // skip '?'
+    if (this.peek == '.') {
+      sb.append("?.");
+      nextChar(); // skip '.'
+      return true;
+    }
+    // Not a null-safe dot (e.g. ternary '?' or '??'): restore the lexer to the original '?'.
     this.peek = this.iterator.setIndex(mark);
     return false;
   }
