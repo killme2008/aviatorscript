@@ -108,6 +108,6 @@ The month is: 3
 * Releases: <https://github.com/killme2008/aviator/releases>
 * Documents: <https://www.yuque.com/boyan-avfmj/aviatorscript>
 * Changelog: <https://www.yuque.com/boyan-avfmj/aviatorscript/bggwx2>
-* Javadoc: <http://fnil.net/aviator/apidocs/>
+* Javadoc: <https://javadoc.io/doc/com.googlecode.aviator/aviator>
 * Spring boot rule: <https://github.com/mengxiangrui007/spring-boot-rule-jsr94>
 * Idea plugin: <https://github.com/yanchangyou/aviatorscript-ideaplugin>
